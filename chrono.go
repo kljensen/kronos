@@ -49,6 +49,34 @@ func (c *Chrono) ParseDate(text string, referenceDate interface{}, option *Parsi
 	return nil
 }
 
+// ParseWithSettings parses the input text using the provided settings.
+// Settings provide more comprehensive configuration than ParsingOption.
+// This method creates a pipeline from the current configuration and settings.
+func (c *Chrono) ParseWithSettings(text string, referenceDate time.Time, settings Settings) ([]*ParsingResult, error) {
+	// Create a configuration from this Chrono instance
+	config := &Configuration{
+		Parsers:  append([]Parser{}, c.parsers...),
+		Refiners: append([]Refiner{}, c.refiners...),
+	}
+
+	// Create and execute pipeline
+	return ParseWithSettings(text, referenceDate, settings, config)
+}
+
+// ParseDateWithSettings is a shortcut for calling ParseWithSettings and returning the first result's date.
+// Returns nil if no results are found or an error occurs.
+func (c *Chrono) ParseDateWithSettings(text string, referenceDate time.Time, settings Settings) (*time.Time, error) {
+	results, err := c.ParseWithSettings(text, referenceDate, settings)
+	if err != nil {
+		return nil, err
+	}
+	if len(results) > 0 {
+		date := results[0].Date()
+		return &date, nil
+	}
+	return nil, nil
+}
+
 // Parse parses the input text and returns all found date/time results.
 // The parsing process:
 // 1. Create a parsing context

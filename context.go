@@ -9,6 +9,7 @@ type ParsingContext struct {
 	option    ParsingOption
 	reference *ReferenceWithTimezone
 	refDate   time.Time
+	settings  *Settings
 }
 
 // NewParsingContext creates a new ParsingContext.
@@ -36,7 +37,32 @@ func NewParsingContext(text string, refDate interface{}, option *ParsingOption) 
 		option:    opt,
 		reference: reference,
 		refDate:   reference.Instant(),
+		settings:  nil,
 	}
+}
+
+// NewParsingContextWithSettings creates a new ParsingContext with settings.
+// Settings provide more comprehensive configuration than ParsingOption.
+func NewParsingContextWithSettings(text string, refDate interface{}, settings Settings) *ParsingContext {
+	// Convert settings to ParsingOption for backward compatibility
+	opt := settings.ToParsingOption(nil)
+
+	reference := FromInput(refDate, nil)
+
+	// Apply normalization if enabled
+	if settings.Normalize {
+		text = SanitizeInput(text)
+	}
+
+	ctx := &ParsingContext{
+		text:      text,
+		option:    opt,
+		reference: reference,
+		refDate:   reference.Instant(),
+		settings:  &settings,
+	}
+
+	return ctx
 }
 
 // CreateParsingComponents creates ParsingComponents from a component map or existing components.
@@ -139,4 +165,9 @@ func (ctx *ParsingContext) Reference() *ReferenceWithTimezone {
 // RefDate returns the reference date.
 func (ctx *ParsingContext) RefDate() time.Time {
 	return ctx.refDate
+}
+
+// Settings returns the parsing settings, if any.
+func (ctx *ParsingContext) Settings() *Settings {
+	return ctx.settings
 }
