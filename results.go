@@ -294,6 +294,11 @@ func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
 	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
 	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
 	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
+	microsecond := getValueOrDefault(pc.Get(ComponentMicrosecond), 0)
+	nanosecond := getValueOrDefault(pc.Get(ComponentNanosecond), 0)
+
+	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
+	totalNanos := (millisecond * NanosecondsPerMS) + (microsecond * NanosecondsPerMicro) + nanosecond
 
 	// Use the reference date's location to avoid timezone conversion issues
 	location := time.Local
@@ -301,7 +306,7 @@ func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
 		location = pc.reference.instant.Location()
 	}
 
-	return time.Date(year, time.Month(month), day, hour, minute, second, millisecond*NanosecondsPerMS, location)
+	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, location)
 }
 
 // DateUTC creates a UTC time.Time from components for DST calculations.
@@ -320,8 +325,13 @@ func (pc *ParsingComponents) DateUTC() time.Time {
 	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
 	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
 	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
+	microsecond := getValueOrDefault(pc.Get(ComponentMicrosecond), 0)
+	nanosecond := getValueOrDefault(pc.Get(ComponentNanosecond), 0)
 
-	return time.Date(year, time.Month(month), day, hour, minute, second, millisecond*NanosecondsPerMS, time.UTC)
+	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
+	totalNanos := (millisecond * NanosecondsPerMS) + (microsecond * NanosecondsPerMicro) + nanosecond
+
+	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, time.UTC)
 }
 
 // AddTag adds a debugging tag to the components.

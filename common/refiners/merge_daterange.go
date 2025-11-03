@@ -41,6 +41,7 @@ func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromRes
 		allComponents := []kronos.Component{
 			kronos.ComponentYear, kronos.ComponentMonth, kronos.ComponentDay, kronos.ComponentWeekday,
 			kronos.ComponentHour, kronos.ComponentMinute, kronos.ComponentSecond, kronos.ComponentMillisecond,
+			kronos.ComponentMicrosecond, kronos.ComponentNanosecond,
 			kronos.ComponentMeridiem, kronos.ComponentTimezoneOffset,
 		}
 

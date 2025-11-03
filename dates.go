@@ -11,12 +11,26 @@ func AssignSimilarDate(components *ParsingComponents, date time.Time) {
 }
 
 // AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
-// This sets hour, minute, second, millisecond, and meridiem as certain (known) values.
+// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
 func AssignSimilarTime(components *ParsingComponents, date time.Time) {
 	components.Assign(ComponentHour, date.Hour())
 	components.Assign(ComponentMinute, date.Minute())
 	components.Assign(ComponentSecond, date.Second())
-	components.Assign(ComponentMillisecond, date.Nanosecond()/NanosecondsPerMS)
+
+	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
+	totalNanos := date.Nanosecond()
+	millisecond := totalNanos / NanosecondsPerMS
+	remainingNanos := totalNanos % NanosecondsPerMS
+	microsecond := remainingNanos / NanosecondsPerMicro
+	nanosecond := remainingNanos % NanosecondsPerMicro
+
+	components.Assign(ComponentMillisecond, millisecond)
+	if microsecond > 0 {
+		components.Assign(ComponentMicrosecond, microsecond)
+	}
+	if nanosecond > 0 {
+		components.Assign(ComponentNanosecond, nanosecond)
+	}
 
 	// Set meridiem based on hour
 	if date.Hour() < HoursPerDay/2 {
@@ -35,12 +49,26 @@ func ImplySimilarDate(components *ParsingComponents, date time.Time) {
 }
 
 // ImplySimilarTime implies (weakly updates) the parsing components to the same time as the target.
-// This sets hour, minute, second, millisecond, and meridiem as implied values (only if not already certain).
+// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
 func ImplySimilarTime(components *ParsingComponents, date time.Time) {
 	components.Imply(ComponentHour, date.Hour())
 	components.Imply(ComponentMinute, date.Minute())
 	components.Imply(ComponentSecond, date.Second())
-	components.Imply(ComponentMillisecond, date.Nanosecond()/NanosecondsPerMS)
+
+	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
+	totalNanos := date.Nanosecond()
+	millisecond := totalNanos / NanosecondsPerMS
+	remainingNanos := totalNanos % NanosecondsPerMS
+	microsecond := remainingNanos / NanosecondsPerMicro
+	nanosecond := remainingNanos % NanosecondsPerMicro
+
+	components.Imply(ComponentMillisecond, millisecond)
+	if microsecond > 0 {
+		components.Imply(ComponentMicrosecond, microsecond)
+	}
+	if nanosecond > 0 {
+		components.Imply(ComponentNanosecond, nanosecond)
+	}
 
 	// Set meridiem based on hour
 	if date.Hour() < HoursPerDay/2 {

@@ -152,10 +152,44 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		}
 	}
 
-	// Process milliseconds
+	// Process milliseconds (cascade fractional part to microseconds)
 	if val, exists := working[TimeunitMillisecond]; exists {
 		floor := int(val)
 		date = date.Add(time.Duration(floor) * time.Millisecond)
+		remainder := val - float64(floor)
+		if remainder != 0 {
+			// Convert fractional milliseconds to microseconds
+			microseconds := remainder * MicrosecondsPerMS
+			const roundingOffset = 0.5
+			if microseconds > 0 {
+				working[TimeunitMicrosecond] = working[TimeunitMicrosecond] + float64(int(microseconds+roundingOffset))
+			} else if microseconds < 0 {
+				working[TimeunitMicrosecond] = working[TimeunitMicrosecond] + float64(int(microseconds-roundingOffset))
+			}
+		}
+	}
+
+	// Process microseconds (cascade fractional part to nanoseconds)
+	if val, exists := working[TimeunitMicrosecond]; exists {
+		floor := int(val)
+		date = date.Add(time.Duration(floor) * time.Microsecond)
+		remainder := val - float64(floor)
+		if remainder != 0 {
+			// Convert fractional microseconds to nanoseconds
+			nanoseconds := remainder * NanosecondsPerMicro
+			const roundingOffset = 0.5
+			if nanoseconds > 0 {
+				working[TimeunitNanosecond] = working[TimeunitNanosecond] + float64(int(nanoseconds+roundingOffset))
+			} else if nanoseconds < 0 {
+				working[TimeunitNanosecond] = working[TimeunitNanosecond] + float64(int(nanoseconds-roundingOffset))
+			}
+		}
+	}
+
+	// Process nanoseconds
+	if val, exists := working[TimeunitNanosecond]; exists {
+		floor := int(val)
+		date = date.Add(time.Duration(floor) * time.Nanosecond)
 	}
 
 	return date

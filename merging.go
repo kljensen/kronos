@@ -57,6 +57,8 @@ func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingCompo
 	minuteVal := timeComp.Get(ComponentMinute)
 	secondVal := timeComp.Get(ComponentSecond)
 	millisecondVal := timeComp.Get(ComponentMillisecond)
+	microsecondVal := timeComp.Get(ComponentMicrosecond)
+	nanosecondVal := timeComp.Get(ComponentNanosecond)
 
 	if timeComp.IsCertain(ComponentHour) {
 		if hourVal != nil {
@@ -77,12 +79,32 @@ func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingCompo
 					result.Imply(ComponentMillisecond, *millisecondVal)
 				}
 			}
+			if microsecondVal != nil {
+				if timeComp.IsCertain(ComponentMicrosecond) {
+					result.Assign(ComponentMicrosecond, *microsecondVal)
+				} else {
+					result.Imply(ComponentMicrosecond, *microsecondVal)
+				}
+			}
+			if nanosecondVal != nil {
+				if timeComp.IsCertain(ComponentNanosecond) {
+					result.Assign(ComponentNanosecond, *nanosecondVal)
+				} else {
+					result.Imply(ComponentNanosecond, *nanosecondVal)
+				}
+			}
 		} else {
 			if secondVal != nil {
 				result.Imply(ComponentSecond, *secondVal)
 			}
 			if millisecondVal != nil {
 				result.Imply(ComponentMillisecond, *millisecondVal)
+			}
+			if microsecondVal != nil {
+				result.Imply(ComponentMicrosecond, *microsecondVal)
+			}
+			if nanosecondVal != nil {
+				result.Imply(ComponentNanosecond, *nanosecondVal)
 			}
 		}
 	} else {
@@ -97,6 +119,12 @@ func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingCompo
 		}
 		if millisecondVal != nil {
 			result.Imply(ComponentMillisecond, *millisecondVal)
+		}
+		if microsecondVal != nil {
+			result.Imply(ComponentMicrosecond, *microsecondVal)
+		}
+		if nanosecondVal != nil {
+			result.Imply(ComponentNanosecond, *nanosecondVal)
 		}
 	}
 

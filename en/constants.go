@@ -191,40 +191,55 @@ var OrdinalWordDictionary = map[string]int{
 
 // TimeUnitDictionary maps time unit words to Timeunit values
 var TimeUnitDictionary = map[string]kronos.Timeunit{
-	"s":        kronos.TimeunitSecond,
-	"sec":      kronos.TimeunitSecond,
-	"second":   kronos.TimeunitSecond,
-	"seconds":  kronos.TimeunitSecond,
-	"m":        kronos.TimeunitMinute,
-	"min":      kronos.TimeunitMinute,
-	"mins":     kronos.TimeunitMinute,
-	"minute":   kronos.TimeunitMinute,
-	"minutes":  kronos.TimeunitMinute,
-	"h":        kronos.TimeunitHour,
-	"hr":       kronos.TimeunitHour,
-	"hrs":      kronos.TimeunitHour,
-	"hour":     kronos.TimeunitHour,
-	"hours":    kronos.TimeunitHour,
-	"d":        kronos.TimeunitDay,
-	"day":      kronos.TimeunitDay,
-	"days":     kronos.TimeunitDay,
-	"w":        kronos.TimeunitWeek,
-	"week":     kronos.TimeunitWeek,
-	"weeks":    kronos.TimeunitWeek,
-	"mo":       kronos.TimeunitMonth,
-	"mon":      kronos.TimeunitMonth,
-	"mos":      kronos.TimeunitMonth,
-	"month":    kronos.TimeunitMonth,
-	"months":   kronos.TimeunitMonth,
-	"qtr":      kronos.TimeunitQuarter,
-	"quarter":  kronos.TimeunitQuarter,
-	"quarters": kronos.TimeunitQuarter,
-	"y":        kronos.TimeunitYear,
-	"yr":       kronos.TimeunitYear,
-	"year":     kronos.TimeunitYear,
-	"years":    kronos.TimeunitYear,
-	"decade":   kronos.TimeunitDecade,
-	"decades":  kronos.TimeunitDecade,
+	"ns":           kronos.TimeunitNanosecond,
+	"nano":         kronos.TimeunitNanosecond,
+	"nanos":        kronos.TimeunitNanosecond,
+	"nanosecond":   kronos.TimeunitNanosecond,
+	"nanoseconds":  kronos.TimeunitNanosecond,
+	"us":           kronos.TimeunitMicrosecond,
+	"micro":        kronos.TimeunitMicrosecond,
+	"micros":       kronos.TimeunitMicrosecond,
+	"microsecond":  kronos.TimeunitMicrosecond,
+	"microseconds": kronos.TimeunitMicrosecond,
+	"ms":           kronos.TimeunitMillisecond,
+	"milli":        kronos.TimeunitMillisecond,
+	"millis":       kronos.TimeunitMillisecond,
+	"millisecond":  kronos.TimeunitMillisecond,
+	"milliseconds": kronos.TimeunitMillisecond,
+	"s":            kronos.TimeunitSecond,
+	"sec":          kronos.TimeunitSecond,
+	"second":       kronos.TimeunitSecond,
+	"seconds":      kronos.TimeunitSecond,
+	"m":            kronos.TimeunitMinute,
+	"min":          kronos.TimeunitMinute,
+	"mins":         kronos.TimeunitMinute,
+	"minute":       kronos.TimeunitMinute,
+	"minutes":      kronos.TimeunitMinute,
+	"h":            kronos.TimeunitHour,
+	"hr":           kronos.TimeunitHour,
+	"hrs":          kronos.TimeunitHour,
+	"hour":         kronos.TimeunitHour,
+	"hours":        kronos.TimeunitHour,
+	"d":            kronos.TimeunitDay,
+	"day":          kronos.TimeunitDay,
+	"days":         kronos.TimeunitDay,
+	"w":            kronos.TimeunitWeek,
+	"week":         kronos.TimeunitWeek,
+	"weeks":        kronos.TimeunitWeek,
+	"mo":           kronos.TimeunitMonth,
+	"mon":          kronos.TimeunitMonth,
+	"mos":          kronos.TimeunitMonth,
+	"month":        kronos.TimeunitMonth,
+	"months":       kronos.TimeunitMonth,
+	"qtr":          kronos.TimeunitQuarter,
+	"quarter":      kronos.TimeunitQuarter,
+	"quarters":     kronos.TimeunitQuarter,
+	"y":            kronos.TimeunitYear,
+	"yr":           kronos.TimeunitYear,
+	"year":         kronos.TimeunitYear,
+	"years":        kronos.TimeunitYear,
+	"decade":       kronos.TimeunitDecade,
+	"decades":      kronos.TimeunitDecade,
 }
 
 // Pattern builders
@@ -341,11 +356,11 @@ var (
 	NumberPattern = `(?:\d+(?:\.\d*)?|\.\d+)`
 
 	// TimeUnitNoAbbrPattern matches full time unit names only (no abbreviations)
-	TimeUnitNoAbbrPattern = `(?:decades|decade|seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year)`
+	TimeUnitNoAbbrPattern = `(?:nanoseconds|nanosecond|microseconds|microsecond|milliseconds|millisecond|decades|decade|seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year)`
 
 	// TimeUnitPattern matches time units including abbreviations
 	// Order matters: longer alternatives come first to ensure correct matching
-	TimeUnitPattern = `(?:decades|decade|seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year|mins|min|hrs|hr|sec|mos|mon|qtr|yr|mo|s|m|h|d|w|y)`
+	TimeUnitPattern = `(?:nanoseconds|nanosecond|microseconds|microsecond|milliseconds|millisecond|decades|decade|seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year|nanos|nano|micros|micro|millis|milli|mins|min|hrs|hr|sec|mos|mon|qtr|yr|mo|ns|us|ms|s|m|h|d|w|y)`
 )
 
 // ParseDuration parses a duration expression like "3 days", "5 hours 30 minutes", "half an hour"

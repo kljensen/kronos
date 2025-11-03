@@ -25,7 +25,7 @@ var isoPattern = regexp.MustCompile(
 	`(?i)([0-9]{4})\-([0-9]{1,2})\-([0-9]{1,2})` +
 		`(?:T` +
 		`([0-9]{1,2}):([0-9]{1,2})` +
-		`(?::([0-9]{1,2})(?:\.(\d{1,4}))?)?` +
+		`(?::([0-9]{1,2})(?:\.(\d{1,9}))?)?` +
 		`(Z|([+-]\d{2}):?(\d{2})?)?` +
 		`)?` +
 		`(\W|$)`)
@@ -96,19 +96,33 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 			components.Assign(kronos.ComponentSecond, second)
 		}
 
-		// Parse milliseconds if present
+		// Parse fractional seconds if present (up to nanoseconds)
 		if match[isoMillisecondGroup] != "" {
-			// The millisecond group can be 1-4 digits, normalize to milliseconds
-			msStr := match[isoMillisecondGroup]
-			// Pad or truncate to 3 digits
-			for len(msStr) < 3 {
-				msStr += "0"
+			fracStr := match[isoMillisecondGroup]
+			// Pad or truncate to 9 digits (nanoseconds)
+			for len(fracStr) < 9 {
+				fracStr += "0"
 			}
-			if len(msStr) > 3 {
-				msStr = msStr[:3]
+			if len(fracStr) > 9 {
+				fracStr = fracStr[:9]
 			}
-			millisecond, _ := strconv.Atoi(msStr)
-			components.Assign(kronos.ComponentMillisecond, millisecond)
+			nanos, _ := strconv.Atoi(fracStr)
+
+			// Store as milliseconds, microseconds, and nanoseconds for compatibility
+			millisecond := nanos / kronos.NanosecondsPerMS
+			remainingNanos := nanos % kronos.NanosecondsPerMS
+			microsecond := remainingNanos / kronos.NanosecondsPerMicro
+			nanosecond := remainingNanos % kronos.NanosecondsPerMicro
+
+			if millisecond > 0 {
+				components.Assign(kronos.ComponentMillisecond, millisecond)
+			}
+			if microsecond > 0 {
+				components.Assign(kronos.ComponentMicrosecond, microsecond)
+			}
+			if nanosecond > 0 {
+				components.Assign(kronos.ComponentNanosecond, nanosecond)
+			}
 		}
 
 		// Parse timezone if present
