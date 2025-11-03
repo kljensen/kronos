@@ -326,7 +326,7 @@ func ParseDuration(text string) kronos.Duration {
 	// - "a week"
 	// - "half an hour"
 	// - "1d 5h 30m"
-	pattern := regexp.MustCompile(`(?i)(?:(?:([0-9.]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?)(` + TimeUnitPattern + `)`)
+	pattern := regexp.MustCompile(`(?i)\b(?:([0-9.]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?(` + TimeUnitPattern + `)\b`)
 	matches := pattern.FindAllStringSubmatch(text, -1)
 
 	for _, match := range matches {
