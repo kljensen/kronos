@@ -28,7 +28,11 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 				timeUnitPattern = TimeUnitNoAbbrPattern
 			}
 
-			pattern := `(this|last|past|next|after|\+|-)\s*` +
+			// Add optional approximation words at the beginning
+			// Tilde is handled separately because it's a symbol, not a word
+			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
+			pattern := approximationPattern +
+				`(this|last|past|next|after|\+|-)\s*` +
 				`((?:(?:an?\s+)?(?:half|dozen|several|couple|few|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?)?` +
 				timeUnitPattern +
 				`(?:(?:\s*,?\s*)(?:(?:an?\s+)?(?:half|dozen|several|couple|few|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?)?` +
@@ -40,6 +44,10 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 			if len(match) < 3 {
 				return nil
 			}
+
+			// Check if approximation words were used by examining the full match
+			fullMatch := match[0]
+			_, isApproximate := kronos.StripApproximationWords(fullMatch)
 
 			prefix := strings.ToLower(match[1])
 			duration := ParseDuration(match[2])
@@ -59,6 +67,10 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 				components.AddTag("result/relativeDate")
 				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {
 					components.AddTag("result/relativeDateAndTime")
+				}
+				// Add approximation tag if approximation words were detected
+				if isApproximate {
+					components.AddTag("result/approximate")
 				}
 			}
 			return components

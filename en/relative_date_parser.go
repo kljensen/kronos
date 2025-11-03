@@ -32,13 +32,20 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 
 	parser.AbstractParserWithWordBoundary = common.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			pattern := `(this|last|past|next|after\s*this)\s*(` + MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
+			// Add optional approximation words at the beginning
+			// Tilde is handled separately because it's a symbol, not a word
+			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
+			pattern := approximationPattern + `(this|last|past|next|after\s*this)\s*(` + MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
 			return regexp.MustCompile("(?i)" + pattern)
 		},
 		func(context *kronos.ParsingContext, match []string) interface{} {
 			if len(match) < 3 {
 				return nil
 			}
+
+			// Check if approximation words were used by examining the full match
+			fullMatch := match[0]
+			_, isApproximate := kronos.StripApproximationWords(fullMatch)
 
 			modifier := strings.ToLower(match[1])
 			unitWord := strings.ToLower(match[2])
@@ -50,13 +57,21 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "next" and "after this"
 			if modifier == "next" || strings.HasPrefix(modifier, "after") {
 				duration := kronos.Duration{timeunit: 1}
-				return kronos.CreateRelativeFromReference(context.Reference(), duration)
+				components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+				if isApproximate && components != nil {
+					components.AddTag("result/approximate")
+				}
+				return components
 			}
 
 			// Handle "last" and "past"
 			if modifier == "last" || modifier == "past" {
 				duration := kronos.Duration{timeunit: -1}
-				return kronos.CreateRelativeFromReference(context.Reference(), duration)
+				components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+				if isApproximate && components != nil {
+					components.AddTag("result/approximate")
+				}
+				return components
 			}
 
 			// Handle "this" - set to beginning of current period
@@ -87,6 +102,9 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 				components.Assign(kronos.ComponentYear, date.Year())
 			}
 
+			if isApproximate {
+				components.AddTag("result/approximate")
+			}
 			return components
 		},
 		nil,

@@ -28,7 +28,10 @@ func NewENCasualTimeParser() *ENCasualTimeParser {
 }
 
 func (p *ENCasualTimeParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
-	pattern := `(?i)(?:this)?\s{0,3}(morning|afternoon|evening|night|midnight|midday|noon)`
+	// Add optional approximation words at the beginning
+	// Tilde is handled separately because it's a symbol, not a word
+	approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
+	pattern := `(?i)` + approximationPattern + `(?:this)?\s{0,3}(morning|afternoon|evening|night|midnight|midday|noon)`
 	return regexp.MustCompile(pattern)
 }
 
@@ -36,6 +39,10 @@ func (p *ENCasualTimeParser) innerExtract(context *kronos.ParsingContext, match 
 	if len(match) < 2 {
 		return nil
 	}
+
+	// Check if approximation words were used by examining the full match
+	fullMatch := match[0]
+	_, isApproximate := kronos.StripApproximationWords(fullMatch)
 
 	timeWord := strings.ToLower(match[1])
 	var component *kronos.ParsingComponents
@@ -62,6 +69,10 @@ func (p *ENCasualTimeParser) innerExtract(context *kronos.ParsingContext, match 
 
 	if component != nil {
 		component.AddTag("parser/ENCasualTimeParser")
+		// Add approximation tag if approximation words were detected
+		if isApproximate {
+			component.AddTag("result/approximate")
+		}
 	}
 
 	return component
