@@ -127,6 +127,11 @@ func (c *Chrono) executeParser(context *ParsingContext, parser Parser) []*Parsin
 		switch v := result.(type) {
 		case *ParsingResult:
 			parsedResult = v
+			// Check for nil ParsingResult (typed nil)
+			if parsedResult == nil {
+				remainingText = originalText[index+1:]
+				continue
+			}
 		case *ParsingComponents:
 			parsedResult = context.CreateParsingResult(index, matchedText)
 			parsedResult.start = v
