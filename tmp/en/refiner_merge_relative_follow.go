@@ -43,7 +43,17 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *ParsingContext, res
 		next := results[i]
 
 		// Check if dates are adjacent
-		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
+		startIdx := current.Index() + len(current.Text())
+		endIdx := next.Index()
+
+		// Skip if results overlap or are not in order
+		if startIdx > endIdx {
+			merged = append(merged, current)
+			current = next
+			continue
+		}
+
+		textBetween := context.Text()[startIdx:endIdx]
 		if !patternFollowBetween.MatchString(textBetween) {
 			merged = append(merged, current)
 			current = next
