@@ -38,14 +38,14 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 					`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 					timeUnitPattern +
 					`(?:\s+(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
-					timeUnitPattern + `)*)(?=\W|$)`
+					timeUnitPattern + `)*)(?:\s|$|\b)`
 			} else {
 				pattern = `(?:within|in|for)\s*` +
 					`(?:(?:about|around|roughly|approximately|just)\s*(?:~\s*)?)?` +
 					`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 					timeUnitPattern +
 					`(?:\s+(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
-					timeUnitPattern + `)*)(?=\W|$)`
+					timeUnitPattern + `)*)(?:\s|$|\b)`
 			}
 
 			return regexp.MustCompile("(?i)" + pattern)

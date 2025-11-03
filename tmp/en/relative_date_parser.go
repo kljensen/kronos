@@ -32,7 +32,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 
 	parser.AbstractParserWithWordBoundary = common.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			pattern := `(this|last|past|next|after\s*this)\s*(` + MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?=\s*)?(?=\W|$)`
+			pattern := `(this|last|past|next|after\s*this)\s*(` + MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
 			return regexp.MustCompile("(?i)" + pattern)
 		},
 		func(context *kronos.ParsingContext, match []string) interface{} {

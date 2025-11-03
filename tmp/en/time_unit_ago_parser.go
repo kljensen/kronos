@@ -30,7 +30,7 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 			pattern := `((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
 				`(?:\s+(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
-				timeUnitPattern + `)*)\s{0,5}(?:ago|before|earlier)(?=\W|$)`
+				timeUnitPattern + `)*)\s{0,5}(?:ago|before|earlier)(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},

@@ -32,7 +32,7 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
 				`(?:\s+(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
-				timeUnitPattern + `)*)(?=\W|$)`
+				timeUnitPattern + `)*)(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},

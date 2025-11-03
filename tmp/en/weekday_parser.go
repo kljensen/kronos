@@ -21,13 +21,14 @@ func NewENWeekdayParser() *ENWeekdayParser {
 
 	parser.AbstractParserWithWordBoundary = common.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			pattern := `(?:(?:,|\(|\（)\s*)?` +
+			// Unicode parentheses (（ and ）) are literal characters, not escaped
+			pattern := `(?:(?:,|\(|（)\s*)?` +
 				`(?:on\s*?)?` +
 				`(?:(this|last|past|next)\s*)?` +
 				`(` + WeekdayPattern + `|weekend|weekday)` +
-				`(?:\s*(?:,|\)|\）))?` +
+				`(?:\s*(?:,|\)|）))?` +
 				`(?:\s*(this|last|past|next)\s*week)?` +
-				`(?=\W|$)`
+				`(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},

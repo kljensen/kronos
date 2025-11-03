@@ -22,7 +22,8 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 				return `(?:(?:at|from)\s*)?` // Optional "at" or "from" prefix
 			},
 			func() string {
-				return `\s*(?:\-|\–|\~|to|until|through|till|\?)\s*` // Range separator
+				// En dash (–) is Unicode U+2013, represented as literal character in regexp
+				return `\s*(?:\-|–|\~|to|until|through|till|\?)\s*` // Range separator
 			},
 			strictMode,
 		),
@@ -30,7 +31,9 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 
 	// Set custom primary suffix to handle "o'clock", "at night", "in the morning/afternoon"
 	parser.SetPrimarySuffix(func() string {
-		return `(?:\s*(?:o\W*clock|at\s*night|in\s*the\s*(?:morning|afternoon)))?(?!/)(?=\W|$)`
+		// Go regexp doesn't support lookaheads (?! and ?=)
+		// We use word boundary \b which prevents matching across word boundaries
+		return `(?:\s*(?:o\W*clock|at\s*night|in\s*the\s*(?:morning|afternoon)))?(?:\s|$|\b)`
 	})
 
 	// Set custom extraction hook to handle "at night", "in the afternoon", etc.

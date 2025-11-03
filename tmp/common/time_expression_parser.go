@@ -61,10 +61,14 @@ func NewAbstractTimeExpressionParser(
 			return `(^|\s|T|\b)`
 		},
 		primarySuffix: func() string {
-			return `(?!/)(?=\W|$)`
+			// Go regexp doesn't support lookaheads (?! and ?=)
+			// We use word boundary \b or whitespace/end
+			return `(?:\s|$|\b)`
 		},
 		followingSuffix: func() string {
-			return `(?!/)(?=\W|$)`
+			// Go regexp doesn't support lookaheads (?! and ?=)
+			// We use word boundary \b or whitespace/end
+			return `(?:\s|$|\b)`
 		},
 		patternFlags: func() string {
 			return "i"
