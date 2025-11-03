@@ -285,6 +285,13 @@ func (p *Pipeline) applyRequiredParts(results []*ParsingResult) []*ParsingResult
 }
 
 // applyTimezoneConversion converts results to the target timezone.
+//
+// TODO: EXPERIMENTAL/UNIMPLEMENTED
+// This function currently validates the timezone but does not modify the results.
+// A complete implementation needs to:
+// 1. Convert the time.Time value to the target timezone
+// 2. Update the ParsingResult's underlying components to reflect the conversion
+// 3. Handle cases where timezone conversion affects date boundaries (DST, etc.)
 func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*ParsingResult, error) {
 	targetLoc, err := time.LoadLocation(p.settings.ToTimezone)
 	if err != nil {
@@ -298,9 +305,8 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 			date := result.Start().Date()
 			convertedDate := date.In(targetLoc)
 
-			// Update the result's start components
-			// This is a simplification - a full implementation would
-			// update the underlying components
+			// TODO: Update the result's start components to reflect timezone conversion
+			// This requires modifying the underlying ParsingComponents struct
 			_ = convertedDate
 		}
 	}

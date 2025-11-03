@@ -9,6 +9,14 @@ import (
 // Use New() to create a new parser builder, configure it with builder methods,
 // then call Parse() or ParseDate() to execute the parsing.
 //
+// Thread Safety: ParserBuilder is not thread-safe and should not be shared across
+// goroutines. Each goroutine should create its own ParserBuilder instance.
+//
+// Mutability: ParserBuilder is mutable. Calling configuration methods (WithReferenceDate,
+// Strict, PreferPast, etc.) modifies the builder's state and returns the same builder
+// instance to enable method chaining. If you need different configurations, create
+// separate ParserBuilder instances.
+//
 // Example:
 //
 //	parser := kronos.New(en.Casual).
@@ -106,6 +114,12 @@ func (p *ParserBuilder) Timezone(tz string) *ParserBuilder {
 
 // ToTimezone sets the target timezone for converting results.
 // All parsed dates will be converted to this timezone.
+//
+// EXPERIMENTAL: This feature is currently experimental and not fully implemented.
+// The timezone conversion logic is stubbed out in the pipeline and does not yet
+// modify the parsed results. Use with caution.
+//
+// TODO: Complete the timezone conversion implementation in pipeline.go:applyTimezoneConversion
 func (p *ParserBuilder) ToTimezone(tz string) *ParserBuilder {
 	p.settings.ToTimezone = tz
 	return p
