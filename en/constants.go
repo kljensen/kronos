@@ -307,8 +307,11 @@ func ParseNumberPattern(match string) float64 {
 		return 7
 	}
 
+	// Normalize comma to dot for decimal separator (European format support)
+	normalized := strings.ReplaceAll(lower, ",", ".")
+
 	// Try parsing as number
-	val, _ := strconv.ParseFloat(lower, 64)
+	val, _ := strconv.ParseFloat(normalized, 64)
 	return val
 }
 
@@ -338,9 +341,11 @@ func ParseDuration(text string) kronos.Duration {
 	// - "a week"
 	// - "half an hour"
 	// - "1d 5h 30m"
+	// - "2.5 hours" (decimal with dot)
+	// - "2,5 hours" (decimal with comma, European format)
 	// Word numbers: one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve
 	// Note: Using flexible pattern to support consecutive units like "2hr5min"
-	pattern := regexp.MustCompile(`(?i)([0-9.]+|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)?\s*(?:an?\s+)?(` + TimeUnitPattern + `)`)
+	pattern := regexp.MustCompile(`(?i)([0-9]+(?:[.,][0-9]+)?|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)?\s*(?:an?\s+)?(` + TimeUnitPattern + `)`)
 	matchesIdx := pattern.FindAllStringSubmatchIndex(text, -1)
 
 	for _, matchIdx := range matchesIdx {

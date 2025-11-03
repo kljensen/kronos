@@ -58,10 +58,16 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		floor := int(val)
 		date = date.AddDate(0, 0, floor*DaysPerWeek)
 		remainder := val - float64(floor)
-		if remainder > 0 {
-			// Round to nearest day for week fractions
+		if remainder != 0 {
+			// Convert fractional weeks to days
+			// Round to nearest day for both positive and negative values
+			days := remainder * DaysPerWeek
 			const roundingOffset = 0.5
-			working[TimeunitDay] = working[TimeunitDay] + float64(int(remainder*DaysPerWeek+roundingOffset))
+			if days > 0 {
+				working[TimeunitDay] = working[TimeunitDay] + float64(int(days+roundingOffset))
+			} else if days < 0 {
+				working[TimeunitDay] = working[TimeunitDay] + float64(int(days-roundingOffset))
+			}
 		}
 	}
 
@@ -70,10 +76,16 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		floor := int(val)
 		date = date.AddDate(0, 0, floor)
 		remainder := val - float64(floor)
-		if remainder > 0 {
-			// Round to nearest hour for day fractions
+		if remainder != 0 {
+			// Convert fractional days to hours
+			// Round to nearest hour for both positive and negative values
+			hours := remainder * HoursPerDay
 			const roundingOffset = 0.5
-			working[TimeunitHour] = working[TimeunitHour] + float64(int(remainder*HoursPerDay+roundingOffset))
+			if hours > 0 {
+				working[TimeunitHour] = working[TimeunitHour] + float64(int(hours+roundingOffset))
+			} else if hours < 0 {
+				working[TimeunitHour] = working[TimeunitHour] + float64(int(hours-roundingOffset))
+			}
 		}
 	}
 
@@ -82,10 +94,17 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		floor := int(val)
 		date = date.Add(time.Duration(floor) * time.Hour)
 		remainder := val - float64(floor)
-		if remainder > 0 {
-			// Round to nearest minute for hour fractions
+		if remainder != 0 {
+			// Convert fractional hours to minutes
+			// For positive values: round to nearest minute
+			// For negative values: preserve sign and round to nearest minute
+			minutes := remainder * MinutesPerHour
 			const roundingOffset = 0.5
-			working[TimeunitMinute] = working[TimeunitMinute] + float64(int(remainder*MinutesPerHour+roundingOffset))
+			if minutes > 0 {
+				working[TimeunitMinute] = working[TimeunitMinute] + float64(int(minutes+roundingOffset))
+			} else if minutes < 0 {
+				working[TimeunitMinute] = working[TimeunitMinute] + float64(int(minutes-roundingOffset))
+			}
 		}
 	}
 
@@ -94,10 +113,17 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		floor := int(val)
 		date = date.Add(time.Duration(floor) * time.Minute)
 		remainder := val - float64(floor)
-		if remainder > 0 {
-			// Round to nearest second for minute fractions
+		if remainder != 0 {
+			// Convert fractional minutes to seconds
+			// For positive values: round to nearest second
+			// For negative values: preserve sign and round to nearest second
+			seconds := remainder * SecondsPerMinute
 			const roundingOffset = 0.5
-			working[TimeunitSecond] = working[TimeunitSecond] + float64(int(remainder*SecondsPerMinute+roundingOffset))
+			if seconds > 0 {
+				working[TimeunitSecond] = working[TimeunitSecond] + float64(int(seconds+roundingOffset))
+			} else if seconds < 0 {
+				working[TimeunitSecond] = working[TimeunitSecond] + float64(int(seconds-roundingOffset))
+			}
 		}
 	}
 
@@ -106,10 +132,17 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		floor := int(val)
 		date = date.Add(time.Duration(floor) * time.Second)
 		remainder := val - float64(floor)
-		if remainder > 0 {
-			// Round to nearest millisecond for second fractions
+		if remainder != 0 {
+			// Convert fractional seconds to milliseconds
+			// For positive values: round to nearest millisecond
+			// For negative values: preserve sign and round to nearest millisecond
+			milliseconds := remainder * MillisecondsPerSecond
 			const roundingOffset = 0.5
-			working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(remainder*MillisecondsPerSecond+roundingOffset))
+			if milliseconds > 0 {
+				working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(milliseconds+roundingOffset))
+			} else if milliseconds < 0 {
+				working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(milliseconds-roundingOffset))
+			}
 		}
 	}
 

@@ -652,3 +652,163 @@ func TestAgoNegativeCases(t *testing.T) {
 		})
 	}
 }
+
+// TestAgoFractionalTimeUnits tests fractional time units with "ago", "before", "earlier"
+func TestAgoFractionalTimeUnits(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+		expectedSecond *int
+	}{
+		{
+			name:           "2.5 hours ago",
+			text:           "2.5 hours ago",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "2.5 hours ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(30),
+		},
+		{
+			name:           "1.5 days ago",
+			text:           "1.5 days ago",
+			refDate:        time.Date(2016, 10, 2, 12, 0, 0, 0, time.UTC),
+			expectedText:   "1.5 days ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:           "0.5 weeks ago",
+			text:           "0.5 weeks ago",
+			refDate:        time.Date(2016, 10, 5, 12, 0, 0, 0, time.UTC),
+			expectedText:   "0.5 weeks ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1, // -0.5 weeks = -3.5 days (rounded to -4 days)
+			expectedHour:   intPtr(12),
+		},
+		{
+			name:           "3.25 minutes ago",
+			text:           "3.25 minutes ago",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "3.25 minutes ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(56),
+			expectedSecond: intPtr(45),
+		},
+		{
+			name:           "10.75 minutes before",
+			text:           "10.75 minutes before",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "10.75 minutes before",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(49),
+			expectedSecond: intPtr(15),
+		},
+		{
+			name:           "2,5 hours ago (comma separator)",
+			text:           "2,5 hours ago",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "2,5 hours ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(30),
+		},
+		{
+			name:           "1,5 days earlier (comma separator)",
+			text:           "1,5 days earlier",
+			refDate:        time.Date(2016, 10, 2, 12, 0, 0, 0, time.UTC),
+			expectedText:   "1,5 days earlier",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:           "0.5 hours ago",
+			text:           "0.5 hours ago",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "0.5 hours ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(30),
+		},
+		{
+			name:           "1.5 days 2.5 hours ago",
+			text:           "1.5 days 2.5 hours ago",
+			refDate:        time.Date(2016, 10, 3, 12, 0, 0, 0, time.UTC),
+			expectedText:   "1.5 days 2.5 hours ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1, // -1.5 days -2.5 hours = -1 day -12 hours -2 hours -30 min = Oct 1 21:30
+			expectedHour:   intPtr(21),
+			expectedMinute: intPtr(30),
+		},
+		{
+			name:           "0.001 seconds ago",
+			text:           "0.001 seconds ago",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "0.001 seconds ago",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(59),
+			expectedSecond: intPtr(59), // -0.001 seconds = -1 millisecond (result: 11:59:59.999)
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitAgoFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+			if tt.expectedSecond != nil {
+				assert.Equal(t, *tt.expectedSecond, *result.Start().Get(kronos.ComponentSecond), "Second mismatch for: %s", tt.text)
+			}
+		})
+	}
+}

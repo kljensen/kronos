@@ -480,3 +480,185 @@ func TestCasualRelativeNegativeCases(t *testing.T) {
 		})
 	}
 }
+
+// TestFractionalTimeUnits tests fractional time unit expressions
+func TestFractionalTimeUnits(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+		expectedSecond *int
+	}{
+		{
+			name:           "2.5 hours with next",
+			text:           "next 2.5 hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "next 2.5 hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(14),
+			expectedMinute: ptrInt(30),
+		},
+		{
+			name:           "1.5 days with last",
+			text:           "last 1.5 days",
+			refDate:        time.Date(2016, 10, 2, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last 1.5 days",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:           "0.5 weeks from now",
+			text:           "next 0.5 weeks",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "next 0.5 weeks",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    5, // 0.5 weeks = 3.5 days, rounded to 4 days
+			expectedHour:   ptrInt(12),
+		},
+		{
+			name:           "3.25 minutes ago",
+			text:           "last 3.25 minutes",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last 3.25 minutes",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(56),
+			expectedSecond: ptrInt(45),
+		},
+		{
+			name:           "in 2.5 hours",
+			text:           "next 2.5 hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "next 2.5 hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(14),
+			expectedMinute: ptrInt(30),
+		},
+		{
+			name:           "10.75 minutes ago",
+			text:           "last 10.75 minutes",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last 10.75 minutes",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(49),
+			expectedSecond: ptrInt(15),
+		},
+		{
+			name:           "2,5 hours with last (comma separator)",
+			text:           "last 2,5 hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last 2,5 hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(9),
+			expectedMinute: ptrInt(30),
+		},
+		{
+			name:           "1,5 days with past (comma separator)",
+			text:           "past 1,5 days",
+			refDate:        time.Date(2016, 10, 2, 12, 0, 0, 0, time.UTC),
+			expectedText:   "past 1,5 days",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:           "+0.5 hours",
+			text:           "+0.5 hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "+0.5 hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(12),
+			expectedMinute: ptrInt(30),
+		},
+		{
+			name:           "+1.5 days 2.5 hours",
+			text:           "+1.5 days 2.5 hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "+1.5 days 2.5 hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    3,
+			expectedHour:   ptrInt(2),
+			expectedMinute: ptrInt(30),
+		},
+		{
+			name:           "0.001 seconds with last",
+			text:           "last 0.001 seconds",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last 0.001 seconds",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(59),
+			expectedSecond: ptrInt(59), // -0.001 seconds = -1 millisecond
+		},
+		{
+			name:           "-2.5 hours",
+			text:           "-2.5 hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "-2.5 hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(9),
+			expectedMinute: ptrInt(30),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+			if tt.expectedSecond != nil {
+				assert.Equal(t, *tt.expectedSecond, *result.Start().Get(kronos.ComponentSecond), "Second mismatch for: %s", tt.text)
+			}
+		})
+	}
+}

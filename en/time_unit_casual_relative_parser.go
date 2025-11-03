@@ -29,9 +29,9 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 			}
 
 			pattern := `(this|last|past|next|after|\+|-)\s*` +
-				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+				`((?:(?:[0-9]+(?:[.,][0-9]+)?|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
-				`(?:(?:\s*,?\s*)(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+				`(?:(?:\s*,?\s*)(?:(?:[0-9]+(?:[.,][0-9]+)?|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 				timeUnitPattern + `)*)(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)
