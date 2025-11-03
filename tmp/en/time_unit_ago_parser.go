@@ -40,19 +40,19 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 			}
 
 			duration := ParseDuration(match[1])
-			if duration.IsEmpty() {
+			if IsEmptyDuration(duration) {
 				return nil
 			}
 
 			// Reverse the duration (go backwards in time)
-			reversedDuration := duration.Reverse()
+			reversedDuration := kronos.ReverseDuration(duration)
 
 			// Create relative result from reference
-			components := kronos.CreateRelativeFromReference(context.Reference, reversedDuration)
+			components := kronos.CreateRelativeFromReference(context.Reference(), reversedDuration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				// Add tag for relative date and time if time components are present
-				if duration.Hour != 0 || duration.Minute != 0 || duration.Second != 0 {
+				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {
 					components.AddTag("result/relativeDateAndTime")
 				}
 			}

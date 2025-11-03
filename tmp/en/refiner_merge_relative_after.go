@@ -24,11 +24,11 @@ func NewENMergeRelativeAfterDateRefiner() *ENMergeRelativeAfterDateRefiner {
 }
 
 func isPositiveFollowingReference(result *ParsingResult) bool {
-	return patternPositiveFollowing.MatchString(result.Text)
+	return patternPositiveFollowing.MatchString(result.Text())
 }
 
 func isNegativeFollowingReference(result *ParsingResult) bool {
-	return patternNegativeFollowing.MatchString(result.Text)
+	return patternNegativeFollowing.MatchString(result.Text())
 }
 
 func (r *ENMergeRelativeAfterDateRefiner) Refine(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
@@ -43,7 +43,7 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *ParsingContext, result
 		next := results[i]
 
 		// Check if dates are adjacent
-		textBetween := context.Text[current.Index+len(current.Text) : next.Index]
+		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
 		if !patternAfterBetween.MatchString(textBetween) {
 			merged = append(merged, current)
 			current = next
@@ -58,22 +58,19 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *ParsingContext, result
 		}
 
 		// Merge the results
-		duration := ParseDuration(strings.TrimPrefix(next.Text, "+"))
+		duration := ParseDuration(strings.TrimPrefix(next.Text(), "+"))
 		if isNegativeFollowingReference(next) {
 			duration = ReverseDuration(duration)
 		}
 
-		components := CreateRelativeFromReference(
-			NewReferenceFromDate(current.Start.Date()),
-			duration,
-		)
+		// Create new reference from current result's date
+		newRef := context.Reference().FromDate(current.Start().Date())
+		components := CreateRelativeFromReference(newRef, duration)
 
-		result := &ParsingResult{
-			Reference: current.Reference,
-			Index:     current.Index,
-			Text:      current.Text + textBetween + next.Text,
-			Start:     components,
-		}
+		// Create merged result
+		resultIndex := current.Index()
+		resultText := current.Text() + textBetween + next.Text()
+		result := context.CreateParsingResult(resultIndex, resultText, components, nil)
 
 		current = result
 	}

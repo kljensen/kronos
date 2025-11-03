@@ -257,7 +257,7 @@ func TestENTimeExpression_BeforeDate(t *testing.T) {
 // TestENTimeExpression_TimeRange tests time range expressions with various separators
 func TestENTimeExpression_TimeRange(t *testing.T) {
 	parser := NewENTimeExpressionParser(false)
-	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
+	_ = time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC) // default refDate
 
 	tests := []struct {
 		name             string
@@ -454,7 +454,7 @@ func TestENTimeExpression_CasualTimeNumber(t *testing.T) {
 // TestENTimeExpression_TimeRangeMeridiemHandling tests meridiem propagation in time ranges
 func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 	parser := NewENTimeExpressionParser(false)
-	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
+	_ = time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC) // default refDate
 
 	tests := []struct {
 		name              string

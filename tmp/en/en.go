@@ -24,13 +24,13 @@ var (
 
 // Parse parses the text and returns all parsed results.
 // It uses the casual English configuration.
-func Parse(text string, ref time.Time, option ParsingOption) []*ParsingResult {
+func Parse(text string, ref time.Time, option *ParsingOption) []*ParsingResult {
 	return Casual.Parse(text, ref, option)
 }
 
 // ParseDate parses the text and returns the first parsed date.
 // It uses the casual English configuration.
 // Returns zero time if no date is found.
-func ParseDate(text string, ref time.Time, option ParsingOption) time.Time {
+func ParseDate(text string, ref time.Time, option *ParsingOption) *time.Time {
 	return Casual.ParseDate(text, ref, option)
 }

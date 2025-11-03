@@ -370,8 +370,3 @@ func IsEmptyDuration(d kronos.Duration) bool {
 	}
 	return true
 }
-
-// ReverseDuration returns a reversed (negated) duration
-func ReverseDuration(d kronos.Duration) kronos.Duration {
-	return kronos.ReverseDuration(d)
-}

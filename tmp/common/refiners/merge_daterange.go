@@ -15,7 +15,7 @@ type AbstractMergeDateRangeRefiner struct {
 
 func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, current, next *ParsingResult, context *ParsingContext) bool {
 	// Both results should not already have an end
-	if current.End != nil || next.End != nil {
+	if current.End() != nil || next.End() != nil {
 		return false
 	}
 

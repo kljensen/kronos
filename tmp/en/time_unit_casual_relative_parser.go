@@ -43,21 +43,21 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 
 			prefix := strings.ToLower(match[1])
 			duration := ParseDuration(match[2])
-			if duration.IsEmpty() {
+			if IsEmptyDuration(duration) {
 				return nil
 			}
 
 			// Reverse duration for "last", "past", and "-"
 			switch prefix {
 			case "last", "past", "-":
-				duration = duration.Reverse()
+				duration = kronos.ReverseDuration(duration)
 			}
 
 			// Create relative result from reference
-			components := kronos.CreateRelativeFromReference(context.Reference, duration)
+			components := kronos.CreateRelativeFromReference(context.Reference(), duration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
-				if duration.Hour != 0 || duration.Minute != 0 || duration.Second != 0 {
+				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {
 					components.AddTag("result/relativeDateAndTime")
 				}
 			}

@@ -22,12 +22,12 @@ func NewENMergeRelativeFollowByDateRefiner() *ENMergeRelativeFollowByDateRefiner
 }
 
 func hasImpliedEarlierReferenceDate(result *ParsingResult) bool {
-	text := strings.ToLower(result.Text)
+	text := strings.ToLower(result.Text())
 	return strings.HasSuffix(text, " before") || strings.HasSuffix(text, " from")
 }
 
 func hasImpliedLaterReferenceDate(result *ParsingResult) bool {
-	text := strings.ToLower(result.Text)
+	text := strings.ToLower(result.Text())
 	return strings.HasSuffix(text, " after") || strings.HasSuffix(text, " since")
 }
 
@@ -43,7 +43,7 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *ParsingContext, res
 		next := results[i]
 
 		// Check if dates are adjacent
-		textBetween := context.Text[current.Index+len(current.Text) : next.Index]
+		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
 		if !patternFollowBetween.MatchString(textBetween) {
 			merged = append(merged, current)
 			current = next
@@ -58,29 +58,29 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *ParsingContext, res
 		}
 
 		// Check if next implies an absolute date
-		if next.Start.Get(ComponentDay) == 0 || next.Start.Get(ComponentMonth) == 0 || next.Start.Get(ComponentYear) == 0 {
+		dayVal := next.Start().Get(ComponentDay)
+		monthVal := next.Start().Get(ComponentMonth)
+		yearVal := next.Start().Get(ComponentYear)
+		if dayVal == nil || *dayVal == 0 || monthVal == nil || *monthVal == 0 || yearVal == nil || *yearVal == 0 {
 			merged = append(merged, current)
 			current = next
 			continue
 		}
 
 		// Merge the results
-		duration := ParseDuration(current.Text)
+		duration := ParseDuration(current.Text())
 		if hasImpliedEarlierReferenceDate(current) {
 			duration = ReverseDuration(duration)
 		}
 
-		components := CreateRelativeFromReference(
-			NewReferenceFromDate(next.Start.Date()),
-			duration,
-		)
+		// Create new reference from next result's date
+		newRef := context.Reference().FromDate(next.Start().Date())
+		components := CreateRelativeFromReference(newRef, duration)
 
-		result := &ParsingResult{
-			Reference: next.Reference,
-			Index:     current.Index,
-			Text:      current.Text + textBetween + next.Text,
-			Start:     components,
-		}
+		// Create merged result
+		resultIndex := current.Index()
+		resultText := current.Text() + textBetween + next.Text()
+		result := context.CreateParsingResult(resultIndex, resultText, components, nil)
 
 		current = result
 	}

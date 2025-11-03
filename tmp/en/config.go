@@ -21,7 +21,7 @@ func includeCommonConfiguration(config *Configuration, strictMode bool) *Configu
 
 	// Add common refiners at the end
 	config.Refiners = append(config.Refiners,
-		refiners.NewExtractTimezoneAbbrRefiner(),
+		refiners.NewExtractTimezoneAbbrRefiner(nil),
 		refiners.NewOverlapRemovalRefiner(),
 		refiners.NewForwardDateRefiner(),
 		refiners.NewUnlikelyFormatFilter(strictMode),

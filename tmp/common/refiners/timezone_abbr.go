@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	timezoneNamePattern = regexp.MustCompile(`(?i)^\s*,?\s*\(?([A-Z]{2,4})\)?(?=\W|$)`)
+	timezoneNamePattern = regexp.MustCompile(`(?i)^\s*,?\s*\(?([A-Z]{2,4})\)?(?:\W|$)`)
 )
 
 // ExtractTimezoneAbbrRefiner extracts timezone abbreviations from text following a parsed result.

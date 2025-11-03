@@ -40,16 +40,16 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 			}
 
 			duration := ParseDuration(match[1])
-			if duration.IsEmpty() {
+			if IsEmptyDuration(duration) {
 				return nil
 			}
 
 			// Create relative result from reference (forward in time)
-			components := kronos.CreateRelativeFromReference(context.Reference, duration)
+			components := kronos.CreateRelativeFromReference(context.Reference(), duration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				// Add tag for relative date and time if time components are present
-				if duration.Hour != 0 || duration.Minute != 0 || duration.Second != 0 {
+				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {
 					components.AddTag("result/relativeDateAndTime")
 				}
 			}

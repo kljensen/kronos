@@ -49,39 +49,19 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 
 			// Handle "next" and "after this"
 			if modifier == "next" || strings.HasPrefix(modifier, "after") {
-				duration := kronos.Duration{}
-				switch timeunit {
-				case kronos.TimeunitWeek:
-					duration.Week = 1
-				case kronos.TimeunitMonth:
-					duration.Month = 1
-				case kronos.TimeunitQuarter:
-					duration.Quarter = 1
-				case kronos.TimeunitYear:
-					duration.Year = 1
-				}
-				return kronos.CreateRelativeFromReference(context.Reference, duration)
+				duration := kronos.Duration{timeunit: 1}
+				return kronos.CreateRelativeFromReference(context.Reference(), duration)
 			}
 
 			// Handle "last" and "past"
 			if modifier == "last" || modifier == "past" {
-				duration := kronos.Duration{}
-				switch timeunit {
-				case kronos.TimeunitWeek:
-					duration.Week = -1
-				case kronos.TimeunitMonth:
-					duration.Month = -1
-				case kronos.TimeunitQuarter:
-					duration.Quarter = -1
-				case kronos.TimeunitYear:
-					duration.Year = -1
-				}
-				return kronos.CreateRelativeFromReference(context.Reference, duration)
+				duration := kronos.Duration{timeunit: -1}
+				return kronos.CreateRelativeFromReference(context.Reference(), duration)
 			}
 
 			// Handle "this" - set to beginning of current period
-			components := context.CreateParsingComponents()
-			refDate := context.Reference.Instant
+			components := context.CreateParsingComponents(nil)
+			refDate := context.Reference().Instant()
 
 			switch timeunit {
 			case kronos.TimeunitWeek:

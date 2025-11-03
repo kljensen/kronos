@@ -76,7 +76,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 				}
 			} else if weekdayWord == "weekday" {
 				// Weekday means any day of the week except weekend
-				refDate := context.Reference.GetDateWithAdjustedTimezone()
+				refDate := context.Reference().GetDateWithAdjustedTimezone()
 				refWeekday := kronos.Weekday(refDate.Weekday())
 
 				if refWeekday == kronos.WeekdaySunday || refWeekday == kronos.WeekdaySaturday {
@@ -100,7 +100,24 @@ func NewENWeekdayParser() *ENWeekdayParser {
 				return nil
 			}
 
-			return kronos.CreateParsingComponentsAtWeekday(context.Reference, weekday, modifier)
+			// Create components with weekday
+			components := context.CreateParsingComponents(nil)
+			refDate := context.Reference().GetDateWithAdjustedTimezone()
+
+			// Calculate days offset to target weekday
+			var modPtr *string
+			if modifier != "" {
+				modPtr = &modifier
+			}
+			daysOffset := kronos.GetDaysToWeekday(refDate, weekday, modPtr)
+			targetDate := refDate.AddDate(0, 0, daysOffset)
+
+			components.Assign(kronos.ComponentDay, targetDate.Day())
+			components.Assign(kronos.ComponentMonth, int(targetDate.Month()))
+			components.Assign(kronos.ComponentYear, targetDate.Year())
+			components.Assign(kronos.ComponentWeekday, int(weekday))
+
+			return components
 		},
 		nil,
 	)

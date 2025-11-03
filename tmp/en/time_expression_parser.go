@@ -43,21 +43,27 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 
 		// Handle "at night"
 		if strings.HasSuffix(fullMatch, "night") {
-			hour := components.Get(kronos.ComponentHour)
-			if hour >= 6 && hour < 12 {
-				components.Assign(kronos.ComponentHour, hour+12)
-				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
-			} else if hour < 6 {
-				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			hourVal := components.Get(kronos.ComponentHour)
+			if hourVal != nil {
+				hour := *hourVal
+				if hour >= 6 && hour < 12 {
+					components.Assign(kronos.ComponentHour, hour+12)
+					components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+				} else if hour < 6 {
+					components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+				}
 			}
 		}
 
 		// Handle "in the afternoon"
 		if strings.HasSuffix(fullMatch, "afternoon") {
 			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
-			hour := components.Get(kronos.ComponentHour)
-			if hour >= 0 && hour <= 6 {
-				components.Assign(kronos.ComponentHour, hour+12)
+			hourVal := components.Get(kronos.ComponentHour)
+			if hourVal != nil {
+				hour := *hourVal
+				if hour >= 0 && hour <= 6 {
+					components.Assign(kronos.ComponentHour, hour+12)
+				}
 			}
 		}
 
@@ -73,9 +79,4 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 	})
 
 	return parser
-}
-
-// Pattern returns the pattern for this parser
-func (p *ENTimeExpressionParser) Pattern(context *kronos.ParsingContext) string {
-	return p.AbstractTimeExpressionParser.Pattern(context).String()
 }
