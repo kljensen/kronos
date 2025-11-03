@@ -15,6 +15,18 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 	// North American Timezones
 	"EST": -300,
 	"EDT": -240,
+	"ET": &AmbiguousTimezoneMap{
+		TimezoneOffsetDuringDst: -240, // EDT = UTC-4
+		TimezoneOffsetNonDst:    -300, // EST = UTC-5
+		DstStart: func(year int) time.Time {
+			// DST starts 2nd Sunday of March at 2 AM
+			return GetNthWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2, 2)
+		},
+		DstEnd: func(year int) time.Time {
+			// DST ends 1st Sunday of November at 2 AM
+			return GetNthWeekdayOfMonth(year, MonthNovember, WeekdaySunday, 1, 2)
+		},
+	},
 	"CST": -360,
 	"CDT": -300,
 	"MST": -420,
@@ -32,11 +44,22 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 	"IST": 60,
 	"WET": 0,
 	"WEST": 60,
-	"CET": 60,
+	"CET": &AmbiguousTimezoneMap{
+		TimezoneOffsetDuringDst: 120, // CEST = UTC+2
+		TimezoneOffsetNonDst:    60,  // CET = UTC+1
+		DstStart: func(year int) time.Time {
+			// DST starts last Sunday of March at 2 AM
+			return GetLastWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2)
+		},
+		DstEnd: func(year int) time.Time {
+			// DST ends last Sunday of October at 3 AM
+			return GetLastWeekdayOfMonth(year, MonthOctober, WeekdaySunday, 3)
+		},
+	},
 	"CEST": 120,
-	"EET": 120,
+	"EET":  120,
 	"EEST": 180,
-	"MSK": 180,
+	"MSK":  180,
 
 	// Asian Timezones
 	"JST": 540,
@@ -62,6 +85,7 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 	"NZDT": 780,
 	"BRT": -180,
 	"ART": -180,
+	"GET": 240, // Georgia Eastern Time (UTC+4)
 }
 
 // ToTimezoneOffset converts various timezone representations to an offset in minutes.
@@ -115,29 +139,39 @@ func resolveTimezoneValue(val interface{}, instant time.Time) *int {
 		return &offset
 	}
 
-	// Ambiguous timezone with DST
+	// Ambiguous timezone with DST (value type)
 	if ambiguous, ok := val.(AmbiguousTimezoneMap); ok {
-		// Without a valid instant, we can't determine DST status
-		if instant.IsZero() {
-			return nil
-		}
+		return resolveAmbiguousTimezone(ambiguous, instant)
+	}
 
-		year := instant.Year()
-		dstStart := ambiguous.DstStart(year)
-		dstEnd := ambiguous.DstEnd(year)
-
-		// Check if instant is during DST period
-		if instant.After(dstStart) && !instant.After(dstEnd) {
-			offset := ambiguous.TimezoneOffsetDuringDst
-			return &offset
-		}
-
-		// Not during DST
-		offset := ambiguous.TimezoneOffsetNonDst
-		return &offset
+	// Ambiguous timezone with DST (pointer type)
+	if ambiguous, ok := val.(*AmbiguousTimezoneMap); ok {
+		return resolveAmbiguousTimezone(*ambiguous, instant)
 	}
 
 	return nil
+}
+
+// resolveAmbiguousTimezone resolves an ambiguous timezone to its offset based on the instant.
+func resolveAmbiguousTimezone(ambiguous AmbiguousTimezoneMap, instant time.Time) *int {
+	// Without a valid instant, we can't determine DST status
+	if instant.IsZero() {
+		return nil
+	}
+
+	year := instant.Year()
+	dstStart := ambiguous.DstStart(year)
+	dstEnd := ambiguous.DstEnd(year)
+
+	// Check if instant is during DST period
+	if instant.After(dstStart) && !instant.After(dstEnd) {
+		offset := ambiguous.TimezoneOffsetDuringDst
+		return &offset
+	}
+
+	// Not during DST
+	offset := ambiguous.TimezoneOffsetNonDst
+	return &offset
 }
 
 // GetNthWeekdayOfMonth returns the date of the nth occurrence of a given weekday

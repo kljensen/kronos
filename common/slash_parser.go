@@ -69,16 +69,54 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 	// The actual date text is the full match without the opening/ending boundaries
 	matchText := fullMatch[len(opening) : len(fullMatch)-len(ending)]
 
-	// If opening boundary is empty (matched ^), check if there's actually a digit before
-	// this match in the original text. This prevents matching "3/31/2018" in "13/31/2018".
+	// Check if this match is part of an invalid 3-component date like "4/13/1"
+	// This can happen in two ways:
+	// 1. Opening is empty and preceded by "digit/"
+	// 2. Opening is "/" and this is the second part of an invalid date
+	matchStartInText := strings.Index(context.Text(), fullMatch)
+
 	if len(opening) == 0 {
-		matchStartInText := strings.Index(context.Text(), fullMatch)
+		// Case 1: Opening boundary is empty (matched ^), check if there's a digit before
 		if matchStartInText > 0 {
 			prevChar := context.Text()[matchStartInText-1]
 			if prevChar >= '0' && prevChar <= '9' {
 				return nil
 			}
+			// Check for pattern like "/13/1" where this is part of an invalid date
+			if prevChar == '/' || prevChar == '.' || prevChar == '-' {
+				// Look further back for digits
+				if matchStartInText > 1 {
+					beforeSep := context.Text()[matchStartInText-2]
+					if beforeSep >= '0' && beforeSep <= '9' {
+						// This looks like part of a 3-component date
+						// Check if the current match has no year, which would make it invalid
+						if match[slashYearGroup] == "" {
+							return nil
+						}
+					}
+				}
+			}
 		}
+	} else if opening == "/" || opening == "." || opening == "-" {
+		// Case 2: Opening is a separator, check if this is part of an invalid 3-component date
+		// like "/13/1" in "4/13/1"
+		if matchStartInText > 0 {
+			beforeSep := context.Text()[matchStartInText-1]
+			if beforeSep >= '0' && beforeSep <= '9' {
+				// This is part of a date like "4/13/1"
+				// Check if the current match has no year, which would make it invalid
+				if match[slashYearGroup] == "" {
+					return nil
+				}
+			}
+		}
+	}
+
+	// Check if there's an invalid year pattern after the date (e.g., "4/13/1")
+	// If the year wasn't matched but the ending is a slash, it means there's a third
+	// component that didn't match the year pattern (invalid format like single digit)
+	if match[slashYearGroup] == "" && (ending == "/" || ending == "." || ending == "-") {
+		return nil
 	}
 
 	// Skip version numbers like "1.12" or "1.12.12"
@@ -119,6 +157,7 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 		kronos.ComponentDay:   day,
 		kronos.ComponentMonth: month,
 	})
+	components.AddTag("parser/SlashDateFormatParser")
 
 	// Handle year
 	if match[slashYearGroup] != "" {
@@ -134,9 +173,10 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 	// Otherwise, return ParsingComponents for chrono.go to handle
 	if len(opening) > 0 {
 		return &kronos.ParsingResultWithBoundary{
-			Components:   components,
-			AdjustedText: matchText,
-			BoundaryLen:  len(opening),
+			Components:         components,
+			AdjustedText:       matchText,
+			BoundaryLen:        len(opening),
+			IncludeBoundaryIdx: true, // Index should point past the boundary
 		}
 	}
 

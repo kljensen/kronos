@@ -52,11 +52,20 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		if match == nil {
 			continue
 		}
+		// DEBUG
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// fmt.Printf("DEBUG TZ: result.Text=%q, suffix=%q, match[0]=%q\n", result.Text(), suffix[:20], match[0])
+			})
+		}
 
 		timezoneAbbr := strings.ToUpper(match[1])
 
 		// Determine the reference date for timezone lookup
-		refDate := result.Start().Date()
+		// Use DateUTC to avoid circular DST logic issues - we want the "wall clock" time
+		// in UTC for DST calculations
+		resultStart := result.Start().(*kronos.ParsingComponents)
+		refDate := resultStart.DateUTC()
 		if refDate.IsZero() {
 			refDate = result.RefDate()
 		}
@@ -77,7 +86,6 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 			})
 		}
 
-		resultStart := result.Start().(*kronos.ParsingComponents)
 		currentTimezoneOffsetPtr := resultStart.Get(kronos.ComponentTimezoneOffset)
 		currentTimezoneOffset := 0
 		if currentTimezoneOffsetPtr != nil {
@@ -111,10 +119,40 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		// The regex pattern (?:\W|$) consumes trailing non-word chars, which we want to exclude
 		// from the result text (e.g., "pst " should become "pst", but "pst)" should keep the paren)
 		matchedText := match[0]
-		// Trim trailing whitespace only (not punctuation like parentheses)
-		for len(matchedText) > 0 && matchedText[len(matchedText)-1] == ' ' {
-			matchedText = matchedText[:len(matchedText)-1]
+
+		// Trim trailing whitespace - we don't want spaces after the timezone that belong to the next token
+		for len(matchedText) > 0 {
+			lastChar := matchedText[len(matchedText)-1]
+			if lastChar == ' ' || lastChar == '\t' || lastChar == '\n' || lastChar == '\r' {
+				matchedText = matchedText[:len(matchedText)-1]
+			} else {
+				break
+			}
 		}
+
+		// Trim leading whitespace - we don't want to consume spaces that are boundaries for adjacent results
+		// But we need to preserve exactly one space before the timezone for readability
+		matchedText = strings.TrimLeft(matchedText, " \t\n\r")
+		if len(matchedText) > 0 && len(result.Text()) > 0 {
+			// Add exactly one space before the timezone, unless it already starts with punctuation like comma
+			// Exception: if it starts with an opening paren, we do want the space
+			if matchedText[0] != ',' {
+				if matchedText[0] == '(' {
+					matchedText = " " + matchedText
+				} else if matchedText[0] != ' ' {
+					matchedText = " " + matchedText
+				}
+			}
+		}
+
+		// DEBUG
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// fmt.Printf("DEBUG TZ: match[0]=%q, trimmed matchedText=%q, newText will be=%q\n",
+				// 	match[0], matchedText, result.Text()+matchedText)
+			})
+		}
+
 		newText := result.Text() + matchedText
 
 		if !resultStart.IsCertain(kronos.ComponentTimezoneOffset) {

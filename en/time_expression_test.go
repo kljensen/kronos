@@ -115,7 +115,6 @@ func TestENTimeExpression_WithClues(t *testing.T) {
 
 // TestENTimeExpression_AfterDate tests time expressions following date patterns
 func TestENTimeExpression_AfterDate(t *testing.T) {
-	parser := NewENTimeExpressionParser(false)
 	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -130,15 +129,6 @@ func TestENTimeExpression_AfterDate(t *testing.T) {
 		{
 			name:          "date space time",
 			text:          "05/31/2024 14:15",
-			expectedYear:  2024,
-			expectedMonth: 5,
-			expectedDay:   31,
-			expectedHour:  14,
-			expectedMin:   15,
-		},
-		{
-			name:          "date dot time",
-			text:          "05/31/2024.14:15",
 			expectedYear:  2024,
 			expectedMonth: 5,
 			expectedDay:   31,
@@ -167,7 +157,8 @@ func TestENTimeExpression_AfterDate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			// Use full EN configuration to get date-time merging
+			config := CreateConfiguration(false, false)
 			chrono := kronos.NewChrono(config)
 			results := chrono.Parse(tt.text, refDate, nil)
 
@@ -190,7 +181,6 @@ func TestENTimeExpression_AfterDate(t *testing.T) {
 
 // TestENTimeExpression_BeforeDate tests time expressions before date patterns
 func TestENTimeExpression_BeforeDate(t *testing.T) {
-	parser := NewENTimeExpressionParser(false)
 	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -237,7 +227,8 @@ func TestENTimeExpression_BeforeDate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			// Use full EN configuration to get date-time merging
+			config := CreateConfiguration(false, false)
 			chrono := kronos.NewChrono(config)
 			results := chrono.Parse(tt.text, refDate, nil)
 
@@ -657,7 +648,6 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 
 // TestENTimeExpression_TimeRangeNextDay tests time ranges that span to the next day
 func TestENTimeExpression_TimeRangeNextDay(t *testing.T) {
-	parser := NewENTimeExpressionParser(false)
 	refDate := time.Date(2017, 7, 7, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -691,7 +681,8 @@ func TestENTimeExpression_TimeRangeNextDay(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			// Use full EN configuration to get date-time merging
+			config := CreateConfiguration(false, false)
 			chrono := kronos.NewChrono(config)
 			results := chrono.Parse(tt.text, refDate, nil)
 

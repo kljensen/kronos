@@ -112,8 +112,9 @@ func TestTimezoneExpression_NumericOffset(t *testing.T) {
 			assert.Equal(t, tt.expectedText, result.Text())
 
 			if tt.expectTimezoneOffsetSet {
-				assert.NotNil(t, result.Start().Get(kronos.ComponentTimezoneOffset))
-				assert.Equal(t, tt.expectedTimezoneOffset, *result.Start().Get(kronos.ComponentTimezoneOffset))
+				tzOffset := result.Start().Get(kronos.ComponentTimezoneOffset)
+				require.NotNil(t, tzOffset)
+				assert.Equal(t, tt.expectedTimezoneOffset, *tzOffset)
 			} else {
 				// Should be nil or not certain
 				tzOffset := result.Start().Get(kronos.ComponentTimezoneOffset)

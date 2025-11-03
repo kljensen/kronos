@@ -73,6 +73,15 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 		kronos.ComponentDay:   day,
 	})
 
+	// Trim the trailing character from the match text (captured by (\W|$))
+	// We need to return an adjusted match that excludes the trailing character
+	trailingChar := match[isoTrailingGroup]
+	adjustedText := match[0]
+	if len(trailingChar) > 0 && len(adjustedText) > 0 {
+		// Remove the trailing character from the text
+		adjustedText = adjustedText[:len(adjustedText)-len(trailingChar)]
+	}
+
 	// Parse time components if present
 	if match[isoHourGroup] != "" {
 		hour, _ := strconv.Atoi(match[isoHourGroup])
@@ -123,5 +132,15 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 		}
 	}
 
-	return components.AddTag("parser/ISOFormatParser")
+	components.AddTag("parser/ISOFormatParser")
+
+	// The AbstractParserWithWordBoundary will wrap this in ParsingResultWithBoundary
+	// But we need to trim the trailing character from the text
+	// Return a ParsingResultWithBoundary with the adjusted text
+	return &kronos.ParsingResultWithBoundary{
+		Components:         components,
+		AdjustedText:       adjustedText,
+		BoundaryLen:        0, // Will be set by AbstractParserWithWordBoundary
+		IncludeBoundaryIdx: true, // Will be overridden by AbstractParserWithWordBoundary
+	}
 }

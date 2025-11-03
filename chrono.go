@@ -143,9 +143,18 @@ func (c *Chrono) executeParser(context *ParsingContext, parser Parser) []*Parsin
 			// Match ends at the original match end position
 			matchEndPos = index + matchedTextLen
 		case *ParsingResultWithBoundary:
-			// Parser used AbstractParserWithWordBoundary and returned ParsingComponents
-			// Use the adjusted text (without boundary) and adjust the index
-			parsedResult = context.CreateParsingResult(index+v.BoundaryLen, v.AdjustedText)
+			// Parser returned ParsingComponents with boundary information
+			// The AdjustedText doesn't include the boundary character, but the index
+			// should point to the boundary start (where the match begins in the original text)
+			var resultIndex int
+			if v.IncludeBoundaryIdx {
+				// Index should point past the boundary
+				resultIndex = index + v.BoundaryLen
+			} else {
+				// Index should point at the boundary start (include the boundary in the index)
+				resultIndex = index
+			}
+			parsedResult = context.CreateParsingResult(resultIndex, v.AdjustedText)
 			parsedResult.start = v.Components
 			// Match ends at the original match end position (including boundary)
 			matchEndPos = index + matchedTextLen

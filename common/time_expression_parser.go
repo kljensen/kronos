@@ -81,11 +81,23 @@ func (p *AbstractTimeExpressionParser) SetPrimarySuffix(fn func() string) {
 	p.primarySuffix = fn
 }
 
+// SetFollowingSuffix allows customization of the following suffix pattern
+func (p *AbstractTimeExpressionParser) SetFollowingSuffix(fn func() string) {
+	p.followingSuffix = fn
+}
+
 // SetExtractPrimaryTimeComponentsHook allows additional extraction logic
 func (p *AbstractTimeExpressionParser) SetExtractPrimaryTimeComponentsHook(
 	fn func(*kronos.ParsingContext, []string, *kronos.ParsingComponents) bool,
 ) {
 	p.extractPrimaryTimeComponentsHook = fn
+}
+
+// SetExtractFollowingTimeComponentsHook allows additional extraction logic for following time
+func (p *AbstractTimeExpressionParser) SetExtractFollowingTimeComponentsHook(
+	fn func(*kronos.ParsingContext, []string, *kronos.ParsingResult, *kronos.ParsingComponents) bool,
+) {
+	p.extractFollowingTimeComponentsHook = fn
 }
 
 // SetCheckAndReturnWithoutFollowingHook allows customization of validation logic
@@ -195,6 +207,7 @@ func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, m
 	// We remove the left boundary from the text
 	index := len(match[1])
 	text := match[0][len(match[1]):]
+	// Don't trim yet - we may need to preserve spaces for range patterns
 	result := context.CreateParsingResult(index, text, startComponents, nil)
 
 	// Look for following time pattern (for ranges like "10:00 - 21:45")
@@ -221,13 +234,25 @@ func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, m
 	}
 
 	if followingMatch == nil || regexp.MustCompile(`^\s*([+-])\s*\d{3,4}$`).MatchString(followingMatch[0]) {
+		// No following pattern - trim the text now
+		result = context.CreateParsingResult(index, strings.TrimRight(text, " \t"), startComponents, nil)
+		return p.checkAndReturnWithoutFollowingPattern(result)
+	}
+
+	// Check if the following match is followed by a slash (date pattern like "15/15")
+	// If so, reject it as it's not a time range but part of a date expression
+	followingMatchEnd := textIndex + len(match[0]) + len(followingMatch[0])
+	if followingMatchEnd < len(context.Text()) && context.Text()[followingMatchEnd] == '/' {
+		// No following pattern - trim the text now
+		result = context.CreateParsingResult(index, strings.TrimRight(text, " \t"), startComponents, nil)
 		return p.checkAndReturnWithoutFollowingPattern(result)
 	}
 
 	endComponents := p.ExtractFollowingTimeComponents(context, followingMatch, result)
 	if endComponents != nil {
 		// Create a new result with the extended text and end components
-		newText := text + followingMatch[0]
+		// Trim trailing whitespace from the combined text
+		newText := strings.TrimRight(text + followingMatch[0], " \t")
 		startComponents := result.Start().(*kronos.ParsingComponents)
 		result = context.CreateParsingResult(index, newText, startComponents, endComponents)
 	}
@@ -249,16 +274,64 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	hourStr := match[TimeHourGroup]
 	hour, _ := strconv.Atoi(hourStr)
 
+	// Check if this looks like part of a decimal range rather than a time
+	// e.g., "10.1 - 10.12" should not parse "10.12" as a time
+	// or "at 10 - 10.1" should not parse "at 10" as a time
+	matchStartIndex := strings.Index(context.Text(), match[0])
+	if matchStartIndex >= 0 {
+		// Look back to see if preceded by a pattern like "X.Y - "
+		if matchStartIndex > 0 && match[TimeMinuteGroup] != "" {
+			lookback := context.Text()[:matchStartIndex]
+			decimalRangePattern := regexp.MustCompile(`\d+\.\d+\s*[-–]\s*$`)
+			if decimalRangePattern.MatchString(lookback) {
+				return nil
+			}
+		}
+
+		// Look ahead to see if followed by a pattern like " - X.Y" where Y is single digit
+		// This indicates a decimal range like "at 10 - 10.1"
+		matchEndIndex := matchStartIndex + len(match[0])
+		if matchEndIndex < len(context.Text()) && match[TimeMinuteGroup] == "" && match[TimeAMPMGroup] == "" {
+			lookahead := context.Text()[matchEndIndex:]
+			decimalRangePattern := regexp.MustCompile(`^\s*[-–]\s*\d+\.\d`)
+			if decimalRangePattern.MatchString(lookahead) {
+				return nil
+			}
+		}
+	}
+
 	// Check if this match is part of a larger number sequence
-	// e.g., "20-30-12" matching "0-12", or "2012-1400" matching "12-1400"
+	// e.g., "20-30-12" matching "0-12", or "2012-1400" matching "12-1400", or "20" from "2020"
 	matchStartInText := strings.Index(context.Text(), match[0])
-	if matchStartInText > 0 {
+	if matchStartInText >= 0 {
 		// Check what precedes the match
-		prevChar := context.Text()[matchStartInText-1]
-		// If directly preceded by a digit (no space/separator), reject
-		// This catches cases like "2012-1400" where we'd match "12-1400"
-		if prevChar >= '0' && prevChar <= '9' {
-			return nil
+		if matchStartInText > 0 {
+			prevChar := context.Text()[matchStartInText-1]
+			// If directly preceded by a digit (no space/separator), reject
+			// This catches cases like "2012-1400" where we'd match "12-1400"
+			if prevChar >= '0' && prevChar <= '9' {
+				return nil
+			}
+			// If preceded by a decimal point and a digit before that, reject
+			// This catches cases like "10.1" where we'd match "1" after the dot
+			if prevChar == '.' && matchStartInText > 1 {
+				prevPrevChar := context.Text()[matchStartInText-2]
+				if prevPrevChar >= '0' && prevPrevChar <= '9' {
+					return nil
+				}
+			}
+		}
+		// Check what follows the match - only for simple hour-only matches without minutes
+		// This catches cases like "20" from "2020" but allows "11:00:09 2023"
+		if match[TimeMinuteGroup] == "" {
+			matchEndInText := matchStartInText + len(match[0])
+			if matchEndInText < len(context.Text()) {
+				nextChar := context.Text()[matchEndInText]
+				// If directly followed by a digit (no space/separator), reject
+				if nextChar >= '0' && nextChar <= '9' {
+					return nil
+				}
+			}
 		}
 	}
 
@@ -396,12 +469,31 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		components.Assign(kronos.ComponentSecond, second)
 	}
 
+	// Check if this looks like part of a decimal range rather than a time
+	// e.g., "10.1 - 10.12" should not parse "10.12" as a time
+	// Get the match position in the original text
+	matchPos := strings.LastIndex(context.Text()[:len(context.Text())], match[0])
+	if matchPos > 0 {
+		// Look back to see if preceded by a pattern like "X.Y - " where X and Y are digits
+		// This would indicate we're in a decimal range context
+		lookback := context.Text()[:matchPos]
+		// Pattern: ends with something like "10.1 - " or "10.12 - "
+		decimalRangePattern := regexp.MustCompile(`\d+\.\d+\s*[-–]\s*$`)
+		if decimalRangePattern.MatchString(lookback) {
+			return nil
+		}
+	}
+
 	hour, _ := strconv.Atoi(match[TimeHourGroup])
 	minute := 0
 	meridiem := -1
 
 	// Parse minute
 	if match[TimeMinuteGroup] != "" {
+		if len(match[TimeMinuteGroup]) == 1 && match[TimeAMPMGroup] == "" {
+			// Skip single digit minute in following time e.g., "10 - 10.1"
+			return nil
+		}
 		minute, _ = strconv.Atoi(match[TimeMinuteGroup])
 	} else if hour > 100 {
 		minute = hour % 100
@@ -502,6 +594,19 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 	}
 
+	// Call hook if provided
+	if p.extractFollowingTimeComponentsHook != nil {
+		if !p.extractFollowingTimeComponentsHook(context, match, result, components) {
+			return nil
+		}
+	}
+
+	// Add the same parser tag as the start components
+	startTags := result.Start().Tags()
+	for tag := range startTags {
+		components.AddTag(tag)
+	}
+
 	return components
 }
 
@@ -538,8 +643,9 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(res
 	}
 
 	// If it ends only with numbers or dots (after a non-digit prefix like "at")
+	// Only match if there's at least one digit (not just dots like in "9 p.m.")
 	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)$`).FindStringSubmatch(text)
-	if endingWithNumbers != nil {
+	if endingWithNumbers != nil && regexp.MustCompile(`\d`).MatchString(endingWithNumbers[1]) {
 		endingNumbers := endingWithNumbers[1]
 
 		// In strict mode (e.g., "at 1" or "at 1.2"), this should not be accepted

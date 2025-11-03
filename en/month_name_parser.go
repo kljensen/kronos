@@ -29,14 +29,11 @@ func NewENMonthNameParser() *ENMonthNameParser {
 
 func (p *ENMonthNameParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
 	// Pattern: (in)? MONTH (,|-|of)? YEAR?
-	// Simplified lookahead pattern from: (?=[^\s\w]|\s+[^0-9]|\s+$|$)
 	pattern := `(?i)((?:in)\s*)?` +
 		`(` + MonthPattern + `)` +
-		`\s*` +
 		`(?:` +
-		`(?:,|-|of)?\s*(` + YearPattern + `)?` +
-		`)?` +
-		`(?:\s|$|\b)`
+		`(?:\s*(?:,|-|of))?\s*(` + YearPattern + `)` +
+		`)?`
 
 	return regexp.MustCompile(pattern)
 }

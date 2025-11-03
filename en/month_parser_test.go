@@ -412,7 +412,7 @@ func TestENMonth_InContext(t *testing.T) {
 		{
 			name:          "Sep 2012 in sentence",
 			text:          "The date is Sep 2012 is the date",
-			expectedIndex: 11, // Parser includes leading space
+			expectedIndex: 12, // Index points past the leading space
 			expectedText:  "Sep 2012",
 			expectedYear:  2012,
 			expectedMonth: 9,

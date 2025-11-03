@@ -2,6 +2,7 @@ package en
 
 import (
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -215,6 +216,14 @@ func MatchAnyPattern(dict interface{}) string {
 			keys = append(keys, regexp.QuoteMeta(k))
 		}
 	}
+	// Sort keys for deterministic pattern generation
+	// Longer strings first to ensure greedy matching (e.g., "september" before "sep")
+	sort.SliceStable(keys, func(i, j int) bool {
+		if len(keys[i]) != len(keys[j]) {
+			return len(keys[i]) > len(keys[j])
+		}
+		return keys[i] < keys[j]
+	})
 	return strings.Join(keys, "|")
 }
 

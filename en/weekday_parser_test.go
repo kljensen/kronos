@@ -80,8 +80,8 @@ func TestENWeekdayParser_SingleExpression(t *testing.T) {
 			name:            "last Friday",
 			text:            "The Deadline is last Friday...",
 			refDate:         time.Date(2012, 8, 9, 0, 0, 0, 0, time.UTC),
-			expectedIndex:   15, // Note: includes boundary space
-			expectedText:    " last Friday",
+			expectedIndex:   16, // Excludes boundary space
+			expectedText:    "last Friday",
 			expectedYear:    2012,
 			expectedMonth:   8,
 			expectedDay:     3,
@@ -95,8 +95,8 @@ func TestENWeekdayParser_SingleExpression(t *testing.T) {
 			name:            "past Friday",
 			text:            "The Deadline is past Friday...",
 			refDate:         time.Date(2012, 8, 9, 0, 0, 0, 0, time.UTC),
-			expectedIndex:   15, // Note: includes boundary space
-			expectedText:    " past Friday",
+			expectedIndex:   16, // Excludes boundary space
+			expectedText:    "past Friday",
 			expectedYear:    2012,
 			expectedMonth:   8,
 			expectedDay:     3,
@@ -110,8 +110,8 @@ func TestENWeekdayParser_SingleExpression(t *testing.T) {
 			name:            "on Friday next week",
 			text:            "Let's have a meeting on Friday next week",
 			refDate:         time.Date(2015, 4, 18, 0, 0, 0, 0, time.UTC),
-			expectedIndex:   20, // Note: includes boundary space
-			expectedText:    " on Friday next week",
+			expectedIndex:   21, // Excludes boundary space
+			expectedText:    "on Friday next week",
 			expectedYear:    2015,
 			expectedMonth:   4,
 			expectedDay:     24,
@@ -125,8 +125,8 @@ func TestENWeekdayParser_SingleExpression(t *testing.T) {
 			name:            "on Tuesday, next week",
 			text:            "I plan on taking the day off on Tuesday, next week",
 			refDate:         time.Date(2015, 4, 18, 0, 0, 0, 0, time.UTC),
-			expectedIndex:   28, // Note: includes boundary space
-			expectedText:    " on Tuesday, next week",
+			expectedIndex:   29, // Excludes boundary space
+			expectedText:    "on Tuesday, next week",
 			expectedYear:    2015,
 			expectedMonth:   4,
 			expectedDay:     21,
@@ -716,7 +716,7 @@ func TestENWeekdayParser_ForwardDatesOnly(t *testing.T) {
 			text:            "Monday (forward dates only)",
 			refDate:         time.Date(2012, 8, 9, 0, 0, 0, 0, time.UTC),
 			expectedIndex:   0,
-			expectedText:    "Monday ", // Note: includes trailing space from pattern
+			expectedText:    "Monday", // Trailing space is trimmed
 			expectedYear:    2012,
 			expectedMonth:   8,
 			expectedDay:     13,

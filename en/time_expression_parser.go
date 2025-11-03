@@ -29,23 +29,22 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 		),
 	}
 
-	// Set custom primary suffix to handle "o'clock", "at night", "in the morning/afternoon"
+	// Set custom primary suffix to handle "o'clock", "at night", "in the morning/afternoon", "tonight"
 	parser.SetPrimarySuffix(func() string {
 		// Go regexp doesn't support lookaheads (?! and ?=)
 		// We use word boundary \b which prevents matching across word boundaries
-		return `(?:\s*(?:o\W*clock|at\s*night|in\s*the\s*(?:morning|afternoon)))?(?:\s|$|\b)`
+		return `(?:\s*(?:o\W*clock|at\s*night|tonight|in\s*the\s*(?:morning|afternoon)))?(?:\s|$|\b)`
 	})
 
-	// Set custom extraction hook to handle "at night", "in the afternoon", etc.
-	parser.SetExtractPrimaryTimeComponentsHook(func(
-		context *kronos.ParsingContext,
-		match []string,
-		components *kronos.ParsingComponents,
-	) bool {
-		fullMatch := match[0]
+	// Set custom following suffix to also capture "at night", etc. in ranges
+	parser.SetFollowingSuffix(func() string {
+		return `(?:\s*(?:o\W*clock|at\s*night|tonight|in\s*the\s*(?:morning|afternoon)))?(?:\s|$|\b)`
+	})
 
-		// Handle "at night"
-		if strings.HasSuffix(fullMatch, "night") {
+	// Helper function to process time clues like "at night", "in the afternoon", "tonight"
+	processTimeClues := func(fullMatch string, components *kronos.ParsingComponents) {
+		// Handle "at night" or "tonight"
+		if strings.Contains(fullMatch, "night") || strings.Contains(fullMatch, "tonight") {
 			hourVal := components.Get(kronos.ComponentHour)
 			if hourVal != nil {
 				hour := *hourVal
@@ -59,7 +58,7 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 		}
 
 		// Handle "in the afternoon"
-		if strings.HasSuffix(fullMatch, "afternoon") {
+		if strings.Contains(fullMatch, "afternoon") {
 			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
 			hourVal := components.Get(kronos.ComponentHour)
 			if hourVal != nil {
@@ -71,13 +70,40 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 		}
 
 		// Handle "in the morning"
-		if strings.HasSuffix(fullMatch, "morning") {
+		if strings.Contains(fullMatch, "morning") {
 			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
 			// Hour stays as-is for morning times
 		}
+	}
 
+	// Set custom extraction hook to handle "at night", "in the afternoon", etc.
+	parser.SetExtractPrimaryTimeComponentsHook(func(
+		context *kronos.ParsingContext,
+		match []string,
+		components *kronos.ParsingComponents,
+	) bool {
+		processTimeClues(match[0], components)
 		// Add parser tag
 		components.AddTag("parser/ENTimeExpressionParser")
+		return true
+	})
+
+	// Set hook for following time components to also handle time clues
+	parser.SetExtractFollowingTimeComponentsHook(func(
+		context *kronos.ParsingContext,
+		match []string,
+		result *kronos.ParsingResult,
+		components *kronos.ParsingComponents,
+	) bool {
+		processTimeClues(match[0], components)
+
+		// If the following match has a time clue like "at night", apply it to the start component too
+		// (e.g., "10 - 11 at night" means both 10pm and 11pm)
+		if strings.Contains(match[0], "night") || strings.Contains(match[0], "afternoon") || strings.Contains(match[0], "morning") {
+			startComponents := result.Start().(*kronos.ParsingComponents)
+			processTimeClues(match[0], startComponents)
+		}
+
 		return true
 	})
 

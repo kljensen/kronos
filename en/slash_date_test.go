@@ -96,9 +96,9 @@ func TestParsingOffsetExpression(t *testing.T) {
 
 	assert.Len(t, results, 1, "Should parse one result")
 	result := results[0]
-	// Parser includes leading space, so index is 3 instead of 4
-	assert.Equal(t, 3, result.Index(), "Index should be 3")
-	// Text includes leading space
+	// Index points past the leading spaces (4 spaces)
+	assert.Equal(t, 4, result.Index(), "Index should be 4")
+	// Text does not include leading spaces
 	assert.Contains(t, result.Text(), "04/2016", "Text should contain '04/2016'")
 }
 

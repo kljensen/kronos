@@ -234,7 +234,7 @@ func (pc *ParsingComponents) IsDateWithUnknownYear() bool {
 
 // IsValidDate validates that the components form a valid date.
 func (pc *ParsingComponents) IsValidDate() bool {
-	date := pc.dateWithoutTimezoneAdjustment()
+	date := pc.DateWithoutTimezoneAdjustment()
 
 	yearVal := pc.Get(ComponentYear)
 	if yearVal != nil && date.Year() != *yearVal {
@@ -267,7 +267,7 @@ func (pc *ParsingComponents) IsValidDate() bool {
 // Date returns a time.Time object constructed from the components.
 // It applies timezone adjustments as needed.
 func (pc *ParsingComponents) Date() time.Time {
-	date := pc.dateWithoutTimezoneAdjustment()
+	date := pc.DateWithoutTimezoneAdjustment()
 
 	timezoneOffsetVal := pc.Get(ComponentTimezoneOffset)
 	timezoneAdjustment := pc.reference.GetSystemTimezoneAdjustmentMinute(date, timezoneOffsetVal)
@@ -275,8 +275,9 @@ func (pc *ParsingComponents) Date() time.Time {
 	return date.Add(time.Duration(timezoneAdjustment) * time.Minute)
 }
 
-// dateWithoutTimezoneAdjustment creates a time.Time from components without timezone adjustment.
-func (pc *ParsingComponents) dateWithoutTimezoneAdjustment() time.Time {
+// DateWithoutTimezoneAdjustment creates a time.Time from components without timezone adjustment.
+// This is useful for DST calculations where you need the "wall clock" time.
+func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
 	year := getValueOrDefault(pc.Get(ComponentYear), 2000)
 	month := getValueOrDefault(pc.Get(ComponentMonth), 1)
 	day := getValueOrDefault(pc.Get(ComponentDay), 1)
@@ -299,6 +300,20 @@ func (pc *ParsingComponents) dateWithoutTimezoneAdjustment() time.Time {
 	}
 
 	return date
+}
+
+// DateUTC creates a UTC time.Time from components for DST calculations.
+// This returns a time in UTC with the "wall clock" values from the components.
+func (pc *ParsingComponents) DateUTC() time.Time {
+	year := getValueOrDefault(pc.Get(ComponentYear), 2000)
+	month := getValueOrDefault(pc.Get(ComponentMonth), 1)
+	day := getValueOrDefault(pc.Get(ComponentDay), 1)
+	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
+	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
+	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
+	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
+
+	return time.Date(year, time.Month(month), day, hour, minute, second, millisecond*1000000, time.UTC)
 }
 
 // AddTag adds a debugging tag to the components.
@@ -526,9 +541,10 @@ func (pr *ParsingResult) SetIndex(index int) {
 // This is used internally to communicate the adjusted text (without boundary) to chrono.go
 // when parsers using AbstractParserWithWordBoundary return ParsingComponents.
 type ParsingResultWithBoundary struct {
-	Components   *ParsingComponents
-	AdjustedText string
-	BoundaryLen  int
+	Components         *ParsingComponents
+	AdjustedText       string
+	BoundaryLen        int
+	IncludeBoundaryIdx bool // If true, index points past boundary; if false, index points at boundary start
 }
 
 // Text returns the matched text from the input.

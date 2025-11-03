@@ -51,8 +51,7 @@ func (p *ENMonthNameMiddleEndianParser) innerPattern(context *kronos.ParsingCont
 		`(?:` +
 		`(?:\s*(?:-|/|,)\s*|\s+)` +  // punctuation separator or space
 		`(` + YearPattern + `)` +
-		`)?` +
-		`\s*`  // trailing spaces
+		`)?`
 
 	return regexp.MustCompile(pattern)
 }
@@ -77,6 +76,30 @@ func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.ParsingCont
 
 	// Validate day
 	if day > 31 {
+		return nil
+	}
+
+	// Find where the day portion ends in the original text
+	// This helps us check if the day is part of a longer number (like "20" from "2012")
+	monthPos := strings.Index(strings.ToLower(context.Text()), strings.ToLower(match[1]))
+	if monthPos >= 0 {
+		textAfterMonth := context.Text()[monthPos+len(match[1]):]
+		dayPattern := regexp.MustCompile(`(?i)(?:-|/|\s*,?\s*)(` + regexp.QuoteMeta(match[2]) + `)`)
+		dayMatch := dayPattern.FindStringSubmatchIndex(textAfterMonth)
+		if dayMatch != nil && len(dayMatch) >= 4 {
+			// dayMatch[3] is the end of the captured day group
+			dayEnd := dayMatch[3]
+			if dayEnd < len(textAfterMonth) && textAfterMonth[dayEnd] >= '0' && textAfterMonth[dayEnd] <= '9' {
+				// Day is followed by another digit, likely part of a year (e.g., "20" from "2012")
+				return nil
+			}
+		}
+	}
+
+	// Reject if the match is followed by a colon (time indicator like ":00")
+	// This prevents false matches like "May 12:00" being parsed as "May 12"
+	matchEnd := strings.Index(context.Text(), match[0]) + len(match[0])
+	if matchEnd < len(context.Text()) && context.Text()[matchEnd] == ':' {
 		return nil
 	}
 

@@ -98,15 +98,34 @@ func (p *AbstractParserWithWordBoundary) Extract(context *kronos.ParsingContext,
 	// Wrap the result to communicate boundary information to chrono.go
 	switch v := result.(type) {
 	case *kronos.ParsingResult:
-		// Store the header length in the index so chrono.go can add it to the base position
+		// Index should point past the boundary (skip the boundary characters)
+		// headerLen is the length of the boundary to skip
 		v.SetIndex(headerLen)
+		return v
+	case *kronos.ParsingResultWithBoundary:
+		// Parser returned a ParsingResultWithBoundary with custom adjusted text
+		// Update it with the correct boundary length
+		v.BoundaryLen = headerLen
+		v.IncludeBoundaryIdx = true
 		return v
 	case *kronos.ParsingComponents:
 		// Wrap in a struct that provides both the components and the adjusted text
+		// The text should NOT include the boundary character
+		// Trim trailing whitespace that may have been matched by (?:\s|$|\b)
+		adjustedText := adjustedMatch[0]
+		for len(adjustedText) > 0 {
+			lastChar := adjustedText[len(adjustedText)-1]
+			if lastChar == ' ' || lastChar == '\t' || lastChar == '\n' || lastChar == '\r' {
+				adjustedText = adjustedText[:len(adjustedText)-1]
+			} else {
+				break
+			}
+		}
 		return &kronos.ParsingResultWithBoundary{
-			Components:   v,
-			AdjustedText: adjustedMatch[0],
-			BoundaryLen:  headerLen,
+			Components:         v,
+			AdjustedText:       adjustedText,        // Exclude boundary and trailing space from text
+			BoundaryLen:        headerLen,           // Length of boundary to skip
+			IncludeBoundaryIdx: true,                // Index should point past the boundary
 		}
 	default:
 		return result
