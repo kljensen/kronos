@@ -2,14 +2,19 @@ package refiners
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 
-	. "github.com/markusmobius/go-chrono"
-	"github.com/markusmobius/go-chrono/en"
+	. "github.com/kljensen/kronos"
+)
+
+const (
+	// YEAR_PATTERN matches year patterns including BE, AD, BC, BCE, CE suffixes
+	yearPattern = `(?:[1-9][0-9]{0,3}\s{0,2}(?:BE|AD|BC|BCE|CE)|[1-2][0-9]{3}|[5-9][0-9]|2[0-5])`
 )
 
 var (
-	yearSuffixPattern = regexp.MustCompile(`^\s*(` + en.YEAR_PATTERN + `)`)
+	yearSuffixPattern = regexp.MustCompile(`^\s*(` + yearPattern + `)`)
 )
 
 // ENExtractYearSuffixRefiner extracts year suffixes from dates.
@@ -37,7 +42,7 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *ParsingContext, results []*
 			continue
 		}
 
-		year := en.ParseYear(match[1])
+		year := parseYear(match[1])
 		if result.End != nil {
 			result.End.Assign(ComponentYear, year)
 		}
@@ -46,4 +51,32 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *ParsingContext, results []*
 	}
 
 	return results
+}
+
+// parseYear parses a year pattern (handles BE, AD, BC, BCE, CE)
+func parseYear(match string) int {
+	// Buddhist Era
+	if regexp.MustCompile(`(?i)BE`).MatchString(match) {
+		cleaned := regexp.MustCompile(`(?i)\s*BE`).ReplaceAllString(match, "")
+		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		return year - 543
+	}
+
+	// Before Christ / Before Common Era
+	if regexp.MustCompile(`(?i)BCE?`).MatchString(match) {
+		cleaned := regexp.MustCompile(`(?i)\s*BCE?`).ReplaceAllString(match, "")
+		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		return -year
+	}
+
+	// Anno Domini / Common Era
+	if regexp.MustCompile(`(?i)(AD|CE)`).MatchString(match) {
+		cleaned := regexp.MustCompile(`(?i)\s*(AD|CE)`).ReplaceAllString(match, "")
+		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		return year
+	}
+
+	// Regular year number
+	year, _ := strconv.Atoi(strings.TrimSpace(match))
+	return FindMostLikelyADYear(year)
 }

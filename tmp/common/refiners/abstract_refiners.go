@@ -1,6 +1,6 @@
 package refiners
 
-import . "github.com/markusmobius/go-chrono"
+import . "github.com/kljensen/kronos"
 
 // Filter is a special type of Refiner that filters results based on validity.
 type Filter interface {

@@ -1,11 +1,34 @@
 package en
 
 import (
-	. "github.com/markusmobius/go-chrono"
-	"github.com/markusmobius/go-chrono/common"
-	"github.com/markusmobius/go-chrono/common/refiners"
-	enrefiners "github.com/markusmobius/go-chrono/en/refiners"
+	. "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/common"
+	"github.com/kljensen/kronos/common/refiners"
+	enrefiners "github.com/kljensen/kronos/en/refiners"
 )
+
+// includeCommonConfiguration adds common parsers and refiners to a configuration.
+func includeCommonConfiguration(config *Configuration, strictMode bool) *Configuration {
+	// Add ISO format parser at the beginning
+	config.Parsers = append([]Parser{common.NewISOFormatParser()}, config.Parsers...)
+
+	// Add common refiners at the beginning
+	config.Refiners = append([]Refiner{
+		refiners.NewMergeWeekdayComponentRefiner(),
+		refiners.NewExtractTimezoneOffsetRefiner(),
+		refiners.NewOverlapRemovalRefiner(),
+	}, config.Refiners...)
+
+	// Add common refiners at the end
+	config.Refiners = append(config.Refiners,
+		refiners.NewExtractTimezoneAbbrRefiner(),
+		refiners.NewOverlapRemovalRefiner(),
+		refiners.NewForwardDateRefiner(),
+		refiners.NewUnlikelyFormatFilter(strictMode),
+	)
+
+	return config
+}
 
 // CreateCasualConfiguration creates a casual English configuration.
 // This includes parsers for casual language like "today", "tomorrow", etc.
@@ -47,15 +70,15 @@ func CreateConfiguration(strictMode, littleEndian bool) *Configuration {
 	}
 
 	// Apply common configuration
-	config = IncludeCommonConfiguration(config, strictMode)
+	config = includeCommonConfiguration(config, strictMode)
 
 	// Add year/month/day parser at the beginning
 	config.Parsers = append([]Parser{NewENYearMonthDayParser(strictMode)}, config.Parsers...)
 
 	// Add relative date refiners at the beginning
 	config.Refiners = append([]Refiner{
-		enrefiners.NewENMergeRelativeFollowByDateRefiner(),
-		enrefiners.NewENMergeRelativeAfterDateRefiner(),
+		NewENMergeRelativeFollowByDateRefiner(),
+		NewENMergeRelativeAfterDateRefiner(),
 		refiners.NewOverlapRemovalRefiner(),
 	}, config.Refiners...)
 

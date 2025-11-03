@@ -1,11 +1,10 @@
-package refiners
+package en
 
 import (
 	"regexp"
 	"strings"
 
-	. "github.com/markusmobius/go-chrono"
-	"github.com/markusmobius/go-chrono/en"
+	. "github.com/kljensen/kronos"
 )
 
 var (
@@ -59,7 +58,7 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *ParsingContext, result
 		}
 
 		// Merge the results
-		duration := en.ParseDuration(strings.TrimPrefix(next.Text, "+"))
+		duration := ParseDuration(strings.TrimPrefix(next.Text, "+"))
 		if isNegativeFollowingReference(next) {
 			duration = ReverseDuration(duration)
 		}

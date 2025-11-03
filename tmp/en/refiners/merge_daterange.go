@@ -3,8 +3,8 @@ package refiners
 import (
 	"regexp"
 
-	. "github.com/markusmobius/go-chrono"
-	"github.com/markusmobius/go-chrono/common/refiners"
+	. "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/common/refiners"
 )
 
 // ENMergeDateRangeRefiner merges before and after results.

@@ -3,7 +3,7 @@ package refiners
 import (
 	"regexp"
 
-	. "github.com/markusmobius/go-chrono"
+	. "github.com/kljensen/kronos"
 )
 
 // AbstractMergeDateTimeRefiner merges date-only and time-only results.

@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	. "github.com/markusmobius/go-chrono"
+	. "github.com/kljensen/kronos"
 )
 
 var (

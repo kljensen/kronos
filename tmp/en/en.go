@@ -5,21 +5,21 @@ package en
 import (
 	"time"
 
-	. "github.com/markusmobius/go-chrono"
+	. "github.com/kljensen/kronos"
 )
 
 var (
 	// Casual is a Chrono instance configured for parsing casual English.
 	// It recognizes informal expressions like "today", "tomorrow", "next week", etc.
-	Casual = New(CreateCasualConfiguration(false))
+	Casual = NewChrono(CreateCasualConfiguration(false))
 
 	// Strict is a Chrono instance configured for parsing strict English.
 	// It only recognizes formal date/time patterns and avoids casual expressions.
-	Strict = New(CreateConfiguration(true, false))
+	Strict = NewChrono(CreateConfiguration(true, false))
 
 	// GB is a Chrono instance configured for parsing UK-style English.
 	// It uses little-endian date format (day/month/year) and casual expressions.
-	GB = New(CreateCasualConfiguration(true))
+	GB = NewChrono(CreateCasualConfiguration(true))
 )
 
 // Parse parses the text and returns all parsed results.

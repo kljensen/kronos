@@ -1,11 +1,10 @@
-package refiners
+package en
 
 import (
 	"regexp"
 	"strings"
 
-	. "github.com/markusmobius/go-chrono"
-	"github.com/markusmobius/go-chrono/en"
+	. "github.com/kljensen/kronos"
 )
 
 var (
@@ -66,7 +65,7 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *ParsingContext, res
 		}
 
 		// Merge the results
-		duration := en.ParseDuration(current.Text)
+		duration := ParseDuration(current.Text)
 		if hasImpliedEarlierReferenceDate(current) {
 			duration = ReverseDuration(duration)
 		}

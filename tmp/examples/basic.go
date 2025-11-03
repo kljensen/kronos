@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/markusmobius/go-chrono"
+	"github.com/kljensen/kronos/en"
 )
 
 func main() {
@@ -15,13 +15,13 @@ func main() {
 
 	// Example 1: Parse a simple date
 	fmt.Println("=== Example 1: Simple parsing ===")
-	date := kronos.ParseDate("tomorrow at 3pm", now, kronos.ParsingOption{})
+	date := en.ParseDate("tomorrow at 3pm", now, en.ParsingOption{})
 	fmt.Printf("'tomorrow at 3pm' -> %s\n\n", date.Format("2006-01-02 15:04:05"))
 
 	// Example 2: Parse multiple dates from text
 	fmt.Println("=== Example 2: Multiple dates ===")
 	text := "The event is next Monday at 2pm or Wednesday at 10am"
-	results := kronos.Parse(text, now, kronos.ParsingOption{})
+	results := en.Parse(text, now, en.ParsingOption{})
 	fmt.Printf("Text: %s\n", text)
 	for i, result := range results {
 		fmt.Printf("  [%d] '%s' -> %s\n", i+1, result.Text, result.Start.Date().Format("2006-01-02 15:04:05"))
@@ -31,7 +31,7 @@ func main() {
 	// Example 3: Date ranges
 	fmt.Println("=== Example 3: Date ranges ===")
 	text = "Monday to Friday"
-	results = kronos.Parse(text, now, kronos.ParsingOption{})
+	results = en.Parse(text, now, en.ParsingOption{})
 	if len(results) > 0 && results[0].End != nil {
 		fmt.Printf("Text: %s\n", text)
 		fmt.Printf("  Start: %s\n", results[0].Start.Date().Format("2006-01-02"))
@@ -51,7 +51,7 @@ func main() {
 		"2 hours ago",
 	}
 	for _, expr := range expressions {
-		date := kronos.ParseDate(expr, now, kronos.ParsingOption{})
+		date := en.ParseDate(expr, now, en.ParsingOption{})
 		fmt.Printf("%-15s -> %s\n", expr, date.Format("2006-01-02 15:04:05"))
 	}
 	fmt.Println()
@@ -66,7 +66,7 @@ func main() {
 		"Wed, 25 Dec 2024",
 	}
 	for _, dateStr := range formalDates {
-		date := kronos.ParseDate(dateStr, now, kronos.ParsingOption{})
+		date := en.ParseDate(dateStr, now, en.ParsingOption{})
 		fmt.Printf("%-25s -> %s\n", dateStr, date.Format("2006-01-02"))
 	}
 	fmt.Println()
@@ -81,7 +81,7 @@ func main() {
 		"quarter to 4",
 	}
 	for _, timeStr := range times {
-		date := kronos.ParseDate(timeStr, now, kronos.ParsingOption{})
+		date := en.ParseDate(timeStr, now, en.ParsingOption{})
 		fmt.Printf("%-15s -> %s\n", timeStr, date.Format("15:04:05"))
 	}
 	fmt.Println()
@@ -91,8 +91,8 @@ func main() {
 	casualText := "I'll see you tmr"
 	strictText := "Meeting on 2024-12-25"
 
-	casualDate := kronos.Casual.ParseDate(casualText, now, kronos.ParsingOption{})
-	strictDate := kronos.Strict.ParseDate(strictText, now, kronos.ParsingOption{})
+	casualDate := en.Casual.ParseDate(casualText, now, en.ParsingOption{})
+	strictDate := en.Strict.ParseDate(strictText, now, en.ParsingOption{})
 
 	fmt.Printf("Casual: '%s' -> %s\n", casualText, casualDate.Format("2006-01-02"))
 	fmt.Printf("Strict: '%s' -> %s\n", strictText, strictDate.Format("2006-01-02"))
@@ -107,7 +107,7 @@ func main() {
 		"this Saturday morning",
 	}
 	for _, expr := range complex {
-		date := kronos.ParseDate(expr, now, kronos.ParsingOption{})
+		date := en.ParseDate(expr, now, en.ParsingOption{})
 		fmt.Printf("%-30s -> %s\n", expr, date.Format("2006-01-02 15:04:05"))
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"time"
 
-	. "github.com/markusmobius/go-chrono"
+	. "github.com/kljensen/kronos"
 )
 
 // AbstractMergeDateRangeRefiner merges two date results into a date range.
