@@ -1,0 +1,458 @@
+=== RUN   TestNow
+--- PASS: TestNow (0.00s)
+=== RUN   TestToday
+--- PASS: TestToday (0.00s)
+=== RUN   TestYesterday
+--- PASS: TestYesterday (0.00s)
+=== RUN   TestTomorrow
+--- PASS: TestTomorrow (0.00s)
+=== RUN   TestTheDayAfter
+--- PASS: TestTheDayAfter (0.00s)
+=== RUN   TestTheDayBefore
+--- PASS: TestTheDayBefore (0.00s)
+=== RUN   TestTonight
+--- PASS: TestTonight (0.00s)
+=== RUN   TestTonightWithHour
+--- PASS: TestTonightWithHour (0.00s)
+=== RUN   TestLastNight_EarlyMorning
+--- PASS: TestLastNight_EarlyMorning (0.00s)
+=== RUN   TestLastNight_AfterMorning
+--- PASS: TestLastNight_AfterMorning (0.00s)
+=== RUN   TestEvening
+--- PASS: TestEvening (0.00s)
+=== RUN   TestYesterdayEvening
+--- PASS: TestYesterdayEvening (0.00s)
+=== RUN   TestMidnight_EarlyMorning
+--- PASS: TestMidnight_EarlyMorning (0.00s)
+=== RUN   TestMidnight_AfterMorning
+--- PASS: TestMidnight_AfterMorning (0.00s)
+=== RUN   TestMorning
+--- PASS: TestMorning (0.00s)
+=== RUN   TestAfternoon
+--- PASS: TestAfternoon (0.00s)
+=== RUN   TestNoon
+--- PASS: TestNoon (0.00s)
+=== RUN   TestMonthBoundaries
+--- PASS: TestMonthBoundaries (0.00s)
+=== RUN   TestYearBoundaries
+--- PASS: TestYearBoundaries (0.00s)
+=== RUN   TestNewParsingContext
+=== RUN   TestNewParsingContext/NewParsingContext_with_time.Time
+=== RUN   TestNewParsingContext/NewParsingContext_with_ParsingReference
+=== RUN   TestNewParsingContext/NewParsingContext_with_nil_refDate_uses_current_time
+=== RUN   TestNewParsingContext/NewParsingContext_with_nil_option_uses_defaults
+=== RUN   TestNewParsingContext/NewParsingContext_with_custom_option
+--- PASS: TestNewParsingContext (0.00s)
+    --- PASS: TestNewParsingContext/NewParsingContext_with_time.Time (0.00s)
+    --- PASS: TestNewParsingContext/NewParsingContext_with_ParsingReference (0.00s)
+    --- PASS: TestNewParsingContext/NewParsingContext_with_nil_refDate_uses_current_time (0.00s)
+    --- PASS: TestNewParsingContext/NewParsingContext_with_nil_option_uses_defaults (0.00s)
+    --- PASS: TestNewParsingContext/NewParsingContext_with_custom_option (0.00s)
+=== RUN   TestCreateParsingComponents
+=== RUN   TestCreateParsingComponents/CreateParsingComponents_with_nil_creates_default
+=== RUN   TestCreateParsingComponents/CreateParsingComponents_with_component_map
+=== RUN   TestCreateParsingComponents/CreateParsingComponents_with_existing_ParsingComponents_returns_as-is
+--- PASS: TestCreateParsingComponents (0.00s)
+    --- PASS: TestCreateParsingComponents/CreateParsingComponents_with_nil_creates_default (0.00s)
+    --- PASS: TestCreateParsingComponents/CreateParsingComponents_with_component_map (0.00s)
+    --- PASS: TestCreateParsingComponents/CreateParsingComponents_with_existing_ParsingComponents_returns_as-is (0.00s)
+=== RUN   TestCreateParsingResult
+=== RUN   TestCreateParsingResult/CreateParsingResult_with_text
+=== RUN   TestCreateParsingResult/CreateParsingResult_with_endIndex
+=== RUN   TestCreateParsingResult/CreateParsingResult_with_start_components_as_map
+=== RUN   TestCreateParsingResult/CreateParsingResult_with_start_and_end_components
+=== RUN   TestCreateParsingResult/CreateParsingResult_with_ParsingComponents_instances
+=== RUN   TestCreateParsingResult/CreateParsingResult_with_endIndex_bounds_checking
+--- PASS: TestCreateParsingResult (0.00s)
+    --- PASS: TestCreateParsingResult/CreateParsingResult_with_text (0.00s)
+    --- PASS: TestCreateParsingResult/CreateParsingResult_with_endIndex (0.00s)
+    --- PASS: TestCreateParsingResult/CreateParsingResult_with_start_components_as_map (0.00s)
+    --- PASS: TestCreateParsingResult/CreateParsingResult_with_start_and_end_components (0.00s)
+    --- PASS: TestCreateParsingResult/CreateParsingResult_with_ParsingComponents_instances (0.00s)
+    --- PASS: TestCreateParsingResult/CreateParsingResult_with_endIndex_bounds_checking (0.00s)
+=== RUN   TestDebug
+=== RUN   TestDebug/Debug_calls_handler_when_set
+=== RUN   TestDebug/Debug_does_nothing_when_handler_not_set
+--- PASS: TestDebug (0.00s)
+    --- PASS: TestDebug/Debug_calls_handler_when_set (0.00s)
+    --- PASS: TestDebug/Debug_does_nothing_when_handler_not_set (0.00s)
+=== RUN   TestContextAccessors
+=== RUN   TestContextAccessors/Text_returns_input_text
+=== RUN   TestContextAccessors/Option_returns_parsing_option
+=== RUN   TestContextAccessors/Reference_returns_reference_with_timezone
+=== RUN   TestContextAccessors/RefDate_returns_reference_date
+--- PASS: TestContextAccessors (0.00s)
+    --- PASS: TestContextAccessors/Text_returns_input_text (0.00s)
+    --- PASS: TestContextAccessors/Option_returns_parsing_option (0.00s)
+    --- PASS: TestContextAccessors/Reference_returns_reference_with_timezone (0.00s)
+    --- PASS: TestContextAccessors/RefDate_returns_reference_date (0.00s)
+=== RUN   TestAssignSimilarDate
+--- PASS: TestAssignSimilarDate (0.00s)
+=== RUN   TestAssignSimilarTime
+--- PASS: TestAssignSimilarTime (0.00s)
+=== RUN   TestAssignSimilarTime_PM
+--- PASS: TestAssignSimilarTime_PM (0.00s)
+=== RUN   TestImplySimilarDate
+--- PASS: TestImplySimilarDate (0.00s)
+=== RUN   TestImplySimilarTime
+--- PASS: TestImplySimilarTime (0.00s)
+=== RUN   TestFindMostLikelyADYear
+=== RUN   TestFindMostLikelyADYear/4-digit_year_unchanged
+=== RUN   TestFindMostLikelyADYear/3-digit_year_unchanged
+=== RUN   TestFindMostLikelyADYear/year_0_->_2000
+=== RUN   TestFindMostLikelyADYear/year_20_->_2020s
+=== RUN   TestFindMostLikelyADYear/year_25_->_2020s
+=== RUN   TestFindMostLikelyADYear/year_99_->_1999
+=== RUN   TestFindMostLikelyADYear/year_50_->_1950
+=== RUN   TestFindMostLikelyADYear/year_80_->_1980
+--- PASS: TestFindMostLikelyADYear (0.00s)
+    --- PASS: TestFindMostLikelyADYear/4-digit_year_unchanged (0.00s)
+    --- PASS: TestFindMostLikelyADYear/3-digit_year_unchanged (0.00s)
+    --- PASS: TestFindMostLikelyADYear/year_0_->_2000 (0.00s)
+    --- PASS: TestFindMostLikelyADYear/year_20_->_2020s (0.00s)
+    --- PASS: TestFindMostLikelyADYear/year_25_->_2020s (0.00s)
+    --- PASS: TestFindMostLikelyADYear/year_99_->_1999 (0.00s)
+    --- PASS: TestFindMostLikelyADYear/year_50_->_1950 (0.00s)
+    --- PASS: TestFindMostLikelyADYear/year_80_->_1980 (0.00s)
+=== RUN   TestFindYearClosestToRef
+=== RUN   TestFindYearClosestToRef/exact_match_with_reference_year
+=== RUN   TestFindYearClosestToRef/future_date_in_same_year
+=== RUN   TestFindYearClosestToRef/past_date_in_same_year
+=== RUN   TestFindYearClosestToRef/date_closer_to_previous_year
+=== RUN   TestFindYearClosestToRef/date_closer_to_next_year
+=== RUN   TestFindYearClosestToRef/February_29_on_leap_year_ref
+=== RUN   TestFindYearClosestToRef/mid-year_reference
+--- PASS: TestFindYearClosestToRef (0.00s)
+    --- PASS: TestFindYearClosestToRef/exact_match_with_reference_year (0.00s)
+    --- PASS: TestFindYearClosestToRef/future_date_in_same_year (0.00s)
+    --- PASS: TestFindYearClosestToRef/past_date_in_same_year (0.00s)
+    --- PASS: TestFindYearClosestToRef/date_closer_to_previous_year (0.00s)
+    --- PASS: TestFindYearClosestToRef/date_closer_to_next_year (0.00s)
+    --- PASS: TestFindYearClosestToRef/February_29_on_leap_year_ref (0.00s)
+    --- PASS: TestFindYearClosestToRef/mid-year_reference (0.00s)
+=== RUN   TestAssignOverridesImply
+--- PASS: TestAssignOverridesImply (0.00s)
+=== RUN   TestAddDuration
+=== RUN   TestAddDuration/add_years
+=== RUN   TestAddDuration/add_fractional_years
+=== RUN   TestAddDuration/add_months
+=== RUN   TestAddDuration/add_months_with_overflow
+=== RUN   TestAddDuration/add_fractional_months
+=== RUN   TestAddDuration/add_quarters
+=== RUN   TestAddDuration/add_weeks
+=== RUN   TestAddDuration/add_days
+=== RUN   TestAddDuration/add_hours
+=== RUN   TestAddDuration/add_minutes
+=== RUN   TestAddDuration/add_seconds
+=== RUN   TestAddDuration/add_milliseconds
+=== RUN   TestAddDuration/add_mixed_duration
+=== RUN   TestAddDuration/add_negative_duration
+=== RUN   TestAddDuration/empty_duration
+=== RUN   TestAddDuration/leap_year_handling
+--- PASS: TestAddDuration (0.00s)
+    --- PASS: TestAddDuration/add_years (0.00s)
+    --- PASS: TestAddDuration/add_fractional_years (0.00s)
+    --- PASS: TestAddDuration/add_months (0.00s)
+    --- PASS: TestAddDuration/add_months_with_overflow (0.00s)
+    --- PASS: TestAddDuration/add_fractional_months (0.00s)
+    --- PASS: TestAddDuration/add_quarters (0.00s)
+    --- PASS: TestAddDuration/add_weeks (0.00s)
+    --- PASS: TestAddDuration/add_days (0.00s)
+    --- PASS: TestAddDuration/add_hours (0.00s)
+    --- PASS: TestAddDuration/add_minutes (0.00s)
+    --- PASS: TestAddDuration/add_seconds (0.00s)
+    --- PASS: TestAddDuration/add_milliseconds (0.00s)
+    --- PASS: TestAddDuration/add_mixed_duration (0.00s)
+    --- PASS: TestAddDuration/add_negative_duration (0.00s)
+    --- PASS: TestAddDuration/empty_duration (0.00s)
+    --- PASS: TestAddDuration/leap_year_handling (0.00s)
+=== RUN   TestReverseDuration
+=== RUN   TestReverseDuration/reverse_positive_duration
+=== RUN   TestReverseDuration/reverse_negative_duration
+=== RUN   TestReverseDuration/reverse_mixed_duration
+=== RUN   TestReverseDuration/reverse_empty_duration
+--- PASS: TestReverseDuration (0.00s)
+    --- PASS: TestReverseDuration/reverse_positive_duration (0.00s)
+    --- PASS: TestReverseDuration/reverse_negative_duration (0.00s)
+    --- PASS: TestReverseDuration/reverse_mixed_duration (0.00s)
+    --- PASS: TestReverseDuration/reverse_empty_duration (0.00s)
+=== RUN   TestEmptyDuration
+--- PASS: TestEmptyDuration (0.00s)
+=== RUN   TestAddDurationDoesNotMutateInput
+--- PASS: TestAddDurationDoesNotMutateInput (0.00s)
+=== RUN   TestParser
+=== RUN   TestParser/Parser_interface_with_mock_implementation
+=== RUN   TestParser/Parser_can_return_different_result_types
+--- PASS: TestParser (0.00s)
+    --- PASS: TestParser/Parser_interface_with_mock_implementation (0.00s)
+    --- PASS: TestParser/Parser_can_return_different_result_types (0.00s)
+=== RUN   TestRefiner
+=== RUN   TestRefiner/Refiner_interface_with_mock_implementation
+=== RUN   TestRefiner/Refiner_can_modify_results
+=== RUN   TestRefiner/Refiner_can_merge_or_split_results
+--- PASS: TestRefiner (0.00s)
+    --- PASS: TestRefiner/Refiner_interface_with_mock_implementation (0.00s)
+    --- PASS: TestRefiner/Refiner_can_modify_results (0.00s)
+    --- PASS: TestRefiner/Refiner_can_merge_or_split_results (0.00s)
+=== RUN   TestConfiguration
+=== RUN   TestConfiguration/Configuration_with_parsers_and_refiners
+=== RUN   TestConfiguration/Configuration_can_be_empty
+=== RUN   TestConfiguration/Configuration_with_only_parsers
+=== RUN   TestConfiguration/Configuration_with_only_refiners
+--- PASS: TestConfiguration (0.00s)
+    --- PASS: TestConfiguration/Configuration_with_parsers_and_refiners (0.00s)
+    --- PASS: TestConfiguration/Configuration_can_be_empty (0.00s)
+    --- PASS: TestConfiguration/Configuration_with_only_parsers (0.00s)
+    --- PASS: TestConfiguration/Configuration_with_only_refiners (0.00s)
+=== RUN   TestCreateRelativeFromReference_DateOnly
+--- PASS: TestCreateRelativeFromReference_DateOnly (0.00s)
+=== RUN   TestCreateRelativeFromReference_WithTime
+--- PASS: TestCreateRelativeFromReference_WithTime (0.00s)
+=== RUN   TestCreateRelativeFromReference_WeekDuration
+--- PASS: TestCreateRelativeFromReference_WeekDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_MonthDuration
+--- PASS: TestCreateRelativeFromReference_MonthDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_YearDuration
+--- PASS: TestCreateRelativeFromReference_YearDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_QuarterDuration
+--- PASS: TestCreateRelativeFromReference_QuarterDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_NegativeDuration
+--- PASS: TestCreateRelativeFromReference_NegativeDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_MixedDuration
+--- PASS: TestCreateRelativeFromReference_MixedDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_EmptyDuration
+--- PASS: TestCreateRelativeFromReference_EmptyDuration (0.00s)
+=== RUN   TestCreateRelativeFromReference_NilDuration
+--- PASS: TestCreateRelativeFromReference_NilDuration (0.00s)
+=== RUN   TestAddDurationAsImplied
+--- PASS: TestAddDurationAsImplied (0.00s)
+=== RUN   TestAddDurationAsImplied_ImpliedValues
+--- PASS: TestAddDurationAsImplied_ImpliedValues (0.00s)
+=== RUN   TestReferenceWithTimezone
+=== RUN   TestReferenceWithTimezone/NewReferenceWithTimezone_with_instant_and_offset
+=== RUN   TestReferenceWithTimezone/NewReferenceWithTimezone_with_zero_instant_uses_current_time
+=== RUN   TestReferenceWithTimezone/FromDate_creates_reference_without_timezone_offset
+--- PASS: TestReferenceWithTimezone (0.00s)
+    --- PASS: TestReferenceWithTimezone/NewReferenceWithTimezone_with_instant_and_offset (0.00s)
+    --- PASS: TestReferenceWithTimezone/NewReferenceWithTimezone_with_zero_instant_uses_current_time (0.00s)
+    --- PASS: TestReferenceWithTimezone/FromDate_creates_reference_without_timezone_offset (0.00s)
+=== RUN   TestFromInput
+=== RUN   TestFromInput/FromInput_with_time.Time
+=== RUN   TestFromInput/FromInput_with_ParsingReference
+=== RUN   TestFromInput/FromInput_with_nil
+--- PASS: TestFromInput (0.00s)
+    --- PASS: TestFromInput/FromInput_with_time.Time (0.00s)
+    --- PASS: TestFromInput/FromInput_with_ParsingReference (0.00s)
+    --- PASS: TestFromInput/FromInput_with_nil (0.00s)
+=== RUN   TestGetTimezoneOffset
+=== RUN   TestGetTimezoneOffset/GetTimezoneOffset_with_explicit_offset
+=== RUN   TestGetTimezoneOffset/GetTimezoneOffset_without_explicit_offset_uses_system
+--- PASS: TestGetTimezoneOffset (0.00s)
+    --- PASS: TestGetTimezoneOffset/GetTimezoneOffset_with_explicit_offset (0.00s)
+    --- PASS: TestGetTimezoneOffset/GetTimezoneOffset_without_explicit_offset_uses_system (0.00s)
+=== RUN   TestParsingComponents
+=== RUN   TestParsingComponents/NewParsingComponents_sets_default_implied_values
+=== RUN   TestParsingComponents/IsCertain_returns_true_only_for_known_values
+=== RUN   TestParsingComponents/Assign_sets_known_value_and_removes_implied
+=== RUN   TestParsingComponents/Imply_does_not_override_known_values
+=== RUN   TestParsingComponents/Delete_removes_both_known_and_implied_values
+=== RUN   TestParsingComponents/Clone_creates_independent_copy
+=== RUN   TestParsingComponents/IsOnlyDate_returns_true_when_no_time_components_are_certain
+=== RUN   TestParsingComponents/IsOnlyTime_returns_true_when_no_date_components_are_certain
+=== RUN   TestParsingComponents/IsOnlyWeekdayComponent
+=== RUN   TestParsingComponents/IsDateWithUnknownYear
+=== RUN   TestParsingComponents/IsValidDate_validates_component_values
+=== RUN   TestParsingComponents/Date_constructs_time.Time_from_components
+=== RUN   TestParsingComponents/AddTag_and_Tags
+=== RUN   TestParsingComponents/String_returns_debug_representation
+--- PASS: TestParsingComponents (0.00s)
+    --- PASS: TestParsingComponents/NewParsingComponents_sets_default_implied_values (0.00s)
+    --- PASS: TestParsingComponents/IsCertain_returns_true_only_for_known_values (0.00s)
+    --- PASS: TestParsingComponents/Assign_sets_known_value_and_removes_implied (0.00s)
+    --- PASS: TestParsingComponents/Imply_does_not_override_known_values (0.00s)
+    --- PASS: TestParsingComponents/Delete_removes_both_known_and_implied_values (0.00s)
+    --- PASS: TestParsingComponents/Clone_creates_independent_copy (0.00s)
+    --- PASS: TestParsingComponents/IsOnlyDate_returns_true_when_no_time_components_are_certain (0.00s)
+    --- PASS: TestParsingComponents/IsOnlyTime_returns_true_when_no_date_components_are_certain (0.00s)
+    --- PASS: TestParsingComponents/IsOnlyWeekdayComponent (0.00s)
+    --- PASS: TestParsingComponents/IsDateWithUnknownYear (0.00s)
+    --- PASS: TestParsingComponents/IsValidDate_validates_component_values (0.00s)
+    --- PASS: TestParsingComponents/Date_constructs_time.Time_from_components (0.00s)
+    --- PASS: TestParsingComponents/AddTag_and_Tags (0.00s)
+    --- PASS: TestParsingComponents/String_returns_debug_representation (0.00s)
+=== RUN   TestParsingResult
+=== RUN   TestParsingResult/NewParsingResult_creates_result
+=== RUN   TestParsingResult/NewParsingResult_with_nil_start_creates_default
+=== RUN   TestParsingResult/Clone_creates_independent_copy
+=== RUN   TestParsingResult/Date_delegates_to_start.Date()
+=== RUN   TestParsingResult/AddTag_adds_to_both_start_and_end
+=== RUN   TestParsingResult/Tags_combines_start_and_end_tags
+=== RUN   TestParsingResult/String_returns_debug_representation
+=== RUN   TestParsingResult/RefDate_returns_reference_date
+--- PASS: TestParsingResult (0.00s)
+    --- PASS: TestParsingResult/NewParsingResult_creates_result (0.00s)
+    --- PASS: TestParsingResult/NewParsingResult_with_nil_start_creates_default (0.00s)
+    --- PASS: TestParsingResult/Clone_creates_independent_copy (0.00s)
+    --- PASS: TestParsingResult/Date_delegates_to_start.Date() (0.00s)
+    --- PASS: TestParsingResult/AddTag_adds_to_both_start_and_end (0.00s)
+    --- PASS: TestParsingResult/Tags_combines_start_and_end_tags (0.00s)
+    --- PASS: TestParsingResult/String_returns_debug_representation (0.00s)
+    --- PASS: TestParsingResult/RefDate_returns_reference_date (0.00s)
+=== RUN   TestToTimezoneOffset
+=== RUN   TestToTimezoneOffset/toTimezoneOffset_with_int_returns_value
+=== RUN   TestToTimezoneOffset/toTimezoneOffset_with_nil_returns_0
+=== RUN   TestToTimezoneOffset/toTimezoneOffset_with_timezone_name_in_overrides
+=== RUN   TestToTimezoneOffset/toTimezoneOffset_with_ambiguous_timezone_during_DST
+=== RUN   TestToTimezoneOffset/toTimezoneOffset_with_location_name
+--- PASS: TestToTimezoneOffset (0.00s)
+    --- PASS: TestToTimezoneOffset/toTimezoneOffset_with_int_returns_value (0.00s)
+    --- PASS: TestToTimezoneOffset/toTimezoneOffset_with_nil_returns_0 (0.00s)
+    --- PASS: TestToTimezoneOffset/toTimezoneOffset_with_timezone_name_in_overrides (0.00s)
+    --- PASS: TestToTimezoneOffset/toTimezoneOffset_with_ambiguous_timezone_during_DST (0.00s)
+    --- PASS: TestToTimezoneOffset/toTimezoneOffset_with_location_name (0.00s)
+=== RUN   TestToTimezoneOffset_NumericOffset
+--- PASS: TestToTimezoneOffset_NumericOffset (0.00s)
+=== RUN   TestToTimezoneOffset_StringTimezone
+=== RUN   TestToTimezoneOffset_StringTimezone/UTC
+=== RUN   TestToTimezoneOffset_StringTimezone/GMT
+=== RUN   TestToTimezoneOffset_StringTimezone/EST
+=== RUN   TestToTimezoneOffset_StringTimezone/EDT
+=== RUN   TestToTimezoneOffset_StringTimezone/PST
+=== RUN   TestToTimezoneOffset_StringTimezone/PDT
+=== RUN   TestToTimezoneOffset_StringTimezone/JST
+=== RUN   TestToTimezoneOffset_StringTimezone/AEST
+--- PASS: TestToTimezoneOffset_StringTimezone (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/UTC (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/GMT (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/EST (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/EDT (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/PST (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/PDT (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/JST (0.00s)
+    --- PASS: TestToTimezoneOffset_StringTimezone/AEST (0.00s)
+=== RUN   TestToTimezoneOffset_WithOverrides
+--- PASS: TestToTimezoneOffset_WithOverrides (0.00s)
+=== RUN   TestToTimezoneOffset_AmbiguousTimezone
+--- PASS: TestToTimezoneOffset_AmbiguousTimezone (0.00s)
+=== RUN   TestToTimezoneOffset_NilTimezone
+--- PASS: TestToTimezoneOffset_NilTimezone (0.00s)
+=== RUN   TestToTimezoneOffset_UnknownTimezone
+--- PASS: TestToTimezoneOffset_UnknownTimezone (0.00s)
+=== RUN   TestToTimezoneOffset_AmbiguousWithZeroInstant
+--- PASS: TestToTimezoneOffset_AmbiguousWithZeroInstant (0.00s)
+=== RUN   TestGetNthWeekdayOfMonth
+=== RUN   TestGetNthWeekdayOfMonth/2nd_Sunday_of_March_2020
+=== RUN   TestGetNthWeekdayOfMonth/1st_Monday_of_November_2020
+=== RUN   TestGetNthWeekdayOfMonth/4th_Thursday_of_November_2020_(Thanksgiving)
+=== RUN   TestGetNthWeekdayOfMonth/1st_Friday_of_January_2021
+=== RUN   TestGetNthWeekdayOfMonth/3rd_Tuesday_of_July_2020
+--- PASS: TestGetNthWeekdayOfMonth (0.00s)
+    --- PASS: TestGetNthWeekdayOfMonth/2nd_Sunday_of_March_2020 (0.00s)
+    --- PASS: TestGetNthWeekdayOfMonth/1st_Monday_of_November_2020 (0.00s)
+    --- PASS: TestGetNthWeekdayOfMonth/4th_Thursday_of_November_2020_(Thanksgiving) (0.00s)
+    --- PASS: TestGetNthWeekdayOfMonth/1st_Friday_of_January_2021 (0.00s)
+    --- PASS: TestGetNthWeekdayOfMonth/3rd_Tuesday_of_July_2020 (0.00s)
+=== RUN   TestGetLastWeekdayOfMonth
+=== RUN   TestGetLastWeekdayOfMonth/Last_Sunday_of_October_2020
+=== RUN   TestGetLastWeekdayOfMonth/Last_Monday_of_December_2020
+=== RUN   TestGetLastWeekdayOfMonth/Last_Friday_of_February_2020_(leap_year)
+=== RUN   TestGetLastWeekdayOfMonth/Last_Saturday_of_April_2021
+=== RUN   TestGetLastWeekdayOfMonth/Last_Wednesday_of_June_2020
+--- PASS: TestGetLastWeekdayOfMonth (0.00s)
+    --- PASS: TestGetLastWeekdayOfMonth/Last_Sunday_of_October_2020 (0.00s)
+    --- PASS: TestGetLastWeekdayOfMonth/Last_Monday_of_December_2020 (0.00s)
+    --- PASS: TestGetLastWeekdayOfMonth/Last_Friday_of_February_2020_(leap_year) (0.00s)
+    --- PASS: TestGetLastWeekdayOfMonth/Last_Saturday_of_April_2021 (0.00s)
+    --- PASS: TestGetLastWeekdayOfMonth/Last_Wednesday_of_June_2020 (0.00s)
+=== RUN   TestDefaultTimezoneAbbrMap
+--- PASS: TestDefaultTimezoneAbbrMap (0.00s)
+=== RUN   TestComponentConstants
+--- PASS: TestComponentConstants (0.00s)
+=== RUN   TestTimeunitConstants
+--- PASS: TestTimeunitConstants (0.00s)
+=== RUN   TestMeridiemValues
+--- PASS: TestMeridiemValues (0.00s)
+=== RUN   TestWeekdayValues
+--- PASS: TestWeekdayValues (0.00s)
+=== RUN   TestMonthValues
+--- PASS: TestMonthValues (0.00s)
+=== RUN   TestParsingOptionDefaults
+--- PASS: TestParsingOptionDefaults (0.00s)
+=== RUN   TestParsingOptionWithValues
+--- PASS: TestParsingOptionWithValues (0.00s)
+=== RUN   TestAmbiguousTimezoneMap
+--- PASS: TestAmbiguousTimezoneMap (0.00s)
+=== RUN   TestTimezoneAbbrMap
+--- PASS: TestTimezoneAbbrMap (0.00s)
+=== RUN   TestParsingReference
+--- PASS: TestParsingReference (0.00s)
+=== RUN   TestParsingReferenceWithOffset
+--- PASS: TestParsingReferenceWithOffset (0.00s)
+=== RUN   TestComponentAsMapKey
+--- PASS: TestComponentAsMapKey (0.00s)
+=== RUN   TestTimeunitAsMapKey
+--- PASS: TestTimeunitAsMapKey (0.00s)
+=== RUN   TestGetNextWeekday
+=== RUN   TestGetNextWeekday/Monday_to_next_Monday
+=== RUN   TestGetNextWeekday/Monday_to_next_Tuesday
+=== RUN   TestGetNextWeekday/Friday_to_next_Monday
+=== RUN   TestGetNextWeekday/Saturday_to_next_Sunday
+=== RUN   TestGetNextWeekday/Sunday_to_next_Saturday
+--- PASS: TestGetNextWeekday (0.00s)
+    --- PASS: TestGetNextWeekday/Monday_to_next_Monday (0.00s)
+    --- PASS: TestGetNextWeekday/Monday_to_next_Tuesday (0.00s)
+    --- PASS: TestGetNextWeekday/Friday_to_next_Monday (0.00s)
+    --- PASS: TestGetNextWeekday/Saturday_to_next_Sunday (0.00s)
+    --- PASS: TestGetNextWeekday/Sunday_to_next_Saturday (0.00s)
+=== RUN   TestGetLastWeekday
+=== RUN   TestGetLastWeekday/Monday_to_last_Monday
+=== RUN   TestGetLastWeekday/Friday_to_last_Monday
+=== RUN   TestGetLastWeekday/Tuesday_to_last_Friday
+=== RUN   TestGetLastWeekday/Sunday_to_last_Sunday
+--- PASS: TestGetLastWeekday (0.00s)
+    --- PASS: TestGetLastWeekday/Monday_to_last_Monday (0.00s)
+    --- PASS: TestGetLastWeekday/Friday_to_last_Monday (0.00s)
+    --- PASS: TestGetLastWeekday/Tuesday_to_last_Friday (0.00s)
+    --- PASS: TestGetLastWeekday/Sunday_to_last_Sunday (0.00s)
+=== RUN   TestGetThisWeekday
+=== RUN   TestGetThisWeekday/Wednesday_to_this_Monday_(forward)
+=== RUN   TestGetThisWeekday/Wednesday_to_this_Monday_(backward)
+=== RUN   TestGetThisWeekday/Wednesday_to_this_Wednesday_(forward)
+=== RUN   TestGetThisWeekday/Wednesday_to_this_Wednesday_(backward)
+=== RUN   TestGetThisWeekday/Wednesday_to_this_Friday_(forward)
+=== RUN   TestGetThisWeekday/Wednesday_to_this_Friday_(backward)
+--- PASS: TestGetThisWeekday (0.00s)
+    --- PASS: TestGetThisWeekday/Wednesday_to_this_Monday_(forward) (0.00s)
+    --- PASS: TestGetThisWeekday/Wednesday_to_this_Monday_(backward) (0.00s)
+    --- PASS: TestGetThisWeekday/Wednesday_to_this_Wednesday_(forward) (0.00s)
+    --- PASS: TestGetThisWeekday/Wednesday_to_this_Wednesday_(backward) (0.00s)
+    --- PASS: TestGetThisWeekday/Wednesday_to_this_Friday_(forward) (0.00s)
+    --- PASS: TestGetThisWeekday/Wednesday_to_this_Friday_(backward) (0.00s)
+=== RUN   TestGetDaysToWeekday
+=== RUN   TestGetDaysToWeekday/this_Monday_from_Wednesday
+=== RUN   TestGetDaysToWeekday/last_Monday_from_Wednesday
+=== RUN   TestGetDaysToWeekday/next_Monday_from_Wednesday
+=== RUN   TestGetDaysToWeekday/next_Friday_from_Wednesday
+=== RUN   TestGetDaysToWeekday/next_Sunday_from_Sunday
+=== RUN   TestGetDaysToWeekday/next_Monday_from_Sunday
+=== RUN   TestGetDaysToWeekday/next_Saturday_from_Saturday
+=== RUN   TestGetDaysToWeekday/next_Sunday_from_Saturday
+=== RUN   TestGetDaysToWeekday/closest_Monday_from_Wednesday_(should_go_back)
+=== RUN   TestGetDaysToWeekday/closest_Friday_from_Wednesday_(should_go_forward)
+--- PASS: TestGetDaysToWeekday (0.00s)
+    --- PASS: TestGetDaysToWeekday/this_Monday_from_Wednesday (0.00s)
+    --- PASS: TestGetDaysToWeekday/last_Monday_from_Wednesday (0.00s)
+    --- PASS: TestGetDaysToWeekday/next_Monday_from_Wednesday (0.00s)
+    --- PASS: TestGetDaysToWeekday/next_Friday_from_Wednesday (0.00s)
+    --- PASS: TestGetDaysToWeekday/next_Sunday_from_Sunday (0.00s)
+    --- PASS: TestGetDaysToWeekday/next_Monday_from_Sunday (0.00s)
+    --- PASS: TestGetDaysToWeekday/next_Saturday_from_Saturday (0.00s)
+    --- PASS: TestGetDaysToWeekday/next_Sunday_from_Saturday (0.00s)
+    --- PASS: TestGetDaysToWeekday/closest_Monday_from_Wednesday_(should_go_back) (0.00s)
+    --- PASS: TestGetDaysToWeekday/closest_Friday_from_Wednesday_(should_go_forward) (0.00s)
+=== RUN   TestGetDaysForwardToWeekday
+--- PASS: TestGetDaysForwardToWeekday (0.00s)
+=== RUN   TestGetBackwardDaysToWeekday
+--- PASS: TestGetBackwardDaysToWeekday (0.00s)
+PASS
+ok  	github.com/kljensen/kronos	0.010s
