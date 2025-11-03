@@ -8,6 +8,9 @@ import (
 	kronos "github.com/kljensen/kronos"
 )
 
+// YEAR_PATTERN matches year patterns including BE, AD, BC, BCE, CE suffixes
+const YEAR_PATTERN = `(?:[1-9][0-9]{0,3}\s{0,2}(?:BE|AD|BC|BCE|CE)|[1-2][0-9]{3}|[5-9][0-9]|2[0-5])`
+
 // MonthDictionary maps month names to month numbers (1-12)
 var MonthDictionary = map[string]int{
 	// Full names
