@@ -119,9 +119,11 @@ func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingCompo
 	}
 
 	// Apply PM meridiem adjustment
+	// Note: hour 0 (midnight) should not be converted even with PM meridiem
+	// Only hours 1-11 should be adjusted for PM (becoming 13-23)
 	resultMeridiem = result.Get(ComponentMeridiem)
 	resultHour := result.Get(ComponentHour)
-	if resultMeridiem != nil && *resultMeridiem == int(MeridiemPM) && resultHour != nil && *resultHour < 12 {
+	if resultMeridiem != nil && *resultMeridiem == int(MeridiemPM) && resultHour != nil && *resultHour > 0 && *resultHour < 12 {
 		if timeComp.IsCertain(ComponentHour) {
 			result.Assign(ComponentHour, *resultHour+12)
 		} else {
