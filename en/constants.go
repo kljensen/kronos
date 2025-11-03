@@ -415,7 +415,7 @@ func ParseDuration(text string) kronos.Duration {
 
 // IsEmpty returns true if the duration has no non-zero values
 func IsEmptyDuration(d kronos.Duration) bool {
-	if d == nil || len(d) == 0 {
+	if len(d) == 0 {
 		return true
 	}
 	for _, v := range d {

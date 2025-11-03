@@ -2,7 +2,6 @@ package common
 
 import (
 	"regexp"
-	"unicode"
 
 	kronos "github.com/kljensen/kronos"
 )
@@ -137,19 +136,4 @@ func isRegexpCaseInsensitive(re *regexp.Regexp) bool {
 	// Go's regexp doesn't expose flags directly, so we check the string representation
 	str := re.String()
 	return len(str) >= 4 && str[:4] == "(?i)"
-}
-
-// isWordBoundary checks if there's a word boundary at the given position
-func isWordBoundary(text string, pos int) bool {
-	if pos <= 0 || pos >= len(text) {
-		return true
-	}
-
-	prevChar := rune(text[pos-1])
-	currChar := rune(text[pos])
-
-	prevIsWord := unicode.IsLetter(prevChar) || unicode.IsDigit(prevChar) || prevChar == '_'
-	currIsWord := unicode.IsLetter(currChar) || unicode.IsDigit(currChar) || currChar == '_'
-
-	return prevIsWord != currIsWord
 }

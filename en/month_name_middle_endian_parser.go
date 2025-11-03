@@ -86,7 +86,7 @@ func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.ParsingCont
 		textAfterMonth := context.Text()[monthPos+len(match[1]):]
 		dayPattern := regexp.MustCompile(`(?i)(?:-|/|\s*,?\s*)(` + regexp.QuoteMeta(match[2]) + `)`)
 		dayMatch := dayPattern.FindStringSubmatchIndex(textAfterMonth)
-		if dayMatch != nil && len(dayMatch) >= 4 {
+		if len(dayMatch) >= 4 {
 			// dayMatch[3] is the end of the captured day group
 			dayEnd := dayMatch[3]
 			if dayEnd < len(textAfterMonth) && textAfterMonth[dayEnd] >= '0' && textAfterMonth[dayEnd] <= '9' {

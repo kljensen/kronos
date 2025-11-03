@@ -49,7 +49,6 @@ type AbstractTimeExpressionParser struct {
 	extractPrimaryTimeComponentsHook   func(*kronos.ParsingContext, []string, *kronos.ParsingComponents) bool
 	extractFollowingTimeComponentsHook func(*kronos.ParsingContext, []string, *kronos.ParsingResult, *kronos.ParsingComponents) bool
 	checkAndReturnWithoutFollowingHook func(*kronos.ParsingResult) *kronos.ParsingResult
-	checkAndReturnWithFollowingHook    func(*kronos.ParsingResult) *kronos.ParsingResult
 
 	// Cached patterns
 	cachedPrimaryPrefix        string

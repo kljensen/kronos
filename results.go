@@ -128,10 +128,8 @@ func NewParsingComponents(reference *ReferenceWithTimezone, knownComponents map[
 		tags:          make(map[string]bool),
 	}
 
-	if knownComponents != nil {
-		for k, v := range knownComponents {
-			pc.knownValues[k] = v
-		}
+	for k, v := range knownComponents {
+		pc.knownValues[k] = v
 	}
 
 	// Set default implied values from reference

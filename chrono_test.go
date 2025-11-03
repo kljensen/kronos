@@ -11,10 +11,8 @@ import (
 
 // MockParser is a simple parser for testing
 type MockParser struct {
-	pattern      string
-	extractFunc  func(context *ParsingContext, match []string) interface{}
-	shouldMatch  bool
-	expectedText string
+	pattern     string
+	extractFunc func(context *ParsingContext, match []string) interface{}
 }
 
 func (p *MockParser) Pattern(context *ParsingContext) *regexp.Regexp {
