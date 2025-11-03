@@ -167,5 +167,22 @@ func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingCompo
 		result.AddTag(tag)
 	}
 
+	// Merge period - use the finest granularity
+	// If time components are present, period should be PeriodTime
+	datePeriod := dateComp.Period()
+	timePeriod := timeComp.Period()
+
+	// If either is time-level, the result is time-level
+	if timePeriod == PeriodTime || datePeriod == PeriodTime {
+		result.SetPeriod(PeriodTime)
+	} else {
+		// Otherwise, use the finer of the two periods
+		if datePeriod > timePeriod {
+			result.SetPeriod(datePeriod)
+		} else {
+			result.SetPeriod(timePeriod)
+		}
+	}
+
 	return result
 }

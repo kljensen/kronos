@@ -117,7 +117,8 @@ func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.ParsingCont
 	components := context.CreateParsingComponents(nil).
 		Assign(kronos.ComponentMonth, month).
 		Assign(kronos.ComponentDay, day).
-		AddTag("parser/ENMonthNameMiddleEndianParser")
+		AddTag("parser/ENMonthNameMiddleEndianParser").
+		SetPeriod(kronos.PeriodDay)
 
 	// Handle year if present
 	if len(match) > 5 && match[5] != "" {

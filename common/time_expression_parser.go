@@ -494,6 +494,9 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 		}
 	}
 
+	// Set period to time-level since we're parsing time components
+	components.SetPeriod(kronos.PeriodTime)
+
 	return components
 }
 
@@ -671,6 +674,9 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	for tag := range startTags {
 		components.AddTag(tag)
 	}
+
+	// Set period to time-level since we're parsing time components
+	components.SetPeriod(kronos.PeriodTime)
 
 	return components
 }

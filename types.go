@@ -130,6 +130,48 @@ const (
 	MonthDecember
 )
 
+// Period represents the granularity of a parsed date/time expression.
+// It indicates the finest level of precision explicitly mentioned in the input.
+// For example:
+//   - "2020" has year-level precision
+//   - "March 2020" has month-level precision
+//   - "yesterday" has day-level precision
+//   - "10:30" has time-level precision
+type Period int
+
+const (
+	// PeriodUnknown indicates the period could not be determined.
+	PeriodUnknown Period = iota
+	// PeriodYear represents year-level precision (e.g., "2020", "last year").
+	PeriodYear
+	// PeriodMonth represents month-level precision (e.g., "March", "3 months ago").
+	PeriodMonth
+	// PeriodWeek represents week-level precision (e.g., "last week", "2 weeks ago").
+	PeriodWeek
+	// PeriodDay represents day-level precision (e.g., "yesterday", "March 15").
+	PeriodDay
+	// PeriodTime represents time-level precision (e.g., "10:30", "2 hours ago").
+	PeriodTime
+)
+
+// String returns the string representation of the Period.
+func (p Period) String() string {
+	switch p {
+	case PeriodYear:
+		return "year"
+	case PeriodMonth:
+		return "month"
+	case PeriodWeek:
+		return "week"
+	case PeriodDay:
+		return "day"
+	case PeriodTime:
+		return "time"
+	default:
+		return "unknown"
+	}
+}
+
 // DebugHandler is a function that handles debug events.
 // It receives a debug message for logging or analysis.
 type DebugHandler func(message string)

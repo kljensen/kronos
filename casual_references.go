@@ -10,6 +10,7 @@ func Now(reference *ReferenceWithTimezone) *ParsingComponents {
 	AssignSimilarTime(component, targetDate)
 	component.Assign(ComponentTimezoneOffset, reference.GetTimezoneOffset())
 	component.AddTag("casualReference/now")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }
@@ -24,6 +25,7 @@ func Today(reference *ReferenceWithTimezone) *ParsingComponents {
 	ImplySimilarTime(component, targetDate)
 	component.Delete(ComponentMeridiem)
 	component.AddTag("casualReference/today")
+	component.SetPeriod(PeriodDay)
 
 	return component
 }
@@ -33,6 +35,7 @@ func Today(reference *ReferenceWithTimezone) *ParsingComponents {
 func Yesterday(reference *ReferenceWithTimezone) *ParsingComponents {
 	component := TheDayBefore(reference, 1)
 	component.AddTag("casualReference/yesterday")
+	component.SetPeriod(PeriodDay)
 	return component
 }
 
@@ -41,6 +44,7 @@ func Yesterday(reference *ReferenceWithTimezone) *ParsingComponents {
 func Tomorrow(reference *ReferenceWithTimezone) *ParsingComponents {
 	component := TheDayAfter(reference, 1)
 	component.AddTag("casualReference/tomorrow")
+	component.SetPeriod(PeriodDay)
 	return component
 }
 
@@ -61,6 +65,7 @@ func TheDayAfter(reference *ReferenceWithTimezone, nDays int) *ParsingComponents
 	AssignSimilarDate(component, newDate)
 	ImplySimilarTime(component, newDate)
 	component.Delete(ComponentMeridiem)
+	component.SetPeriod(PeriodDay)
 
 	return component
 }
@@ -80,6 +85,7 @@ func TonightWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingCo
 	component.Imply(ComponentHour, implyHour)
 	component.Imply(ComponentMeridiem, int(MeridiemPM))
 	component.AddTag("casualReference/tonight")
+	component.SetPeriod(PeriodDay)
 
 	return component
 }
@@ -104,6 +110,7 @@ func LastNightWithHour(reference *ReferenceWithTimezone, implyHour int) *Parsing
 	AssignSimilarDate(component, targetDate)
 	component.Imply(ComponentHour, implyHour)
 	component.AddTag("casualReference/lastNight")
+	component.SetPeriod(PeriodDay)
 
 	return component
 }
@@ -121,6 +128,7 @@ func EveningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingCo
 	component.Imply(ComponentMeridiem, int(MeridiemPM))
 	component.Imply(ComponentHour, implyHour)
 	component.AddTag("casualReference/evening")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }
@@ -142,6 +150,7 @@ func YesterdayEveningWithHour(reference *ReferenceWithTimezone, implyHour int) *
 	component.Imply(ComponentMeridiem, int(MeridiemPM))
 	component.AddTag("casualReference/yesterday")
 	component.AddTag("casualReference/evening")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }
@@ -165,6 +174,7 @@ func Midnight(reference *ReferenceWithTimezone) *ParsingComponents {
 	component.Imply(ComponentSecond, 0)
 	component.Imply(ComponentMillisecond, 0)
 	component.AddTag("casualReference/midnight")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }
@@ -185,6 +195,7 @@ func MorningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingCo
 	component.Imply(ComponentSecond, 0)
 	component.Imply(ComponentMillisecond, 0)
 	component.AddTag("casualReference/morning")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }
@@ -205,6 +216,7 @@ func AfternoonWithHour(reference *ReferenceWithTimezone, implyHour int) *Parsing
 	component.Imply(ComponentSecond, 0)
 	component.Imply(ComponentMillisecond, 0)
 	component.AddTag("casualReference/afternoon")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }
@@ -219,6 +231,7 @@ func Noon(reference *ReferenceWithTimezone) *ParsingComponents {
 	component.Imply(ComponentSecond, 0)
 	component.Imply(ComponentMillisecond, 0)
 	component.AddTag("casualReference/noon")
+	component.SetPeriod(PeriodTime)
 
 	return component
 }

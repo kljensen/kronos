@@ -122,6 +122,8 @@ func NewENWeekdayParser() *ENWeekdayParser {
 			kronos.ImplySimilarDate(components, targetDate)
 			// Only weekday is certain
 			components.Assign(kronos.ComponentWeekday, int(weekday))
+			// Set period to week-level since we're parsing weekday
+			components.SetPeriod(kronos.PeriodWeek)
 
 			return components
 		},

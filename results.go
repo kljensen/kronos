@@ -116,6 +116,7 @@ type ParsingComponents struct {
 	impliedValues map[Component]int
 	reference     *ReferenceWithTimezone
 	tags          map[string]bool
+	period        Period
 }
 
 // NewParsingComponents creates a new ParsingComponents with the given reference.
@@ -199,6 +200,7 @@ func (pc *ParsingComponents) Clone() *ParsingComponents {
 		impliedValues: make(map[Component]int),
 		reference:     pc.reference,
 		tags:          make(map[string]bool),
+		period:        pc.period,
 	}
 
 	for k, v := range pc.knownValues {
@@ -365,6 +367,96 @@ func (pc *ParsingComponents) Reference() *ReferenceWithTimezone {
 	return pc.reference
 }
 
+// Period returns the granularity/period of the parsed date.
+func (pc *ParsingComponents) Period() Period {
+	return pc.period
+}
+
+// SetPeriod sets the granularity/period of the parsed date.
+func (pc *ParsingComponents) SetPeriod(period Period) *ParsingComponents {
+	pc.period = period
+	return pc
+}
+
+// DeterminePeriodFromDuration determines the granularity/period based on a duration.
+// The period represents the finest time unit present in the duration.
+// This follows the pattern from Python's dateparser.
+func DeterminePeriodFromDuration(duration Duration) Period {
+	if duration == nil {
+		return PeriodDay // Default
+	}
+
+	// Check from finest to coarsest granularity
+	// Time components (hour, minute, second) indicate time-level precision
+	for _, timeunit := range []Timeunit{TimeunitSecond, TimeunitMinute, TimeunitHour} {
+		if _, exists := duration[timeunit]; exists {
+			return PeriodTime
+		}
+	}
+
+	// Day indicates day-level precision
+	if _, exists := duration[TimeunitDay]; exists {
+		return PeriodDay
+	}
+
+	// Week indicates week-level precision
+	if _, exists := duration[TimeunitWeek]; exists {
+		return PeriodWeek
+	}
+
+	// Month indicates month-level precision
+	if _, exists := duration[TimeunitMonth]; exists {
+		return PeriodMonth
+	}
+
+	// Year, decade, or quarter indicate year-level precision
+	for _, timeunit := range []Timeunit{TimeunitYear, TimeunitDecade, TimeunitQuarter} {
+		if _, exists := duration[timeunit]; exists {
+			return PeriodYear
+		}
+	}
+
+	// Default to day if no specific duration is found
+	return PeriodDay
+}
+
+// DeterminePeriodFromComponents determines the granularity/period based on which
+// components are certain (explicitly mentioned). The period represents the finest
+// granularity of date/time information that was directly parsed.
+func DeterminePeriodFromComponents(pc *ParsingComponents) Period {
+	if pc == nil {
+		return PeriodUnknown
+	}
+
+	// If any time components (hour, minute, second) are certain, it's time-level
+	if pc.IsCertain(ComponentHour) || pc.IsCertain(ComponentMinute) || pc.IsCertain(ComponentSecond) {
+		return PeriodTime
+	}
+
+	// If day is certain, it's day-level
+	if pc.IsCertain(ComponentDay) {
+		return PeriodDay
+	}
+
+	// If weekday is certain (without day/month), it's week-level
+	if pc.IsCertain(ComponentWeekday) && !pc.IsCertain(ComponentDay) {
+		return PeriodWeek
+	}
+
+	// If month is certain (without day), it's month-level
+	if pc.IsCertain(ComponentMonth) {
+		return PeriodMonth
+	}
+
+	// If only year is certain, it's year-level
+	if pc.IsCertain(ComponentYear) {
+		return PeriodYear
+	}
+
+	// Default to unknown if nothing is certain
+	return PeriodUnknown
+}
+
 // CreateRelativeFromReference creates a ParsingComponents from a duration relative to the reference.
 // It handles date-only durations (implies time) and time durations (assigns both date and time).
 // This is used for parsing relative expressions like "in 3 days", "2 hours ago", etc.
@@ -377,6 +469,10 @@ func CreateRelativeFromReference(reference *ReferenceWithTimezone, duration Dura
 
 	components := NewParsingComponents(reference, nil)
 	components.AddTag("result/relativeDate")
+
+	// Determine and set the period based on the duration
+	period := DeterminePeriodFromDuration(duration)
+	components.SetPeriod(period)
 
 	// Check if duration contains time components
 	hasTimeComponents := false

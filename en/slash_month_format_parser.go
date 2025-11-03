@@ -44,5 +44,6 @@ func (p *ENSlashMonthFormatParser) innerExtract(context *kronos.ParsingContext, 
 	return context.CreateParsingComponents(nil).
 		Assign(kronos.ComponentMonth, month).
 		Assign(kronos.ComponentYear, year).
-		Imply(kronos.ComponentDay, 1)
+		Imply(kronos.ComponentDay, 1).
+		SetPeriod(kronos.PeriodMonth)
 }

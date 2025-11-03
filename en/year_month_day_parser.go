@@ -87,8 +87,11 @@ func (p *ENYearMonthDayParser) innerExtract(context *kronos.ParsingContext, matc
 		return nil
 	}
 
-	return context.CreateParsingComponents(nil).
+	components := context.CreateParsingComponents(nil).
 		Assign(kronos.ComponentYear, year).
 		Assign(kronos.ComponentMonth, month).
-		Assign(kronos.ComponentDay, day)
+		Assign(kronos.ComponentDay, day).
+		SetPeriod(kronos.PeriodDay)
+
+	return components
 }

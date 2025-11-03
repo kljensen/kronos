@@ -69,5 +69,8 @@ func (p *ENMonthNameParser) innerExtract(context *kronos.ParsingContext, match [
 		components.Imply(kronos.ComponentYear, year)
 	}
 
+	// Set period to month-level
+	components.SetPeriod(kronos.PeriodMonth)
+
 	return components
 }
