@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	kronos "github.com/kljensen/kronos"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,9 +30,8 @@ func TestIntegrationDateTimeExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, err := New().Parse(tt.text)
+			assert.NoError(t, err)
 
 			if len(results) > 0 {
 				assert.Contains(t, results[0].Text(), tt.expectedText, "Text mismatch")
@@ -68,9 +66,8 @@ func TestIntegrationTimeExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results)
 		})
 	}
@@ -108,9 +105,8 @@ func TestIntegrationQuotedExpressions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results)
 		})
 	}
@@ -209,9 +205,8 @@ func TestIntegrationRandomText(t *testing.T) {
 				refDate = time.Now()
 			}
 
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-			results := chrono.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			if len(results) > 0 {
 				assert.Contains(t, results[0].Text(), tt.expectedText, "Text mismatch")
@@ -227,9 +222,10 @@ func TestIntegrationWikipediaText(t *testing.T) {
 		`"well-wishers" to send their remembrance messages to an email address created to receive such messages.[240] ` +
 		"Sunday, October 16, 2011"
 
-	config := CreateCasualConfiguration(false)
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(text, time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC), nil)
+	results, err := New().
+		WithReferenceDate(time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)).
+		Parse(text)
+	assert.NoError(t, err)
 
 	// Should find at least the clear dates
 	if len(results) >= 2 {
@@ -243,9 +239,8 @@ func TestIntegrationMultipleResults(t *testing.T) {
 	text := "I will see you at 2:30. If not I will see you somewhere between 3:30-4:30pm"
 	refDate := time.Date(2020, 7, 6, 0, 0, 0, 0, time.UTC)
 
-	config := CreateCasualConfiguration(false)
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(text, refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse(text)
+	assert.NoError(t, err)
 
 	// Should find at least one result
 	assert.NotEmpty(t, results, "Expected to find at least one date")

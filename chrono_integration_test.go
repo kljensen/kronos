@@ -20,18 +20,22 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("Let's finish this before 2013-02-07", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("Let's finish this before 2013-02-07")
 
+		require.NoError(t, err)
 		require.Len(t, results, 1)
 		result := results[0]
 
 		assert.Equal(t, 2013, *result.Start().Get(kronos.ComponentYear))
 		assert.Equal(t, 2, *result.Start().Get(kronos.ComponentMonth))
 		assert.Equal(t, 7, *result.Start().Get(kronos.ComponentDay))
-		assert.True(t, result.Tags()["parser/ISOFormatParser"])
+		// Note: Tags are not exposed in the public Result interface
+		// assert.True(t, result.Tags()["parser/ISOFormatParser"])
 	})
 
 	t.Run("parse ISO datetime with timezone", func(t *testing.T) {
@@ -41,11 +45,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("Event at 1994-11-05T08:15:30-05:30", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("Event at 1994-11-05T08:15:30-05:30")
 
+		require.NoError(t, err)
 		require.Len(t, results, 1)
 		result := results[0]
 
@@ -65,19 +72,20 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("The Deadline is 8/10/2012", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("The Deadline is 8/10/2012")
 
+		require.NoError(t, err)
 		require.Len(t, results, 1)
 		result := results[0]
 
 		assert.Equal(t, 2012, *result.Start().Get(kronos.ComponentYear))
 		assert.Equal(t, 8, *result.Start().Get(kronos.ComponentMonth))
 		assert.Equal(t, 10, *result.Start().Get(kronos.ComponentDay))
-		// Note: Tags are not preserved when parsers return ParsingComponents
-		// assert.True(t, result.Tags()["parser/SlashDateFormatParser"])
 		assert.Equal(t, "8/10/2012", result.Text())
 	})
 
@@ -88,11 +96,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("The Deadline is 8/10/2012", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("The Deadline is 8/10/2012")
 
+		require.NoError(t, err)
 		require.Len(t, results, 1)
 		result := results[0]
 
@@ -109,11 +120,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("Meeting on 8/10/2012 and event at 2013-02-07", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("Meeting on 8/10/2012 and event at 2013-02-07")
 
+		require.NoError(t, err)
 		require.Len(t, results, 2)
 
 		// Results should be sorted by position
@@ -137,11 +151,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		date := c.ParseDate("Event at 1994-11-05T13:15:30Z", refDate, nil)
+		date, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			ParseDate("Event at 1994-11-05T13:15:30Z")
 
+		require.NoError(t, err)
 		require.NotNil(t, date)
 		assert.Equal(t, 1994, date.Year())
 		assert.Equal(t, time.Month(11), date.Month())
@@ -159,10 +176,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		date := c.ParseDate("No date here", refDate, nil)
+		date, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			ParseDate("No date here")
+
+		require.NoError(t, err)
 		assert.Nil(t, date)
 	})
 
@@ -173,11 +194,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("Meeting on 12/30/16", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("Meeting on 12/30/16")
 
+		require.NoError(t, err)
 		require.Len(t, results, 1)
 		result := results[0]
 
@@ -192,11 +216,14 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results := c.Parse("Meeting on 8/15", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("Meeting on 8/15")
 
+		require.NoError(t, err)
 		require.Len(t, results, 1)
 		result := results[0]
 
@@ -212,11 +239,15 @@ func TestChronoIntegration(t *testing.T) {
 			},
 		}
 
-		c := kronos.NewChrono(config)
+		chrono := kronos.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
 		// Should not match date in version number
-		results := c.Parse("Version1994-11-05T13:15:30Z released", refDate, nil)
+		results, err := kronos.New(chrono).
+			WithReferenceDate(refDate).
+			Parse("Version1994-11-05T13:15:30Z released")
+
+		require.NoError(t, err)
 		assert.Len(t, results, 0)
 	})
 }
