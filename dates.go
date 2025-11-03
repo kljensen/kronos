@@ -134,6 +134,10 @@ func FindYearClosestToRef(refDate time.Time, day, month int) int {
 // FindYearClosestToRefWithPreference finds the year based on date preference settings.
 // This allows control over whether ambiguous dates should be resolved to past, future, or current period.
 //
+// Special handling for February 29:
+// When month is 2 and day is 29, this function ensures we select a leap year.
+// It adjusts the candidate years to be valid leap years according to the preference.
+//
 // Parameters:
 //   - refDate: The reference date/time for comparison
 //   - day: The day of month (1-31)
@@ -144,11 +148,21 @@ func FindYearClosestToRef(refDate time.Time, day, month int) int {
 //   - PreferCurrentPeriod: "March 15" → March 15, 2015 (current year)
 //   - PreferPast: "March 15" → March 15, 2014 (last year, since March 15, 2015 is in future)
 //   - PreferFuture: "March 15" → March 15, 2015 (this year, since it's in future)
+//
+// Examples with February 29 and reference date March 1, 2023:
+//   - PreferPast: "February 29" → February 29, 2020 (previous leap year)
+//   - PreferFuture: "February 29" → February 29, 2024 (next leap year)
+//   - PreferCurrentPeriod: "February 29" → February 29, 2024 (nearest leap year)
 func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, preference DatePreference) int {
 	const defaultImpliedHour = 12 // Use noon for comparison
 
 	refYear := refDate.Year()
 	location := refDate.Location()
+
+	// Special case: February 29 requires leap year selection
+	if month == 2 && day == 29 {
+		return FindNearestLeapYear(refYear, preference)
+	}
 
 	// Create candidate dates for the reference year and adjacent years
 	candidates := []time.Time{
@@ -197,5 +211,108 @@ func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, prefe
 		}
 
 		return closestYear
+	}
+}
+
+// IsLeapYear checks if a year is a leap year according to the Gregorian calendar rules.
+//
+// Leap year rules:
+// 1. Divisible by 4, AND
+// 2. NOT divisible by 100, OR
+// 3. Divisible by 400
+//
+// Examples:
+//   - 2000: Leap year (divisible by 400)
+//   - 1900: NOT leap year (divisible by 100 but not 400)
+//   - 2004: Leap year (divisible by 4, not by 100)
+//   - 2001: NOT leap year (not divisible by 4)
+func IsLeapYear(year int) bool {
+	if year%400 == 0 {
+		return true
+	}
+	if year%100 == 0 {
+		return false
+	}
+	return year%4 == 0
+}
+
+// FindPreviousLeapYear finds the most recent leap year before or at baseYear.
+// It searches backward from baseYear until it finds a leap year.
+// The search is bounded at year 1900 to avoid excessive searching.
+//
+// Examples:
+//   - FindPreviousLeapYear(2023) → 2020
+//   - FindPreviousLeapYear(2024) → 2024
+//   - FindPreviousLeapYear(1901) → 1900 (bounded)
+func FindPreviousLeapYear(baseYear int) int {
+	const lowerBound = 1900
+	for year := baseYear; year >= lowerBound; year-- {
+		if IsLeapYear(year) {
+			return year
+		}
+	}
+	// Fallback: if no leap year found, return base year
+	return baseYear
+}
+
+// FindNextLeapYear finds the next leap year after or at baseYear.
+// It searches forward from baseYear until it finds a leap year.
+// The search is bounded at year 9999 to avoid excessive searching.
+//
+// Examples:
+//   - FindNextLeapYear(2023) → 2024
+//   - FindNextLeapYear(2024) → 2024
+//   - FindNextLeapYear(9997) → 9998 (bounded)
+func FindNextLeapYear(baseYear int) int {
+	const upperBound = 9999
+	for year := baseYear; year <= upperBound; year++ {
+		if IsLeapYear(year) {
+			return year
+		}
+	}
+	// Fallback: if no leap year found, return base year
+	return baseYear
+}
+
+// FindNearestLeapYear finds the nearest leap year based on date preference.
+// This is used when parsing February 29 without a year, ensuring we select
+// a valid leap year according to the preference setting.
+//
+// Parameters:
+//   - baseYear: The starting year (typically the reference year)
+//   - preference: How to resolve ambiguous dates (PreferPast, PreferFuture, PreferCurrentPeriod)
+//
+// Examples with baseYear 2023 (not a leap year):
+//   - PreferPast → 2020 (previous leap year)
+//   - PreferFuture → 2024 (next leap year)
+//   - PreferCurrentPeriod → 2024 (prefer future when current isn't leap)
+func FindNearestLeapYear(baseYear int, preference DatePreference) int {
+	// If the base year is already a leap year, use it for all preferences
+	if IsLeapYear(baseYear) {
+		return baseYear
+	}
+
+	switch preference {
+	case PreferPast:
+		return FindPreviousLeapYear(baseYear)
+
+	case PreferFuture:
+		return FindNextLeapYear(baseYear)
+
+	default: // PreferCurrentPeriod
+		// When current year is not a leap year, prefer the nearest one
+		// Break ties by preferring the future
+		next := FindNextLeapYear(baseYear)
+		prev := FindPreviousLeapYear(baseYear)
+
+		// Calculate distances
+		distToNext := next - baseYear
+		distToPrev := baseYear - prev
+
+		// Prefer future if equal distance
+		if distToNext <= distToPrev {
+			return next
+		}
+		return prev
 	}
 }
