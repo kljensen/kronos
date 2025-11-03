@@ -1,5 +1,34 @@
 package en
 
+// Port of chrono's en_month_name_little_endian.test.ts
+//
+// Original chrono file has 40 test cases testing little-endian month name formats
+// (e.g., "5 January 2020", "2nd Feb", "1st March 2021").
+//
+// Current status: 15 test cases ported (9 passing, 6 with known limitations)
+// - Passing (9 tests):
+//   - Ordinal numbers with full year (7 tests): "1st Jan 2020", "2nd Feb 2020", etc.
+//   - With weekday (2 tests): "Tuesday, 10 January"
+// - Known limitations (6 tests):
+//   - Full month names abbreviated: "10 August" -> "10 Aug"
+//   - Year inference not working: defaults to reference year
+//   - Invalid dates not rejected: pattern matches but validation missing
+//
+// Remaining 25 test cases from chrono not yet ported:
+// - Separators (4 tests): "10-August 2012", "10/August/2012", etc.
+// - Range expressions (6 tests): "10 - 22 August 2012", etc.
+// - Combined with time (3 tests): "12th of July at 19:00", etc.
+// - Ordinal words (2 tests): "Twenty-fourth of May", etc.
+// - Date followed by time (5 tests): "24th October, 9 am", etc.
+// - Year 90's (3 tests): "03 Aug 96", etc.
+// - Forward option (3 tests): requires forwardDate option with refiners
+//
+// NOTE: Full parser stack (Casual.Parse/Strict.Parse) currently has a bug that causes
+// nil pointer panics when calling Parse(). Investigation shows the executeParser function
+// crashes. Once fixed, remaining test cases can be added and limitations addressed.
+//
+// These tests use single-parser configuration to validate core parsing logic.
+
 import (
 	"testing"
 	"time"
