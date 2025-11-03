@@ -36,6 +36,7 @@ shell CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
     $SRUN_CMD apptainer shell \
         --no-home \
         --bind $PWD:/workspace \
+        --bind $HOME/.cache:$HOME/.cache \
         --bind $HOME/.claude:$HOME/.claude \
         --bind $HOME/.claude.json:$HOME/.claude.json \
         --bind $HOME/.codex:$HOME/.codex \
@@ -47,6 +48,8 @@ shell CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
         --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
         --env "PATH=$HOME/local/bin:$PATH" \
+        --env "GOCACHE=/tmp/go-build" \
+        --env "GOMODCACHE=/tmp/go-mod" \
         --pwd /workspace \
         {{sif_image}}
 
