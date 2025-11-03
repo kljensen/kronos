@@ -276,3 +276,39 @@ type ParsedResult interface {
 	// Tags returns combined debugging tags from start and end components.
 	Tags() map[string]bool
 }
+
+// Result is the future simplified public interface for parsed date/time results.
+// This will be the primary interface in the new builder-based API (Phase 5).
+// It provides a cleaner, more focused API surface compared to ParsedResult.
+type Result interface {
+	// Text returns the matched text from the input.
+	Text() string
+
+	// Index returns the position in the input text where this result was found.
+	Index() int
+
+	// Date returns a time.Time object created from the start components.
+	Date() time.Time
+
+	// Start returns the starting date/time components.
+	Start() Components
+
+	// End returns the ending date/time components for a range, or nil for a single date/time.
+	End() Components
+}
+
+// Components is the future simplified public interface for date/time components.
+// This will be the primary interface in the new builder-based API (Phase 5).
+// It provides a cleaner API focused on the most common use cases.
+type Components interface {
+	// Get returns the component value.
+	// Returns nil if the component is not present (neither certain nor implied).
+	Get(component Component) *int
+
+	// IsCertain returns true if the component was explicitly mentioned in the input.
+	// Returns false if the component was implied or is not present.
+	IsCertain(component Component) bool
+
+	// Date returns a time.Time object constructed from the components.
+	Date() time.Time
+}
