@@ -1,0 +1,81 @@
+package en
+
+import (
+	"strings"
+
+	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/common"
+)
+
+// ENTimeExpressionParser parses English time expressions with keywords:
+// at, from, after, before.
+// Examples: "at 3pm", "3:30pm", "15:30", "1 at night", "6 in the morning"
+type ENTimeExpressionParser struct {
+	*common.AbstractTimeExpressionParser
+}
+
+// NewENTimeExpressionParser creates a new English time expression parser
+func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
+	parser := &ENTimeExpressionParser{
+		AbstractTimeExpressionParser: common.NewAbstractTimeExpressionParser(
+			func() string {
+				return `(?:(?:at|from)\s*)?` // Optional "at" or "from" prefix
+			},
+			func() string {
+				return `\s*(?:\-|\–|\~|to|until|through|till|\?)\s*` // Range separator
+			},
+			strictMode,
+		),
+	}
+
+	// Set custom primary suffix to handle "o'clock", "at night", "in the morning/afternoon"
+	parser.SetPrimarySuffix(func() string {
+		return `(?:\s*(?:o\W*clock|at\s*night|in\s*the\s*(?:morning|afternoon)))?(?!/)(?=\W|$)`
+	})
+
+	// Set custom extraction hook to handle "at night", "in the afternoon", etc.
+	parser.SetExtractPrimaryTimeComponentsHook(func(
+		context *kronos.ParsingContext,
+		match []string,
+		components *kronos.ParsingComponents,
+	) bool {
+		fullMatch := match[0]
+
+		// Handle "at night"
+		if strings.HasSuffix(fullMatch, "night") {
+			hour := components.Get(kronos.ComponentHour)
+			if hour >= 6 && hour < 12 {
+				components.Assign(kronos.ComponentHour, hour+12)
+				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+			} else if hour < 6 {
+				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			}
+		}
+
+		// Handle "in the afternoon"
+		if strings.HasSuffix(fullMatch, "afternoon") {
+			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+			hour := components.Get(kronos.ComponentHour)
+			if hour >= 0 && hour <= 6 {
+				components.Assign(kronos.ComponentHour, hour+12)
+			}
+		}
+
+		// Handle "in the morning"
+		if strings.HasSuffix(fullMatch, "morning") {
+			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			// Hour stays as-is for morning times
+		}
+
+		// Add parser tag
+		components.AddTag("parser/ENTimeExpressionParser")
+		return true
+	})
+
+	return parser
+}
+
+// Pattern returns the pattern for this parser
+func (p *ENTimeExpressionParser) Pattern(context *kronos.ParsingContext) string {
+	return p.AbstractTimeExpressionParser.Pattern(context).String()
+}

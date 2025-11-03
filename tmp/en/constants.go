@@ -298,3 +298,77 @@ func ParseNumberPattern(match string) float64 {
 	val, _ := strconv.ParseFloat(lower, 64)
 	return val
 }
+
+// Time-related patterns
+
+var (
+	// NumberPattern matches integers and float numbers
+	NumberPattern = `(?:\d+(?:\.\d*)?|\.\d+)`
+
+	// TimeUnitNoAbbrPattern matches full time unit names only (no abbreviations)
+	TimeUnitNoAbbrPattern = `(?:second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months|quarter|quarters|year|years)`
+
+	// TimeUnitPattern matches time units including abbreviations
+	TimeUnitPattern = `(?:s|sec|second|seconds|m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days|w|week|weeks|mo|mon|mos|month|months|qtr|quarter|quarters|y|yr|year|years)`
+)
+
+// ParseDuration parses a duration expression like "3 days", "5 hours 30 minutes", "half an hour"
+func ParseDuration(text string) kronos.Duration {
+	result := make(kronos.Duration)
+
+	// Pattern for matching time units
+	// Supports formats like:
+	// - "3 days"
+	// - "5 hours 30 minutes"
+	// - "a week"
+	// - "half an hour"
+	// - "1d 5h 30m"
+	pattern := regexp.MustCompile(`(?i)(?:(?:([0-9.]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?)(` + TimeUnitPattern + `)`)
+	matches := pattern.FindAllStringSubmatch(text, -1)
+
+	for _, match := range matches {
+		if len(match) < 3 {
+			continue
+		}
+
+		numStr := strings.TrimSpace(match[1])
+		unit := strings.ToLower(strings.TrimSpace(match[2]))
+
+		var num float64
+		if numStr == "" {
+			num = 1
+		} else {
+			num = ParseNumberPattern(numStr)
+		}
+
+		// Map to Timeunit and add to duration
+		if timeunit, ok := TimeUnitDictionary[unit]; ok {
+			// Accumulate values for same timeunit
+			if existing, exists := result[timeunit]; exists {
+				result[timeunit] = existing + num
+			} else {
+				result[timeunit] = num
+			}
+		}
+	}
+
+	return result
+}
+
+// IsEmpty returns true if the duration has no non-zero values
+func IsEmptyDuration(d kronos.Duration) bool {
+	if d == nil || len(d) == 0 {
+		return true
+	}
+	for _, v := range d {
+		if v != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// ReverseDuration returns a reversed (negated) duration
+func ReverseDuration(d kronos.Duration) kronos.Duration {
+	return kronos.ReverseDuration(d)
+}
