@@ -187,21 +187,3 @@ func (c *Chrono) executeParser(context *ParsingContext, parser Parser) []*Parsin
 
 	return results
 }
-
-// MatchIndex represents the index information from a regex match
-type MatchIndex struct {
-	Start int
-	End   int
-}
-
-// Helper function to extract match indices from FindStringSubmatchIndex result
-func extractMatchIndices(indices []int) []MatchIndex {
-	matches := make([]MatchIndex, len(indices)/2)
-	for i := 0; i < len(indices); i += 2 {
-		matches[i/2] = MatchIndex{
-			Start: indices[i],
-			End:   indices[i+1],
-		}
-	}
-	return matches
-}

@@ -209,10 +209,10 @@ func TestENMonthNameLittleEndianParser_CombinedWithTime(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		text         string
-		expectedDay  int
+		text          string
+		expectedDay   int
 		expectedMonth int
-		expectedHour int
+		expectedHour  int
 	}{
 		{"12th of July at 19:00", 12, 7, 19},
 		{"5 May 12:00", 5, 5, 12},
@@ -273,10 +273,10 @@ func TestENMonthNameLittleEndianParser_DateFollowedByTime(t *testing.T) {
 	refDate := time.Date(2017, 7, 7, 15, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		text         string
-		expectedDay  int
+		text          string
+		expectedDay   int
 		expectedMonth int
-		expectedHour int
+		expectedHour  int
 	}{
 		{"24th October, 9 am", 24, 10, 9},
 		{"24th October, 9 pm", 24, 10, 21},
@@ -306,10 +306,10 @@ func TestENMonthNameLittleEndianParser_Year90s(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		text         string
-		expectedDay  int
+		text          string
+		expectedDay   int
 		expectedMonth int
-		expectedYear int
+		expectedYear  int
 	}{
 		{"03 Aug 96", 3, 8, 1996},
 		{"3 Aug 96", 3, 8, 1996},

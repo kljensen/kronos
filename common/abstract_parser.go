@@ -123,9 +123,9 @@ func (p *AbstractParserWithWordBoundary) Extract(context *kronos.ParsingContext,
 		}
 		return &kronos.ParsingResultWithBoundary{
 			Components:         v,
-			AdjustedText:       adjustedText,        // Exclude boundary and trailing space from text
-			BoundaryLen:        headerLen,           // Length of boundary to skip
-			IncludeBoundaryIdx: true,                // Index should point past the boundary
+			AdjustedText:       adjustedText, // Exclude boundary and trailing space from text
+			BoundaryLen:        headerLen,    // Length of boundary to skip
+			IncludeBoundaryIdx: true,         // Index should point past the boundary
 		}
 	default:
 		return result

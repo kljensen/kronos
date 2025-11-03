@@ -140,7 +140,7 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 	return &kronos.ParsingResultWithBoundary{
 		Components:         components,
 		AdjustedText:       adjustedText,
-		BoundaryLen:        0, // Will be set by AbstractParserWithWordBoundary
+		BoundaryLen:        0,    // Will be set by AbstractParserWithWordBoundary
 		IncludeBoundaryIdx: true, // Will be overridden by AbstractParserWithWordBoundary
 	}
 }

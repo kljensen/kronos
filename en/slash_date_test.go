@@ -105,34 +105,34 @@ func TestParsingOffsetExpression(t *testing.T) {
 // TestSingleExpressionMiddleEndian tests MM/dd/yyyy format (US-style)
 func TestSingleExpressionMiddleEndian(t *testing.T) {
 	tests := []struct {
-		name              string
-		text              string
-		refDate           time.Time
-		expectedIndex     int
-		expectedText      string
-		expectedYear      int
-		expectedMonth     int
-		expectedDay       int
-		checkCertainty    bool
-		yearCertain       bool
-		monthCertain      bool
-		dayCertain        bool
-		expectedDate      time.Time
+		name           string
+		text           string
+		refDate        time.Time
+		expectedIndex  int
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		checkCertainty bool
+		yearCertain    bool
+		monthCertain   bool
+		dayCertain     bool
+		expectedDate   time.Time
 	}{
 		{
-			name:          "8/10/2012",
-			text:          "8/10/2012",
-			refDate:       time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
-			expectedIndex: 0,
-			expectedText:  "8/10/2012",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
+			name:           "8/10/2012",
+			text:           "8/10/2012",
+			refDate:        time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
+			expectedIndex:  0,
+			expectedText:   "8/10/2012",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
 			checkCertainty: true,
 			yearCertain:    true,
 			monthCertain:   true,
 			dayCertain:     true,
-			expectedDate:  time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
+			expectedDate:   time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
 		},
 		{
 			name:          ": 8/1/2012",
@@ -241,12 +241,12 @@ func TestDashDateFormat(t *testing.T) {
 // TestSingleExpressionLittleEndian tests dd/MM/yyyy format (UK-style)
 func TestSingleExpressionLittleEndian(t *testing.T) {
 	tests := []struct {
-		name         string
-		text         string
-		expectedYear int
+		name          string
+		text          string
+		expectedYear  int
 		expectedMonth int
-		expectedDay  int
-		expectedDate time.Time
+		expectedDay   int
+		expectedDate  time.Time
 	}{
 		{
 			name:          "8/10/2012 - GB format",
@@ -271,7 +271,7 @@ func TestSingleExpressionLittleEndian(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 			chrono := createGBTestChrono()
-	results := chrono.Parse(tt.text, refDate, nil)
+			results := chrono.Parse(tt.text, refDate, nil)
 			assert.NotEmpty(t, results, "Should parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -515,13 +515,13 @@ func TestRangeExpressionsWithTime(t *testing.T) {
 // TestSplitterVariancePatterns tests various date separator patterns
 func TestSplitterVariancePatterns(t *testing.T) {
 	tests := []struct {
-		name       string
-		text       string
-		shouldParse bool  // Some formats may not be supported
+		name        string
+		text        string
+		shouldParse bool // Some formats may not be supported
 	}{
-		{"2015-05-25", "2015-05-25", false},  // YYYY-MM-DD not supported by SlashDateFormatParser
-		{"2015/05/25", "2015/05/25", false},  // YYYY/MM/DD not supported by SlashDateFormatParser
-		{"2015.05.25", "2015.05.25", false},  // YYYY.MM.DD not supported by SlashDateFormatParser
+		{"2015-05-25", "2015-05-25", false}, // YYYY-MM-DD not supported by SlashDateFormatParser
+		{"2015/05/25", "2015/05/25", false}, // YYYY/MM/DD not supported by SlashDateFormatParser
+		{"2015.05.25", "2015.05.25", false}, // YYYY.MM.DD not supported by SlashDateFormatParser
 		{"05-25-2015", "05-25-2015", true},
 		{"05/25/2015", "05/25/2015", true},
 		{"05.25.2015", "05.25.2015", true},
@@ -562,20 +562,20 @@ func TestSplitterVariancePatterns(t *testing.T) {
 func TestImpossibleDatesAndUnexpectedResults(t *testing.T) {
 	tests := []struct {
 		text         string
-		shouldReject bool  // Some invalid dates may still parse (parser doesn't validate calendar)
+		shouldReject bool // Some invalid dates may still parse (parser doesn't validate calendar)
 	}{
-		{"8/32/2014", true},     // Invalid day
-		{"8/32", true},          // Invalid day (short form)
-		{"2/29/2014", false},    // Invalid leap year - but parser allows it
-		{"2014/22/29", true},    // Invalid month
-		{"2014/13/22", true},    // Invalid month
-		{"80-32-89-89", true},   // Invalid format
-		{"02/29/2022", false},   // Invalid leap year - but parser allows it
-		{"06/31/2022", false},   // June has 30 days - but parser allows it
-		{"06/-31/2022", true},   // Negative day
-		{"18/13/2022", true},    // Invalid month (could be ambiguous)
-		{"15/28/2022", true},    // Ambiguous but invalid in either format
-		{"4/13/1", true},        // Year too short
+		{"8/32/2014", true},   // Invalid day
+		{"8/32", true},        // Invalid day (short form)
+		{"2/29/2014", false},  // Invalid leap year - but parser allows it
+		{"2014/22/29", true},  // Invalid month
+		{"2014/13/22", true},  // Invalid month
+		{"80-32-89-89", true}, // Invalid format
+		{"02/29/2022", false}, // Invalid leap year - but parser allows it
+		{"06/31/2022", false}, // June has 30 days - but parser allows it
+		{"06/-31/2022", true}, // Negative day
+		{"18/13/2022", true},  // Invalid month (could be ambiguous)
+		{"15/28/2022", true},  // Ambiguous but invalid in either format
+		{"4/13/1", true},      // Year too short
 	}
 
 	for _, tt := range tests {
@@ -596,14 +596,14 @@ func TestImpossibleDatesAndUnexpectedResults(t *testing.T) {
 // TestForwardDatesOnlyOption tests the forwardDate option
 func TestForwardDatesOnlyOption(t *testing.T) {
 	tests := []struct {
-		name          string
-		text          string
-		refDate       time.Time
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
+		name           string
+		text           string
+		refDate        time.Time
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
 		checkCertainty bool
-		yearCertain   bool
+		yearCertain    bool
 	}{
 		{
 			name:           "5/31 forward from June 1999",
@@ -629,7 +629,7 @@ func TestForwardDatesOnlyOption(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			option := &kronos.ParsingOption{ForwardDate: true}
 			chrono := createTestChrono()
-	results := chrono.Parse(tt.text, tt.refDate, option)
+			results := chrono.Parse(tt.text, tt.refDate, option)
 			assert.NotEmpty(t, results, "Should parse: %s", tt.text)
 			if len(results) == 0 {
 				return

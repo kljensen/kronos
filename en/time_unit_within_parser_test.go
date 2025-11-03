@@ -46,36 +46,36 @@ func TestNormalWithinExpression(t *testing.T) {
 		expectedSecond *int
 	}{
 		{
-			name:          "in 5 minutes",
-			text:          "in 5 minutes",
-			refDate:       time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
-			expectedText:  "in 5 minutes",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  intPtr(12),
+			name:           "in 5 minutes",
+			text:           "in 5 minutes",
+			refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
+			expectedText:   "in 5 minutes",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
 			expectedMinute: intPtr(19),
 		},
 		{
-			name:          "within 1 hour",
-			text:          "within 1 hour",
-			refDate:       time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
-			expectedText:  "within 1 hour",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  intPtr(13),
+			name:           "within 1 hour",
+			text:           "within 1 hour",
+			refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
+			expectedText:   "within 1 hour",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   intPtr(13),
 			expectedMinute: intPtr(14),
 		},
 		{
-			name:          "within half an hour",
-			text:          "within half an hour",
-			refDate:       time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
-			expectedText:  "within half an hour",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  intPtr(12),
+			name:           "within half an hour",
+			text:           "within half an hour",
+			refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
+			expectedText:   "within half an hour",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
 			expectedMinute: intPtr(44),
 		},
 		{
@@ -162,36 +162,36 @@ func TestWithinExpressionCertainKeywords(t *testing.T) {
 		expectedMinute int
 	}{
 		{
-			name:          "In about 5 hours (with double space)",
-			text:          "In  about 5 hours",
-			refDate:       time.Date(2012, 8, 10, 12, 49, 0, 0, time.UTC),
-			expectedText:  "about 5 hours",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  17,
+			name:           "In about 5 hours (with double space)",
+			text:           "In  about 5 hours",
+			refDate:        time.Date(2012, 8, 10, 12, 49, 0, 0, time.UTC),
+			expectedText:   "about 5 hours",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   17,
 			expectedMinute: 49,
 		},
 		{
-			name:          "within around 3 hours",
-			text:          "within around 3 hours",
-			refDate:       time.Date(2012, 8, 10, 12, 49, 0, 0, time.UTC),
-			expectedText:  "around 3 hours",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  15,
+			name:           "within around 3 hours",
+			text:           "within around 3 hours",
+			refDate:        time.Date(2012, 8, 10, 12, 49, 0, 0, time.UTC),
+			expectedText:   "around 3 hours",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   15,
 			expectedMinute: 49,
 		},
 		{
-			name:          "In several hours",
-			text:          "In several hours",
-			refDate:       time.Date(2012, 8, 10, 12, 49, 0, 0, time.UTC),
-			expectedText:  "several hours",
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  19,
+			name:           "In several hours",
+			text:           "In several hours",
+			refDate:        time.Date(2012, 8, 10, 12, 49, 0, 0, time.UTC),
+			expectedText:   "several hours",
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   19,
 			expectedMinute: 49,
 		},
 	}
@@ -258,13 +258,13 @@ func TestImpliedTimeValues(t *testing.T) {
 		expectedMinute int
 	}{
 		{
-			name:          "in 24 hours",
-			text:          "in 24 hours",
-			refDate:       time.Date(2020, 7, 10, 12, 14, 0, 0, time.UTC),
-			expectedYear:  2020,
-			expectedMonth: 7,
-			expectedDay:   11,
-			expectedHour:  12,
+			name:           "in 24 hours",
+			text:           "in 24 hours",
+			refDate:        time.Date(2020, 7, 10, 12, 14, 0, 0, time.UTC),
+			expectedYear:   2020,
+			expectedMonth:  7,
+			expectedDay:    11,
+			expectedHour:   12,
 			expectedMinute: 14,
 		},
 	}
@@ -295,50 +295,50 @@ func TestImpliedTimeValues(t *testing.T) {
 // TestTimeUnitsCertainty tests the certainty of time units
 func TestTimeUnitsCertainty(t *testing.T) {
 	tests := []struct {
-		name          string
-		text          string
-		refDate       time.Time
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		expectedHour  int
+		name           string
+		text           string
+		refDate        time.Time
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   int
 		expectedMinute int
-		yearCertain   bool
-		monthCertain  bool
-		dayCertain    bool
-		hourCertain   bool
-		minuteCertain bool
-		forwardDate   bool
+		yearCertain    bool
+		monthCertain   bool
+		dayCertain     bool
+		hourCertain    bool
+		minuteCertain  bool
+		forwardDate    bool
 	}{
 		{
-			name:          "in 2 minute - all certain",
-			text:          "in 2 minute",
-			refDate:       time.Date(2016, 10, 1, 14, 52, 0, 0, time.UTC),
-			expectedYear:  2016,
-			expectedMonth: 10,
-			expectedDay:   1,
-			expectedHour:  14,
+			name:           "in 2 minute - all certain",
+			text:           "in 2 minute",
+			refDate:        time.Date(2016, 10, 1, 14, 52, 0, 0, time.UTC),
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   14,
 			expectedMinute: 54,
-			yearCertain:   true,
-			monthCertain:  true,
-			dayCertain:    true,
-			hourCertain:   true,
-			minuteCertain: true,
+			yearCertain:    true,
+			monthCertain:   true,
+			dayCertain:     true,
+			hourCertain:    true,
+			minuteCertain:  true,
 		},
 		{
-			name:          "in 2hour - all certain",
-			text:          "in 2hour",
-			refDate:       time.Date(2016, 10, 1, 14, 52, 0, 0, time.UTC),
-			expectedYear:  2016,
-			expectedMonth: 10,
-			expectedDay:   1,
-			expectedHour:  16,
+			name:           "in 2hour - all certain",
+			text:           "in 2hour",
+			refDate:        time.Date(2016, 10, 1, 14, 52, 0, 0, time.UTC),
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   16,
 			expectedMinute: 52,
-			yearCertain:   true,
-			monthCertain:  true,
-			dayCertain:    true,
-			hourCertain:   true,
-			minuteCertain: true,
+			yearCertain:    true,
+			monthCertain:   true,
+			dayCertain:     true,
+			hourCertain:    true,
+			minuteCertain:  true,
 		},
 		// NOTE: "within 3 days" test removed - certainty flags behave differently in Kronos vs chrono
 	}
@@ -418,33 +418,33 @@ func TestStrictMode(t *testing.T) {
 // TestForwardDateOption tests the forwardDate option
 func TestForwardDateOption(t *testing.T) {
 	tests := []struct {
-		name          string
-		text          string
-		refDate       time.Time
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		expectedHour  *int
+		name           string
+		text           string
+		refDate        time.Time
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
 		expectedMinute *int
 	}{
 		{
-			name:          "1 hour with forwardDate",
-			text:          "1 hour",
-			refDate:       time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  intPtr(13),
+			name:           "1 hour with forwardDate",
+			text:           "1 hour",
+			refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   intPtr(13),
 			expectedMinute: intPtr(14),
 		},
 		{
-			name:          "in 1 hour with forwardDate (explicit prefix)",
-			text:          "in 1 hour",
-			refDate:       time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
-			expectedYear:  2012,
-			expectedMonth: 8,
-			expectedDay:   10,
-			expectedHour:  intPtr(13),
+			name:           "in 1 hour with forwardDate (explicit prefix)",
+			text:           "in 1 hour",
+			refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   intPtr(13),
 			expectedMinute: intPtr(14),
 		},
 	}

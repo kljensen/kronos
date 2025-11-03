@@ -15,7 +15,6 @@ func TestENCasualDateParser_Now(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline is now", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -36,7 +35,6 @@ func TestENCasualDateParser_Today(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline is today", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -85,9 +83,8 @@ func TestENCasualDateParser_Tomorrow(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, tt.refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, tt.refDate, nil)
 
 			assert.NotEmpty(t, results)
 			result := results[0]
@@ -106,7 +103,6 @@ func TestENCasualDateParser_Yesterday(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline was yesterday", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -124,7 +120,6 @@ func TestENCasualDateParser_LastNight(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline was last night ", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -143,7 +138,6 @@ func TestENCasualDateParser_Tonight(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("See you tonight", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -163,7 +157,6 @@ func TestENCasualDateParser_Overmorrow(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("See you overmorrow", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]

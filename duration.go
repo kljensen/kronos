@@ -33,14 +33,14 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		date = addYears(date, floor)
 		remainder := val - float64(floor)
 		if remainder > 0 {
-			working[TimeunitMonth] = working[TimeunitMonth] + remainder*12
+			working[TimeunitMonth] = working[TimeunitMonth] + remainder*MonthsPerYear
 		}
 	}
 
 	// Process quarters (convert to months)
 	if val, exists := working[TimeunitQuarter]; exists {
 		floor := int(val)
-		date = addMonths(date, floor*3)
+		date = addMonths(date, floor*MonthsPerQuarter)
 	}
 
 	// Process months (cascade fractional part to weeks)
@@ -49,18 +49,19 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		date = addMonths(date, floor)
 		remainder := val - float64(floor)
 		if remainder > 0 {
-			working[TimeunitWeek] = working[TimeunitWeek] + remainder*4
+			working[TimeunitWeek] = working[TimeunitWeek] + remainder*WeeksPerMonthApprox
 		}
 	}
 
 	// Process weeks (cascade fractional part to days)
 	if val, exists := working[TimeunitWeek]; exists {
 		floor := int(val)
-		date = date.AddDate(0, 0, floor*7)
+		date = date.AddDate(0, 0, floor*DaysPerWeek)
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			// Round to nearest day for week fractions
-			working[TimeunitDay] = working[TimeunitDay] + float64(int(remainder*7+0.5))
+			const roundingOffset = 0.5
+			working[TimeunitDay] = working[TimeunitDay] + float64(int(remainder*DaysPerWeek+roundingOffset))
 		}
 	}
 
@@ -71,7 +72,8 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			// Round to nearest hour for day fractions
-			working[TimeunitHour] = working[TimeunitHour] + float64(int(remainder*24+0.5))
+			const roundingOffset = 0.5
+			working[TimeunitHour] = working[TimeunitHour] + float64(int(remainder*HoursPerDay+roundingOffset))
 		}
 	}
 
@@ -82,7 +84,8 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			// Round to nearest minute for hour fractions
-			working[TimeunitMinute] = working[TimeunitMinute] + float64(int(remainder*60+0.5))
+			const roundingOffset = 0.5
+			working[TimeunitMinute] = working[TimeunitMinute] + float64(int(remainder*MinutesPerHour+roundingOffset))
 		}
 	}
 
@@ -93,7 +96,8 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			// Round to nearest second for minute fractions
-			working[TimeunitSecond] = working[TimeunitSecond] + float64(int(remainder*60+0.5))
+			const roundingOffset = 0.5
+			working[TimeunitSecond] = working[TimeunitSecond] + float64(int(remainder*SecondsPerMinute+roundingOffset))
 		}
 	}
 
@@ -104,7 +108,8 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			// Round to nearest millisecond for second fractions
-			working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(remainder*1000+0.5))
+			const roundingOffset = 0.5
+			working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(remainder*MillisecondsPerSecond+roundingOffset))
 		}
 	}
 

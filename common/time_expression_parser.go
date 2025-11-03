@@ -17,6 +17,19 @@ const (
 	TimeAMPMGroup        = 6
 )
 
+// Time validation constants
+const (
+	maxHour24Format      = 24
+	maxHour12Format      = 12
+	maxMinute            = 60
+	maxSecond            = 60
+	maxMillisecond       = 1000
+	hourCombinedFormat   = 100 // Format like "1430" for 14:30
+	fourDigitYearLength  = 4
+	maxMSDigits          = 3
+	singleDigitThreshold = 1
+)
+
 // AbstractTimeExpressionParser is an abstract base for parsing time expressions.
 // It supports 12-hour format (3pm, 3:30pm), 24-hour format (15:30),
 // meridiem handling, and optional "at" keyword.
@@ -259,84 +272,129 @@ func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, m
 	return p.checkAndReturnWithFollowingPattern(result)
 }
 
+// isDigit checks if a byte is a digit character (0-9).
+func isDigit(b byte) bool {
+	return b >= '0' && b <= '9'
+}
+
+// looksLikeDecimalRange checks if the match appears to be part of a decimal range
+// rather than a time expression. For example, "10.1 - 10.12" should not parse "10.12" as a time.
+func looksLikeDecimalRange(context *kronos.ParsingContext, match []string) bool {
+	matchStartIndex := strings.Index(context.Text(), match[0])
+	if matchStartIndex < 0 {
+		return false
+	}
+
+	// Look back for pattern like "X.Y - "
+	if matchStartIndex > 0 && match[TimeMinuteGroup] != "" {
+		lookback := context.Text()[:matchStartIndex]
+		if regexp.MustCompile(`\d+\.\d+\s*[-–]\s*$`).MatchString(lookback) {
+			return true
+		}
+	}
+
+	// Look ahead for pattern like " - X.Y" where Y is single digit
+	matchEndIndex := matchStartIndex + len(match[0])
+	if matchEndIndex < len(context.Text()) && match[TimeMinuteGroup] == "" && match[TimeAMPMGroup] == "" {
+		lookahead := context.Text()[matchEndIndex:]
+		if regexp.MustCompile(`^\s*[-–]\s*\d+\.\d`).MatchString(lookahead) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// isPartOfLargerNumber checks if match is embedded in a larger number sequence.
+// For example, "2012-1400" should not match "12-1400" as a time, and "20" from "2020" should be rejected.
+func isPartOfLargerNumber(context *kronos.ParsingContext, match []string) bool {
+	matchStartInText := strings.Index(context.Text(), match[0])
+	if matchStartInText < 0 {
+		return false
+	}
+
+	// Check what precedes the match
+	if matchStartInText > 0 {
+		prevChar := context.Text()[matchStartInText-1]
+		// Directly preceded by a digit (e.g., "2012-1400" matching "12-1400")
+		if isDigit(prevChar) {
+			return true
+		}
+		// Preceded by decimal point with digit (e.g., "10.1" matching "1")
+		if prevChar == '.' && matchStartInText > 1 {
+			if isDigit(context.Text()[matchStartInText-2]) {
+				return true
+			}
+		}
+	}
+
+	// Check what follows (only for hour-only matches)
+	if match[TimeMinuteGroup] == "" {
+		matchEndInText := matchStartInText + len(match[0])
+		if matchEndInText < len(context.Text()) {
+			if isDigit(context.Text()[matchEndInText]) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// parseMeridiem parses AM/PM indicator and adjusts hour accordingly.
+// Returns the adjusted hour, meridiem value, and success status.
+// For AM: hour 12 becomes 0 (midnight). For PM: hours 1-11 add 12.
+func parseMeridiem(ampmStr string, hour int) (int, *kronos.Meridiem, bool) {
+	if hour > maxHour12Format {
+		return 0, nil, false
+	}
+
+	ampm := strings.ToLower(string(ampmStr[0]))
+	if ampm == "a" {
+		m := kronos.MeridiemAM
+		if hour == maxHour12Format {
+			hour = 0
+		}
+		return hour, &m, true
+	}
+
+	if ampm == "p" {
+		m := kronos.MeridiemPM
+		if hour != maxHour12Format {
+			hour += maxHour12Format
+		}
+		return hour, &m, true
+	}
+
+	return hour, nil, true
+}
+
 // ExtractPrimaryTimeComponents extracts time components from the primary match
 func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	context *kronos.ParsingContext,
 	match []string,
 	strict bool,
 ) *kronos.ParsingComponents {
+	// Reject decimal ranges and embedded numbers early
+	if looksLikeDecimalRange(context, match) {
+		return nil
+	}
+
+	if isPartOfLargerNumber(context, match) {
+		return nil
+	}
+
 	components := context.CreateParsingComponents(nil)
 	minute := 0
 	var meridiem *kronos.Meridiem
 
 	// Parse hour
-	hourStr := match[TimeHourGroup]
-	hour, _ := strconv.Atoi(hourStr)
+	hour, _ := strconv.Atoi(match[TimeHourGroup])
 
-	// Check if this looks like part of a decimal range rather than a time
-	// e.g., "10.1 - 10.12" should not parse "10.12" as a time
-	// or "at 10 - 10.1" should not parse "at 10" as a time
-	matchStartIndex := strings.Index(context.Text(), match[0])
-	if matchStartIndex >= 0 {
-		// Look back to see if preceded by a pattern like "X.Y - "
-		if matchStartIndex > 0 && match[TimeMinuteGroup] != "" {
-			lookback := context.Text()[:matchStartIndex]
-			decimalRangePattern := regexp.MustCompile(`\d+\.\d+\s*[-–]\s*$`)
-			if decimalRangePattern.MatchString(lookback) {
-				return nil
-			}
-		}
-
-		// Look ahead to see if followed by a pattern like " - X.Y" where Y is single digit
-		// This indicates a decimal range like "at 10 - 10.1"
-		matchEndIndex := matchStartIndex + len(match[0])
-		if matchEndIndex < len(context.Text()) && match[TimeMinuteGroup] == "" && match[TimeAMPMGroup] == "" {
-			lookahead := context.Text()[matchEndIndex:]
-			decimalRangePattern := regexp.MustCompile(`^\s*[-–]\s*\d+\.\d`)
-			if decimalRangePattern.MatchString(lookahead) {
-				return nil
-			}
-		}
-	}
-
-	// Check if this match is part of a larger number sequence
-	// e.g., "20-30-12" matching "0-12", or "2012-1400" matching "12-1400", or "20" from "2020"
-	matchStartInText := strings.Index(context.Text(), match[0])
-	if matchStartInText >= 0 {
-		// Check what precedes the match
-		if matchStartInText > 0 {
-			prevChar := context.Text()[matchStartInText-1]
-			// If directly preceded by a digit (no space/separator), reject
-			// This catches cases like "2012-1400" where we'd match "12-1400"
-			if prevChar >= '0' && prevChar <= '9' {
-				return nil
-			}
-			// If preceded by a decimal point and a digit before that, reject
-			// This catches cases like "10.1" where we'd match "1" after the dot
-			if prevChar == '.' && matchStartInText > 1 {
-				prevPrevChar := context.Text()[matchStartInText-2]
-				if prevPrevChar >= '0' && prevPrevChar <= '9' {
-					return nil
-				}
-			}
-		}
-		// Check what follows the match - only for simple hour-only matches without minutes
-		// This catches cases like "20" from "2020" but allows "11:00:09 2023"
-		if match[TimeMinuteGroup] == "" {
-			matchEndInText := matchStartInText + len(match[0])
-			if matchEndInText < len(context.Text()) {
-				nextChar := context.Text()[matchEndInText]
-				// If directly followed by a digit (no space/separator), reject
-				if nextChar >= '0' && nextChar <= '9' {
-					return nil
-				}
-			}
-		}
-	}
-
-	if hour > 100 {
+	// Handle combined hour-minute format (e.g., "1430" for 14:30)
+	if hour > hourCombinedFormat {
 		// When time is like '2019', it is more likely a year
-		if len(match[TimeHourGroup]) == 4 && match[TimeMinuteGroup] == "" && match[TimeAMPMGroup] == "" {
+		if len(match[TimeHourGroup]) == fourDigitYearLength && match[TimeMinuteGroup] == "" && match[TimeAMPMGroup] == "" {
 			return nil
 		}
 
@@ -344,51 +402,39 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 			return nil
 		}
 
-		minute = hour % 100
-		hour = hour / 100
+		minute = hour % hourCombinedFormat
+		hour = hour / hourCombinedFormat
 	}
 
-	if hour > 24 {
+	if hour > maxHour24Format {
 		return nil
 	}
 
 	// Parse minute
 	if match[TimeMinuteGroup] != "" {
-		if len(match[TimeMinuteGroup]) == 1 && match[TimeAMPMGroup] == "" {
+		if len(match[TimeMinuteGroup]) == singleDigitThreshold && match[TimeAMPMGroup] == "" {
 			// Skip single digit minute e.g., "at 1.1 xx"
 			return nil
 		}
 		minute, _ = strconv.Atoi(match[TimeMinuteGroup])
 	}
 
-	if minute >= 60 {
+	if minute >= maxMinute {
 		return nil
 	}
 
-	if hour > 12 {
+	// Infer PM for 24-hour format
+	if hour > maxHour12Format {
 		m := kronos.MeridiemPM
 		meridiem = &m
 	}
 
 	// Parse AM/PM
 	if match[TimeAMPMGroup] != "" {
-		if hour > 12 {
+		var ok bool
+		hour, meridiem, ok = parseMeridiem(match[TimeAMPMGroup], hour)
+		if !ok {
 			return nil
-		}
-		ampm := strings.ToLower(string(match[TimeAMPMGroup][0]))
-		if ampm == "a" {
-			m := kronos.MeridiemAM
-			meridiem = &m
-			if hour == 12 {
-				hour = 0
-			}
-		}
-		if ampm == "p" {
-			m := kronos.MeridiemPM
-			meridiem = &m
-			if hour != 12 {
-				hour += 12
-			}
 		}
 	}
 
@@ -398,7 +444,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	if meridiem != nil {
 		components.Assign(kronos.ComponentMeridiem, int(*meridiem))
 	} else {
-		if hour < 12 {
+		if hour < maxHour12Format {
 			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
 		} else {
 			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
@@ -407,13 +453,12 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 
 	// Parse milliseconds
 	if match[TimeMillisecondGroup] != "" {
-		// Take first 3 digits
 		msStr := match[TimeMillisecondGroup]
-		if len(msStr) > 3 {
-			msStr = msStr[:3]
+		if len(msStr) > maxMSDigits {
+			msStr = msStr[:maxMSDigits]
 		}
 		millisecond, _ := strconv.Atoi(msStr)
-		if millisecond >= 1000 {
+		if millisecond >= maxMillisecond {
 			return nil
 		}
 		components.Assign(kronos.ComponentMillisecond, millisecond)
@@ -422,7 +467,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {
 		second, _ := strconv.Atoi(match[TimeSecondGroup])
-		if second >= 60 {
+		if second >= maxSecond {
 			return nil
 		}
 		components.Assign(kronos.ComponentSecond, second)
@@ -444,17 +489,19 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	match []string,
 	result *kronos.ParsingResult,
 ) *kronos.ParsingComponents {
+	const noMeridiem = -1
+
 	components := context.CreateParsingComponents(nil)
 	resultStart, hasStart := kronos.AsParsingComponents(result.Start())
 
 	// Parse milliseconds
 	if match[TimeMillisecondGroup] != "" {
 		msStr := match[TimeMillisecondGroup]
-		if len(msStr) > 3 {
-			msStr = msStr[:3]
+		if len(msStr) > maxMSDigits {
+			msStr = msStr[:maxMSDigits]
 		}
 		millisecond, _ := strconv.Atoi(msStr)
-		if millisecond >= 1000 {
+		if millisecond >= maxMillisecond {
 			return nil
 		}
 		components.Assign(kronos.ComponentMillisecond, millisecond)
@@ -463,65 +510,59 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {
 		second, _ := strconv.Atoi(match[TimeSecondGroup])
-		if second >= 60 {
+		if second >= maxSecond {
 			return nil
 		}
 		components.Assign(kronos.ComponentSecond, second)
 	}
 
-	// Check if this looks like part of a decimal range rather than a time
-	// e.g., "10.1 - 10.12" should not parse "10.12" as a time
-	// Get the match position in the original text
-	matchPos := strings.LastIndex(context.Text()[:len(context.Text())], match[0])
+	// Check if this looks like part of a decimal range
+	matchPos := strings.LastIndex(context.Text(), match[0])
 	if matchPos > 0 {
-		// Look back to see if preceded by a pattern like "X.Y - " where X and Y are digits
-		// This would indicate we're in a decimal range context
 		lookback := context.Text()[:matchPos]
-		// Pattern: ends with something like "10.1 - " or "10.12 - "
-		decimalRangePattern := regexp.MustCompile(`\d+\.\d+\s*[-–]\s*$`)
-		if decimalRangePattern.MatchString(lookback) {
+		if regexp.MustCompile(`\d+\.\d+\s*[-–]\s*$`).MatchString(lookback) {
 			return nil
 		}
 	}
 
 	hour, _ := strconv.Atoi(match[TimeHourGroup])
 	minute := 0
-	meridiem := -1
+	meridiem := noMeridiem
 
 	// Parse minute
 	if match[TimeMinuteGroup] != "" {
-		if len(match[TimeMinuteGroup]) == 1 && match[TimeAMPMGroup] == "" {
+		if len(match[TimeMinuteGroup]) == singleDigitThreshold && match[TimeAMPMGroup] == "" {
 			// Skip single digit minute in following time e.g., "10 - 10.1"
 			return nil
 		}
 		minute, _ = strconv.Atoi(match[TimeMinuteGroup])
-	} else if hour > 100 {
-		minute = hour % 100
-		hour = hour / 100
+	} else if hour > hourCombinedFormat {
+		minute = hour % hourCombinedFormat
+		hour = hour / hourCombinedFormat
 	}
 
-	if minute >= 60 || hour > 24 {
+	if minute >= maxMinute || hour > maxHour24Format {
 		return nil
 	}
 
-	if hour >= 12 {
+	if hour >= maxHour12Format {
 		meridiem = int(kronos.MeridiemPM)
 	}
 
 	// Parse AM/PM
 	if match[TimeAMPMGroup] != "" {
-		if hour > 12 {
+		if hour > maxHour12Format {
 			return nil
 		}
 
 		ampm := strings.ToLower(string(match[TimeAMPMGroup][0]))
 		if ampm == "a" {
 			meridiem = int(kronos.MeridiemAM)
-			if hour == 12 {
+			if hour == maxHour12Format {
 				hour = 0
+				// Crossing midnight - advance day
 				if hasStart && !resultStart.IsCertain(kronos.ComponentDay) {
-					dayVal := resultStart.Get(kronos.ComponentDay)
-					if dayVal != nil {
+					if dayVal := resultStart.Get(kronos.ComponentDay); dayVal != nil {
 						components.Imply(kronos.ComponentDay, *dayVal+1)
 					}
 				}
@@ -530,23 +571,22 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 
 		if ampm == "p" {
 			meridiem = int(kronos.MeridiemPM)
-			if hour != 12 {
-				hour += 12
+			if hour != maxHour12Format {
+				hour += maxHour12Format
 			}
 		}
 
+		// Backfill meridiem to start time if not certain
 		if hasStart && !resultStart.IsCertain(kronos.ComponentMeridiem) {
 			if meridiem == int(kronos.MeridiemAM) {
 				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
-				hourVal := resultStart.Get(kronos.ComponentHour)
-				if hourVal != nil && *hourVal == 12 {
+				if hourVal := resultStart.Get(kronos.ComponentHour); hourVal != nil && *hourVal == maxHour12Format {
 					resultStart.Assign(kronos.ComponentHour, 0)
 				}
 			} else {
 				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
-				hourVal := resultStart.Get(kronos.ComponentHour)
-				if hourVal != nil && *hourVal != 12 {
-					resultStart.Assign(kronos.ComponentHour, *hourVal+12)
+				if hourVal := resultStart.Get(kronos.ComponentHour); hourVal != nil && *hourVal != maxHour12Format {
+					resultStart.Assign(kronos.ComponentHour, *hourVal+maxHour12Format)
 				}
 			}
 		}
@@ -555,31 +595,29 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	components.Assign(kronos.ComponentHour, hour)
 	components.Assign(kronos.ComponentMinute, minute)
 
+	// Assign or imply meridiem
 	if meridiem >= 0 {
 		components.Assign(kronos.ComponentMeridiem, meridiem)
 	} else {
-		startAtPM := hasStart && resultStart.IsCertain(kronos.ComponentMeridiem)
-		if startAtPM {
-			startHourVal := resultStart.Get(kronos.ComponentHour)
-			if startHourVal != nil && *startHourVal > 12 {
+		// Infer meridiem from start time if available
+		startAtPM := false
+		if hasStart && resultStart.IsCertain(kronos.ComponentMeridiem) {
+			if startHourVal := resultStart.Get(kronos.ComponentHour); startHourVal != nil && *startHourVal > maxHour12Format {
 				startAtPM = true
-			} else {
-				startAtPM = false
 			}
 		}
 
 		if startAtPM {
-			startHourVal := resultStart.Get(kronos.ComponentHour)
-			if startHourVal != nil && *startHourVal-12 > hour {
-				// 10pm - 1 (am)
+			if startHourVal := resultStart.Get(kronos.ComponentHour); startHourVal != nil && *startHourVal-maxHour12Format > hour {
+				// e.g., "10pm - 1" means 1am next day
 				components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
-			} else if hour <= 12 {
-				components.Assign(kronos.ComponentHour, hour+12)
+			} else if hour <= maxHour12Format {
+				components.Assign(kronos.ComponentHour, hour+maxHour12Format)
 				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
 			}
-		} else if hour > 12 {
+		} else if hour > maxHour12Format {
 			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
-		} else if hour <= 12 {
+		} else if hour <= maxHour12Format {
 			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
 		}
 	}
@@ -607,6 +645,17 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	return components
 }
 
+// Validation patterns (compiled once for efficiency)
+var (
+	singleDigitPattern       = regexp.MustCompile(`^\d$`)
+	threeOrMoreDigitsPattern = regexp.MustCompile(`^\d\d\d+$`)
+	endsWithSingleAPPattern  = regexp.MustCompile(`\d[apAP]$`)
+	plainNumberPattern       = regexp.MustCompile(`^\d+(?:\.\d+)?$`)
+	endingNumbersPattern     = regexp.MustCompile(`[^\d:.]([\d.]+)$`)
+	hasDigitPattern          = regexp.MustCompile(`\d`)
+	twoDigitDecimalPattern   = regexp.MustCompile(`\d(\.\d{2})+$`)
+)
+
 func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(result *kronos.ParsingResult) *kronos.ParsingResult {
 	// Use hook if provided
 	if p.checkAndReturnWithoutFollowingHook != nil {
@@ -615,95 +664,90 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(res
 
 	text := strings.TrimSpace(result.Text())
 
-	// Single digit (e.g., "1") should not be counted as time expression
-	if regexp.MustCompile(`^\d$`).MatchString(text) {
+	// Reject single digits (e.g., "1")
+	if singleDigitPattern.MatchString(text) {
 		return nil
 	}
 
-	// Three or more digits (e.g., "203", "2014") should not be counted as time expression
-	if regexp.MustCompile(`^\d\d\d+$`).MatchString(text) {
+	// Reject three or more digits without separators (e.g., "203", "2014")
+	if threeOrMoreDigitsPattern.MatchString(text) {
 		return nil
 	}
 
-	// Instead of "am/pm", it ends with "a" or "p" (e.g., "1a", "123p"), this seems unlikely
-	if regexp.MustCompile(`\d[apAP]$`).MatchString(text) {
+	// Reject single letter AM/PM suffix (e.g., "1a", "123p")
+	if endsWithSingleAPPattern.MatchString(text) {
 		return nil
 	}
 
-	// In strict mode, standalone numbers without time separators should not parse
-	// e.g., "20", "10.12" should be rejected, but "10:30" or "10pm" should be allowed
-	if p.strictMode {
-		// Check if it's just a number with optional dot but no colon and no am/pm
-		if regexp.MustCompile(`^\d+(?:\.\d+)?$`).MatchString(text) {
-			return nil
-		}
+	// In strict mode, reject standalone numbers
+	if p.strictMode && plainNumberPattern.MatchString(text) {
+		return nil
 	}
 
-	// If it ends only with numbers or dots (after a non-digit prefix like "at")
-	// Only match if there's at least one digit (not just dots like in "9 p.m.")
-	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)$`).FindStringSubmatch(text)
-	if endingWithNumbers != nil && regexp.MustCompile(`\d`).MatchString(endingWithNumbers[1]) {
-		endingNumbers := endingWithNumbers[1]
+	// Validate trailing numbers after prefix (e.g., "at 10")
+	if endingNumbers := endingNumbersPattern.FindStringSubmatch(text); endingNumbers != nil {
+		if hasDigitPattern.MatchString(endingNumbers[1]) {
+			nums := endingNumbers[1]
 
-		// In strict mode (e.g., "at 1" or "at 1.2"), this should not be accepted
-		if p.strictMode {
-			return nil
-		}
+			if p.strictMode {
+				return nil
+			}
 
-		// If it ends only with dot single digit, e.g., "at 1.2"
-		if strings.Contains(endingNumbers, ".") && !regexp.MustCompile(`\d(\.\d{2})+$`).MatchString(endingNumbers) {
-			return nil
-		}
+			// Reject single-digit decimals (e.g., "at 1.2")
+			if strings.Contains(nums, ".") && !twoDigitDecimalPattern.MatchString(nums) {
+				return nil
+			}
 
-		// If it ends only with numbers above 24, e.g., "at 25" or "at 101"
-		endingNumberVal, _ := strconv.Atoi(endingNumbers)
-		if endingNumberVal > 24 {
-			return nil
+			// Reject hours above 24
+			if val, _ := strconv.Atoi(nums); val > maxHour24Format {
+				return nil
+			}
 		}
 	}
 
 	return result
 }
 
+var (
+	startsWithDigitDashPattern = regexp.MustCompile(`^\d+\s*-`)
+	pureNumberRangePattern     = regexp.MustCompile(`^\d+-\d+$`)
+	numberRangePattern         = regexp.MustCompile(`[^\d:.]([\d.]+)\s*-\s*([\d.]+)$`)
+)
+
 func (p *AbstractTimeExpressionParser) checkAndReturnWithFollowingPattern(result *kronos.ParsingResult) *kronos.ParsingResult {
 	text := strings.TrimSpace(result.Text())
 
-	// In strict mode, reject simple number ranges like "7-730" or "10 - 20"
-	if p.strictMode {
-		// If it starts with just digits (no proper time separator like colon)
-		// and contains a dash, reject it as ambiguous
-		if regexp.MustCompile(`^\d+\s*-`).MatchString(text) {
-			return nil
-		}
-	}
-
-	if regexp.MustCompile(`^\d+-\d+$`).MatchString(text) {
+	// In strict mode, reject simple number ranges (e.g., "7-730", "10 - 20")
+	if p.strictMode && startsWithDigitDashPattern.MatchString(text) {
 		return nil
 	}
 
-	// If it ends only with numbers or dots (e.g., "at 10 - 20")
-	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)\s*-\s*([\d.]+)$`).FindStringSubmatch(text)
-	if endingWithNumbers != nil {
-		// In strict mode (e.g., "at 1-3" or "at 1.2 - 2.3"), this should not be accepted
+	// Reject pure number ranges without context (e.g., "12-14")
+	if pureNumberRangePattern.MatchString(text) {
+		return nil
+	}
+
+	// Validate number ranges after prefix (e.g., "at 10 - 20")
+	if rangeMatch := numberRangePattern.FindStringSubmatch(text); rangeMatch != nil {
 		if p.strictMode {
 			return nil
 		}
 
-		startingNumbers := endingWithNumbers[1]
-		endingNumbers := endingWithNumbers[2]
+		startNum, endNum := rangeMatch[1], rangeMatch[2]
 
-		// If it ends only with dot single digit, e.g., "at 1.2 - 2.3"
-		if strings.Contains(endingNumbers, ".") && !regexp.MustCompile(`\d(\.\d{2})+$`).MatchString(endingNumbers) {
+		// Reject single-digit decimals (e.g., "at 1.2 - 2.3")
+		if strings.Contains(startNum, ".") && !twoDigitDecimalPattern.MatchString(startNum) {
 			return nil
 		}
-		if strings.Contains(startingNumbers, ".") && !regexp.MustCompile(`\d(\.\d{2})+$`).MatchString(startingNumbers) {
+		if strings.Contains(endNum, ".") && !twoDigitDecimalPattern.MatchString(endNum) {
 			return nil
 		}
 
-		// If it ends only with numbers above 24, e.g., "at 25 - 30"
-		endingNumberVal, _ := strconv.Atoi(endingNumbers)
-		startingNumberVal, _ := strconv.Atoi(startingNumbers)
-		if endingNumberVal > 24 || startingNumberVal > 24 {
+		// Reject hours above 24
+		if startVal, _ := strconv.Atoi(startNum); startVal > maxHour24Format {
+			return nil
+		}
+		if endVal, _ := strconv.Atoi(endNum); endVal > maxHour24Format {
 			return nil
 		}
 	}

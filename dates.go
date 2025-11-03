@@ -16,10 +16,10 @@ func AssignSimilarTime(components *ParsingComponents, date time.Time) {
 	components.Assign(ComponentHour, date.Hour())
 	components.Assign(ComponentMinute, date.Minute())
 	components.Assign(ComponentSecond, date.Second())
-	components.Assign(ComponentMillisecond, date.Nanosecond()/1000000)
+	components.Assign(ComponentMillisecond, date.Nanosecond()/NanosecondsPerMS)
 
 	// Set meridiem based on hour
-	if date.Hour() < 12 {
+	if date.Hour() < HoursPerDay/2 {
 		components.Assign(ComponentMeridiem, int(MeridiemAM))
 	} else {
 		components.Assign(ComponentMeridiem, int(MeridiemPM))
@@ -40,10 +40,10 @@ func ImplySimilarTime(components *ParsingComponents, date time.Time) {
 	components.Imply(ComponentHour, date.Hour())
 	components.Imply(ComponentMinute, date.Minute())
 	components.Imply(ComponentSecond, date.Second())
-	components.Imply(ComponentMillisecond, date.Nanosecond()/1000000)
+	components.Imply(ComponentMillisecond, date.Nanosecond()/NanosecondsPerMS)
 
 	// Set meridiem based on hour
-	if date.Hour() < 12 {
+	if date.Hour() < HoursPerDay/2 {
 		components.Imply(ComponentMeridiem, int(MeridiemAM))
 	} else {
 		components.Imply(ComponentMeridiem, int(MeridiemPM))
@@ -54,7 +54,7 @@ func ImplySimilarTime(components *ParsingComponents, date time.Time) {
 // Years 0-99 are mapped to 1900-2099 range.
 //
 // Logic:
-// - 0-99 maps to 2000-2099 if the year would be <= current year + 20
+// - 0-99 maps to 2000-2099 if the year would be <= current year + YearLookAheadThreshold
 // - Otherwise maps to 1900-1999
 //
 // Examples (assuming current year is 2020):
@@ -63,8 +63,10 @@ func ImplySimilarTime(components *ParsingComponents, date time.Time) {
 //   - 50 -> 1950 (would be 2050, which is > 2040, so use 1900s)
 //   - 99 -> 1999
 func FindMostLikelyADYear(rawYear int) int {
+	const twoDigitThreshold = 100
+
 	// If it's already a 4-digit year, return as-is
-	if rawYear >= 100 {
+	if rawYear >= twoDigitThreshold {
 		return rawYear
 	}
 
@@ -72,15 +74,17 @@ func FindMostLikelyADYear(rawYear int) int {
 	currentYear := time.Now().Year()
 
 	// Calculate the 2000s version
-	year2000s := 2000 + rawYear
+	const year2000Base = 2000
+	year2000s := year2000Base + rawYear
 
-	// If the year in 2000s would be within 20 years of current year, use it
-	if year2000s <= currentYear+20 {
+	// If the year in 2000s would be within threshold of current year, use it
+	if year2000s <= currentYear+YearLookAheadThreshold {
 		return year2000s
 	}
 
 	// Otherwise, use 1900s
-	return 1900 + rawYear
+	const year1900Base = 1900
+	return year1900Base + rawYear
 }
 
 // FindYearClosestToRef finds the year (past or future) that is closest to the reference date
@@ -96,17 +100,19 @@ func FindMostLikelyADYear(rawYear int) int {
 //   - Could be 2021-03-20 (about 14 months ahead)
 //   - Returns 2020 (closest match)
 func FindYearClosestToRef(refDate time.Time, day, month int) int {
+	const defaultImpliedHour = 12 // Use noon for comparison
+
 	refYear := refDate.Year()
 
 	// Try the reference year and adjacent years
 	candidates := []time.Time{
-		time.Date(refYear-1, time.Month(month), day, 12, 0, 0, 0, time.Local),
-		time.Date(refYear, time.Month(month), day, 12, 0, 0, 0, time.Local),
-		time.Date(refYear+1, time.Month(month), day, 12, 0, 0, 0, time.Local),
+		time.Date(refYear-1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, time.Local),
+		time.Date(refYear, time.Month(month), day, defaultImpliedHour, 0, 0, 0, time.Local),
+		time.Date(refYear+1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, time.Local),
 	}
 
 	// Find the candidate with the smallest absolute difference from refDate
-	minDiff := int64(0)
+	var minDiff int64
 	closestYear := refYear
 
 	for i, candidate := range candidates {

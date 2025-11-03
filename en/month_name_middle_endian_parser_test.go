@@ -238,16 +238,16 @@ func TestENMonthNameMiddleEndian_RangeExpression(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		name           string
-		text           string
-		expectedText   string
-		expectedIndex  int
-		startDay       int
-		startMonth     int
-		startYear      int
-		endDay         int
-		endMonth       int
-		endYear        int
+		name          string
+		text          string
+		expectedText  string
+		expectedIndex int
+		startDay      int
+		startMonth    int
+		startYear     int
+		endDay        int
+		endMonth      int
+		endYear       int
 	}{
 		{
 			name:          "August 10 - 22, 2012",
@@ -358,16 +358,16 @@ func TestENMonthNameMiddleEndian_OrdinalWords(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		name           string
-		text           string
-		expectedText   string
-		expectedDay    int
-		expectedMonth  int
-		expectedYear   int
-		hasEndDate     bool
-		endDay         int
-		endMonth       int
-		endYear        int
+		name          string
+		text          string
+		expectedText  string
+		expectedDay   int
+		expectedMonth int
+		expectedYear  int
+		hasEndDate    bool
+		endDay        int
+		endMonth      int
+		endYear       int
 	}{
 		{
 			name:          "May eighth, 2010",

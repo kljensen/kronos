@@ -27,22 +27,22 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 			return GetNthWeekdayOfMonth(year, MonthNovember, WeekdaySunday, 1, 2)
 		},
 	},
-	"CST": -360,
-	"CDT": -300,
-	"MST": -420,
-	"MDT": -360,
-	"PST": -480,
-	"PDT": -420,
+	"CST":  -360,
+	"CDT":  -300,
+	"MST":  -420,
+	"MDT":  -360,
+	"PST":  -480,
+	"PDT":  -420,
 	"AKST": -540,
 	"AKDT": -480,
-	"HST": -600,
+	"HST":  -600,
 	"HAST": -600,
 	"HADT": -540,
 
 	// European Timezones
-	"BST": 60,
-	"IST": 60,
-	"WET": 0,
+	"BST":  60,
+	"IST":  60,
+	"WET":  0,
 	"WEST": 60,
 	"CET": &AmbiguousTimezoneMap{
 		TimezoneOffsetDuringDst: 120, // CEST = UTC+2
@@ -62,16 +62,16 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 	"MSK":  180,
 
 	// Asian Timezones
-	"JST": 540,
-	"KST": 540,
-	"HKT": 480,
-	"SGT": 480,
+	"JST":       540,
+	"KST":       540,
+	"HKT":       480,
+	"SGT":       480,
 	"CST_CHINA": 480, // China Standard Time
 	"IST_INDIA": 330, // India Standard Time
-	"PKT": 300,
-	"WIB": 420,
-	"WITA": 480,
-	"WIT": 540,
+	"PKT":       300,
+	"WIB":       420,
+	"WITA":      480,
+	"WIT":       540,
 
 	// Australian Timezones
 	"AEST": 600,
@@ -83,9 +83,9 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 	// Other Timezones
 	"NZST": 720,
 	"NZDT": 780,
-	"BRT": -180,
-	"ART": -180,
-	"GET": 240, // Georgia Eastern Time (UTC+4)
+	"BRT":  -180,
+	"ART":  -180,
+	"GET":  240, // Georgia Eastern Time (UTC+4)
 }
 
 // ToTimezoneOffset converts various timezone representations to an offset in minutes.

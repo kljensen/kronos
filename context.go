@@ -70,13 +70,17 @@ func (ctx *ParsingContext) CreateParsingResult(index int, textOrEndIndex interfa
 		text = v
 	case int:
 		// It's an endIndex, extract substring
-		if v > len(ctx.text) {
-			v = len(ctx.text)
-		}
+		endIndex := v
 		if index < 0 {
 			index = 0
 		}
-		text = ctx.text[index:v]
+		if endIndex > len(ctx.text) {
+			endIndex = len(ctx.text)
+		}
+		if index > len(ctx.text) {
+			index = len(ctx.text)
+		}
+		text = ctx.text[index:endIndex]
 	default:
 		text = ""
 	}

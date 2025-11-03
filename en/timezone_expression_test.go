@@ -16,12 +16,12 @@ func TestTimezoneExpression_UTCOffset(t *testing.T) {
 	chrono := kronos.NewChrono(config)
 
 	tests := []struct {
-		name                    string
-		text                    string
-		expectedText            string
-		expectedHour            int
-		expectedMinute          int
-		expectedTimezoneOffset  int
+		name                   string
+		text                   string
+		expectedText           string
+		expectedHour           int
+		expectedMinute         int
+		expectedTimezoneOffset int
 	}{
 		{
 			name:                   "UTC offset with colon separator",
@@ -75,11 +75,11 @@ func TestTimezoneExpression_NumericOffset(t *testing.T) {
 	chrono := kronos.NewChrono(config)
 
 	tests := []struct {
-		name                      string
-		text                      string
-		expectedText              string
-		expectTimezoneOffsetSet   bool
-		expectedTimezoneOffset    int
+		name                    string
+		text                    string
+		expectedText            string
+		expectTimezoneOffsetSet bool
+		expectedTimezoneOffset  int
 	}{
 		{
 			name:                    "numeric offset +14",
@@ -192,28 +192,28 @@ func TestTimezoneExpression_Abbreviation(t *testing.T) {
 	chrono := kronos.NewChrono(config)
 
 	tests := []struct {
-		name                      string
-		text                      string
-		refTime                   time.Time
-		expectedText              string
-		expectedYear              int
-		expectedMonth             int
-		expectedDay               int
-		expectedHour              int
-		expectedMinute            int
-		expectTimezoneOffset      bool
-		expectedTimezoneOffset    int
+		name                   string
+		text                   string
+		refTime                time.Time
+		expectedText           string
+		expectedYear           int
+		expectedMonth          int
+		expectedDay            int
+		expectedHour           int
+		expectedMinute         int
+		expectTimezoneOffset   bool
+		expectedTimezoneOffset int
 	}{
 		{
-			name:                   "without timezone abbreviation",
-			text:                   "wednesday, september 16, 2020 at 11 am",
-			expectedText:           "wednesday, september 16, 2020 at 11 am",
-			expectedYear:           2020,
-			expectedMonth:          9,
-			expectedDay:            16,
-			expectedHour:           11,
-			expectedMinute:         0,
-			expectTimezoneOffset:   false,
+			name:                 "without timezone abbreviation",
+			text:                 "wednesday, september 16, 2020 at 11 am",
+			expectedText:         "wednesday, september 16, 2020 at 11 am",
+			expectedYear:         2020,
+			expectedMonth:        9,
+			expectedDay:          16,
+			expectedHour:         11,
+			expectedMinute:       0,
+			expectTimezoneOffset: false,
 		},
 		{
 			name:                   "with JST timezone",

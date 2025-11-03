@@ -17,19 +17,19 @@ func TestENWeekdayParser_SingleExpression(t *testing.T) {
 	parser := createWeekdayParser()
 
 	tests := []struct {
-		name             string
-		text             string
-		refDate          time.Time
-		expectedIndex    int
-		expectedText     string
-		expectedYear     int
-		expectedMonth    int
-		expectedDay      int
-		expectedWeekday  int
-		certainDay       bool
-		certainMonth     bool
-		certainYear      bool
-		certainWeekday   bool
+		name            string
+		text            string
+		refDate         time.Time
+		expectedIndex   int
+		expectedText    string
+		expectedYear    int
+		expectedMonth   int
+		expectedDay     int
+		expectedWeekday int
+		certainDay      bool
+		certainMonth    bool
+		certainYear     bool
+		certainWeekday  bool
 	}{
 		{
 			name:            "Monday",
@@ -543,19 +543,19 @@ func TestENWeekdayParser_Overlap(t *testing.T) {
 	slashParser := NewENSlashMonthFormatParser()
 
 	tests := []struct {
-		name             string
-		text             string
-		refDate          time.Time
-		expectedIndex    int
-		expectedText     string
-		expectedYear     int
-		expectedMonth    int
-		expectedDay      int
-		expectedWeekday  int
-		certainDay       bool
-		certainMonth     bool
-		certainYear      bool
-		certainWeekday   bool
+		name            string
+		text            string
+		refDate         time.Time
+		expectedIndex   int
+		expectedText    string
+		expectedYear    int
+		expectedMonth   int
+		expectedDay     int
+		expectedWeekday int
+		certainDay      bool
+		certainMonth    bool
+		certainYear     bool
+		certainWeekday  bool
 	}{
 		{
 			name:            "Sunday, December 7, 2014",
@@ -620,43 +620,43 @@ func TestENWeekdayParser_Range(t *testing.T) {
 	parser := createWeekdayParser()
 
 	tests := []struct {
-		name              string
-		text              string
-		refDate           time.Time
-		expectedStartYear int
-		expectedStartMonth int
-		expectedStartDay  int
+		name                 string
+		text                 string
+		refDate              time.Time
+		expectedStartYear    int
+		expectedStartMonth   int
+		expectedStartDay     int
 		expectedStartWeekday int
-		expectedEndYear   int
-		expectedEndMonth  int
-		expectedEndDay    int
-		expectedEndWeekday int
+		expectedEndYear      int
+		expectedEndMonth     int
+		expectedEndDay       int
+		expectedEndWeekday   int
 	}{
 		{
-			name:              "Friday to Monday",
-			text:              "Friday to Monday",
-			refDate:           time.Date(2023, 4, 9, 0, 0, 0, 0, time.UTC), // Sunday
-			expectedStartYear: 2023,
-			expectedStartMonth: 4,
-			expectedStartDay:  7,
+			name:                 "Friday to Monday",
+			text:                 "Friday to Monday",
+			refDate:              time.Date(2023, 4, 9, 0, 0, 0, 0, time.UTC), // Sunday
+			expectedStartYear:    2023,
+			expectedStartMonth:   4,
+			expectedStartDay:     7,
 			expectedStartWeekday: 5,
-			expectedEndYear:   2023,
-			expectedEndMonth:  4,
-			expectedEndDay:    10,
-			expectedEndWeekday: 1,
+			expectedEndYear:      2023,
+			expectedEndMonth:     4,
+			expectedEndDay:       10,
+			expectedEndWeekday:   1,
 		},
 		{
-			name:              "Monday to Friday",
-			text:              "Monday to Friday",
-			refDate:           time.Date(2023, 4, 9, 0, 0, 0, 0, time.UTC), // Sunday
-			expectedStartYear: 2023,
-			expectedStartMonth: 4,
-			expectedStartDay:  10,
+			name:                 "Monday to Friday",
+			text:                 "Monday to Friday",
+			refDate:              time.Date(2023, 4, 9, 0, 0, 0, 0, time.UTC), // Sunday
+			expectedStartYear:    2023,
+			expectedStartMonth:   4,
+			expectedStartDay:     10,
 			expectedStartWeekday: 1,
-			expectedEndYear:   2023,
-			expectedEndMonth:  4,
-			expectedEndDay:    14,
-			expectedEndWeekday: 5,
+			expectedEndYear:      2023,
+			expectedEndMonth:     4,
+			expectedEndDay:       14,
+			expectedEndWeekday:   5,
 		},
 	}
 
@@ -688,28 +688,28 @@ func TestENWeekdayParser_ForwardDatesOnly(t *testing.T) {
 	parser := createWeekdayParser()
 
 	tests := []struct {
-		name             string
-		text             string
-		refDate          time.Time
-		expectedIndex    int
-		expectedText     string
-		expectedYear     int
-		expectedMonth    int
-		expectedDay      int
-		expectedWeekday  int
-		certainDay       bool
-		certainMonth     bool
-		certainYear      bool
-		certainWeekday   bool
-		hasEnd           bool
-		expectedEndYear  int
-		expectedEndMonth int
-		expectedEndDay   int
+		name               string
+		text               string
+		refDate            time.Time
+		expectedIndex      int
+		expectedText       string
+		expectedYear       int
+		expectedMonth      int
+		expectedDay        int
+		expectedWeekday    int
+		certainDay         bool
+		certainMonth       bool
+		certainYear        bool
+		certainWeekday     bool
+		hasEnd             bool
+		expectedEndYear    int
+		expectedEndMonth   int
+		expectedEndDay     int
 		expectedEndWeekday int
-		endCertainDay    bool
-		endCertainMonth  bool
-		endCertainYear   bool
-		endCertainWeekday bool
+		endCertainDay      bool
+		endCertainMonth    bool
+		endCertainYear     bool
+		endCertainWeekday  bool
 	}{
 		{
 			name:            "Monday (forward dates only)",
@@ -728,28 +728,28 @@ func TestENWeekdayParser_ForwardDatesOnly(t *testing.T) {
 			hasEnd:          false,
 		},
 		{
-			name:            "this Friday to this Monday",
-			text:            "this Friday to this Monday",
-			refDate:         time.Date(2016, 8, 4, 0, 0, 0, 0, time.UTC),
-			expectedIndex:   0,
-			expectedText:    "this Friday to this Monday",
-			expectedYear:    2016,
-			expectedMonth:   8,
-			expectedDay:     5,
-			expectedWeekday: 5,
-			certainDay:      false,
-			certainMonth:    false,
-			certainYear:     false,
-			certainWeekday:  true,
-			hasEnd:          true,
-			expectedEndYear: 2016,
-			expectedEndMonth: 8,
-			expectedEndDay:  8,
+			name:               "this Friday to this Monday",
+			text:               "this Friday to this Monday",
+			refDate:            time.Date(2016, 8, 4, 0, 0, 0, 0, time.UTC),
+			expectedIndex:      0,
+			expectedText:       "this Friday to this Monday",
+			expectedYear:       2016,
+			expectedMonth:      8,
+			expectedDay:        5,
+			expectedWeekday:    5,
+			certainDay:         false,
+			certainMonth:       false,
+			certainYear:        false,
+			certainWeekday:     true,
+			hasEnd:             true,
+			expectedEndYear:    2016,
+			expectedEndMonth:   8,
+			expectedEndDay:     8,
 			expectedEndWeekday: 1,
-			endCertainDay:   false,
-			endCertainMonth: false,
-			endCertainYear:  false,
-			endCertainWeekday: true,
+			endCertainDay:      false,
+			endCertainMonth:    false,
+			endCertainYear:     false,
+			endCertainWeekday:  true,
 		},
 		{
 			name:            "sunday morning",
@@ -768,28 +768,28 @@ func TestENWeekdayParser_ForwardDatesOnly(t *testing.T) {
 			hasEnd:          false,
 		},
 		{
-			name:            "vacation monday - friday",
-			text:            "vacation monday - friday",
-			refDate:         time.Date(2019, 6, 13, 0, 0, 0, 0, time.UTC), // Thursday
-			expectedIndex:   8, // Note: includes boundary space
-			expectedText:    " monday - friday",
-			expectedYear:    2019,
-			expectedMonth:   6,
-			expectedDay:     17,
-			expectedWeekday: 1,
-			certainDay:      false,
-			certainMonth:    false,
-			certainYear:     false,
-			certainWeekday:  true,
-			hasEnd:          true,
-			expectedEndYear: 2019,
-			expectedEndMonth: 6,
-			expectedEndDay:  21,
+			name:               "vacation monday - friday",
+			text:               "vacation monday - friday",
+			refDate:            time.Date(2019, 6, 13, 0, 0, 0, 0, time.UTC), // Thursday
+			expectedIndex:      8,                                            // Note: includes boundary space
+			expectedText:       " monday - friday",
+			expectedYear:       2019,
+			expectedMonth:      6,
+			expectedDay:        17,
+			expectedWeekday:    1,
+			certainDay:         false,
+			certainMonth:       false,
+			certainYear:        false,
+			certainWeekday:     true,
+			hasEnd:             true,
+			expectedEndYear:    2019,
+			expectedEndMonth:   6,
+			expectedEndDay:     21,
 			expectedEndWeekday: 5,
-			endCertainDay:   false,
-			endCertainMonth: false,
-			endCertainYear:  false,
-			endCertainWeekday: true,
+			endCertainDay:      false,
+			endCertainMonth:    false,
+			endCertainYear:     false,
+			endCertainWeekday:  true,
 		},
 	}
 

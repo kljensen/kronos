@@ -9,11 +9,11 @@ import (
 
 func TestGetNextWeekday(t *testing.T) {
 	tests := []struct {
-		name           string
-		refDate        time.Time
-		targetWeekday  Weekday
-		expectedDays   int
-		expectedDate   time.Time
+		name          string
+		refDate       time.Time
+		targetWeekday Weekday
+		expectedDays  int
+		expectedDate  time.Time
 	}{
 		{
 			name:          "Monday to next Monday",

@@ -13,69 +13,68 @@ func TestENYearMonthDayParser_SingleExpression(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		text         string
-		expectedText string
-		expectedDate time.Time
-		expectedDay  int
+		text          string
+		expectedText  string
+		expectedDate  time.Time
+		expectedDay   int
 		expectedMonth int
-		expectedYear int
+		expectedYear  int
 	}{
 		{
-			text:         "2012/8/10",
-			expectedText: "2012/8/10",
-			expectedDate: time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
-			expectedDay:  10,
+			text:          "2012/8/10",
+			expectedText:  "2012/8/10",
+			expectedDate:  time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
+			expectedDay:   10,
 			expectedMonth: 8,
-			expectedYear: 2012,
+			expectedYear:  2012,
 		},
 		{
-			text:         "The Deadline is 2012/8/10",
-			expectedText: "2012/8/10",
-			expectedDate: time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
-			expectedDay:  10,
+			text:          "The Deadline is 2012/8/10",
+			expectedText:  "2012/8/10",
+			expectedDate:  time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC),
+			expectedDay:   10,
 			expectedMonth: 8,
-			expectedYear: 2012,
+			expectedYear:  2012,
 		},
 		{
-			text:         "2014/2/28",
-			expectedText: "2014/2/28",
-			expectedDate: time.Date(2014, 2, 28, 12, 0, 0, 0, time.UTC),
-			expectedDay:  28,
+			text:          "2014/2/28",
+			expectedText:  "2014/2/28",
+			expectedDate:  time.Date(2014, 2, 28, 12, 0, 0, 0, time.UTC),
+			expectedDay:   28,
 			expectedMonth: 2,
-			expectedYear: 2014,
+			expectedYear:  2014,
 		},
 		{
-			text:         "2014/12/28",
-			expectedText: "2014/12/28",
-			expectedDate: time.Date(2014, 12, 28, 12, 0, 0, 0, time.UTC),
-			expectedDay:  28,
+			text:          "2014/12/28",
+			expectedText:  "2014/12/28",
+			expectedDate:  time.Date(2014, 12, 28, 12, 0, 0, 0, time.UTC),
+			expectedDay:   28,
 			expectedMonth: 12,
-			expectedYear: 2014,
+			expectedYear:  2014,
 		},
 		{
-			text:         "2014.12.28",
-			expectedText: "2014.12.28",
-			expectedDate: time.Date(2014, 12, 28, 12, 0, 0, 0, time.UTC),
-			expectedDay:  28,
+			text:          "2014.12.28",
+			expectedText:  "2014.12.28",
+			expectedDate:  time.Date(2014, 12, 28, 12, 0, 0, 0, time.UTC),
+			expectedDay:   28,
 			expectedMonth: 12,
-			expectedYear: 2014,
+			expectedYear:  2014,
 		},
 		{
-			text:         "2014 12 28",
-			expectedText: "2014 12 28",
-			expectedDate: time.Date(2014, 12, 28, 12, 0, 0, 0, time.UTC),
-			expectedDay:  28,
+			text:          "2014 12 28",
+			expectedText:  "2014 12 28",
+			expectedDate:  time.Date(2014, 12, 28, 12, 0, 0, 0, time.UTC),
+			expectedDay:   28,
 			expectedMonth: 12,
-			expectedYear: 2014,
+			expectedYear:  2014,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -96,41 +95,40 @@ func TestENYearMonthDayParser_WithMonthName(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		text         string
-		expectedText string
-		expectedDay  int
+		text          string
+		expectedText  string
+		expectedDay   int
 		expectedMonth int
-		expectedYear int
+		expectedYear  int
 	}{
 		{
-			text:         "2012/Aug/10",
-			expectedText: "2012/Aug/10",
-			expectedDay:  10,
+			text:          "2012/Aug/10",
+			expectedText:  "2012/Aug/10",
+			expectedDay:   10,
 			expectedMonth: 8,
-			expectedYear: 2012,
+			expectedYear:  2012,
 		},
 		{
-			text:         "The Deadline is 2012/aug/10",
-			expectedText: "2012/aug/10",
-			expectedDay:  10,
+			text:          "The Deadline is 2012/aug/10",
+			expectedText:  "2012/aug/10",
+			expectedDay:   10,
 			expectedMonth: 8,
-			expectedYear: 2012,
+			expectedYear:  2012,
 		},
 		{
-			text:         "The Deadline is 2018 March 18",
-			expectedText: "2018 March 18",
-			expectedDay:  18,
+			text:          "The Deadline is 2018 March 18",
+			expectedText:  "2018 March 18",
+			expectedDay:   18,
 			expectedMonth: 3,
-			expectedYear: 2018,
+			expectedYear:  2018,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -225,9 +223,8 @@ func TestENYearMonthDayParser_InvalidDates(t *testing.T) {
 	for _, text := range tests {
 		t.Run(text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(text, refDate, nil)
 
 			assert.Empty(t, results, "Should not parse invalid date: %s", text)
 		})

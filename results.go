@@ -48,8 +48,7 @@ func FromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceW
 
 		var timezoneOffset *int
 		if v.Timezone != nil {
-			offset := toTimezoneOffset(v.Timezone, instant, timezoneOverrides)
-			timezoneOffset = &offset
+			timezoneOffset = ToTimezoneOffset(v.Timezone, instant, timezoneOverrides)
 		}
 
 		return NewReferenceWithTimezone(instant, timezoneOffset)
@@ -73,13 +72,15 @@ func (r *ReferenceWithTimezone) GetDateWithAdjustedTimezone() time.Time {
 // GetSystemTimezoneAdjustmentMinute returns the number of minutes difference between
 // the system's timezone and the reference timezone.
 func (r *ReferenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time, overrideTimezoneOffset *int) int {
+	const secondsPerMinute = 60
+
 	if date.IsZero() || date.Unix() < 0 {
 		// Javascript date timezone calculation got effect when the time epoch < 0
 		date = time.Now()
 	}
 
 	_, currentOffset := date.Zone()
-	currentTimezoneOffset := currentOffset / 60
+	currentTimezoneOffset := currentOffset / secondsPerMinute
 
 	targetTimezoneOffset := currentTimezoneOffset
 	if overrideTimezoneOffset != nil {
@@ -94,11 +95,13 @@ func (r *ReferenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time
 // GetTimezoneOffset returns the timezone offset in minutes.
 // If no timezone offset is set, it returns the system timezone offset.
 func (r *ReferenceWithTimezone) GetTimezoneOffset() int {
+	const secondsPerMinute = 60
+
 	if r.timezoneOffset != nil {
 		return *r.timezoneOffset
 	}
 	_, offset := r.instant.Zone()
-	return offset / 60
+	return offset / secondsPerMinute
 }
 
 // Instant returns the reference instant.
@@ -132,11 +135,13 @@ func NewParsingComponents(reference *ReferenceWithTimezone, knownComponents map[
 	}
 
 	// Set default implied values from reference
+	const defaultImpliedHour = 12 // Noon as default
+
 	date := reference.GetDateWithAdjustedTimezone()
 	pc.Imply(ComponentDay, date.Day())
 	pc.Imply(ComponentMonth, int(date.Month()))
 	pc.Imply(ComponentYear, date.Year())
-	pc.Imply(ComponentHour, 12)
+	pc.Imply(ComponentHour, defaultImpliedHour)
 	pc.Imply(ComponentMinute, 0)
 	pc.Imply(ComponentSecond, 0)
 	pc.Imply(ComponentMillisecond, 0)
@@ -278,9 +283,15 @@ func (pc *ParsingComponents) Date() time.Time {
 // DateWithoutTimezoneAdjustment creates a time.Time from components without timezone adjustment.
 // This is useful for DST calculations where you need the "wall clock" time.
 func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
-	year := getValueOrDefault(pc.Get(ComponentYear), 2000)
-	month := getValueOrDefault(pc.Get(ComponentMonth), 1)
-	day := getValueOrDefault(pc.Get(ComponentDay), 1)
+	const (
+		defaultYear  = 2000
+		defaultMonth = 1
+		defaultDay   = 1
+	)
+
+	year := getValueOrDefault(pc.Get(ComponentYear), defaultYear)
+	month := getValueOrDefault(pc.Get(ComponentMonth), defaultMonth)
+	day := getValueOrDefault(pc.Get(ComponentDay), defaultDay)
 	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
 	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
 	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
@@ -292,28 +303,27 @@ func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
 		location = pc.reference.instant.Location()
 	}
 
-	date := time.Date(year, time.Month(month), day, hour, minute, second, millisecond*1000000, location)
-
-	// Handle years < 100 properly (time.Date can interpret them differently)
-	if year < 100 {
-		date = time.Date(year, time.Month(month), day, hour, minute, second, millisecond*1000000, location)
-	}
-
-	return date
+	return time.Date(year, time.Month(month), day, hour, minute, second, millisecond*NanosecondsPerMS, location)
 }
 
 // DateUTC creates a UTC time.Time from components for DST calculations.
 // This returns a time in UTC with the "wall clock" values from the components.
 func (pc *ParsingComponents) DateUTC() time.Time {
-	year := getValueOrDefault(pc.Get(ComponentYear), 2000)
-	month := getValueOrDefault(pc.Get(ComponentMonth), 1)
-	day := getValueOrDefault(pc.Get(ComponentDay), 1)
+	const (
+		defaultYear  = 2000
+		defaultMonth = 1
+		defaultDay   = 1
+	)
+
+	year := getValueOrDefault(pc.Get(ComponentYear), defaultYear)
+	month := getValueOrDefault(pc.Get(ComponentMonth), defaultMonth)
+	day := getValueOrDefault(pc.Get(ComponentDay), defaultDay)
 	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
 	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
 	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
 	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
 
-	return time.Date(year, time.Month(month), day, hour, minute, second, millisecond*1000000, time.UTC)
+	return time.Date(year, time.Month(month), day, hour, minute, second, millisecond*NanosecondsPerMS, time.UTC)
 }
 
 // AddTag adds a debugging tag to the components.
@@ -571,47 +581,4 @@ func getValueOrDefault(ptr *int, defaultVal int) int {
 		return defaultVal
 	}
 	return *ptr
-}
-
-// toTimezoneOffset converts various timezone representations to an offset in minutes.
-// This is a simplified version - a full implementation would handle timezone names
-// and ambiguous timezones.
-func toTimezoneOffset(timezone interface{}, instant time.Time, timezoneOverrides TimezoneAbbrMap) int {
-	if timezone == nil {
-		return 0
-	}
-
-	switch v := timezone.(type) {
-	case int:
-		return v
-	case string:
-		// Try to look up in overrides first
-		if timezoneOverrides != nil {
-			if offset, exists := timezoneOverrides[v]; exists {
-				switch o := offset.(type) {
-				case int:
-					return o
-				case AmbiguousTimezoneMap:
-					// For ambiguous timezones, we need to determine if DST is in effect
-					year := instant.Year()
-					dstStart := o.DstStart(year)
-					dstEnd := o.DstEnd(year)
-
-					if instant.After(dstStart) && instant.Before(dstEnd) {
-						return o.TimezoneOffsetDuringDst
-					}
-					return o.TimezoneOffsetNonDst
-				}
-			}
-		}
-
-		// Try to parse as location name
-		loc, err := time.LoadLocation(v)
-		if err == nil {
-			_, offset := instant.In(loc).Zone()
-			return offset / 60
-		}
-	}
-
-	return 0
 }

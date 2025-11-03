@@ -213,7 +213,7 @@ func AfternoonWithHour(reference *ReferenceWithTimezone, implyHour int) *Parsing
 func Noon(reference *ReferenceWithTimezone) *ParsingComponents {
 	component := NewParsingComponents(reference, nil)
 
-	component.Imply(ComponentMeridiem, int(MeridiemAM))
+	component.Imply(ComponentMeridiem, int(MeridiemPM))
 	component.Assign(ComponentHour, 12)
 	component.Imply(ComponentMinute, 0)
 	component.Imply(ComponentSecond, 0)

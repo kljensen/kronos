@@ -15,7 +15,6 @@ func TestENCasualTimeParser_ThisMorning(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline was this morning ", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -34,7 +33,6 @@ func TestENCasualTimeParser_ThisAfternoon(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline is this afternoon ", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -53,7 +51,6 @@ func TestENCasualTimeParser_ThisEvening(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("The Deadline is this evening ", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -72,7 +69,6 @@ func TestENCasualTimeParser_Night(t *testing.T) {
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 	chrono := kronos.NewChrono(config)
 	results := chrono.Parse("See you night", refDate, nil)
-	
 
 	assert.NotEmpty(t, results)
 	result := results[0]
@@ -90,9 +86,8 @@ func TestENCasualTimeParser_Noon(t *testing.T) {
 	for _, text := range tests {
 		t.Run(text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse("Meet at "+text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse("Meet at "+text, refDate, nil)
 
 			assert.NotEmpty(t, results)
 			result := results[0]
@@ -130,9 +125,8 @@ func TestENCasualTimeParser_Midnight(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse("Meet at midnight", tt.refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse("Meet at midnight", tt.refDate, nil)
 
 			assert.NotEmpty(t, results)
 			result := results[0]
@@ -163,9 +157,8 @@ func TestENCasualTimeParser_WithoutThis(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, refDate, nil)
 
 			assert.NotEmpty(t, results)
 			result := results[0]

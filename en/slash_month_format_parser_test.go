@@ -52,9 +52,8 @@ func TestENSlashMonthFormatParser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, refDate, nil)
 
 			if tt.shouldParse {
 				assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)

@@ -73,9 +73,8 @@ func TestENMonthNameParser_MonthYear(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -133,9 +132,8 @@ func TestENMonthNameParser_MonthOnly(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-	chrono := kronos.NewChrono(config)
-	results := chrono.Parse(tt.text, tt.refDate, nil)
-			
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, tt.refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {

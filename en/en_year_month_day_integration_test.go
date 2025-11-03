@@ -210,7 +210,7 @@ func TestYearMonthDaySwapInCasual(t *testing.T) {
 			name:          "2024/13/1 in casual mode",
 			text:          "2024/13/1",
 			strictMode:    false,
-			shouldParse:   true,  // Should parse as Jan 13, 2024
+			shouldParse:   true, // Should parse as Jan 13, 2024
 			expectedYear:  2024,
 			expectedMonth: 1,
 			expectedDay:   13,

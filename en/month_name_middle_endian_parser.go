@@ -49,7 +49,7 @@ func (p *ENMonthNameMiddleEndianParser) innerPattern(context *kronos.ParsingCont
 		`(` + OrdinalNumberPattern + `)` +
 		`)?` +
 		`(?:` +
-		`(?:\s*(?:-|/|,)\s*|\s+)` +  // punctuation separator or space
+		`(?:\s*(?:-|/|,)\s*|\s+)` + // punctuation separator or space
 		`(` + YearPattern + `)` +
 		`)?`
 

@@ -42,6 +42,22 @@ const (
 	MeridiemPM Meridiem = 1
 )
 
+// Common time constants
+const (
+	HoursPerDay            = 24
+	MinutesPerHour         = 60
+	SecondsPerMinute       = 60
+	MillisecondsPerSecond  = 1000
+	NanosecondsPerMS       = 1000000
+	SecondsPerHour         = 3600
+	MinutesPerDay          = 1440
+	DaysPerWeek            = 7
+	MonthsPerYear          = 12
+	MonthsPerQuarter       = 3
+	WeeksPerMonthApprox    = 4
+	YearLookAheadThreshold = 20 // For 2-digit year conversion
+)
+
 // Weekday represents the day of the week.
 type Weekday int
 

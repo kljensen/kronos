@@ -78,21 +78,21 @@ func TestENTimeExpression_WithClues(t *testing.T) {
 	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		name            string
-		text            string
-		expectedHour    int
+		name             string
+		text             string
+		expectedHour     int
 		expectedMeridiem int
 	}{
 		{
-			name:            "1 at night",
-			text:            "1 at night",
-			expectedHour:    1,
+			name:             "1 at night",
+			text:             "1 at night",
+			expectedHour:     1,
 			expectedMeridiem: int(kronos.MeridiemAM),
 		},
 		{
-			name:            "1 in the afternoon",
-			text:            "1 in the afternoon",
-			expectedHour:    13,
+			name:             "1 in the afternoon",
+			text:             "1 in the afternoon",
+			expectedHour:     13,
 			expectedMeridiem: int(kronos.MeridiemPM),
 		},
 	}
@@ -184,43 +184,43 @@ func TestENTimeExpression_BeforeDate(t *testing.T) {
 	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		name          string
-		text          string
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		expectedHour  int
-		expectedMin   int
+		name             string
+		text             string
+		expectedYear     int
+		expectedMonth    int
+		expectedDay      int
+		expectedHour     int
+		expectedMin      int
 		expectedMeridiem int
 	}{
 		{
-			name:          "time before slash date",
-			text:          "14:15 05/31/2024",
-			expectedYear:  2024,
-			expectedMonth: 5,
-			expectedDay:   31,
-			expectedHour:  14,
-			expectedMin:   15,
+			name:             "time before slash date",
+			text:             "14:15 05/31/2024",
+			expectedYear:     2024,
+			expectedMonth:    5,
+			expectedDay:      31,
+			expectedHour:     14,
+			expectedMin:      15,
 			expectedMeridiem: int(kronos.MeridiemPM),
 		},
 		{
-			name:          "AM time with comma and month",
-			text:          "8:23 AM, Jul 9",
-			expectedYear:  2016,
-			expectedMonth: 7,
-			expectedDay:   9,
-			expectedHour:  8,
-			expectedMin:   23,
+			name:             "AM time with comma and month",
+			text:             "8:23 AM, Jul 9",
+			expectedYear:     2016,
+			expectedMonth:    7,
+			expectedDay:      9,
+			expectedHour:     8,
+			expectedMin:      23,
 			expectedMeridiem: int(kronos.MeridiemAM),
 		},
 		{
-			name:          "AM time with bullet separator",
-			text:          "8:23 AM ∙ Jul 9",
-			expectedYear:  2016,
-			expectedMonth: 7,
-			expectedDay:   9,
-			expectedHour:  8,
-			expectedMin:   23,
+			name:             "AM time with bullet separator",
+			text:             "8:23 AM ∙ Jul 9",
+			expectedYear:     2016,
+			expectedMonth:    7,
+			expectedDay:      9,
+			expectedHour:     8,
+			expectedMin:      23,
 			expectedMeridiem: int(kronos.MeridiemAM),
 		},
 	}
@@ -252,17 +252,17 @@ func TestENTimeExpression_TimeRange(t *testing.T) {
 	_ = time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC) // default refDate
 
 	tests := []struct {
-		name             string
-		text             string
-		refDate          time.Time
-		startHour        int
-		startMin         int
-		startSec         int
-		startMeridiem    int
-		endHour          int
-		endMin           int
-		endSec           int
-		endMeridiem      int
+		name          string
+		text          string
+		refDate       time.Time
+		startHour     int
+		startMin      int
+		startSec      int
+		startMeridiem int
+		endHour       int
+		endMin        int
+		endSec        int
+		endMeridiem   int
 	}{
 		{
 			name:          "time range with dash",
@@ -371,49 +371,49 @@ func TestENTimeExpression_CasualTimeNumber(t *testing.T) {
 	refDate := time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC)
 
 	tests := []struct {
-		name         string
-		text         string
-		expectedYear int
-		expectedMonth int
-		expectedDay  int
-		expectedHour int
-		expectedMin  *int
+		name             string
+		text             string
+		expectedYear     int
+		expectedMonth    int
+		expectedDay      int
+		expectedHour     int
+		expectedMin      *int
 		expectedMeridiem *int
 	}{
 		{
-			name:         "11 at night",
-			text:         "11 at night",
-			expectedYear: 2016,
+			name:          "11 at night",
+			text:          "11 at night",
+			expectedYear:  2016,
 			expectedMonth: 10,
-			expectedDay:  1,
-			expectedHour: 23,
+			expectedDay:   1,
+			expectedHour:  23,
 		},
 		{
-			name:         "11 tonight",
-			text:         "11 tonight",
-			expectedYear: 2016,
+			name:          "11 tonight",
+			text:          "11 tonight",
+			expectedYear:  2016,
 			expectedMonth: 10,
-			expectedDay:  1,
-			expectedHour: 23,
+			expectedDay:   1,
+			expectedHour:  23,
 		},
 		{
-			name:         "6 in the morning",
-			text:         "6 in the morning",
-			expectedYear: 2016,
-			expectedMonth: 10,
-			expectedDay:  1,
-			expectedHour: 6,
-			expectedMin:  intPtr(0),
+			name:             "6 in the morning",
+			text:             "6 in the morning",
+			expectedYear:     2016,
+			expectedMonth:    10,
+			expectedDay:      1,
+			expectedHour:     6,
+			expectedMin:      intPtr(0),
 			expectedMeridiem: intPtr(int(kronos.MeridiemAM)),
 		},
 		{
-			name:         "6 in the afternoon",
-			text:         "6 in the afternoon",
-			expectedYear: 2016,
-			expectedMonth: 10,
-			expectedDay:  1,
-			expectedHour: 18,
-			expectedMin:  intPtr(0),
+			name:             "6 in the afternoon",
+			text:             "6 in the afternoon",
+			expectedYear:     2016,
+			expectedMonth:    10,
+			expectedDay:      1,
+			expectedHour:     18,
+			expectedMin:      intPtr(0),
 			expectedMeridiem: intPtr(int(kronos.MeridiemPM)),
 		},
 	}
@@ -449,34 +449,34 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 	_ = time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC) // default refDate
 
 	tests := []struct {
-		name              string
-		text              string
-		refDate           time.Time
-		startYear         int
-		startMonth        int
-		startDay          int
-		startHour         int
-		startMeridiem     *int
+		name                 string
+		text                 string
+		refDate              time.Time
+		startYear            int
+		startMonth           int
+		startDay             int
+		startHour            int
+		startMeridiem        *int
 		startMeridiemCertain *bool
-		endYear           int
-		endMonth          int
-		endDay            int
-		endHour           int
-		endMeridiem       *int
-		endMeridiemCertain *bool
+		endYear              int
+		endMonth             int
+		endDay               int
+		endHour              int
+		endMeridiem          *int
+		endMeridiemCertain   *bool
 	}{
 		{
-			name:          "10 - 11 at night",
-			text:          "10 - 11 at night",
-			refDate:       time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC),
-			startYear:     2016,
-			startMonth:    10,
-			startDay:      1,
-			startHour:     22,
-			endYear:       2016,
-			endMonth:      10,
-			endDay:        1,
-			endHour:       23,
+			name:       "10 - 11 at night",
+			text:       "10 - 11 at night",
+			refDate:    time.Date(2016, 10, 1, 8, 0, 0, 0, time.UTC),
+			startYear:  2016,
+			startMonth: 10,
+			startDay:   1,
+			startHour:  22,
+			endYear:    2016,
+			endMonth:   10,
+			endDay:     1,
+			endHour:    23,
 		},
 		{
 			name:          "8pm - 11",
@@ -524,86 +524,86 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			endMeridiem:   intPtr(int(kronos.MeridiemAM)),
 		},
 		{
-			name:          "1pm-3",
-			text:          "1pm-3",
-			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-			startYear:     2012,
-			startMonth:    8,
-			startDay:      10,
-			startHour:     13,
-			startMeridiem: intPtr(int(kronos.MeridiemPM)),
+			name:                 "1pm-3",
+			text:                 "1pm-3",
+			refDate:              time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			startYear:            2012,
+			startMonth:           8,
+			startDay:             10,
+			startHour:            13,
+			startMeridiem:        intPtr(int(kronos.MeridiemPM)),
 			startMeridiemCertain: boolPtr(true),
-			endYear:       2012,
-			endMonth:      8,
-			endDay:        10,
-			endHour:       15,
-			endMeridiem:   intPtr(int(kronos.MeridiemPM)),
+			endYear:              2012,
+			endMonth:             8,
+			endDay:               10,
+			endHour:              15,
+			endMeridiem:          intPtr(int(kronos.MeridiemPM)),
+			endMeridiemCertain:   boolPtr(true),
+		},
+		{
+			name:                 "1am-3",
+			text:                 "1am-3",
+			refDate:              time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			startYear:            2012,
+			startMonth:           8,
+			startDay:             10,
+			startHour:            1,
+			startMeridiem:        intPtr(int(kronos.MeridiemAM)),
+			startMeridiemCertain: boolPtr(true),
+			endYear:              2012,
+			endMonth:             8,
+			endDay:               10,
+			endHour:              3,
+			endMeridiem:          intPtr(int(kronos.MeridiemAM)),
+			endMeridiemCertain:   boolPtr(false),
+		},
+		{
+			name:                 "11pm-3 (crosses midnight)",
+			text:                 "11pm-3",
+			refDate:              time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			startYear:            2012,
+			startMonth:           8,
+			startDay:             10,
+			startHour:            23,
+			startMeridiem:        intPtr(int(kronos.MeridiemPM)),
+			startMeridiemCertain: boolPtr(true),
+			endYear:              2012,
+			endMonth:             8,
+			endDay:               11,
+			endHour:              3,
+			endMeridiem:          intPtr(int(kronos.MeridiemAM)),
+			endMeridiemCertain:   boolPtr(false),
+		},
+		{
+			name:               "12-3am",
+			text:               "12-3am",
+			refDate:            time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			startYear:          2012,
+			startMonth:         8,
+			startDay:           10,
+			startHour:          0,
+			startMeridiem:      intPtr(int(kronos.MeridiemAM)),
+			endYear:            2012,
+			endMonth:           8,
+			endDay:             10,
+			endHour:            3,
+			endMeridiem:        intPtr(int(kronos.MeridiemAM)),
 			endMeridiemCertain: boolPtr(true),
 		},
 		{
-			name:          "1am-3",
-			text:          "1am-3",
-			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-			startYear:     2012,
-			startMonth:    8,
-			startDay:      10,
-			startHour:     1,
-			startMeridiem: intPtr(int(kronos.MeridiemAM)),
-			startMeridiemCertain: boolPtr(true),
-			endYear:       2012,
-			endMonth:      8,
-			endDay:        10,
-			endHour:       3,
-			endMeridiem:   intPtr(int(kronos.MeridiemAM)),
-			endMeridiemCertain: boolPtr(false),
-		},
-		{
-			name:          "11pm-3 (crosses midnight)",
-			text:          "11pm-3",
-			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-			startYear:     2012,
-			startMonth:    8,
-			startDay:      10,
-			startHour:     23,
-			startMeridiem: intPtr(int(kronos.MeridiemPM)),
-			startMeridiemCertain: boolPtr(true),
-			endYear:       2012,
-			endMonth:      8,
-			endDay:        11,
-			endHour:       3,
-			endMeridiem:   intPtr(int(kronos.MeridiemAM)),
-			endMeridiemCertain: boolPtr(false),
-		},
-		{
-			name:          "12-3am",
-			text:          "12-3am",
-			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-			startYear:     2012,
-			startMonth:    8,
-			startDay:      10,
-			startHour:     0,
-			startMeridiem: intPtr(int(kronos.MeridiemAM)),
-			endYear:       2012,
-			endMonth:      8,
-			endDay:        10,
-			endHour:       3,
-			endMeridiem:   intPtr(int(kronos.MeridiemAM)),
-			endMeridiemCertain: boolPtr(true),
-		},
-		{
-			name:          "12-3pm",
-			text:          "12-3pm",
-			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-			startYear:     2012,
-			startMonth:    8,
-			startDay:      10,
-			startHour:     12,
-			startMeridiem: intPtr(int(kronos.MeridiemPM)),
-			endYear:       2012,
-			endMonth:      8,
-			endDay:        10,
-			endHour:       15,
-			endMeridiem:   intPtr(int(kronos.MeridiemPM)),
+			name:               "12-3pm",
+			text:               "12-3pm",
+			refDate:            time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			startYear:          2012,
+			startMonth:         8,
+			startDay:           10,
+			startHour:          12,
+			startMeridiem:      intPtr(int(kronos.MeridiemPM)),
+			endYear:            2012,
+			endMonth:           8,
+			endDay:             10,
+			endHour:            15,
+			endMeridiem:        intPtr(int(kronos.MeridiemPM)),
 			endMeridiemCertain: boolPtr(true),
 		},
 	}
@@ -861,64 +861,64 @@ func TestENTimeExpression_ForwardDateFlag(t *testing.T) {
 	parser := NewENTimeExpressionParser(false)
 
 	tests := []struct {
-		name         string
-		text         string
-		refDate      time.Time
-		expectedYear int
+		name          string
+		text          string
+		refDate       time.Time
+		expectedYear  int
 		expectedMonth int
-		expectedDay  int
-		expectedHour int
-		endExpected  bool
-		endYear      *int
-		endMonth     *int
-		endDay       *int
-		endHour      *int
+		expectedDay   int
+		expectedHour  int
+		endExpected   bool
+		endYear       *int
+		endMonth      *int
+		endDay        *int
+		endHour       *int
 	}{
 		{
-			name:         "1am after reference time",
-			text:         "1am",
-			refDate:      time.Date(2022, 5, 26, 1, 57, 0, 0, time.UTC),
-			expectedYear: 2022,
+			name:          "1am after reference time",
+			text:          "1am",
+			refDate:       time.Date(2022, 5, 26, 1, 57, 0, 0, time.UTC),
+			expectedYear:  2022,
 			expectedMonth: 5,
-			expectedDay:  27,
-			expectedHour: 1,
+			expectedDay:   27,
+			expectedHour:  1,
 		},
 		{
-			name:         "11am after reference time",
-			text:         "11am",
-			refDate:      time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
-			expectedYear: 2016,
+			name:          "11am after reference time",
+			text:          "11am",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedYear:  2016,
 			expectedMonth: 10,
-			expectedDay:  2,
-			expectedHour: 11,
+			expectedDay:   2,
+			expectedHour:  11,
 		},
 		{
-			name:         "11am to 1am range",
-			text:         "  11am to 1am  ",
-			refDate:      time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
-			expectedYear: 2016,
+			name:          "11am to 1am range",
+			text:          "  11am to 1am  ",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedYear:  2016,
 			expectedMonth: 10,
-			expectedDay:  2,
-			expectedHour: 11,
-			endExpected:  true,
-			endYear:      intPtr(2016),
-			endMonth:     intPtr(10),
-			endDay:       intPtr(3),
-			endHour:      intPtr(1),
+			expectedDay:   2,
+			expectedHour:  11,
+			endExpected:   true,
+			endYear:       intPtr(2016),
+			endMonth:      intPtr(10),
+			endDay:        intPtr(3),
+			endHour:       intPtr(1),
 		},
 		{
-			name:         "10am to 12pm same day",
-			text:         "  10am to 12pm  ",
-			refDate:      time.Date(2016, 10, 1, 11, 0, 0, 0, time.UTC),
-			expectedYear: 2016,
+			name:          "10am to 12pm same day",
+			text:          "  10am to 12pm  ",
+			refDate:       time.Date(2016, 10, 1, 11, 0, 0, 0, time.UTC),
+			expectedYear:  2016,
 			expectedMonth: 10,
-			expectedDay:  2,
-			expectedHour: 10,
-			endExpected:  true,
-			endYear:      intPtr(2016),
-			endMonth:     intPtr(10),
-			endDay:       intPtr(2),
-			endHour:      intPtr(12),
+			expectedDay:   2,
+			expectedHour:  10,
+			endExpected:   true,
+			endYear:       intPtr(2016),
+			endMonth:      intPtr(10),
+			endDay:        intPtr(2),
+			endHour:       intPtr(12),
 		},
 	}
 

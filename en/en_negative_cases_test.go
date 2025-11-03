@@ -123,8 +123,8 @@ func TestNegativeImpossibleDates(t *testing.T) {
 		{name: "02/29/2022", text: "02/29/2022"},
 		{name: "June 31, 2022", text: "June 31, 2022"}, // June has 30 days
 		{name: "06/31/2022", text: "06/31/2022"},
-		{name: "14PM", text: "14PM"}, // 14 PM doesn't exist (use 24h or 12h)
-		{name: "25:12", text: "25:12"}, // Hour 25 doesn't exist
+		{name: "14PM", text: "14PM"},                               // 14 PM doesn't exist (use 24h or 12h)
+		{name: "25:12", text: "25:12"},                             // Hour 25 doesn't exist
 		{name: "13/31/2018", text: "An appointment on 13/31/2018"}, // Month 13 doesn't exist
 	}
 
@@ -146,7 +146,7 @@ func TestNegativeImpossibleDateRanges(t *testing.T) {
 		text string
 	}{
 		{name: "February 20 - 29, 2022", text: "February 20 - 29, 2022"}, // 2022 not leap year
-		{name: "June 10 - 31, 2022", text: "June 10 - 31, 2022"},       // June has 30 days
+		{name: "June 10 - 31, 2022", text: "June 10 - 31, 2022"},         // June has 30 days
 	}
 
 	for _, tt := range tests {

@@ -229,13 +229,13 @@ func MatchAnyPattern(dict interface{}) string {
 
 // Patterns
 var (
-	MonthPattern        = MatchAnyPattern(MonthDictionary)
-	FullMonthPattern    = MatchAnyPattern(FullMonthNameDictionary)
-	WeekdayPattern      = MatchAnyPattern(WeekdayDictionary)
-	IntegerWordPattern  = MatchAnyPattern(IntegerWordDictionary)
-	OrdinalWordPattern  = MatchAnyPattern(OrdinalWordDictionary)
+	MonthPattern         = MatchAnyPattern(MonthDictionary)
+	FullMonthPattern     = MatchAnyPattern(FullMonthNameDictionary)
+	WeekdayPattern       = MatchAnyPattern(WeekdayDictionary)
+	IntegerWordPattern   = MatchAnyPattern(IntegerWordDictionary)
+	OrdinalWordPattern   = MatchAnyPattern(OrdinalWordDictionary)
 	OrdinalNumberPattern = `(?:` + OrdinalWordPattern + `|[0-9]{1,2}(?:st|nd|rd|th)?)`
-	YearPattern         = YEAR_PATTERN
+	YearPattern          = YEAR_PATTERN
 )
 
 // ParseOrdinalNumber parses an ordinal number pattern (e.g., "1st", "2nd", "first", "second")
