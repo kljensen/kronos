@@ -1,0 +1,68 @@
+Bootstrap: docker
+From: golang:1.23-bookworm
+
+%post
+    # Disable apt sandboxing for Apptainer build compatibility
+    echo 'APT::Sandbox::User "root";' > /etc/apt/apt.conf.d/99sandboxroot
+
+    # Update and install minimal development tools
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        git \
+        make \
+        curl \
+        ca-certificates \
+        python3 \
+        python3-pip \
+        locales \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Configure locale to prevent warnings
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+    locale-gen en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
+
+    # Install nvm (Node Version Manager)
+    export NVM_DIR="/root/.nvm"
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
+    # Load nvm and install Node.js LTS
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm install --lts
+    nvm use --lts
+    nvm alias default lts/*
+
+    # Set up Go environment
+    go env -w GO111MODULE=on
+
+    # Install global npm packages for AI development tools
+    # Set npm user/group to root to avoid fchown errors in fakeroot environment
+    npm_config_user=root npm_config_group=root npm install -g \
+        @anthropic-ai/claude-code \
+        @github/copilot \
+        @google/gemini-cli \
+        @openai/codex
+
+    # Install uv (fast Python package installer)
+    # Manual installation to avoid tar ownership errors in fakeroot
+    export UV_VERSION="0.9.7"
+    export UV_INSTALL_DIR="/root/.cargo/bin"
+    mkdir -p "$UV_INSTALL_DIR"
+    curl -LsSf "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" | \
+        tar xzf - --strip-components=1 --no-same-owner -C "$UV_INSTALL_DIR"
+    chmod +x "$UV_INSTALL_DIR/uv"
+
+%environment
+    export NVM_DIR="/root/.nvm"
+    export PATH="$NVM_DIR/versions/node/$(ls -1 $NVM_DIR/versions/node 2>/dev/null | tail -1)/bin:/root/.cargo/bin:/usr/local/go/bin:/go/bin:$PATH"
+    export GOPATH=/go
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+
+%runscript
+    exec /bin/bash "$@"
+
+%labels
+    Author kljensen
+    Version 2.2
+    Description Go + Node.js (via nvm) development environment with multiple AI coding assistants (Claude Code, GitHub Copilot, OpenAI, Gemini) based on Debian Bookworm
