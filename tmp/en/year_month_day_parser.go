@@ -1,0 +1,84 @@
+package en
+
+import (
+	"regexp"
+	"strconv"
+	"strings"
+
+	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/common"
+)
+
+// ENYearMonthDayParser parses date formats like YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD
+// Supports both numeric months and month names (e.g., 2012/Aug/10)
+type ENYearMonthDayParser struct {
+	*common.AbstractParserWithWordBoundary
+	strictMonthDateOrder bool
+}
+
+// NewENYearMonthDayParser creates a new ENYearMonthDayParser
+func NewENYearMonthDayParser(strictMonthDateOrder bool) *ENYearMonthDayParser {
+	parser := &ENYearMonthDayParser{
+		strictMonthDateOrder: strictMonthDateOrder,
+	}
+
+	parser.AbstractParserWithWordBoundary = common.NewAbstractParserWithWordBoundary(
+		parser.innerPattern,
+		parser.innerExtract,
+		nil, // use default word boundary
+	)
+
+	return parser
+}
+
+func (p *ENYearMonthDayParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+	// Pattern: YYYY[-/./ ]MM[-/./ ]DD or YYYY[-/./ ]MONTH[-/./ ]DD
+	pattern := `(?i)([0-9]{4})[-.\\/\s]` +
+		`(?:(` + MonthPattern + `)|([0-9]{1,2}))[-.\\/\s]` +
+		`([0-9]{1,2})` +
+		``
+
+	return regexp.MustCompile(pattern)
+}
+
+func (p *ENYearMonthDayParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+	if len(match) < 5 {
+		return nil
+	}
+
+	year, _ := strconv.Atoi(match[1])
+
+	var month, day int
+
+	// Check if month name was matched (group 2) or numeric month (group 3)
+	if match[2] != "" {
+		// Month name
+		month = MonthDictionary[strings.ToLower(match[2])]
+	} else {
+		// Numeric month
+		month, _ = strconv.Atoi(match[3])
+	}
+
+	day, _ = strconv.Atoi(match[4])
+
+	// Validate and potentially swap month/day if not in strict mode
+	if month < 1 || month > 12 {
+		if p.strictMonthDateOrder {
+			return nil
+		}
+		// Try swapping if day value could be a valid month
+		if day >= 1 && day <= 12 {
+			month, day = day, month
+		}
+	}
+
+	// Validate day
+	if day < 1 || day > 31 {
+		return nil
+	}
+
+	return context.CreateParsingComponents(nil).
+		Assign(kronos.ComponentYear, year).
+		Assign(kronos.ComponentMonth, month).
+		Assign(kronos.ComponentDay, day)
+}
