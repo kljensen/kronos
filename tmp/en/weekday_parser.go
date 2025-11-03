@@ -109,13 +109,18 @@ func NewENWeekdayParser() *ENWeekdayParser {
 			var modPtr *string
 			if modifier != "" {
 				modPtr = &modifier
+			} else if context.Option().ForwardDate {
+				// When ForwardDate is enabled and no modifier is given,
+				// treat it as "this" (forward)
+				thisModifier := "this"
+				modPtr = &thisModifier
 			}
 			daysOffset := kronos.GetDaysToWeekday(refDate, weekday, modPtr)
 			targetDate := refDate.AddDate(0, 0, daysOffset)
 
-			components.Assign(kronos.ComponentDay, targetDate.Day())
-			components.Assign(kronos.ComponentMonth, int(targetDate.Month()))
-			components.Assign(kronos.ComponentYear, targetDate.Year())
+			// Day/month/year are implied (uncertain) - they're calculated from the weekday
+			kronos.ImplySimilarDate(components, targetDate)
+			// Only weekday is certain
 			components.Assign(kronos.ComponentWeekday, int(weekday))
 
 			return components
