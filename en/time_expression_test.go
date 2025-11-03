@@ -24,14 +24,14 @@ func TestENTimeExpression_ParsingTextOffset(t *testing.T) {
 		{
 			name:          "time with leading spaces",
 			text:          "  11 AM ",
-			expectedIndex: 2,
+			expectedIndex: 0, // After sanitization, leading spaces are trimmed
 			expectedText:  "11 AM",
 		},
 		{
 			name:          "time after year with 'at' keyword",
 			text:          "2020 at  11 AM ",
 			expectedIndex: 5,
-			expectedText:  "at  11 AM",
+			expectedText:  "at 11 AM", // After sanitization, multiple spaces are collapsed to single space
 		},
 	}
 

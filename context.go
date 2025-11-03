@@ -14,6 +14,7 @@ type ParsingContext struct {
 // NewParsingContext creates a new ParsingContext.
 // If refDate is nil, the current time is used.
 // If option is nil, default options are used.
+// The input text is sanitized to normalize Unicode characters before parsing.
 func NewParsingContext(text string, refDate interface{}, option *ParsingOption) *ParsingContext {
 	var opt ParsingOption
 	if option != nil {
@@ -26,6 +27,9 @@ func NewParsingContext(text string, refDate interface{}, option *ParsingOption) 
 	}
 
 	reference := FromInput(refDate, timezones)
+
+	// Sanitize input text to handle Unicode normalization issues
+	text = SanitizeInput(text)
 
 	return &ParsingContext{
 		text:      text,

@@ -89,6 +89,8 @@ func createGBTestChrono() *kronos.Chrono {
 }
 
 // TestParsingOffsetExpression tests parsing dates with whitespace offset
+// Note: As of the sanitization implementation, leading/trailing spaces are trimmed
+// and multiple spaces are collapsed, so the index starts at 0 for sanitized text.
 func TestParsingOffsetExpression(t *testing.T) {
 	chrono := createTestChrono()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
@@ -96,9 +98,9 @@ func TestParsingOffsetExpression(t *testing.T) {
 
 	assert.Len(t, results, 1, "Should parse one result")
 	result := results[0]
-	// Index points past the leading spaces (4 spaces)
-	assert.Equal(t, 4, result.Index(), "Index should be 4")
-	// Text does not include leading spaces
+	// After sanitization, leading spaces are trimmed, so index is 0
+	assert.Equal(t, 0, result.Index(), "Index should be 0 after sanitization")
+	// Text does not include leading/trailing spaces after sanitization
 	assert.Contains(t, result.Text(), "04/2016", "Text should contain '04/2016'")
 }
 
