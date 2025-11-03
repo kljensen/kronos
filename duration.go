@@ -27,6 +27,12 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		working[k] = v
 	}
 
+	// Process decades (convert to years)
+	if val, exists := working[TimeunitDecade]; exists {
+		const yearsPerDecade = 10
+		working[TimeunitYear] = working[TimeunitYear] + val*yearsPerDecade
+	}
+
 	// Process years (cascade fractional part to months)
 	if val, exists := working[TimeunitYear]; exists {
 		floor := int(val)

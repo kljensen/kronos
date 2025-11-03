@@ -223,6 +223,8 @@ var TimeUnitDictionary = map[string]kronos.Timeunit{
 	"yr":       kronos.TimeunitYear,
 	"year":     kronos.TimeunitYear,
 	"years":    kronos.TimeunitYear,
+	"decade":   kronos.TimeunitDecade,
+	"decades":  kronos.TimeunitDecade,
 }
 
 // Pattern builders
@@ -339,11 +341,11 @@ var (
 	NumberPattern = `(?:\d+(?:\.\d*)?|\.\d+)`
 
 	// TimeUnitNoAbbrPattern matches full time unit names only (no abbreviations)
-	TimeUnitNoAbbrPattern = `(?:second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months|quarter|quarters|year|years)`
+	TimeUnitNoAbbrPattern = `(?:decades|decade|seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year)`
 
 	// TimeUnitPattern matches time units including abbreviations
 	// Order matters: longer alternatives come first to ensure correct matching
-	TimeUnitPattern = `(?:seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year|mins|min|hrs|hr|sec|mos|mon|qtr|yr|mo|s|m|h|d|w|y)`
+	TimeUnitPattern = `(?:decades|decade|seconds|second|minutes|minute|hours|hour|days|day|weeks|week|months|month|quarters|quarter|years|year|mins|min|hrs|hr|sec|mos|mon|qtr|yr|mo|s|m|h|d|w|y)`
 )
 
 // ParseDuration parses a duration expression like "3 days", "5 hours 30 minutes", "half an hour"

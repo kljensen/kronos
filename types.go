@@ -32,6 +32,7 @@ const (
 	TimeunitSecond      Timeunit = "second"
 	TimeunitMillisecond Timeunit = "millisecond"
 	TimeunitQuarter     Timeunit = "quarter"
+	TimeunitDecade      Timeunit = "decade"
 )
 
 // Meridiem represents the AM/PM indicator.

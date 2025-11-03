@@ -914,3 +914,203 @@ func TestFractionalTimeUnits(t *testing.T) {
 		})
 	}
 }
+
+// TestDecadeTimeUnit tests decade time unit support based on dateparser test cases
+// Reference: https://github.com/scrapinghub/dateparser/blob/master/tests/test_freshness_date_parser.py#L64-76
+func TestDecadeTimeUnit(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+	}{
+		// Basic decade expressions
+		{
+			name:          "1 decade ago",
+			text:          "1 decade ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "1 decade ago",
+			expectedYear:  2006,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "2 decades ago",
+			text:          "2 decades ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "2 decades ago",
+			expectedYear:  1996,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "last a decade",
+			text:          "last a decade",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last a decade",
+			expectedYear:  2006,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "next a decade",
+			text:          "next a decade",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "next a decade",
+			expectedYear:  2026,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "a decade ago",
+			text:          "a decade ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "a decade ago",
+			expectedYear:  2006,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "100 decades ago",
+			text:          "100 decades ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "100 decades ago",
+			expectedYear:  1016,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		// Combined with other time units
+		{
+			name:          "1 decade 2 years ago",
+			text:          "1 decade 2 years ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "1 decade 2 years ago",
+			expectedYear:  2004,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "1 decade 12 months ago",
+			text:          "1 decade 12 months ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "1 decade 12 months ago",
+			expectedYear:  2005,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		// With casual relative prefixes
+		{
+			name:          "past a decade",
+			text:          "past a decade",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "past a decade",
+			expectedYear:  2006,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "+1 decade",
+			text:          "+1 decade",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "+1 decade",
+			expectedYear:  2026,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "-1 decade",
+			text:          "-1 decade",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "-1 decade",
+			expectedYear:  2006,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		// Fractional decades
+		{
+			name:          "half a decade ago",
+			text:          "half a decade ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "half a decade ago",
+			expectedYear:  2011,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "0.5 decades ago",
+			text:          "0.5 decades ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "0.5 decades ago",
+			expectedYear:  2011,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "1.5 decades ago",
+			text:          "1.5 decades ago",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "1.5 decades ago",
+			expectedYear:  2001,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "2.5 decades from now",
+			text:          "next 2.5 decades",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "next 2.5 decades",
+			expectedYear:  2041,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			agoParser := NewENTimeUnitAgoFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser, agoParser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+		})
+	}
+}
