@@ -326,6 +326,97 @@ func (pc *ParsingComponents) Reference() *ReferenceWithTimezone {
 	return pc.reference
 }
 
+// CreateRelativeFromReference creates a ParsingComponents from a duration relative to the reference.
+// It handles date-only durations (implies time) and time durations (assigns both date and time).
+// This is used for parsing relative expressions like "in 3 days", "2 hours ago", etc.
+func CreateRelativeFromReference(reference *ReferenceWithTimezone, duration Duration) *ParsingComponents {
+	if duration == nil {
+		duration = EmptyDuration
+	}
+
+	date := AddDuration(reference.GetDateWithAdjustedTimezone(), duration)
+
+	components := NewParsingComponents(reference, nil)
+	components.AddTag("result/relativeDate")
+
+	// Check if duration contains time components
+	hasTimeComponents := false
+	for _, timeunit := range []Timeunit{TimeunitHour, TimeunitMinute, TimeunitSecond, TimeunitMillisecond} {
+		if _, exists := duration[timeunit]; exists {
+			hasTimeComponents = true
+			break
+		}
+	}
+
+	if hasTimeComponents {
+		// Duration includes time - assign both date and time as certain
+		components.AddTag("result/relativeDateAndTime")
+		AssignSimilarTime(components, date)
+		AssignSimilarDate(components, date)
+		components.Assign(ComponentTimezoneOffset, reference.GetTimezoneOffset())
+	} else {
+		// Duration is date-only - imply time components
+		ImplySimilarTime(components, date)
+		components.Imply(ComponentTimezoneOffset, reference.GetTimezoneOffset())
+
+		// Handle different date granularities
+		if _, hasDayDuration := duration[TimeunitDay]; hasDayDuration {
+			// Day duration - assign day, month, year and weekday
+			components.Assign(ComponentDay, date.Day())
+			components.Assign(ComponentMonth, int(date.Month()))
+			components.Assign(ComponentYear, date.Year())
+			components.Assign(ComponentWeekday, int(date.Weekday()))
+		} else if _, hasWeekDuration := duration[TimeunitWeek]; hasWeekDuration {
+			// Week duration - assign day, month, year and imply weekday
+			components.Assign(ComponentDay, date.Day())
+			components.Assign(ComponentMonth, int(date.Month()))
+			components.Assign(ComponentYear, date.Year())
+			components.Imply(ComponentWeekday, int(date.Weekday()))
+		} else {
+			// Month/year duration - imply day
+			components.Imply(ComponentDay, date.Day())
+
+			if _, hasMonthDuration := duration[TimeunitMonth]; hasMonthDuration {
+				// Month duration - assign month and year
+				components.Assign(ComponentMonth, int(date.Month()))
+				components.Assign(ComponentYear, date.Year())
+			} else {
+				// Imply month
+				components.Imply(ComponentMonth, int(date.Month()))
+
+				if _, hasYearDuration := duration[TimeunitYear]; hasYearDuration {
+					// Year duration - assign year
+					components.Assign(ComponentYear, date.Year())
+				} else if _, hasQuarterDuration := duration[TimeunitQuarter]; hasQuarterDuration {
+					// Quarter duration - assign year
+					components.Assign(ComponentYear, date.Year())
+				} else {
+					// Imply year
+					components.Imply(ComponentYear, date.Year())
+				}
+			}
+		}
+	}
+
+	return components
+}
+
+// AddDurationAsImplied adds the duration to the current components and implies the result.
+// This is useful for modifying existing parsing components with a relative offset.
+func (pc *ParsingComponents) AddDurationAsImplied(duration Duration) *ParsingComponents {
+	// Get the current date from this component
+	currentDate := pc.Date()
+
+	// Add the duration
+	newDate := AddDuration(currentDate, duration)
+
+	// Imply the new date components
+	ImplySimilarDate(pc, newDate)
+	ImplySimilarTime(pc, newDate)
+
+	return pc
+}
+
 // ParsingResult represents a parsed result containing date/time information.
 type ParsingResult struct {
 	reference *ReferenceWithTimezone
