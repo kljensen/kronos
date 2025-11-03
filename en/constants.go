@@ -116,6 +116,34 @@ var IntegerWordDictionary = map[string]int{
 	"twelve": 12,
 }
 
+// NumberWordDictionary maps all number words to their float values
+// This includes regular numbers, informal quantifiers, and fractional values
+var NumberWordDictionary = map[string]float64{
+	// Regular number words (1-12)
+	"one":    1.0,
+	"two":    2.0,
+	"three":  3.0,
+	"four":   4.0,
+	"five":   5.0,
+	"six":    6.0,
+	"seven":  7.0,
+	"eight":  8.0,
+	"nine":   9.0,
+	"ten":    10.0,
+	"eleven": 11.0,
+	"twelve": 12.0,
+	// Articles that indicate singular
+	"a":  1.0,
+	"an": 1.0,
+	// Special quantifiers
+	"couple":  2.0, // "a couple" typically means 2
+	"few":     3.0, // "a few" typically means 3-5, using 3 as standard
+	"several": 7.0, // "several" typically means 3-7, using 7 for backward compatibility
+	"dozen":   12.0,
+	// Fractional values
+	"half": 0.5,
+}
+
 // OrdinalWordDictionary maps ordinal words to integers
 var OrdinalWordDictionary = map[string]int{
 	"first":          1,
@@ -285,26 +313,15 @@ func ParseYear(match string) int {
 func ParseNumberPattern(match string) float64 {
 	lower := strings.ToLower(strings.TrimSpace(match))
 
-	// Check integer words
-	if val, ok := IntegerWordDictionary[lower]; ok {
-		return float64(val)
+	// Check number word dictionary (includes all word numbers and quantifiers)
+	if val, ok := NumberWordDictionary[lower]; ok {
+		return val
 	}
 
-	// Check special cases
-	if lower == "a" || lower == "an" || lower == "the" {
+	// Special handling for "the" - only treat as 1 in certain contexts
+	// For now, skip "the" as it's not typically used as a quantity
+	if lower == "the" {
 		return 1
-	}
-	if strings.Contains(lower, "few") {
-		return 3
-	}
-	if strings.Contains(lower, "half") {
-		return 0.5
-	}
-	if strings.Contains(lower, "couple") {
-		return 2
-	}
-	if strings.Contains(lower, "several") {
-		return 7
 	}
 
 	// Normalize comma to dot for decimal separator (European format support)
@@ -343,9 +360,20 @@ func ParseDuration(text string) kronos.Duration {
 	// - "1d 5h 30m"
 	// - "2.5 hours" (decimal with dot)
 	// - "2,5 hours" (decimal with comma, European format)
+	// - "a couple of days" -> captures "couple"
+	// - "a few hours" -> captures "few"
+	// - "several weeks" -> captures "several"
 	// Word numbers: one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve
+	// Extended quantifiers: a, an, couple, few, several, half, dozen
 	// Note: Using flexible pattern to support consecutive units like "2hr5min"
-	pattern := regexp.MustCompile(`(?i)([0-9]+(?:[.,][0-9]+)?|half|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|the|few|couple|several)?\s*(?:an?\s+)?(` + TimeUnitPattern + `)`)
+	// Also supports optional "of" separator (e.g., "couple of days")
+	// Pattern breakdown:
+	// 1. Optional leading "a/an" (not captured)
+	// 2. Number/quantifier word (captured)
+	// 3. Optional "a/an" again for "half an hour"
+	// 4. Optional "of"
+	// 5. Time unit (captured)
+	pattern := regexp.MustCompile(`(?i)(?:an?\s+)?(half|dozen|several|couple|few|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?(` + TimeUnitPattern + `)`)
 	matchesIdx := pattern.FindAllStringSubmatchIndex(text, -1)
 
 	for _, matchIdx := range matchesIdx {

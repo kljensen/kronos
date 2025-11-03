@@ -481,6 +481,258 @@ func TestCasualRelativeNegativeCases(t *testing.T) {
 	}
 }
 
+// TestExtendedNumberWords tests extended number words like "a", "an", "few", "several", "couple", "half"
+func TestExtendedNumberWords(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+		expectedSecond *int
+	}{
+		{
+			name:           "a minute ago",
+			text:           "last a minute",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last a minute",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(59),
+		},
+		{
+			name:           "an hour ago",
+			text:           "last an hour",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last an hour",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:          "a day ago",
+			text:          "last a day",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last a day",
+			expectedYear:  2016,
+			expectedMonth: 9,
+			expectedDay:   30,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "a week ago",
+			text:          "last a week",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last a week",
+			expectedYear:  2016,
+			expectedMonth: 9,
+			expectedDay:   24, // Sept 24
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "a couple of days ago",
+			text:          "last a couple of days",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last a couple of days",
+			expectedYear:  2016,
+			expectedMonth: 9,
+			expectedDay:   29, // Sept 29 (Oct 1 - 2 days)
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:          "couple days ago (without of)",
+			text:          "last couple days",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last couple days",
+			expectedYear:  2016,
+			expectedMonth: 9,
+			expectedDay:   29, // Sept 29
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:           "a few hours ago",
+			text:           "last a few hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last a few hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(9),
+			expectedMinute: ptrInt(0), // 12 - 3 = 9
+		},
+		{
+			name:           "few hours ago (without a)",
+			text:           "last few hours",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last few hours",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(9),
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:          "several weeks ago",
+			text:          "last several weeks",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last several weeks",
+			expectedYear:  2016,
+			expectedMonth: 8,
+			expectedDay:   13, // Oct 1 - 49 days (7 weeks) = Aug 13
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:           "half an hour ago",
+			text:           "last half an hour",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last half an hour",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(30), // 12:00 - 0.5h = 11:30
+		},
+		{
+			name:           "half a day ago",
+			text:           "last half a day",
+			refDate:        time.Date(2016, 10, 2, 12, 0, 0, 0, time.UTC),
+			expectedText:   "last half a day",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    2,
+			expectedHour:   ptrInt(0), // Oct 2 12:00 - 12h = Oct 2 00:00
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:          "a dozen hours ago",
+			text:          "last a dozen hours",
+			refDate:       time.Date(2016, 10, 2, 12, 0, 0, 0, time.UTC),
+			expectedText:  "last a dozen hours",
+			expectedYear:  2016,
+			expectedMonth: 10,
+			expectedDay:   2,
+			expectedHour:  ptrInt(0), // Oct 2 12:00 - 12h = Oct 2 00:00
+		},
+		// Test with "next" prefix
+		{
+			name:           "next an hour",
+			text:           "next an hour",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "next an hour",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(13),
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:          "next a couple of days",
+			text:          "next a couple of days",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "next a couple of days",
+			expectedYear:  2016,
+			expectedMonth: 10,
+			expectedDay:   3,
+			expectedHour:  ptrInt(12),
+		},
+		{
+			name:           "next half an hour",
+			text:           "next half an hour",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "next half an hour",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(12),
+			expectedMinute: ptrInt(30),
+		},
+		// Test with + prefix
+		{
+			name:           "+a minute",
+			text:           "+a minute",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "+a minute",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(12),
+			expectedMinute: ptrInt(1),
+		},
+		{
+			name:           "+half an hour",
+			text:           "+half an hour",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "+half an hour",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(12),
+			expectedMinute: ptrInt(30),
+		},
+		// Test with - prefix
+		{
+			name:           "-an hour",
+			text:           "-an hour",
+			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:   "-an hour",
+			expectedYear:   2016,
+			expectedMonth:  10,
+			expectedDay:    1,
+			expectedHour:   ptrInt(11),
+			expectedMinute: ptrInt(0),
+		},
+		{
+			name:          "-a couple days",
+			text:          "-a couple days",
+			refDate:       time.Date(2016, 10, 3, 12, 0, 0, 0, time.UTC),
+			expectedText:  "-a couple days",
+			expectedYear:  2016,
+			expectedMonth: 10,
+			expectedDay:   1,
+			expectedHour:  ptrInt(12),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+			if tt.expectedSecond != nil {
+				assert.Equal(t, *tt.expectedSecond, *result.Start().Get(kronos.ComponentSecond), "Second mismatch for: %s", tt.text)
+			}
+		})
+	}
+}
+
 // TestFractionalTimeUnits tests fractional time unit expressions
 func TestFractionalTimeUnits(t *testing.T) {
 	tests := []struct {
