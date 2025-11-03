@@ -44,7 +44,7 @@ func (m *BaseMergingRefiner) Refine(context *ParsingContext, results []*ParsingR
 
 	for i := 1; i < len(results); i++ {
 		next := results[i]
-		textBetween := context.Text[current.Index+len(current.Text) : next.Index]
+		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
 
 		// Get the concrete implementation
 		merger, ok := interface{}(m).(MergingRefiner)

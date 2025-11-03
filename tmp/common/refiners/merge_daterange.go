@@ -29,80 +29,96 @@ func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, c
 }
 
 func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromResult, toResult *ParsingResult, context *ParsingContext) *ParsingResult {
+	fromStart := fromResult.Start().(*ParsingComponents)
+	toStart := toResult.Start().(*ParsingComponents)
+
 	// Imply similar components between from and to
-	if !fromResult.Start.IsOnlyWeekdayComponent() && !toResult.Start.IsOnlyWeekdayComponent() {
+	if !fromStart.IsOnlyWeekdayComponent() && !toStart.IsOnlyWeekdayComponent() {
+		// All possible components to check
+		allComponents := []Component{
+			ComponentYear, ComponentMonth, ComponentDay, ComponentWeekday,
+			ComponentHour, ComponentMinute, ComponentSecond, ComponentMillisecond,
+			ComponentMeridiem, ComponentTimezoneOffset,
+		}
+
 		// Copy certain components from toResult to fromResult
-		for _, comp := range toResult.Start.CertainComponents() {
-			if !fromResult.Start.IsCertain(comp) {
-				fromResult.Start.Imply(comp, toResult.Start.Get(comp))
+		for _, comp := range allComponents {
+			if toStart.IsCertain(comp) && !fromStart.IsCertain(comp) {
+				val := toStart.Get(comp)
+				if val != nil {
+					fromStart.Imply(comp, *val)
+				}
 			}
 		}
 
 		// Copy certain components from fromResult to toResult
-		for _, comp := range fromResult.Start.CertainComponents() {
-			if !toResult.Start.IsCertain(comp) {
-				toResult.Start.Imply(comp, fromResult.Start.Get(comp))
+		for _, comp := range allComponents {
+			if fromStart.IsCertain(comp) && !toStart.IsCertain(comp) {
+				val := fromStart.Get(comp)
+				if val != nil {
+					toStart.Imply(comp, *val)
+				}
 			}
 		}
 	}
 
 	// Handle reversed dates
-	if fromResult.Start.Date().After(toResult.Start.Date()) {
-		fromDate := fromResult.Start.Date()
-		toDate := toResult.Start.Date()
+	if fromStart.Date().After(toStart.Date()) {
+		fromDate := fromStart.Date()
+		toDate := toStart.Date()
 
 		// If toResult is only weekday, try adding 7 days
-		if toResult.Start.IsOnlyWeekdayComponent() {
+		if toStart.IsOnlyWeekdayComponent() {
 			nextWeek := toDate.Add(7 * 24 * time.Hour)
 			if nextWeek.After(fromDate) {
 				toDate = nextWeek
-				toResult.Start.Imply(ComponentDay, toDate.Day())
-				toResult.Start.Imply(ComponentMonth, int(toDate.Month()))
-				toResult.Start.Imply(ComponentYear, toDate.Year())
+				toStart.Imply(ComponentDay, toDate.Day())
+				toStart.Imply(ComponentMonth, int(toDate.Month()))
+				toStart.Imply(ComponentYear, toDate.Year())
 			}
-		} else if fromResult.Start.IsOnlyWeekdayComponent() {
+		} else if fromStart.IsOnlyWeekdayComponent() {
 			// If fromResult is only weekday, try subtracting 7 days
 			prevWeek := fromDate.Add(-7 * 24 * time.Hour)
 			if prevWeek.Before(toDate) {
 				fromDate = prevWeek
-				fromResult.Start.Imply(ComponentDay, fromDate.Day())
-				fromResult.Start.Imply(ComponentMonth, int(fromDate.Month()))
-				fromResult.Start.Imply(ComponentYear, fromDate.Year())
+				fromStart.Imply(ComponentDay, fromDate.Day())
+				fromStart.Imply(ComponentMonth, int(fromDate.Month()))
+				fromStart.Imply(ComponentYear, fromDate.Year())
 			}
-		} else if toResult.Start.IsDateWithUnknownYear() {
+		} else if toStart.IsDateWithUnknownYear() {
 			// Try adding a year to toResult
 			nextYear := toDate.AddDate(1, 0, 0)
 			if nextYear.After(fromDate) {
 				toDate = nextYear
-				toResult.Start.Imply(ComponentYear, toDate.Year())
+				toStart.Imply(ComponentYear, toDate.Year())
 			}
-		} else if fromResult.Start.IsDateWithUnknownYear() {
+		} else if fromStart.IsDateWithUnknownYear() {
 			// Try subtracting a year from fromResult
 			prevYear := fromDate.AddDate(-1, 0, 0)
 			if prevYear.Before(toDate) {
 				fromDate = prevYear
-				fromResult.Start.Imply(ComponentYear, fromDate.Year())
+				fromStart.Imply(ComponentYear, fromDate.Year())
 			}
 		} else {
 			// Swap if still reversed
 			fromResult, toResult = toResult, fromResult
+			fromStart, toStart = toStart, fromStart
 		}
 	}
 
-	// Create the range result
-	result := fromResult.Clone()
-	result.Start = fromResult.Start
-	result.End = toResult.Start
-
-	// Set index and text
-	if fromResult.Index < toResult.Index {
-		result.Index = fromResult.Index
-		result.Text = fromResult.Text + textBetween + toResult.Text
+	// Create the range result by creating a new ParsingResult
+	// Calculate index and text based on order
+	var resultIndex int
+	var resultText string
+	if fromResult.Index() < toResult.Index() {
+		resultIndex = fromResult.Index()
+		resultText = fromResult.Text() + textBetween + toResult.Text()
 	} else {
-		result.Index = toResult.Index
-		result.Text = toResult.Text + textBetween + fromResult.Text
+		resultIndex = toResult.Index()
+		resultText = toResult.Text() + textBetween + fromResult.Text()
 	}
 
+	result := context.CreateParsingResult(resultIndex, resultText, fromStart, toStart)
 	return result
 }
 
@@ -116,7 +132,7 @@ func (r *AbstractMergeDateRangeRefiner) Refine(context *ParsingContext, results 
 
 	for i := 1; i < len(results); i++ {
 		next := results[i]
-		textBetween := context.Text[current.Index+len(current.Text) : next.Index]
+		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
 
 		if !r.ShouldMergeResults(textBetween, current, next, context) {
 			merged = append(merged, current)

@@ -3,7 +3,6 @@ package refiners
 import (
 	"regexp"
 	"strconv"
-	"strings"
 
 	kronos "github.com/kljensen/kronos"
 )
@@ -29,19 +28,22 @@ func NewExtractTimezoneOffsetRefiner() *ExtractTimezoneOffsetRefiner {
 
 // Refine extracts timezone offsets and adds them to results
 func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
-	for _, result := range results {
-		if result.Start.IsCertain(kronos.ComponentTimezoneOffset) {
+	for i, result := range results {
+		resultStart := result.Start().(*kronos.ParsingComponents)
+		if resultStart.IsCertain(kronos.ComponentTimezoneOffset) {
 			continue
 		}
 
-		suffix := context.Text[result.Index+len(result.Text):]
+		suffix := context.Text()[result.Index()+len(result.Text()):]
 		match := timezoneOffsetPattern.FindStringSubmatch(suffix)
 		if match == nil {
 			continue
 		}
 
-		if context.Option.Debug {
-			context.DebugLog("Extracting timezone: '%s' into: %s", match[0], result)
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// Log: Extracting timezone offset
+			})
 		}
 
 		hourOffset, _ := strconv.Atoi(match[timezoneOffsetHourOffsetGroup])
@@ -61,12 +63,18 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 			timezoneOffset = -timezoneOffset
 		}
 
-		if result.End != nil {
-			result.End.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
+		var resultEnd *kronos.ParsingComponents
+		if result.End() != nil {
+			resultEnd = result.End().(*kronos.ParsingComponents)
+			resultEnd.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
 		}
 
-		result.Start.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
-		result.Text += match[0]
+		resultStart.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
+
+		// Create new result with updated text
+		newText := result.Text() + match[0]
+		newResult := context.CreateParsingResult(result.Index(), newText, resultStart, resultEnd)
+		results[i] = newResult
 	}
 
 	return results

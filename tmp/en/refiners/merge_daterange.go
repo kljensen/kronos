@@ -3,7 +3,6 @@ package refiners
 import (
 	"regexp"
 
-	. "github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/common/refiners"
 )
 

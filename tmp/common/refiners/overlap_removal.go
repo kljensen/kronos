@@ -26,7 +26,7 @@ func (r *OverlapRemovalRefiner) Refine(context *kronos.ParsingContext, results [
 		result := results[i]
 
 		// Check if results overlap
-		if result.Index >= prevResult.Index+len(prevResult.Text) {
+		if result.Index() >= prevResult.Index()+len(prevResult.Text()) {
 			// No overlap, keep previous result and move to current
 			filteredResults = append(filteredResults, prevResult)
 			prevResult = result
@@ -34,17 +34,17 @@ func (r *OverlapRemovalRefiner) Refine(context *kronos.ParsingContext, results [
 		}
 
 		// Results overlap - keep the longer one
-		var kept, removed *kronos.ParsingResult
-		if len(result.Text) > len(prevResult.Text) {
+		var kept *kronos.ParsingResult
+		if len(result.Text()) > len(prevResult.Text()) {
 			kept = result
-			removed = prevResult
 		} else {
 			kept = prevResult
-			removed = result
 		}
 
-		if context.Option.Debug {
-			context.DebugLog("OverlapRemovalRefiner removing %s by %s", removed, kept)
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// Log: OverlapRemovalRefiner removing result
+			})
 		}
 
 		prevResult = kept

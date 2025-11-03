@@ -26,12 +26,13 @@ func NewENExtractYearSuffixRefiner() *ENExtractYearSuffixRefiner {
 }
 
 func (r *ENExtractYearSuffixRefiner) Refine(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
-	for _, result := range results {
-		if !result.Start.IsDateWithUnknownYear() {
+	for i, result := range results {
+		resultStart := result.Start().(*ParsingComponents)
+		if !resultStart.IsDateWithUnknownYear() {
 			continue
 		}
 
-		suffix := context.Text[result.Index+len(result.Text):]
+		suffix := context.Text()[result.Index()+len(result.Text()):]
 		match := yearSuffixPattern.FindStringSubmatch(suffix)
 		if match == nil {
 			continue
@@ -43,11 +44,17 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *ParsingContext, results []*
 		}
 
 		year := parseYear(match[1])
-		if result.End != nil {
-			result.End.Assign(ComponentYear, year)
+		var resultEnd *ParsingComponents
+		if result.End() != nil {
+			resultEnd = result.End().(*ParsingComponents)
+			resultEnd.Assign(ComponentYear, year)
 		}
-		result.Start.Assign(ComponentYear, year)
-		result.Text += match[0]
+		resultStart.Assign(ComponentYear, year)
+
+		// Create new result with updated text
+		newText := result.Text() + match[0]
+		newResult := context.CreateParsingResult(result.Index(), newText, resultStart, resultEnd)
+		results[i] = newResult
 	}
 
 	return results

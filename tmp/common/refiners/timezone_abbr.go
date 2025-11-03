@@ -30,18 +30,18 @@ func NewExtractTimezoneAbbrRefiner(timezoneOverrides map[string]int) *ExtractTim
 // Refine extracts timezone abbreviations and adds them to results
 func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	// Merge context timezones with refiner overrides
-	timezoneOverrides := make(map[string]int)
+	timezoneOverrides := make(kronos.TimezoneAbbrMap)
 	for k, v := range r.timezoneOverrides {
 		timezoneOverrides[k] = v
 	}
-	if context.Option.Timezones != nil {
-		for k, v := range context.Option.Timezones {
+	if context.Option().Timezones != nil {
+		for k, v := range context.Option().Timezones {
 			timezoneOverrides[k] = v
 		}
 	}
 
 	for _, result := range results {
-		suffix := context.Text[result.Index+len(result.Text):]
+		suffix := context.Text()[result.Index()+len(result.Text()):]
 		match := timezoneNamePattern.FindStringSubmatch(suffix)
 		if match == nil {
 			continue
@@ -50,30 +50,39 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		timezoneAbbr := strings.ToUpper(match[1])
 
 		// Determine the reference date for timezone lookup
-		refDate := result.Start.Date()
-		if refDate.IsZero() && result.RefDate != nil {
-			refDate = *result.RefDate
+		refDate := result.Start().Date()
+		if refDate.IsZero() {
+			refDate = result.RefDate()
 		}
 		if refDate.IsZero() {
-			refDate = context.Reference.Instant
+			refDate = context.Reference().Instant()
 		}
 
 		// Look up timezone offset
-		extractedTimezoneOffset, err := kronos.ToTimezoneOffset(timezoneAbbr, refDate, timezoneOverrides)
-		if err != nil {
+		extractedTimezoneOffsetPtr := kronos.ToTimezoneOffset(timezoneAbbr, refDate, timezoneOverrides)
+		if extractedTimezoneOffsetPtr == nil {
 			continue
 		}
+		extractedTimezoneOffset := *extractedTimezoneOffsetPtr
 
-		if context.Option.Debug {
-			context.DebugLog("Extracting timezone: '%s' into: %d for: %s", timezoneAbbr, extractedTimezoneOffset, result.Start)
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// Log: Extracting timezone
+			})
 		}
 
-		currentTimezoneOffset := result.Start.Get(kronos.ComponentTimezoneOffset)
+		resultStart := result.Start().(*kronos.ParsingComponents)
+		currentTimezoneOffsetPtr := resultStart.Get(kronos.ComponentTimezoneOffset)
+		currentTimezoneOffset := 0
+		if currentTimezoneOffsetPtr != nil {
+			currentTimezoneOffset = *currentTimezoneOffsetPtr
+		}
+
 		if currentTimezoneOffset != 0 && extractedTimezoneOffset != currentTimezoneOffset {
 			// We may already have extracted the timezone offset e.g., "11 am GMT+0900 (JST)"
 			// - if they are equal, we also want to take the abbreviation text into result
 			// - if they are not equal, we trust the offset more
-			if result.Start.IsCertain(kronos.ComponentTimezoneOffset) {
+			if resultStart.IsCertain(kronos.ComponentTimezoneOffset) {
 				continue
 			}
 
@@ -84,7 +93,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 			}
 		}
 
-		if result.Start.IsOnlyDate() {
+		if resultStart.IsOnlyDate() {
 			// If the time is not explicitly mentioned,
 			// Then, we also want to double-check the abbr case (e.g., "GET" not "get")
 			if timezoneAbbr != match[1] {
@@ -92,14 +101,29 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 			}
 		}
 
-		result.Text += match[0]
+		// Update result with the timezone text (need to create new result since Text is immutable)
+		newText := result.Text() + match[0]
 
-		if !result.Start.IsCertain(kronos.ComponentTimezoneOffset) {
-			result.Start.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
+		if !resultStart.IsCertain(kronos.ComponentTimezoneOffset) {
+			resultStart.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
 		}
 
-		if result.End != nil && !result.End.IsCertain(kronos.ComponentTimezoneOffset) {
-			result.End.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
+		var resultEnd *kronos.ParsingComponents
+		if result.End() != nil {
+			resultEnd = result.End().(*kronos.ParsingComponents)
+			if !resultEnd.IsCertain(kronos.ComponentTimezoneOffset) {
+				resultEnd.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
+			}
+		}
+
+		// Create new result with updated text
+		newResult := context.CreateParsingResult(result.Index(), newText, resultStart, resultEnd)
+		// Replace the result in the slice
+		for j, r := range results {
+			if r == result {
+				results[j] = newResult
+				break
+			}
 		}
 	}
 

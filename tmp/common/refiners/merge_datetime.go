@@ -14,8 +14,11 @@ type AbstractMergeDateTimeRefiner struct {
 
 func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, current, next *ParsingResult, context *ParsingContext) bool {
 	// Check if one is date-only and the other is time-only
-	isDateTimePair := (current.Start.IsOnlyDate() && next.Start.IsOnlyTime()) ||
-		(next.Start.IsOnlyDate() && current.Start.IsOnlyTime())
+	currentStart := current.Start().(*ParsingComponents)
+	nextStart := next.Start().(*ParsingComponents)
+
+	isDateTimePair := (currentStart.IsOnlyDate() && nextStart.IsOnlyTime()) ||
+		(nextStart.IsOnlyDate() && currentStart.IsOnlyTime())
 
 	if !isDateTimePair {
 		return false
@@ -31,17 +34,24 @@ func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, cu
 }
 
 func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current, next *ParsingResult, context *ParsingContext) *ParsingResult {
-	var result *ParsingResult
+	currentStart := current.Start().(*ParsingComponents)
 
-	// Determine which is date and which is time
-	if current.Start.IsOnlyDate() {
+	// Calculate index and text for merged result
+	var resultIndex int
+	var resultText string
+	resultIndex = current.Index()
+	resultText = current.Text() + textBetween + next.Text()
+
+	// Determine which is date and which is time, then merge
+	var result *ParsingResult
+	if currentStart.IsOnlyDate() {
 		result = MergeDateTimeResult(current, next)
 	} else {
 		result = MergeDateTimeResult(next, current)
 	}
 
-	result.Index = current.Index
-	result.Text = current.Text + textBetween + next.Text
+	// Create new result with correct index and text
+	result = context.CreateParsingResult(resultIndex, resultText, result.Start().(*ParsingComponents), nil)
 
 	return result
 }
@@ -56,7 +66,7 @@ func (r *AbstractMergeDateTimeRefiner) Refine(context *ParsingContext, results [
 
 	for i := 1; i < len(results); i++ {
 		next := results[i]
-		textBetween := context.Text[current.Index+len(current.Text) : next.Index]
+		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
 
 		if !r.ShouldMergeResults(textBetween, current, next, context) {
 			merged = append(merged, current)

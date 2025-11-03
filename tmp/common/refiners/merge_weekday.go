@@ -32,10 +32,10 @@ func (r *MergeWeekdayComponentRefiner) Refine(context *kronos.ParsingContext, re
 		// Check if we can merge with the next result
 		if i+1 < len(results) {
 			nextResult := results[i+1]
-			textBetween := context.Text[currentResult.Index+len(currentResult.Text) : nextResult.Index]
+			textBetween := context.Text()[currentResult.Index()+len(currentResult.Text()) : nextResult.Index()]
 
-			if r.shouldMergeResults(textBetween, currentResult, nextResult) {
-				mergedResult := r.mergeResults(textBetween, currentResult, nextResult)
+			if r.shouldMergeResults(textBetween, currentResult, nextResult, context) {
+				mergedResult := r.mergeResults(textBetween, currentResult, nextResult, context)
 				merged = append(merged, mergedResult)
 				i += 2 // Skip both current and next
 				continue
@@ -54,15 +54,19 @@ func (r *MergeWeekdayComponentRefiner) shouldMergeResults(
 	textBetween string,
 	currentResult *kronos.ParsingResult,
 	nextResult *kronos.ParsingResult,
+	context *kronos.ParsingContext,
 ) bool {
 	// Merge when:
 	// 1. Current result is weekday-only
 	// 2. Current result has no certain hour
 	// 3. Next result has a certain day
 	// 4. Text between is just optional comma and whitespace
-	weekdayThenNormalDate := currentResult.Start.IsOnlyWeekdayComponent() &&
-		!currentResult.Start.IsCertain(kronos.ComponentHour) &&
-		nextResult.Start.IsCertain(kronos.ComponentDay)
+	currentStart := currentResult.Start().(*kronos.ParsingComponents)
+	nextStart := nextResult.Start().(*kronos.ParsingComponents)
+
+	weekdayThenNormalDate := currentStart.IsOnlyWeekdayComponent() &&
+		!currentStart.IsCertain(kronos.ComponentHour) &&
+		nextStart.IsCertain(kronos.ComponentDay)
 
 	if !weekdayThenNormalDate {
 		return false
@@ -76,22 +80,35 @@ func (r *MergeWeekdayComponentRefiner) mergeResults(
 	textBetween string,
 	currentResult *kronos.ParsingResult,
 	nextResult *kronos.ParsingResult,
+	context *kronos.ParsingContext,
 ) *kronos.ParsingResult {
-	// Create a new result based on nextResult but with updated index and text
-	newResult := &kronos.ParsingResult{
-		Reference: nextResult.Reference,
-		Index:     currentResult.Index,
-		Text:      currentResult.Text + textBetween + nextResult.Text,
-		Start:     nextResult.Start.Clone(),
-		End:       nextResult.End,
-		RefDate:   nextResult.RefDate,
-	}
+	// Get start components
+	currentStart := currentResult.Start().(*kronos.ParsingComponents)
+	nextStart := nextResult.Start().(*kronos.ParsingComponents)
+
+	// Clone the next result's start components
+	newStart := nextStart.Clone()
 
 	// Assign the weekday from the current result
-	newResult.Start.Assign(kronos.ComponentWeekday, currentResult.Start.Get(kronos.ComponentWeekday))
-	if newResult.End != nil {
-		newResult.End.Assign(kronos.ComponentWeekday, currentResult.Start.Get(kronos.ComponentWeekday))
+	weekdayVal := currentStart.Get(kronos.ComponentWeekday)
+	if weekdayVal != nil {
+		newStart.Assign(kronos.ComponentWeekday, *weekdayVal)
 	}
+
+	// Handle end components if present
+	var newEnd *kronos.ParsingComponents
+	if nextResult.End() != nil {
+		nextEnd := nextResult.End().(*kronos.ParsingComponents)
+		newEnd = nextEnd.Clone()
+		if weekdayVal != nil {
+			newEnd.Assign(kronos.ComponentWeekday, *weekdayVal)
+		}
+	}
+
+	// Create a new result with correct index and text
+	resultIndex := currentResult.Index()
+	resultText := currentResult.Text() + textBetween + nextResult.Text()
+	newResult := context.CreateParsingResult(resultIndex, resultText, newStart, newEnd)
 
 	return newResult
 }

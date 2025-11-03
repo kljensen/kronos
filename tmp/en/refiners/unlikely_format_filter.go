@@ -32,17 +32,17 @@ func (f *ENUnlikelyFormatFilter) Refine(context *ParsingContext, results []*Pars
 }
 
 func (f *ENUnlikelyFormatFilter) isValid(context *ParsingContext, result *ParsingResult) bool {
-	text := strings.TrimSpace(result.Text)
+	text := strings.TrimSpace(result.Text())
 
 	// If the result consists of the whole text, it's likely valid
-	if text == strings.TrimSpace(context.Text) {
+	if text == strings.TrimSpace(context.Text()) {
 		return true
 	}
 
 	// "may" is a month name but also a modal verb
 	// Check if the text before "may" follows allowed patterns
 	if strings.ToLower(text) == "may" {
-		textBefore := strings.TrimSpace(context.Text[:result.Index])
+		textBefore := strings.TrimSpace(context.Text()[:result.Index()])
 		if !mayContextPattern.MatchString(textBefore) {
 			return false
 		}
@@ -50,7 +50,7 @@ func (f *ENUnlikelyFormatFilter) isValid(context *ParsingContext, result *Parsin
 
 	// "the second" could refer to the ordinal number or timeunit
 	if strings.HasSuffix(strings.ToLower(text), "the second") {
-		textAfter := strings.TrimSpace(context.Text[result.Index+len(result.Text):])
+		textAfter := strings.TrimSpace(context.Text()[result.Index()+len(result.Text()):])
 		if len(textAfter) > 0 {
 			return false
 		}

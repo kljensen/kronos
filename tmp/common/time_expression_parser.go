@@ -186,12 +186,19 @@ func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, m
 	}
 
 	// Calculate index and text
-	index := context.Index + len(match[1])
+	// The match[1] is the left boundary capture group
+	index := 0
 	text := match[0][len(match[1]):]
 	result := context.CreateParsingResult(index, text, startComponents, nil)
 
 	// Look for following time pattern (for ranges like "10:00 - 21:45")
-	remainingText := context.Text[context.Index+len(match[0]):]
+	// Try to find it in the remaining part of the match or immediately after
+	// Note: Without context.Index, we search in context.Text() starting after match[0]
+	textIndex := strings.Index(context.Text(), match[0])
+	if textIndex < 0 {
+		return p.checkAndReturnWithoutFollowingPattern(result)
+	}
+	remainingText := context.Text()[textIndex+len(match[0]):]
 	followingPattern := p.getFollowingTimePatternThroughCache()
 	followingMatch := followingPattern.FindStringSubmatch(remainingText)
 
@@ -213,8 +220,10 @@ func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, m
 
 	endComponents := p.ExtractFollowingTimeComponents(context, followingMatch, result)
 	if endComponents != nil {
-		result.End = endComponents
-		result.Text += followingMatch[0]
+		// Create a new result with the extended text and end components
+		newText := text + followingMatch[0]
+		startComponents := result.Start().(*kronos.ParsingComponents)
+		result = context.CreateParsingResult(index, newText, startComponents, endComponents)
 	}
 
 	return p.checkAndReturnWithFollowingPattern(result)
@@ -226,7 +235,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	match []string,
 	strict bool,
 ) *kronos.ParsingComponents {
-	components := context.CreateParsingComponents()
+	components := context.CreateParsingComponents(nil)
 	minute := 0
 	var meridiem *kronos.Meridiem
 
@@ -342,7 +351,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	match []string,
 	result *kronos.ParsingResult,
 ) *kronos.ParsingComponents {
-	components := context.CreateParsingComponents()
+	components := context.CreateParsingComponents(nil)
 
 	// Parse milliseconds
 	if match[TimeMillisecondGroup] != "" {
@@ -397,8 +406,12 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			meridiem = int(kronos.MeridiemAM)
 			if hour == 12 {
 				hour = 0
-				if !result.Start.IsCertain(kronos.ComponentDay) {
-					components.Imply(kronos.ComponentDay, result.Start.Get(kronos.ComponentDay)+1)
+				resultStart := result.Start().(*kronos.ParsingComponents)
+				if !resultStart.IsCertain(kronos.ComponentDay) {
+					dayVal := resultStart.Get(kronos.ComponentDay)
+					if dayVal != nil {
+						components.Imply(kronos.ComponentDay, *dayVal+1)
+					}
 				}
 			}
 		}
@@ -410,16 +423,19 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			}
 		}
 
-		if !result.Start.IsCertain(kronos.ComponentMeridiem) {
+		resultStart := result.Start().(*kronos.ParsingComponents)
+		if !resultStart.IsCertain(kronos.ComponentMeridiem) {
 			if meridiem == int(kronos.MeridiemAM) {
-				result.Start.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
-				if result.Start.Get(kronos.ComponentHour) == 12 {
-					result.Start.Assign(kronos.ComponentHour, 0)
+				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+				hourVal := resultStart.Get(kronos.ComponentHour)
+				if hourVal != nil && *hourVal == 12 {
+					resultStart.Assign(kronos.ComponentHour, 0)
 				}
 			} else {
-				result.Start.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
-				if result.Start.Get(kronos.ComponentHour) != 12 {
-					result.Start.Assign(kronos.ComponentHour, result.Start.Get(kronos.ComponentHour)+12)
+				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+				hourVal := resultStart.Get(kronos.ComponentHour)
+				if hourVal != nil && *hourVal != 12 {
+					resultStart.Assign(kronos.ComponentHour, *hourVal+12)
 				}
 			}
 		}
@@ -431,9 +447,20 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	if meridiem >= 0 {
 		components.Assign(kronos.ComponentMeridiem, meridiem)
 	} else {
-		startAtPM := result.Start.IsCertain(kronos.ComponentMeridiem) && result.Start.Get(kronos.ComponentHour) > 12
+		resultStart := result.Start().(*kronos.ParsingComponents)
+		startAtPM := resultStart.IsCertain(kronos.ComponentMeridiem)
 		if startAtPM {
-			if result.Start.Get(kronos.ComponentHour)-12 > hour {
+			startHourVal := resultStart.Get(kronos.ComponentHour)
+			if startHourVal != nil && *startHourVal > 12 {
+				startAtPM = true
+			} else {
+				startAtPM = false
+			}
+		}
+
+		if startAtPM {
+			startHourVal := resultStart.Get(kronos.ComponentHour)
+			if startHourVal != nil && *startHourVal-12 > hour {
 				// 10pm - 1 (am)
 				components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
 			} else if hour <= 12 {
@@ -447,8 +474,11 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 	}
 
-	if components.Date().Before(result.Start.Date()) {
-		components.Imply(kronos.ComponentDay, components.Get(kronos.ComponentDay)+1)
+	if components.Date().Before(result.Start().Date()) {
+		dayVal := components.Get(kronos.ComponentDay)
+		if dayVal != nil {
+			components.Imply(kronos.ComponentDay, *dayVal+1)
+		}
 	}
 
 	return components
@@ -461,22 +491,22 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(res
 	}
 
 	// Single digit (e.g., "1") should not be counted as time expression
-	if regexp.MustCompile(`^\d$`).MatchString(result.Text) {
+	if regexp.MustCompile(`^\d$`).MatchString(result.Text()) {
 		return nil
 	}
 
 	// Three or more digits (e.g., "203", "2014") should not be counted as time expression
-	if regexp.MustCompile(`^\d\d\d+$`).MatchString(result.Text) {
+	if regexp.MustCompile(`^\d\d\d+$`).MatchString(result.Text()) {
 		return nil
 	}
 
 	// Instead of "am/pm", it ends with "a" or "p" (e.g., "1a", "123p"), this seems unlikely
-	if regexp.MustCompile(`\d[apAP]$`).MatchString(result.Text) {
+	if regexp.MustCompile(`\d[apAP]$`).MatchString(result.Text()) {
 		return nil
 	}
 
 	// If it ends only with numbers or dots
-	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)$`).FindStringSubmatch(result.Text)
+	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)$`).FindStringSubmatch(result.Text())
 	if endingWithNumbers != nil {
 		endingNumbers := endingWithNumbers[1]
 
@@ -501,12 +531,12 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(res
 }
 
 func (p *AbstractTimeExpressionParser) checkAndReturnWithFollowingPattern(result *kronos.ParsingResult) *kronos.ParsingResult {
-	if regexp.MustCompile(`^\d+-\d+$`).MatchString(result.Text) {
+	if regexp.MustCompile(`^\d+-\d+$`).MatchString(result.Text()) {
 		return nil
 	}
 
 	// If it ends only with numbers or dots
-	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)\s*-\s*([\d.]+)$`).FindStringSubmatch(result.Text)
+	endingWithNumbers := regexp.MustCompile(`[^\d:.]([\d.]+)\s*-\s*([\d.]+)$`).FindStringSubmatch(result.Text())
 	if endingWithNumbers != nil {
 		// In strict mode (e.g., "at 1-3" or "at 1.2 - 2.3"), this should not be accepted
 		if p.strictMode {

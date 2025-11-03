@@ -35,27 +35,37 @@ func (f *UnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results []
 
 func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
 	// Remove results that are just numbers or dots
-	if regexp.MustCompile(`^\d*(\.\d*)?$`).MatchString(strings.ReplaceAll(result.Text, " ", "")) {
-		if context.Option.Debug {
-			context.DebugLog("Removing unlikely result '%s'", result.Text)
+	if regexp.MustCompile(`^\d*(\.\d*)?$`).MatchString(strings.ReplaceAll(result.Text(), " ", "")) {
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// Log: Removing unlikely result
+			})
 		}
 		return false
 	}
 
 	// Check if start date is valid
-	if !result.Start.IsValidDate() {
-		if context.Option.Debug {
-			context.DebugLog("Removing invalid result: %s (%s)", result, result.Start)
+	resultStart := result.Start().(*kronos.ParsingComponents)
+	if !resultStart.IsValidDate() {
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// Log: Removing invalid result
+			})
 		}
 		return false
 	}
 
 	// Check if end date is valid
-	if result.End != nil && !result.End.IsValidDate() {
-		if context.Option.Debug {
-			context.DebugLog("Removing invalid result: %s (%s)", result, result.End)
+	if result.End() != nil {
+		resultEnd := result.End().(*kronos.ParsingComponents)
+		if !resultEnd.IsValidDate() {
+			if context.Option().Debug != nil {
+				context.Debug(func() {
+					// Log: Removing invalid result with invalid end date
+				})
+			}
+			return false
 		}
-		return false
 	}
 
 	// Apply strict mode checks
@@ -68,9 +78,12 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 
 func (f *UnlikelyFormatFilter) isStrictModeValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
 	// In strict mode, remove weekday-only components
-	if result.Start.IsOnlyWeekdayComponent() {
-		if context.Option.Debug {
-			context.DebugLog("(Strict) Removing weekday only component: %s (%s)", result, result.Start)
+	resultStart := result.Start().(*kronos.ParsingComponents)
+	if resultStart.IsOnlyWeekdayComponent() {
+		if context.Option().Debug != nil {
+			context.Debug(func() {
+				// Log: (Strict) Removing weekday only component
+			})
 		}
 		return false
 	}
