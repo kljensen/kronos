@@ -134,9 +134,19 @@ func (p *ParserBuilder) ForwardDate() *ParserBuilder {
 
 // Parse executes the parser on the given text and returns all found date/time results.
 // Returns an error if the settings are invalid or parsing fails.
-func (p *ParserBuilder) Parse(text string) ([]*ParsingResult, error) {
+func (p *ParserBuilder) Parse(text string) ([]Result, error) {
 	// Use pipeline for parsing with settings
-	return ParseWithSettings(text, p.refDate, p.settings, p.config)
+	results, err := ParseWithSettings(text, p.refDate, p.settings, p.config)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert internal ParsingResult to public Result interface
+	publicResults := make([]Result, len(results))
+	for i, r := range results {
+		publicResults[i] = newResultAdapter(r)
+	}
+	return publicResults, nil
 }
 
 // ParseDate is a shortcut for calling Parse and returning the first result's date.
@@ -160,7 +170,7 @@ func (p *ParserBuilder) ParseDate(text string) (*time.Time, error) {
 // Example:
 //
 //	results, err := kronos.Parse("tomorrow at 3pm", en.Casual)
-func Parse(text string, chrono *Chrono) ([]*ParsingResult, error) {
+func Parse(text string, chrono *Chrono) ([]Result, error) {
 	return New(chrono).Parse(text)
 }
 

@@ -80,7 +80,7 @@ func ParseDate(text string, ref time.Time, option *kronos.ParsingOption) *time.T
 // Example:
 //
 //	results, err := en.ParseSimple("tomorrow at 3pm")
-func ParseSimple(text string) ([]*kronos.ParsingResult, error) {
+func ParseSimple(text string) ([]kronos.Result, error) {
 	return New().Parse(text)
 }
 
