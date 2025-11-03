@@ -43,11 +43,10 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 	for _, result := range results {
 		// Calculate the position after the result text
 		suffixStart := result.Index() + len(result.Text())
-		// Check if we're beyond the end of the text
-		if suffixStart >= len(context.Text()) {
+		suffix, okSlice := kronos.SafeSlice(context.Text(), suffixStart, len(context.Text()))
+		if !okSlice {
 			continue
 		}
-		suffix := context.Text()[suffixStart:]
 		match := timezoneNamePattern.FindStringSubmatch(suffix)
 		if match == nil {
 			continue
@@ -64,7 +63,10 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		// Determine the reference date for timezone lookup
 		// Use DateUTC to avoid circular DST logic issues - we want the "wall clock" time
 		// in UTC for DST calculations
-		resultStart := result.Start().(*kronos.ParsingComponents)
+		resultStart, okStart := kronos.AsParsingComponents(result.Start())
+		if !okStart {
+			continue
+		}
 		refDate := resultStart.DateUTC()
 		if refDate.IsZero() {
 			refDate = result.RefDate()
@@ -161,9 +163,11 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 
 		var resultEnd *kronos.ParsingComponents
 		if result.End() != nil {
-			resultEnd = result.End().(*kronos.ParsingComponents)
-			if !resultEnd.IsCertain(kronos.ComponentTimezoneOffset) {
-				resultEnd.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
+			if endComponents, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+				resultEnd = endComponents
+				if !resultEnd.IsCertain(kronos.ComponentTimezoneOffset) {
+					resultEnd.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
+				}
 			}
 		}
 

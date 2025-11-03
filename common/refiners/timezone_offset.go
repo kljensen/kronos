@@ -29,7 +29,10 @@ func NewExtractTimezoneOffsetRefiner() *ExtractTimezoneOffsetRefiner {
 // Refine extracts timezone offsets and adds them to results
 func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	for i, result := range results {
-		resultStart := result.Start().(*kronos.ParsingComponents)
+		resultStart, ok := kronos.AsParsingComponents(result.Start())
+		if !ok {
+			continue
+		}
 		if resultStart.IsCertain(kronos.ComponentTimezoneOffset) {
 			continue
 		}
@@ -37,10 +40,10 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 		// Calculate the position after the result text
 		suffixStart := result.Index() + len(result.Text())
 		// Check if we're beyond the end of the text
-		if suffixStart >= len(context.Text()) {
+		suffix, okSlice := kronos.SafeSlice(context.Text(), suffixStart, len(context.Text()))
+		if !okSlice {
 			continue
 		}
-		suffix := context.Text()[suffixStart:]
 		match := timezoneOffsetPattern.FindStringSubmatch(suffix)
 		if match == nil {
 			continue
@@ -71,8 +74,10 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 
 		var resultEnd *kronos.ParsingComponents
 		if result.End() != nil {
-			resultEnd = result.End().(*kronos.ParsingComponents)
-			resultEnd.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
+			if endComponents, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+				resultEnd = endComponents
+				resultEnd.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
+			}
 		}
 
 		resultStart.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)

@@ -44,7 +44,14 @@ func (m *BaseMergingRefiner) Refine(context *ParsingContext, results []*ParsingR
 
 	for i := 1; i < len(results); i++ {
 		next := results[i]
-		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
+		start := current.Index() + len(current.Text())
+		end := next.Index()
+		textBetween, okRange := SafeSlice(context.Text(), start, end)
+		if !okRange {
+			merged = append(merged, current)
+			current = next
+			continue
+		}
 
 		// Get the concrete implementation
 		merger, ok := interface{}(m).(MergingRefiner)

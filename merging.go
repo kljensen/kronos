@@ -5,22 +5,28 @@ import "time"
 // MergeDateTimeResult merges a date-only result with a time-only result.
 func MergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
 	result := dateResult.Clone()
-	beginDate := dateResult.Start().(*ParsingComponents)
-	beginTime := timeResult.Start().(*ParsingComponents)
+	beginDate, okDate := AsParsingComponents(dateResult.Start())
+	beginTime, okTime := AsParsingComponents(timeResult.Start())
+	if !okDate || !okTime {
+		return result
+	}
 
 	result.start = MergeDateTimeComponent(beginDate, beginTime)
 
 	if dateResult.End() != nil || timeResult.End() != nil {
 		var endDate, endTime *ParsingComponents
 		if dateResult.End() == nil {
-			endDate = dateResult.Start().(*ParsingComponents)
+			endDate, okDate = AsParsingComponents(dateResult.Start())
 		} else {
-			endDate = dateResult.End().(*ParsingComponents)
+			endDate, okDate = AsParsingComponents(dateResult.End())
 		}
 		if timeResult.End() == nil {
-			endTime = timeResult.Start().(*ParsingComponents)
+			endTime, okTime = AsParsingComponents(timeResult.Start())
 		} else {
-			endTime = timeResult.End().(*ParsingComponents)
+			endTime, okTime = AsParsingComponents(timeResult.End())
+		}
+		if !okDate || !okTime {
+			return result
 		}
 
 		endDateTime := MergeDateTimeComponent(endDate, endTime)
@@ -47,46 +53,79 @@ func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingCompo
 	result := dateComp.Clone()
 
 	// Merge time components
+	hourVal := timeComp.Get(ComponentHour)
+	minuteVal := timeComp.Get(ComponentMinute)
+	secondVal := timeComp.Get(ComponentSecond)
+	millisecondVal := timeComp.Get(ComponentMillisecond)
+
 	if timeComp.IsCertain(ComponentHour) {
-		result.Assign(ComponentHour, *timeComp.Get(ComponentHour))
-		result.Assign(ComponentMinute, *timeComp.Get(ComponentMinute))
+		if hourVal != nil {
+			result.Assign(ComponentHour, *hourVal)
+		}
+		if minuteVal != nil {
+			result.Assign(ComponentMinute, *minuteVal)
+		}
 
 		if timeComp.IsCertain(ComponentSecond) {
-			result.Assign(ComponentSecond, *timeComp.Get(ComponentSecond))
-			if timeComp.IsCertain(ComponentMillisecond) {
-				result.Assign(ComponentMillisecond, *timeComp.Get(ComponentMillisecond))
-			} else {
-				result.Imply(ComponentMillisecond, *timeComp.Get(ComponentMillisecond))
+			if secondVal != nil {
+				result.Assign(ComponentSecond, *secondVal)
+			}
+			if millisecondVal != nil {
+				if timeComp.IsCertain(ComponentMillisecond) {
+					result.Assign(ComponentMillisecond, *millisecondVal)
+				} else {
+					result.Imply(ComponentMillisecond, *millisecondVal)
+				}
 			}
 		} else {
-			result.Imply(ComponentSecond, *timeComp.Get(ComponentSecond))
-			result.Imply(ComponentMillisecond, *timeComp.Get(ComponentMillisecond))
+			if secondVal != nil {
+				result.Imply(ComponentSecond, *secondVal)
+			}
+			if millisecondVal != nil {
+				result.Imply(ComponentMillisecond, *millisecondVal)
+			}
 		}
 	} else {
-		result.Imply(ComponentHour, *timeComp.Get(ComponentHour))
-		result.Imply(ComponentMinute, *timeComp.Get(ComponentMinute))
-		result.Imply(ComponentSecond, *timeComp.Get(ComponentSecond))
-		result.Imply(ComponentMillisecond, *timeComp.Get(ComponentMillisecond))
+		if hourVal != nil {
+			result.Imply(ComponentHour, *hourVal)
+		}
+		if minuteVal != nil {
+			result.Imply(ComponentMinute, *minuteVal)
+		}
+		if secondVal != nil {
+			result.Imply(ComponentSecond, *secondVal)
+		}
+		if millisecondVal != nil {
+			result.Imply(ComponentMillisecond, *millisecondVal)
+		}
 	}
 
 	// Merge timezone
 	if timeComp.IsCertain(ComponentTimezoneOffset) {
-		result.Assign(ComponentTimezoneOffset, *timeComp.Get(ComponentTimezoneOffset))
+		if tzVal := timeComp.Get(ComponentTimezoneOffset); tzVal != nil {
+			result.Assign(ComponentTimezoneOffset, *tzVal)
+		}
 	}
 
 	// Merge meridiem
+	timeMeridiem := timeComp.Get(ComponentMeridiem)
+	resultMeridiem := result.Get(ComponentMeridiem)
 	if timeComp.IsCertain(ComponentMeridiem) {
-		result.Assign(ComponentMeridiem, *timeComp.Get(ComponentMeridiem))
-	} else if timeComp.Get(ComponentMeridiem) != nil && *timeComp.Get(ComponentMeridiem) != 0 && result.Get(ComponentMeridiem) != nil && *result.Get(ComponentMeridiem) == 0 {
-		result.Imply(ComponentMeridiem, *timeComp.Get(ComponentMeridiem))
+		if timeMeridiem != nil {
+			result.Assign(ComponentMeridiem, *timeMeridiem)
+		}
+	} else if timeMeridiem != nil && *timeMeridiem != 0 && resultMeridiem != nil && *resultMeridiem == 0 {
+		result.Imply(ComponentMeridiem, *timeMeridiem)
 	}
 
 	// Apply PM meridiem adjustment
-	if result.Get(ComponentMeridiem) != nil && *result.Get(ComponentMeridiem) == int(MeridiemPM) && result.Get(ComponentHour) != nil && *result.Get(ComponentHour) < 12 {
+	resultMeridiem = result.Get(ComponentMeridiem)
+	resultHour := result.Get(ComponentHour)
+	if resultMeridiem != nil && *resultMeridiem == int(MeridiemPM) && resultHour != nil && *resultHour < 12 {
 		if timeComp.IsCertain(ComponentHour) {
-			result.Assign(ComponentHour, *result.Get(ComponentHour)+12)
+			result.Assign(ComponentHour, *resultHour+12)
 		} else {
-			result.Imply(ComponentHour, *result.Get(ComponentHour)+12)
+			result.Imply(ComponentHour, *resultHour+12)
 		}
 	}
 

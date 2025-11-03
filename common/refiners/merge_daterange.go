@@ -29,8 +29,11 @@ func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, c
 }
 
 func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromResult, toResult *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
-	fromStart := fromResult.Start().(*kronos.ParsingComponents)
-	toStart := toResult.Start().(*kronos.ParsingComponents)
+	fromStart, okFrom := kronos.AsParsingComponents(fromResult.Start())
+	toStart, okTo := kronos.AsParsingComponents(toResult.Start())
+	if !okFrom || !okTo {
+		return fromResult
+	}
 
 	// Imply similar components between from and to
 	if !fromStart.IsOnlyWeekdayComponent() && !toStart.IsOnlyWeekdayComponent() {
@@ -132,7 +135,14 @@ func (r *AbstractMergeDateRangeRefiner) Refine(context *kronos.ParsingContext, r
 
 	for i := 1; i < len(results); i++ {
 		next := results[i]
-		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
+		start := current.Index() + len(current.Text())
+		end := next.Index()
+		textBetween, okRange := kronos.SafeSlice(context.Text(), start, end)
+		if !okRange {
+			merged = append(merged, current)
+			current = next
+			continue
+		}
 
 		if !r.ShouldMergeResults(textBetween, current, next, context) {
 			merged = append(merged, current)

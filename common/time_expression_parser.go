@@ -10,11 +10,11 @@ import (
 
 // Time parsing capture group constants
 const (
-	TimeHourGroup       = 2
-	TimeMinuteGroup     = 3
-	TimeSecondGroup     = 4
+	TimeHourGroup        = 2
+	TimeMinuteGroup      = 3
+	TimeSecondGroup      = 4
 	TimeMillisecondGroup = 5
-	TimeAMPMGroup       = 6
+	TimeAMPMGroup        = 6
 )
 
 // AbstractTimeExpressionParser is an abstract base for parsing time expressions.
@@ -22,9 +22,9 @@ const (
 // meridiem handling, and optional "at" keyword.
 type AbstractTimeExpressionParser struct {
 	// Required fields
-	primaryPrefix   func() string
-	followingPhase  func() string
-	strictMode      bool
+	primaryPrefix  func() string
+	followingPhase func() string
+	strictMode     bool
 
 	// Optional customization
 	primaryPatternLeftBoundary func() string
@@ -33,17 +33,17 @@ type AbstractTimeExpressionParser struct {
 	patternFlags               func() string
 
 	// Additional extraction logic
-	extractPrimaryTimeComponentsHook  func(*kronos.ParsingContext, []string, *kronos.ParsingComponents) bool
+	extractPrimaryTimeComponentsHook   func(*kronos.ParsingContext, []string, *kronos.ParsingComponents) bool
 	extractFollowingTimeComponentsHook func(*kronos.ParsingContext, []string, *kronos.ParsingResult, *kronos.ParsingComponents) bool
 	checkAndReturnWithoutFollowingHook func(*kronos.ParsingResult) *kronos.ParsingResult
 	checkAndReturnWithFollowingHook    func(*kronos.ParsingResult) *kronos.ParsingResult
 
 	// Cached patterns
-	cachedPrimaryPrefix       string
-	cachedPrimarySuffix       string
-	cachedPrimaryTimePattern  *regexp.Regexp
-	cachedFollowingPhase      string
-	cachedFollowingSuffix     string
+	cachedPrimaryPrefix        string
+	cachedPrimarySuffix        string
+	cachedPrimaryTimePattern   *regexp.Regexp
+	cachedFollowingPhase       string
+	cachedFollowingSuffix      string
 	cachedFollowingTimePattern *regexp.Regexp
 }
 
@@ -252,8 +252,7 @@ func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, m
 	if endComponents != nil {
 		// Create a new result with the extended text and end components
 		// Trim trailing whitespace from the combined text
-		newText := strings.TrimRight(text + followingMatch[0], " \t")
-		startComponents := result.Start().(*kronos.ParsingComponents)
+		newText := strings.TrimRight(text+followingMatch[0], " \t")
 		result = context.CreateParsingResult(index, newText, startComponents, endComponents)
 	}
 
@@ -446,6 +445,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	result *kronos.ParsingResult,
 ) *kronos.ParsingComponents {
 	components := context.CreateParsingComponents(nil)
+	resultStart, hasStart := kronos.AsParsingComponents(result.Start())
 
 	// Parse milliseconds
 	if match[TimeMillisecondGroup] != "" {
@@ -519,8 +519,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			meridiem = int(kronos.MeridiemAM)
 			if hour == 12 {
 				hour = 0
-				resultStart := result.Start().(*kronos.ParsingComponents)
-				if !resultStart.IsCertain(kronos.ComponentDay) {
+				if hasStart && !resultStart.IsCertain(kronos.ComponentDay) {
 					dayVal := resultStart.Get(kronos.ComponentDay)
 					if dayVal != nil {
 						components.Imply(kronos.ComponentDay, *dayVal+1)
@@ -536,8 +535,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			}
 		}
 
-		resultStart := result.Start().(*kronos.ParsingComponents)
-		if !resultStart.IsCertain(kronos.ComponentMeridiem) {
+		if hasStart && !resultStart.IsCertain(kronos.ComponentMeridiem) {
 			if meridiem == int(kronos.MeridiemAM) {
 				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
 				hourVal := resultStart.Get(kronos.ComponentHour)
@@ -560,8 +558,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	if meridiem >= 0 {
 		components.Assign(kronos.ComponentMeridiem, meridiem)
 	} else {
-		resultStart := result.Start().(*kronos.ParsingComponents)
-		startAtPM := resultStart.IsCertain(kronos.ComponentMeridiem)
+		startAtPM := hasStart && resultStart.IsCertain(kronos.ComponentMeridiem)
 		if startAtPM {
 			startHourVal := resultStart.Get(kronos.ComponentHour)
 			if startHourVal != nil && *startHourVal > 12 {

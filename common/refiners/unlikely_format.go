@@ -45,7 +45,10 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 	}
 
 	// Check if start date is valid
-	resultStart := result.Start().(*kronos.ParsingComponents)
+	resultStart, okStart := kronos.AsParsingComponents(result.Start())
+	if !okStart {
+		return false
+	}
 	if !resultStart.IsValidDate() {
 		if context.Option().Debug != nil {
 			context.Debug(func() {
@@ -57,8 +60,16 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 
 	// Check if end date is valid
 	if result.End() != nil {
-		resultEnd := result.End().(*kronos.ParsingComponents)
-		if !resultEnd.IsValidDate() {
+		if resultEnd, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+			if !resultEnd.IsValidDate() {
+				if context.Option().Debug != nil {
+					context.Debug(func() {
+						// Log: Removing invalid result with invalid end date
+					})
+				}
+				return false
+			}
+		} else {
 			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: Removing invalid result with invalid end date
@@ -78,7 +89,10 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 
 func (f *UnlikelyFormatFilter) isStrictModeValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
 	// In strict mode, remove weekday-only components
-	resultStart := result.Start().(*kronos.ParsingComponents)
+	resultStart, okStart := kronos.AsParsingComponents(result.Start())
+	if !okStart {
+		return false
+	}
 	if resultStart.IsOnlyWeekdayComponent() {
 		if context.Option().Debug != nil {
 			context.Debug(func() {

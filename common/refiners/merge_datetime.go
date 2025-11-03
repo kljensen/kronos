@@ -14,8 +14,11 @@ type AbstractMergeDateTimeRefiner struct {
 
 func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) bool {
 	// Check if one is date-only and the other is time-only
-	currentStart := current.Start().(*kronos.ParsingComponents)
-	nextStart := next.Start().(*kronos.ParsingComponents)
+	currentStart, okCurrent := kronos.AsParsingComponents(current.Start())
+	nextStart, okNext := kronos.AsParsingComponents(next.Start())
+	if !okCurrent || !okNext {
+		return false
+	}
 
 	isDateTimePair := (currentStart.IsOnlyDate() && nextStart.IsOnlyTime()) ||
 		(nextStart.IsOnlyDate() && currentStart.IsOnlyTime())
@@ -34,7 +37,10 @@ func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, cu
 }
 
 func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
-	currentStart := current.Start().(*kronos.ParsingComponents)
+	currentStart, okCurrent := kronos.AsParsingComponents(current.Start())
+	if !okCurrent {
+		return current
+	}
 
 	// Calculate index and text for merged result
 	var resultIndex int
@@ -51,7 +57,11 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	}
 
 	// Create new result with correct index and text
-	result = context.CreateParsingResult(resultIndex, resultText, result.Start().(*kronos.ParsingComponents), nil)
+	startComponents, okStart := kronos.AsParsingComponents(result.Start())
+	if !okStart {
+		return current
+	}
+	result = context.CreateParsingResult(resultIndex, resultText, startComponents, nil)
 
 	return result
 }
@@ -66,7 +76,14 @@ func (r *AbstractMergeDateTimeRefiner) Refine(context *kronos.ParsingContext, re
 
 	for i := 1; i < len(results); i++ {
 		next := results[i]
-		textBetween := context.Text()[current.Index()+len(current.Text()) : next.Index()]
+		start := current.Index() + len(current.Text())
+		end := next.Index()
+		textBetween, okRange := kronos.SafeSlice(context.Text(), start, end)
+		if !okRange {
+			merged = append(merged, current)
+			current = next
+			continue
+		}
 
 		if !r.ShouldMergeResults(textBetween, current, next, context) {
 			merged = append(merged, current)
