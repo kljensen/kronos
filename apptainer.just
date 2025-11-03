@@ -40,9 +40,12 @@ shell:
         --bind $PWD:/workspace \
         --bind $HOME/.claude:$HOME/.claude \
         --bind $HOME/.claude.json:$HOME/.claude.json \
+        --bind $HOME/.codex:$HOME/.codex \
         --bind $HOME/.config:$HOME/.config \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
+        --bind $HOME/.bashrc:$HOME/.bashrc:ro \
+        --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
         --env "PATH=$HOME/local/bin:$PATH" \
         --pwd /workspace \
@@ -73,9 +76,12 @@ shell-slurm CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
         --bind $PWD:/workspace \
         --bind $HOME/.claude:$HOME/.claude \
         --bind $HOME/.claude.json:$HOME/.claude.json \
+        --bind $HOME/.codex:$HOME/.codex \
         --bind $HOME/.config:$HOME/.config \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
+        --bind $HOME/.bashrc:$HOME/.bashrc:ro \
+        --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
         --env "PATH=$HOME/local/bin:$PATH" \
         --pwd /workspace \
@@ -93,9 +99,12 @@ run CMD:
         --bind $PWD:/workspace \
         --bind $HOME/.claude:$HOME/.claude \
         --bind $HOME/.claude.json:$HOME/.claude.json \
+        --bind $HOME/.codex:$HOME/.codex \
         --bind $HOME/.config:$HOME/.config \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
+        --bind $HOME/.bashrc:$HOME/.bashrc:ro \
+        --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
         --env "PATH=$HOME/local/bin:$PATH" \
         --pwd /workspace \
@@ -122,9 +131,12 @@ run-slurm CMD CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
         --bind $PWD:/workspace \
         --bind $HOME/.claude:$HOME/.claude \
         --bind $HOME/.claude.json:$HOME/.claude.json \
+        --bind $HOME/.codex:$HOME/.codex \
         --bind $HOME/.config:$HOME/.config \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
+        --bind $HOME/.bashrc:$HOME/.bashrc:ro \
+        --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
         --env "PATH=$HOME/local/bin:$PATH" \
         --pwd /workspace \
@@ -143,9 +155,12 @@ test:
         --bind $PWD:/workspace \
         --bind $HOME/.claude:$HOME/.claude \
         --bind $HOME/.claude.json:$HOME/.claude.json \
+        --bind $HOME/.codex:$HOME/.codex \
         --bind $HOME/.config:$HOME/.config \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
+        --bind $HOME/.bashrc:$HOME/.bashrc:ro \
+        --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
         --env "PATH=$HOME/local/bin:$PATH" \
         --pwd /workspace \

@@ -1,0 +1,6 @@
+.*
+benchmark/
+coverage/
+docs/
+examples/
+node_modules/

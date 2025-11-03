@@ -1,0 +1,20 @@
+# Node Modules
+dist/
+node_modules/
+
+# Coverages
+coverage/
+
+# Benchmarking
+benchmark/results
+*.log
+
+# Misc
+.Rhistory
+.idea/
+.DS_Store
+.vscode
+.settings
+
+# Do not put the generated documentation in master
+docs/
