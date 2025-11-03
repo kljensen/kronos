@@ -23,7 +23,8 @@ func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *
 	config.Refiners = append(config.Refiners,
 		refiners.NewExtractTimezoneAbbrRefiner(nil),
 		refiners.NewOverlapRemovalRefiner(),
-		refiners.NewForwardDateRefiner(),
+		refiners.NewDatePreferenceRefiner(), // Apply date preferences before ForwardDateRefiner
+		refiners.NewForwardDateRefiner(),     // ForwardDate option overrides preferences
 		refiners.NewUnlikelyFormatFilter(strictMode),
 	)
 

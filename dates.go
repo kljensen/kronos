@@ -100,32 +100,74 @@ func FindMostLikelyADYear(rawYear int) int {
 //   - Could be 2021-03-20 (about 14 months ahead)
 //   - Returns 2020 (closest match)
 func FindYearClosestToRef(refDate time.Time, day, month int) int {
+	return FindYearClosestToRefWithPreference(refDate, day, month, PreferCurrentPeriod)
+}
+
+// FindYearClosestToRefWithPreference finds the year based on date preference settings.
+// This allows control over whether ambiguous dates should be resolved to past, future, or current period.
+//
+// Parameters:
+//   - refDate: The reference date/time for comparison
+//   - day: The day of month (1-31)
+//   - month: The month (1-12)
+//   - preference: How to resolve ambiguous dates (PreferPast, PreferFuture, PreferCurrentPeriod)
+//
+// Examples with reference date Feb 15, 2015 15:30:
+//   - PreferCurrentPeriod: "March 15" → March 15, 2015 (current year)
+//   - PreferPast: "March 15" → March 15, 2014 (last year, since March 15, 2015 is in future)
+//   - PreferFuture: "March 15" → March 15, 2015 (this year, since it's in future)
+func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, preference DatePreference) int {
 	const defaultImpliedHour = 12 // Use noon for comparison
 
 	refYear := refDate.Year()
+	location := refDate.Location()
 
-	// Try the reference year and adjacent years
+	// Create candidate dates for the reference year and adjacent years
 	candidates := []time.Time{
-		time.Date(refYear-1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, time.Local),
-		time.Date(refYear, time.Month(month), day, defaultImpliedHour, 0, 0, 0, time.Local),
-		time.Date(refYear+1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, time.Local),
+		time.Date(refYear-1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, location),
+		time.Date(refYear, time.Month(month), day, defaultImpliedHour, 0, 0, 0, location),
+		time.Date(refYear+1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, location),
 	}
 
-	// Find the candidate with the smallest absolute difference from refDate
-	var minDiff int64
-	closestYear := refYear
+	// Handle different preference modes
+	switch preference {
+	case PreferPast:
+		// Choose the most recent date that is in the past
+		for i := len(candidates) - 1; i >= 0; i-- {
+			if candidates[i].Before(refDate) || candidates[i].Equal(refDate) {
+				return candidates[i].Year()
+			}
+		}
+		// If all candidates are in the future, return the earliest one
+		return candidates[0].Year()
 
-	for i, candidate := range candidates {
-		diff := candidate.Unix() - refDate.Unix()
-		if diff < 0 {
-			diff = -diff
+	case PreferFuture:
+		// Choose the nearest date that is in the future
+		for i := 0; i < len(candidates); i++ {
+			if candidates[i].After(refDate) || candidates[i].Equal(refDate) {
+				return candidates[i].Year()
+			}
+		}
+		// If all candidates are in the past, return the latest one
+		return candidates[len(candidates)-1].Year()
+
+	default: // PreferCurrentPeriod
+		// Find the candidate with the smallest absolute difference from refDate
+		var minDiff int64
+		closestYear := refYear
+
+		for i, candidate := range candidates {
+			diff := candidate.Unix() - refDate.Unix()
+			if diff < 0 {
+				diff = -diff
+			}
+
+			if i == 0 || diff < minDiff {
+				minDiff = diff
+				closestYear = candidate.Year()
+			}
 		}
 
-		if i == 0 || diff < minDiff {
-			minDiff = diff
-			closestYear = candidate.Year()
-		}
+		return closestYear
 	}
-
-	return closestYear
 }

@@ -72,8 +72,8 @@ func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.ParsingCont
 		year := ParseYear(match[4])
 		components.Assign(kronos.ComponentYear, year)
 	} else {
-		// Find closest year to reference
-		year := kronos.FindYearClosestToRef(context.RefDate(), day, month)
+		// Find closest year to reference using preference setting
+		year := kronos.FindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
 		components.Imply(kronos.ComponentYear, year)
 	}
 

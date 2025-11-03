@@ -34,6 +34,7 @@ shell CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
     fi
 
     $SRUN_CMD apptainer shell \
+        --cleanenv \
         --no-home \
         --bind $PWD:/workspace \
         --bind $HOME/.cache:$HOME/.cache \
@@ -44,10 +45,9 @@ shell CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
         --bind $HOME/.config:$HOME/.config \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
-        --bind $HOME/.bashrc:$HOME/.bashrc:ro \
         --bind $HOME/.nvm:$HOME/.nvm \
         --bind $HOME/local/bin:$HOME/local/bin:ro \
-        --env "PATH=$HOME/local/bin:$PATH" \
+        --env "BASH_ENV=/etc/profile.d/container-env.sh" \
         --env "GOCACHE=/tmp/go-build" \
         --env "GOMODCACHE=/tmp/go-mod" \
         --pwd /workspace \
