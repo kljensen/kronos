@@ -86,6 +86,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 				components.Imply(kronos.ComponentDay, date.Day())
 				components.Imply(kronos.ComponentMonth, int(date.Month()))
 				components.Imply(kronos.ComponentYear, date.Year())
+				components.SetPeriod(kronos.PeriodWeek)
 
 			case kronos.TimeunitMonth:
 				// Start of this month
@@ -93,6 +94,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 				components.Imply(kronos.ComponentDay, date.Day())
 				components.Assign(kronos.ComponentYear, date.Year())
 				components.Assign(kronos.ComponentMonth, int(date.Month()))
+				components.SetPeriod(kronos.PeriodMonth)
 
 			case kronos.TimeunitYear:
 				// Start of this year
@@ -100,6 +102,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 				components.Imply(kronos.ComponentDay, date.Day())
 				components.Imply(kronos.ComponentMonth, int(date.Month()))
 				components.Assign(kronos.ComponentYear, date.Year())
+				components.SetPeriod(kronos.PeriodYear)
 			}
 
 			if isApproximate {
