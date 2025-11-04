@@ -175,6 +175,7 @@ func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
 	return ParsingOption{
 		ForwardDate: s.ForwardDate,
 		Preference:  s.PreferDatesFrom,
+		DateOrder:   s.DateOrder,
 		Timezones:   timezones,
 		Debug:       nil,
 	}

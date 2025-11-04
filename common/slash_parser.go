@@ -181,6 +181,8 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 		kronos.ComponentMonth: month,
 	})
 	components.AddTag("parser/SlashDateFormatParser")
+	// Set period to day-level since this parser extracts a specific date
+	components.SetPeriod(kronos.PeriodDay)
 
 	// Handle year
 	if match[slashYearGroup] != "" {

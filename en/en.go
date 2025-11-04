@@ -56,7 +56,7 @@ func StrictParser() *kronos.ParserBuilder {
 //	parser := en.GBParser().WithReferenceDate(time.Now())
 //	results, err := parser.Parse("15/03/2020")
 func GBParser() *kronos.ParserBuilder {
-	return kronos.New(GB)
+	return kronos.New(GB).DateOrder(kronos.DateOrderDMY)
 }
 
 // Parse parses the text and returns all parsed results.

@@ -189,6 +189,12 @@ type ParsingOption struct {
 	// Default is PreferCurrentPeriod.
 	Preference DatePreference
 
+	// DateOrder specifies the order of date components in ambiguous formats.
+	// Use DateOrderMDY for US format (12/31/2020), DateOrderDMY for European format (31/12/2020),
+	// or DateOrderYMD for ISO format (2020/12/31).
+	// Default is DateOrderMDY.
+	DateOrder DateOrder
+
 	// Timezones provides additional timezone keywords for parsers to recognize.
 	// Any value provided will override the default handling of that value.
 	Timezones TimezoneAbbrMap
