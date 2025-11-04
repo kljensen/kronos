@@ -4,6 +4,10 @@
 .gopath/
 .modcache/
 
+# Claude Code configuration
+.claude/
+.mcp.json
+
 # Temporary files
 tmp/
 
