@@ -226,3 +226,50 @@ func TestPeriodPreservationInMerging(t *testing.T) {
 		})
 	}
 }
+
+// TestSlashDatePeriodTracking is a regression test for Issue #101.
+// It verifies that slash-separated date formats like "03/15/2020" correctly
+// return PeriodDay instead of PeriodUnknown.
+func TestSlashDatePeriodTracking(t *testing.T) {
+	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
+
+	tests := []struct {
+		input          string
+		expectedPeriod kronos.Period
+		description    string
+	}{
+		{"03/15/2020", kronos.PeriodDay, "MM/DD/YYYY format"},
+		{"3/15/2020", kronos.PeriodDay, "M/DD/YYYY format"},
+		{"03/5/2020", kronos.PeriodDay, "MM/D/YYYY format"},
+		{"3/5/2020", kronos.PeriodDay, "M/D/YYYY format"},
+		{"12/31/2020", kronos.PeriodDay, "end of year date"},
+		{"01/01/2020", kronos.PeriodDay, "start of year date"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			results := Parse(tt.input, refTime, nil)
+
+			if len(results) == 0 {
+				t.Fatalf("No results parsed from %q", tt.input)
+			}
+
+			result := results[0]
+			components, ok := kronos.AsParsingComponents(result.Start())
+			if !ok {
+				t.Fatalf("Could not convert result to ParsingComponents")
+			}
+
+			period := components.Period()
+			if period != tt.expectedPeriod {
+				t.Errorf("Input %q: period = %v (%s), want %v (%s)",
+					tt.input, period, period.String(), tt.expectedPeriod, tt.expectedPeriod.String())
+			}
+
+			// Also verify it's not PeriodUnknown (the original bug)
+			if period == kronos.PeriodUnknown {
+				t.Errorf("Input %q: period should not be PeriodUnknown (Issue #101)", tt.input)
+			}
+		})
+	}
+}
