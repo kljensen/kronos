@@ -6,3 +6,10 @@
 
 # Temporary files
 tmp/
+
+# Build artifacts
+/basic
+/british
+/components
+/configured
+/ranges
