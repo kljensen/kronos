@@ -185,20 +185,19 @@ func TestAgoSingleExpression(t *testing.T) {
 			expectedMinute: intPtr(13),
 			expectedSecond: intPtr(48),
 		},
-		// SKIPPED: Word numbers like "three" are not yet implemented
-		// {
-		// 	name:           "three seconds ago",
-		// 	text:           "three seconds ago I did something",
-		// 	refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
-		// 	expectedText:   "three seconds ago",
-		// 	expectedIndex:  0,
-		// 	expectedYear:   2012,
-		// 	expectedMonth:  8,
-		// 	expectedDay:    10,
-		// 	expectedHour:   intPtr(12),
-		// 	expectedMinute: intPtr(13),
-		// 	expectedSecond: intPtr(57),
-		// },
+		{
+			name:           "three seconds ago",
+			text:           "three seconds ago I did something",
+			refDate:        time.Date(2012, 8, 10, 12, 14, 0, 0, time.UTC),
+			expectedText:   "three seconds ago",
+			expectedIndex:  0,
+			expectedYear:   2012,
+			expectedMonth:  8,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(13),
+			expectedSecond: intPtr(57),
+		},
 		{
 			name:          "5 Days ago (capitalized)",
 			text:          "5 Days ago, we did something",
@@ -1060,6 +1059,190 @@ func TestAgoFractionalTimeUnits(t *testing.T) {
 			}
 			if tt.expectedSecond != nil {
 				assert.Equal(t, *tt.expectedSecond, *result.Start().Get(kronos.ComponentSecond), "Second mismatch for: %s", tt.text)
+			}
+		})
+	}
+}
+
+// TestAgoWordNumbers tests word number support in "ago" expressions
+func TestAgoWordNumbers(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedIndex  int
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+		expectedSecond *int
+	}{
+		// Numbers 1-12
+		{
+			name:          "one day ago",
+			text:          "one day ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "one day ago",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   9,
+		},
+		{
+			name:          "two weeks ago",
+			text:          "two weeks ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "two weeks ago",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 8,
+			expectedDay:   27,
+		},
+		{
+			name:           "three minutes ago",
+			text:           "three minutes ago",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 0, 0, time.UTC),
+			expectedText:   "three minutes ago",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(27),
+		},
+		{
+			name:           "five hours ago",
+			text:           "five hours ago",
+			refDate:        time.Date(2024, 9, 10, 12, 0, 0, 0, time.UTC),
+			expectedText:   "five hours ago",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(7),
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:          "twelve months ago",
+			text:          "twelve months ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "twelve months ago",
+			expectedIndex: 0,
+			expectedYear:  2023,
+			expectedMonth: 9,
+			expectedDay:   10,
+		},
+		// Numbers 13-19
+		{
+			name:          "thirteen days ago",
+			text:          "thirteen days ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "thirteen days ago",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 8,
+			expectedDay:   28,
+		},
+		{
+			name:           "fifteen minutes ago",
+			text:           "fifteen minutes ago",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 0, 0, time.UTC),
+			expectedText:   "fifteen minutes ago",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(15),
+		},
+		{
+			name:           "nineteen seconds ago",
+			text:           "nineteen seconds ago",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 30, 0, time.UTC),
+			expectedText:   "nineteen seconds ago",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(30),
+			expectedSecond: intPtr(11),
+		},
+		// Tens (20, 30, etc.)
+		{
+			name:           "twenty hours ago",
+			text:           "twenty hours ago",
+			refDate:        time.Date(2024, 9, 10, 12, 0, 0, 0, time.UTC),
+			expectedText:   "twenty hours ago",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    9,
+			expectedHour:   intPtr(16),
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:          "thirty days ago",
+			text:          "thirty days ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "thirty days ago",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 8,
+			expectedDay:   11,
+		},
+		{
+			name:          "fifty days ago",
+			text:          "fifty days ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "fifty days ago",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 7,
+			expectedDay:   22,
+		},
+		{
+			name:          "ninety days ago",
+			text:          "ninety days ago",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "ninety days ago",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 6,
+			expectedDay:   12,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitAgoFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, &kronos.ParsingOption{})
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Equal(t, tt.expectedText, result.Text(), "Text mismatch")
+			assert.Equal(t, tt.expectedIndex, result.Index(), "Index mismatch")
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
+			}
+			if tt.expectedSecond != nil {
+				assert.Equal(t, *tt.expectedSecond, *result.Start().Get(kronos.ComponentSecond), "Second mismatch")
 			}
 		})
 	}

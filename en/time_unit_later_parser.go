@@ -33,10 +33,12 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
 			// Separator between units: space, comma+space, or " and "
 			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
+			// Word numbers pattern includes 1-19 and tens (20, 30, ..., 90)
+			wordNumbers := `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
 			pattern := approximationPattern +
-				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
-				`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+				`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
 				timeUnitPattern + `)*)\s{0,5}(?:later|after|from now|henceforth|forward|out)(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)

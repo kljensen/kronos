@@ -967,3 +967,167 @@ func TestLaterCompoundExpressionsWithCommasAndAnd(t *testing.T) {
 		})
 	}
 }
+
+// TestLaterWordNumbers tests word number support in "later" expressions
+func TestLaterWordNumbers(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedIndex  int
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+		expectedSecond *int
+	}{
+		// Numbers 1-12
+		{
+			name:          "one day later",
+			text:          "one day later",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "one day later",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   11,
+		},
+		{
+			name:          "two weeks from now",
+			text:          "two weeks from now",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "two weeks from now",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   24,
+		},
+		{
+			name:           "three minutes later",
+			text:           "three minutes later",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 0, 0, time.UTC),
+			expectedText:   "three minutes later",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(33),
+		},
+		{
+			name:           "five hours later",
+			text:           "five hours later",
+			refDate:        time.Date(2024, 9, 10, 12, 0, 0, 0, time.UTC),
+			expectedText:   "five hours later",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(17),
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:          "twelve months from now",
+			text:          "twelve months from now",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "twelve months from now",
+			expectedIndex: 0,
+			expectedYear:  2025,
+			expectedMonth: 9,
+			expectedDay:   10,
+		},
+		// Numbers 13-19
+		{
+			name:          "thirteen days later",
+			text:          "thirteen days later",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "thirteen days later",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   23,
+		},
+		{
+			name:           "fifteen minutes from now",
+			text:           "fifteen minutes from now",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 0, 0, time.UTC),
+			expectedText:   "fifteen minutes from now",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(45),
+		},
+		{
+			name:           "nineteen seconds later",
+			text:           "nineteen seconds later",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 30, 0, time.UTC),
+			expectedText:   "nineteen seconds later",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(30),
+			expectedSecond: intPtr(49),
+		},
+		// Tens (20, 30, etc.)
+		{
+			name:           "twenty hours later",
+			text:           "twenty hours later",
+			refDate:        time.Date(2024, 9, 10, 12, 0, 0, 0, time.UTC),
+			expectedText:   "twenty hours later",
+			expectedIndex:  0,
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    11,
+			expectedHour:   intPtr(8),
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:          "thirty days from now",
+			text:          "thirty days from now",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "thirty days from now",
+			expectedIndex: 0,
+			expectedYear:  2024,
+			expectedMonth: 10,
+			expectedDay:   10,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitLaterFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, &kronos.ParsingOption{})
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Equal(t, tt.expectedText, result.Text(), "Text mismatch")
+			assert.Equal(t, tt.expectedIndex, result.Index(), "Index mismatch")
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
+			}
+			if tt.expectedSecond != nil {
+				assert.Equal(t, *tt.expectedSecond, *result.Start().Get(kronos.ComponentSecond), "Second mismatch")
+			}
+		})
+	}
+}

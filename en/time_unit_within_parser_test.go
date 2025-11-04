@@ -496,3 +496,128 @@ func TestNegativeCases(t *testing.T) {
 		})
 	}
 }
+
+// TestWithinWordNumbers tests word number support in "within" expressions
+func TestWithinWordNumbers(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+	}{
+		// Numbers 1-12
+		{
+			name:          "in one day",
+			text:          "in one day",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "in one day",
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   11,
+		},
+		{
+			name:          "within two weeks",
+			text:          "within two weeks",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "within two weeks",
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   24,
+		},
+		{
+			name:           "in five minutes",
+			text:           "in five minutes",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 0, 0, time.UTC),
+			expectedText:   "in five minutes",
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(35),
+		},
+		{
+			name:          "within twelve months",
+			text:          "within twelve months",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "within twelve months",
+			expectedYear:  2025,
+			expectedMonth: 9,
+			expectedDay:   10,
+		},
+		// Numbers 13-19
+		{
+			name:          "in thirteen days",
+			text:          "in thirteen days",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "in thirteen days",
+			expectedYear:  2024,
+			expectedMonth: 9,
+			expectedDay:   23,
+		},
+		{
+			name:           "within fifteen minutes",
+			text:           "within fifteen minutes",
+			refDate:        time.Date(2024, 9, 10, 12, 30, 0, 0, time.UTC),
+			expectedText:   "within fifteen minutes",
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    10,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(45),
+		},
+		// Tens (20, 30, etc.)
+		{
+			name:           "in twenty hours",
+			text:           "in twenty hours",
+			refDate:        time.Date(2024, 9, 10, 12, 0, 0, 0, time.UTC),
+			expectedText:   "in twenty hours",
+			expectedYear:   2024,
+			expectedMonth:  9,
+			expectedDay:    11,
+			expectedHour:   intPtr(8),
+			expectedMinute: intPtr(0),
+		},
+		{
+			name:          "within thirty days",
+			text:          "within thirty days",
+			refDate:       time.Date(2024, 9, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "within thirty days",
+			expectedYear:  2024,
+			expectedMonth: 10,
+			expectedDay:   10,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitWithinFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, &kronos.ParsingOption{})
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Equal(t, tt.expectedText, result.Text(), "Text mismatch")
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
+			}
+		})
+	}
+}

@@ -132,6 +132,23 @@ var NumberWordDictionary = map[string]float64{
 	"ten":    10.0,
 	"eleven": 11.0,
 	"twelve": 12.0,
+	// Numbers 13-19
+	"thirteen":  13.0,
+	"fourteen":  14.0,
+	"fifteen":   15.0,
+	"sixteen":   16.0,
+	"seventeen": 17.0,
+	"eighteen":  18.0,
+	"nineteen":  19.0,
+	// Tens (20-90)
+	"twenty":  20.0,
+	"thirty":  30.0,
+	"forty":   40.0,
+	"fifty":   50.0,
+	"sixty":   60.0,
+	"seventy": 70.0,
+	"eighty":  80.0,
+	"ninety":  90.0,
 	// Articles that indicate singular
 	"a":  1.0,
 	"an": 1.0,
@@ -395,7 +412,7 @@ func ParseDuration(text string) kronos.Duration {
 	// - "a couple of days" -> captures "couple"
 	// - "a few hours" -> captures "few"
 	// - "several weeks" -> captures "several"
-	// Word numbers: one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve
+	// Word numbers: one through nineteen, and tens (twenty through ninety)
 	// Extended quantifiers: a, an, couple, few, several, half, dozen
 	// Note: Using flexible pattern to support consecutive units like "2hr5min"
 	// Also supports optional "of" separator (e.g., "couple of days")
@@ -405,7 +422,7 @@ func ParseDuration(text string) kronos.Duration {
 	// 3. Optional "a/an" again for "half an hour"
 	// 4. Optional "of"
 	// 5. Time unit (captured)
-	pattern := regexp.MustCompile(`(?i)(?:an?\s+)?(half|dozen|several|couple|few|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?(` + TimeUnitPattern + `)`)
+	pattern := regexp.MustCompile(`(?i)(?:an?\s+)?(half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?(` + TimeUnitPattern + `)`)
 	matchesIdx := pattern.FindAllStringSubmatchIndex(normalized, -1)
 
 	for _, matchIdx := range matchesIdx {
