@@ -508,6 +508,183 @@ func TestENWeekdayParser_Weekday(t *testing.T) {
 	}
 }
 
+func TestENWeekdayParser_WeekendCounting(t *testing.T) {
+	parser := createWeekdayParser()
+
+	tests := []struct {
+		name            string
+		text            string
+		refDate         time.Time
+		expectedYear    int
+		expectedMonth   int
+		expectedDay     int
+		expectedWeekday int
+	}{
+		// "N weekends ago" tests - should resolve to Sunday
+		{
+			name:            "2 weekends ago from Wednesday",
+			text:            "2 weekends ago",
+			refDate:         time.Date(2006, 8, 16, 14, 0, 0, 0, time.UTC), // Wednesday
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     6, // Sunday, 2 weekends back
+			expectedWeekday: 0, // Sunday
+		},
+		{
+			name:            "1 weekend ago from Wednesday",
+			text:            "1 weekend ago",
+			refDate:         time.Date(2006, 8, 16, 14, 0, 0, 0, time.UTC),
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     13, // Sunday, last weekend
+			expectedWeekday: 0,  // Sunday
+		},
+		{
+			name:            "3 weekends ago from Wednesday",
+			text:            "3 weekends ago",
+			refDate:         time.Date(2006, 8, 16, 14, 0, 0, 0, time.UTC),
+			expectedYear:    2006,
+			expectedMonth:   7,
+			expectedDay:     30, // Sunday, 3 weekends back
+			expectedWeekday: 0,  // Sunday
+		},
+
+		// "N weekends from now" tests - should resolve to Saturday
+		{
+			name:            "1 weekend from now from Wednesday",
+			text:            "1 weekend from now",
+			refDate:         time.Date(2006, 8, 16, 14, 0, 0, 0, time.UTC),
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     19, // Saturday, this weekend
+			expectedWeekday: 6,  // Saturday
+		},
+		{
+			name:            "2 weekends from now from Wednesday",
+			text:            "2 weekends from now",
+			refDate:         time.Date(2006, 8, 16, 14, 0, 0, 0, time.UTC),
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     26, // Saturday, 2 weekends forward
+			expectedWeekday: 6,  // Saturday
+		},
+
+		// Edge cases: during weekend
+		{
+			name:            "1 weekend ago from Saturday",
+			text:            "1 weekend ago",
+			refDate:         time.Date(2006, 8, 19, 14, 0, 0, 0, time.UTC), // Saturday
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     13, // Previous Sunday
+			expectedWeekday: 0,  // Sunday
+		},
+		{
+			name:            "1 weekend ago from Sunday",
+			text:            "1 weekend ago",
+			refDate:         time.Date(2006, 8, 20, 14, 0, 0, 0, time.UTC), // Sunday
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     13, // Previous Sunday
+			expectedWeekday: 0,  // Sunday
+		},
+		{
+			name:            "1 weekend from now from Saturday",
+			text:            "1 weekend from now",
+			refDate:         time.Date(2006, 8, 19, 14, 0, 0, 0, time.UTC), // Saturday
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     26, // Next Saturday
+			expectedWeekday: 6,  // Saturday
+		},
+		{
+			name:            "1 weekend from now from Sunday",
+			text:            "1 weekend from now",
+			refDate:         time.Date(2006, 8, 20, 14, 0, 0, 0, time.UTC), // Sunday
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     26, // Next Saturday
+			expectedWeekday: 6,  // Saturday
+		},
+
+		// Test from Monday (just after weekend)
+		{
+			name:            "1 weekend ago from Monday",
+			text:            "1 weekend ago",
+			refDate:         time.Date(2006, 8, 21, 9, 0, 0, 0, time.UTC), // Monday
+			expectedYear:    2006,
+			expectedMonth:   8,
+			expectedDay:     20, // Yesterday (Sunday)
+			expectedWeekday: 0,  // Sunday
+		},
+
+		// Year boundary test
+		{
+			name:            "1 weekend from now crosses year",
+			text:            "1 weekend from now",
+			refDate:         time.Date(2023, 12, 29, 12, 0, 0, 0, time.UTC), // Friday
+			expectedYear:    2023,
+			expectedMonth:   12,
+			expectedDay:     30, // Saturday (this week)
+			expectedWeekday: 6,  // Saturday
+		},
+		{
+			name:            "2 weekends from now crosses year",
+			text:            "2 weekends from now",
+			refDate:         time.Date(2023, 12, 29, 12, 0, 0, 0, time.UTC), // Friday
+			expectedYear:    2024,
+			expectedMonth:   1,
+			expectedDay:     6, // Saturday next year
+			expectedWeekday: 6, // Saturday
+		},
+
+		// Additional reference date: Friday Oct 18, 2024
+		{
+			name:            "last weekend via ago from Friday",
+			text:            "1 weekend ago",
+			refDate:         time.Date(2024, 10, 18, 12, 0, 0, 0, time.UTC),
+			expectedYear:    2024,
+			expectedMonth:   10,
+			expectedDay:     13, // Sunday
+			expectedWeekday: 0,  // Sunday
+		},
+		{
+			name:            "this weekend via from now from Friday",
+			text:            "1 weekend from now",
+			refDate:         time.Date(2024, 10, 18, 12, 0, 0, 0, time.UTC),
+			expectedYear:    2024,
+			expectedMonth:   10,
+			expectedDay:     19, // Saturday
+			expectedWeekday: 6,  // Saturday
+		},
+		{
+			name:            "next weekend via from now from Friday",
+			text:            "2 weekends from now",
+			refDate:         time.Date(2024, 10, 18, 12, 0, 0, 0, time.UTC),
+			expectedYear:    2024,
+			expectedMonth:   10,
+			expectedDay:     26, // Saturday
+			expectedWeekday: 6,  // Saturday
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			result := results[0]
+
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+			assert.Equal(t, tt.expectedWeekday, *result.Start().Get(kronos.ComponentWeekday), "Weekday mismatch")
+		})
+	}
+}
+
 func TestENWeekdayParser_WithCasualTime(t *testing.T) {
 	t.Skip("This test requires a refiner to merge weekday + casual time results - not yet implemented")
 
