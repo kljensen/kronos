@@ -44,7 +44,7 @@ func main() {
     fmt.Printf("Date: %v\n", date)
 
     // Parse all dates in text
-    results, err := en.ParseSimple("Meet me tomorrow at 3pm or next Friday")
+    results, err := en.ParseSimple("Meet me tomorrow at 3pm or next Friday at noon")
     if err != nil {
         panic(err)
     }
@@ -265,7 +265,7 @@ for _, r := range results {
 }
 // Output:
 // Position 18: 'March 15 at 2pm' = 2024-03-15 14:00:00
-// Position 55: 'next Friday' = 2024-03-22 12:00:00
+// Position 52: 'next Friday' = 2024-03-22 12:00:00
 ```
 
 ## Advanced Usage
