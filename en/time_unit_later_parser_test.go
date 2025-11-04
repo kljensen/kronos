@@ -565,43 +565,42 @@ func TestLaterAfterReference(t *testing.T) {
 		expectedMonth int
 		expectedDay   int
 	}{
-		// SKIPPED: These tests require full configuration with refiners, and refiners have bugs with "after" references
-		// {
-		// 	name:          "2 day after today",
-		// 	text:          "2 day after today",
-		// 	refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-		// 	expectedText:  "2 day after today",
-		// 	expectedYear:  2012,
-		// 	expectedMonth: 8,
-		// 	expectedDay:   12,
-		// },
-		// {
-		// 	name:          "the day after tomorrow",
-		// 	text:          "the day after tomorrow",
-		// 	refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-		// 	expectedText:  "the day after tomorrow",
-		// 	expectedYear:  2012,
-		// 	expectedMonth: 8,
-		// 	expectedDay:   12,
-		// },
-		// {
-		// 	name:          "2 day after tomorrow",
-		// 	text:          "2 day after tomorrow",
-		// 	refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-		// 	expectedText:  "2 day after tomorrow",
-		// 	expectedYear:  2012,
-		// 	expectedMonth: 8,
-		// 	expectedDay:   13,
-		// },
-		// {
-		// 	name:          "a week after tomorrow",
-		// 	text:          "a week after tomorrow",
-		// 	refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-		// 	expectedText:  "a week after tomorrow",
-		// 	expectedYear:  2012,
-		// 	expectedMonth: 8,
-		// 	expectedDay:   18,
-		// },
+		{
+			name:          "2 day after today",
+			text:          "2 day after today",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "2 day after today",
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   12,
+		},
+		{
+			name:          "the day after tomorrow",
+			text:          "the day after tomorrow",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "the day after tomorrow",
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   12,
+		},
+		{
+			name:          "2 day after tomorrow",
+			text:          "2 day after tomorrow",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "2 day after tomorrow",
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   13,
+		},
+		{
+			name:          "a week after tomorrow",
+			text:          "a week after tomorrow",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedText:  "a week after tomorrow",
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   18,
+		},
 	}
 
 	for _, tt := range tests {
@@ -639,16 +638,17 @@ func TestLaterPlusReference(t *testing.T) {
 		expectedHour   *int
 		expectedMinute *int
 	}{
-		// SKIPPED: These tests require full configuration with refiners, and refiners have bugs
-		// {
-		// 	name:          "next tuesday +10 days",
-		// 	text:          "next tuesday +10 days",
-		// 	refDate:       time.Date(2023, 12, 29, 0, 0, 0, 0, time.UTC),
-		// 	expectedText:  "next tuesday +10 days",
-		// 	expectedYear:  2024,
-		// 	expectedMonth: 1,
-		// 	expectedDay:   12,
-		// },
+		{
+			name:          "next tuesday +10 days",
+			text:          "next tuesday +10 days",
+			refDate:       time.Date(2023, 12, 29, 0, 0, 0, 0, time.UTC),
+			expectedText:  "next tuesday +10 days",
+			expectedYear:  2024,
+			expectedMonth: 1,
+			expectedDay:   12,
+		},
+		// SKIPPED: This test fails because the parser requires a space between number and unit (e.g., "-10 days" not "-10days")
+		// This is a separate issue unrelated to the slice bounds panic fix
 		// {
 		// 	name:          "2023-12-29 -10days",
 		// 	text:          "2023-12-29 -10days",
@@ -658,17 +658,17 @@ func TestLaterPlusReference(t *testing.T) {
 		// 	expectedMonth: 12,
 		// 	expectedDay:   19,
 		// },
-		// {
-		// 	name:           "now + 40minutes",
-		// 	text:           "now + 40minutes",
-		// 	refDate:        time.Date(2023, 12, 29, 8, 30, 0, 0, time.UTC),
-		// 	expectedText:   "now + 40minutes",
-		// 	expectedYear:   2023,
-		// 	expectedMonth:  12,
-		// 	expectedDay:    29,
-		// 	expectedHour:   intPtr(9),
-		// 	expectedMinute: intPtr(10),
-		// },
+		{
+			name:           "now + 40minutes",
+			text:           "now + 40minutes",
+			refDate:        time.Date(2023, 12, 29, 8, 30, 0, 0, time.UTC),
+			expectedText:   "now + 40minutes",
+			expectedYear:   2023,
+			expectedMonth:  12,
+			expectedDay:    29,
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(10),
+		},
 	}
 
 	for _, tt := range tests {

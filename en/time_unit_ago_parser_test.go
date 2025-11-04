@@ -457,73 +457,68 @@ func TestAgoNestedTimeAgo(t *testing.T) {
 }
 
 // TestAgoBeforeWithReference tests "before" expressions with reference words like "today", "yesterday"
-// SKIPPED: These tests crash due to a bug in ENMergeRelativeFollowByDateRefiner (slice bounds out of range).
-// This is a known issue in the refiner, not the ago parser itself.
-// The crash occurs when trying to merge "X before Y" patterns where Y is a casual date.
 func TestAgoBeforeWithReference(t *testing.T) {
-	t.Skip("Skipping due to refiner bug: slice bounds out of range in ENMergeRelativeFollowByDateRefiner")
+	tests := []struct {
+		name          string
+		text          string
+		refDate       time.Time
+		expectedYear  int
+		expectedMonth int
+		expectedDay   int
+	}{
+		{
+			name:          "2 day before today",
+			text:          "2 day before today",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   8,
+		},
+		{
+			name:          "the day before yesterday",
+			text:          "the day before yesterday",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   8,
+		},
+		{
+			name:          "2 day before yesterday",
+			text:          "2 day before yesterday",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   7,
+		},
+		{
+			name:          "a week before yesterday",
+			text:          "a week before yesterday",
+			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
+			expectedYear:  2012,
+			expectedMonth: 8,
+			expectedDay:   2,
+		},
+	}
 
-	// tests := []struct {
-	// 	name          string
-	// 	text          string
-	// 	refDate       time.Time
-	// 	expectedYear  int
-	// 	expectedMonth int
-	// 	expectedDay   int
-	// }{
-	// 	{
-	// 		name:          "2 day before today",
-	// 		text:          "2 day before today",
-	// 		refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-	// 		expectedYear:  2012,
-	// 		expectedMonth: 8,
-	// 		expectedDay:   8,
-	// 	},
-	// 	{
-	// 		name:          "the day before yesterday",
-	// 		text:          "the day before yesterday",
-	// 		refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-	// 		expectedYear:  2012,
-	// 		expectedMonth: 8,
-	// 		expectedDay:   8,
-	// 	},
-	// 	{
-	// 		name:          "2 day before yesterday",
-	// 		text:          "2 day before yesterday",
-	// 		refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-	// 		expectedYear:  2012,
-	// 		expectedMonth: 8,
-	// 		expectedDay:   7,
-	// 	},
-	// 	{
-	// 		name:          "a week before yesterday",
-	// 		text:          "a week before yesterday",
-	// 		refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
-	// 		expectedYear:  2012,
-	// 		expectedMonth: 8,
-	// 		expectedDay:   2,
-	// 	},
-	// }
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Use casual configuration which includes both ago parser and casual date parser
+			config := CreateCasualConfiguration(false)
+			chrono := kronos.NewChrono(config)
 
-	// for _, tt := range tests {
-	// 	t.Run(tt.name, func(t *testing.T) {
-	// 		// Use casual configuration which includes both ago parser and casual date parser
-	// 		config := CreateCasualConfiguration(false)
-	// 		chrono := kronos.NewChrono(config)
+			results := chrono.Parse(tt.text, tt.refDate, nil)
 
-	// 		results := chrono.Parse(tt.text, tt.refDate, nil)
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
 
-	// 		assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
-	// 		if len(results) == 0 {
-	// 			return
-	// 		}
-
-	// 		result := results[0]
-	// 		assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
-	// 		assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
-	// 		assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
-	// 	})
-	// }
+			result := results[0]
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+		})
+	}
 }
 
 // TestAgoStrictMode tests strict mode parsing behavior

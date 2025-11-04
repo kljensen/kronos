@@ -10,10 +10,7 @@ import (
 
 // TestMergingRelativeDates tests merging of relative date expressions
 // like "2 weeks after yesterday" or "2 days after next Friday".
-// SKIP: These tests currently fail due to bugs in the refiner logic.
-// The refiners have slice bound issues that need to be fixed.
 func TestMergingRelativeDates(t *testing.T) {
-	t.Skip("Skipping - known bugs in merge relative refiners")
 	tests := []struct {
 		name        string
 		text        string

@@ -53,8 +53,8 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.ParsingContext,
 			continue
 		}
 
-		textBetween := context.Text()[startIdx:endIdx]
-		if !patternAfterBetween.MatchString(textBetween) {
+		textBetween, ok := kronos.SafeSlice(context.Text(), startIdx, endIdx)
+		if !ok || !patternAfterBetween.MatchString(textBetween) {
 			merged = append(merged, current)
 			current = next
 			continue
