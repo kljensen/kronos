@@ -52,12 +52,14 @@ func TestPeriodIntegrationWithParser(t *testing.T) {
 		{"2 months ago", kronos.PeriodMonth, "months ago"},
 		{"11/2005", kronos.PeriodMonth, "MM/YYYY format"},
 		{"last month", kronos.PeriodMonth, "last month"},
+		{"this month", kronos.PeriodMonth, "this month"},
 
 		// Year-level expressions
 		{"2020", kronos.PeriodYear, "year only"},
 		{"last year", kronos.PeriodYear, "last year"},
 		{"next year", kronos.PeriodYear, "next year"},
 		{"1 year ago", kronos.PeriodYear, "year ago"},
+		{"this year", kronos.PeriodYear, "this year"},
 	}
 
 	for _, tt := range tests {
