@@ -35,7 +35,19 @@ func (f *UnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results []
 
 func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
 	// Remove results that are just numbers or dots
-	if regexp.MustCompile(`^\d*(\.\d*)?$`).MatchString(strings.ReplaceAll(result.Text(), " ", "")) {
+	// Exception: Allow 4-digit years (1000-2999) which are valid year-only expressions
+	textWithoutSpaces := strings.ReplaceAll(result.Text(), " ", "")
+	if regexp.MustCompile(`^\d*(\.\d*)?$`).MatchString(textWithoutSpaces) {
+		// Check if it's a 4-digit year
+		if regexp.MustCompile(`^[12]\d{3}$`).MatchString(textWithoutSpaces) {
+			// Check if the result has a year-level period
+			if resultStart, okStart := kronos.AsParsingComponents(result.Start()); okStart {
+				if resultStart.Period() == kronos.PeriodYear {
+					// This is a valid year-only expression, don't filter it
+					return true
+				}
+			}
+		}
 		if context.Option().Debug != nil {
 			context.Debug(func() {
 				// Log: Removing unlikely result

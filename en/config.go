@@ -60,6 +60,7 @@ func CreateConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 			NewENMonthNameParser(),
 			NewENRelativeDateFormatParser(),
 			NewENTimeUnitCasualRelativeFormatParser(true),
+			NewENYearParser(), // Add year-only parser before compact format
 			NewENCompactFormatParser(), // Add compact format parser last as catch-all
 		},
 		Refiners: []kronos.Refiner{

@@ -96,7 +96,7 @@ func TestNegativeHyphenatedNumbers(t *testing.T) {
 		{name: "1-2-3", text: "1-2-3"},
 		{name: "4-5-6", text: "4-5-6"},
 		{name: "20-30-12", text: "20-30-12"},
-		{name: "2012", text: "2012"},
+		// Note: Standalone 4-digit years like "2012" now parse as year-only expressions (see Issue #99)
 		{name: "2012-14", text: "2012-14"},
 		{name: "2012-1400", text: "2012-1400"},
 		{name: "2200-25", text: "2200-25"},
