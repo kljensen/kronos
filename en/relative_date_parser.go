@@ -17,6 +17,10 @@ type ENRelativeDateFormatParser struct {
 
 // TimeUnitRelativeDictionary maps time unit words to Timeunit values
 var TimeUnitRelativeDictionary = map[string]kronos.Timeunit{
+	"hour":    kronos.TimeunitHour,
+	"hours":   kronos.TimeunitHour,
+	"day":     kronos.TimeunitDay,
+	"days":    kronos.TimeunitDay,
 	"week":    kronos.TimeunitWeek,
 	"weeks":   kronos.TimeunitWeek,
 	"month":   kronos.TimeunitMonth,
@@ -58,8 +62,18 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			if modifier == "next" || strings.HasPrefix(modifier, "after") {
 				duration := kronos.Duration{timeunit: 1}
 				components := kronos.CreateRelativeFromReference(context.Reference(), duration)
-				if isApproximate && components != nil {
-					components.AddTag("result/approximate")
+				if components != nil {
+					// For month/year timeunits, override day to 1st of period
+					// "next month" means "the next month period" starting on the 1st
+					if timeunit == kronos.TimeunitMonth {
+						components.Imply(kronos.ComponentDay, 1)
+					} else if timeunit == kronos.TimeunitYear {
+						components.Imply(kronos.ComponentMonth, 1)
+						components.Imply(kronos.ComponentDay, 1)
+					}
+					if isApproximate {
+						components.AddTag("result/approximate")
+					}
 				}
 				return components
 			}
@@ -68,8 +82,18 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			if modifier == "last" || modifier == "past" {
 				duration := kronos.Duration{timeunit: -1}
 				components := kronos.CreateRelativeFromReference(context.Reference(), duration)
-				if isApproximate && components != nil {
-					components.AddTag("result/approximate")
+				if components != nil {
+					// For month/year timeunits, override day to 1st of period
+					// "last month" means "the previous month period" starting on the 1st
+					if timeunit == kronos.TimeunitMonth {
+						components.Imply(kronos.ComponentDay, 1)
+					} else if timeunit == kronos.TimeunitYear {
+						components.Imply(kronos.ComponentMonth, 1)
+						components.Imply(kronos.ComponentDay, 1)
+					}
+					if isApproximate {
+						components.AddTag("result/approximate")
+					}
 				}
 				return components
 			}
@@ -79,6 +103,28 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			refDate := context.Reference().Instant()
 
 			switch timeunit {
+			case kronos.TimeunitHour:
+				// Start of this hour
+				date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), refDate.Hour(), 0, 0, 0, refDate.Location())
+				components.Assign(kronos.ComponentDay, date.Day())
+				components.Assign(kronos.ComponentMonth, int(date.Month()))
+				components.Assign(kronos.ComponentYear, date.Year())
+				components.Assign(kronos.ComponentHour, date.Hour())
+				components.Imply(kronos.ComponentMinute, 0)
+				components.Imply(kronos.ComponentSecond, 0)
+				components.SetPeriod(kronos.PeriodTime)
+
+			case kronos.TimeunitDay:
+				// Start of this day
+				date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
+				components.Assign(kronos.ComponentDay, date.Day())
+				components.Assign(kronos.ComponentMonth, int(date.Month()))
+				components.Assign(kronos.ComponentYear, date.Year())
+				components.Imply(kronos.ComponentHour, 0)
+				components.Imply(kronos.ComponentMinute, 0)
+				components.Imply(kronos.ComponentSecond, 0)
+				components.SetPeriod(kronos.PeriodDay)
+
 			case kronos.TimeunitWeek:
 				// Start of this week (Sunday)
 				date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())

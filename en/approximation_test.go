@@ -243,7 +243,7 @@ func TestApproximationWordsCasualRelative(t *testing.T) {
 			refDate:       time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC),
 			expectedYear:  2012,
 			expectedMonth: 9,
-			expectedDay:   10,
+			expectedDay:   1, // Issue #114: "next month" should return the 1st, not preserve day
 			isApproximate: true,
 		},
 		{
