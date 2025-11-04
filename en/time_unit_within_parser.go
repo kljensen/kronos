@@ -30,6 +30,9 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 			}
 
 			// With optional prefix if forwardDate is enabled, required prefix otherwise
+			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
+			// Separator between units: space, comma+space, or " and "
+			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
 			var pattern string
 			option := context.Option()
 			if option.ForwardDate {
@@ -37,14 +40,14 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 					`(?:(?:about|around|roughly|approximately|just)\s*(?:~\s*)?)?` +
 					`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 					timeUnitPattern +
-					`(?:\s+(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+					`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 					timeUnitPattern + `)*)(?:\s|$|\b)`
 			} else {
 				pattern = `(?:within|in|for)\s*` +
 					`(?:(?:about|around|roughly|approximately|just)\s*(?:~\s*)?)?` +
 					`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 					timeUnitPattern +
-					`(?:\s+(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+					`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 					timeUnitPattern + `)*)(?:\s|$|\b)`
 			}
 

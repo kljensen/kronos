@@ -367,6 +367,21 @@ var (
 func ParseDuration(text string) kronos.Duration {
 	result := make(kronos.Duration)
 
+	// Normalize the text to handle commas and "and" connectors
+	// Replace patterns like "1 year, 2 months" or "1 year and 2 months" with "1 year 2 months"
+	// BUT preserve commas in decimal numbers like "2,5 hours" (European format)
+	normalized := text
+
+	// Replace comma+space followed by a number or word (not after a digit immediately before comma)
+	// This preserves "2,5 hours" but replaces "2 hours, 3 minutes"
+	// Pattern: match comma followed by space and then a non-digit word or number with letter
+	// We need to preserve commas that are between digits (decimal separators)
+	normalized = regexp.MustCompile(`([a-zA-Z])\s*,\s*([0-9])`).ReplaceAllString(normalized, "$1 $2")
+
+	// Replace " and " between time units with a single space
+	// This pattern looks for "and" surrounded by spaces/word boundaries
+	normalized = regexp.MustCompile(`\s+and\s+`).ReplaceAllString(normalized, " ")
+
 	// Pattern for matching time units
 	// Supports formats like:
 	// - "3 days"
@@ -391,7 +406,7 @@ func ParseDuration(text string) kronos.Duration {
 	// 4. Optional "of"
 	// 5. Time unit (captured)
 	pattern := regexp.MustCompile(`(?i)(?:an?\s+)?(half|dozen|several|couple|few|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?(` + TimeUnitPattern + `)`)
-	matchesIdx := pattern.FindAllStringSubmatchIndex(text, -1)
+	matchesIdx := pattern.FindAllStringSubmatchIndex(normalized, -1)
 
 	for _, matchIdx := range matchesIdx {
 		// matchIdx has: [fullStart, fullEnd, numStart, numEnd, unitStart, unitEnd]
@@ -403,15 +418,15 @@ func ParseDuration(text string) kronos.Duration {
 
 		// Get the unit match (group 2)
 		unitStart, unitEnd := matchIdx[4], matchIdx[5]
-		unit := strings.ToLower(text[unitStart:unitEnd])
+		unit := strings.ToLower(normalized[unitStart:unitEnd])
 
 		// Skip if match is preceded by a letter (part of a larger word like "them")
 		// But allow if the match starts with a digit (e.g., "2hr5min" where "5min" follows "hr")
 		if fullStart > 0 {
-			prevChar := text[fullStart-1]
+			prevChar := normalized[fullStart-1]
 			matchStartsWithDigit := (matchIdx[2] >= 0 && matchIdx[2] == fullStart &&
-				len(text[matchIdx[2]:matchIdx[3]]) > 0 &&
-				text[matchIdx[2]] >= '0' && text[matchIdx[2]] <= '9')
+				len(normalized[matchIdx[2]:matchIdx[3]]) > 0 &&
+				normalized[matchIdx[2]] >= '0' && normalized[matchIdx[2]] <= '9')
 
 			if !matchStartsWithDigit &&
 				((prevChar >= 'a' && prevChar <= 'z') || (prevChar >= 'A' && prevChar <= 'Z')) {
@@ -420,8 +435,8 @@ func ParseDuration(text string) kronos.Duration {
 		}
 
 		// Skip if the unit is immediately followed by a letter (part of a larger word)
-		if unitEnd < len(text) {
-			nextChar := text[unitEnd]
+		if unitEnd < len(normalized) {
+			nextChar := normalized[unitEnd]
 			if (nextChar >= 'a' && nextChar <= 'z') || (nextChar >= 'A' && nextChar <= 'Z') {
 				continue
 			}
@@ -430,7 +445,7 @@ func ParseDuration(text string) kronos.Duration {
 		// Get the number part (group 1, if any)
 		var numStr string
 		if matchIdx[2] >= 0 {
-			numStr = strings.TrimSpace(text[matchIdx[2]:matchIdx[3]])
+			numStr = strings.TrimSpace(normalized[matchIdx[2]:matchIdx[3]])
 		}
 
 		// Single-letter time units (s, m, h, d, w, y) should have an explicit number

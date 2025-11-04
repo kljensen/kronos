@@ -30,10 +30,13 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 			// Add optional approximation words at the beginning
 			// Tilde is handled separately because it's a symbol, not a word
 			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
+			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
+			// Separator between units: space, comma+space, or " and "
+			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
 			pattern := approximationPattern +
 				`((?:(?:[0-9]+(?:[.,][0-9]+)?|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
-				`(?:\s+(?:(?:[0-9]+(?:[.,][0-9]+)?|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
+				`(?:` + unitSeparator + `(?:(?:[0-9]+(?:[.,][0-9]+)?|half|a|an|the|few|couple|several)\s*(?:an?\s+)?)?` +
 				timeUnitPattern + `)*)\s{0,5}(?:ago|before|earlier)(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)

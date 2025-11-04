@@ -728,3 +728,242 @@ func TestLaterNegativeCases(t *testing.T) {
 		})
 	}
 }
+
+// TestLaterCompoundExpressionsWithCommas tests compound relative expressions with commas for future tense
+func TestLaterCompoundExpressionsWithCommas(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+	}{
+		{
+			name:          "1 year, 2 months later",
+			text:          "1 year, 2 months later",
+			refDate:       time.Date(2020, 3, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "1 year, 2 months later",
+			expectedYear:  2021,
+			expectedMonth: 5,
+			expectedDay:   15,
+		},
+		{
+			name:          "2 weeks, 3 days from now",
+			text:          "2 weeks, 3 days from now",
+			refDate:       time.Date(2020, 3, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "2 weeks, 3 days from now",
+			expectedYear:  2020,
+			expectedMonth: 4,
+			expectedDay:   1,
+		},
+		{
+			name:           "2 hours, 30 minutes from now",
+			text:           "2 hours, 30 minutes from now",
+			refDate:        time.Date(2020, 3, 15, 12, 0, 0, 0, time.UTC),
+			expectedText:   "2 hours, 30 minutes from now",
+			expectedYear:   2020,
+			expectedMonth:  3,
+			expectedDay:    15,
+			expectedHour:   intPtr(14),
+			expectedMinute: intPtr(30),
+		},
+		{
+			name:          "1 year,2 months later (no space after comma)",
+			text:          "1 year,2 months later",
+			refDate:       time.Date(2020, 3, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "1 year,2 months later",
+			expectedYear:  2021,
+			expectedMonth: 5,
+			expectedDay:   15,
+		},
+		{
+			name:           "1y, 2mo, 3d later (abbreviated with commas)",
+			text:           "1y, 2mo, 3d later",
+			refDate:        time.Date(2020, 3, 15, 12, 0, 0, 0, time.UTC),
+			expectedText:   "1y, 2mo, 3d later",
+			expectedYear:   2021,
+			expectedMonth:  5,
+			expectedDay:    18,
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(0),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitLaterFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+		})
+	}
+}
+
+// TestLaterCompoundExpressionsWithAnd tests compound relative expressions with "and" connector for future tense
+func TestLaterCompoundExpressionsWithAnd(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+	}{
+		{
+			name:          "1 year and 2 months later",
+			text:          "1 year and 2 months later",
+			refDate:       time.Date(2020, 3, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "1 year and 2 months later",
+			expectedYear:  2021,
+			expectedMonth: 5,
+			expectedDay:   15,
+		},
+		{
+			name:          "1 month and 5 days from now",
+			text:          "1 month and 5 days from now",
+			refDate:       time.Date(2020, 3, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "1 month and 5 days from now",
+			expectedYear:  2020,
+			expectedMonth: 4,
+			expectedDay:   20,
+		},
+		{
+			name:           "2 hours and 15 minutes from now",
+			text:           "2 hours and 15 minutes from now",
+			refDate:        time.Date(2020, 3, 15, 12, 0, 0, 0, time.UTC),
+			expectedText:   "2 hours and 15 minutes from now",
+			expectedYear:   2020,
+			expectedMonth:  3,
+			expectedDay:    15,
+			expectedHour:   intPtr(14),
+			expectedMinute: intPtr(15),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitLaterFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+		})
+	}
+}
+
+// TestLaterCompoundExpressionsWithCommasAndAnd tests mixed comma and "and" connectors for future tense
+func TestLaterCompoundExpressionsWithCommasAndAnd(t *testing.T) {
+	tests := []struct {
+		name           string
+		text           string
+		refDate        time.Time
+		expectedText   string
+		expectedYear   int
+		expectedMonth  int
+		expectedDay    int
+		expectedHour   *int
+		expectedMinute *int
+	}{
+		{
+			name:          "1 year, 1 month and 1 week later",
+			text:          "1 year, 1 month and 1 week later",
+			refDate:       time.Date(2020, 3, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "1 year, 1 month and 1 week later",
+			expectedYear:  2021,
+			expectedMonth: 4,
+			expectedDay:   22,
+		},
+		{
+			name:           "1 year, 1 month, 1 week, 1 day, 1 hour and 1 minute from now",
+			text:           "1 year, 1 month, 1 week, 1 day, 1 hour and 1 minute from now",
+			refDate:        time.Date(2020, 3, 15, 12, 30, 0, 0, time.UTC),
+			expectedText:   "1 year, 1 month, 1 week, 1 day, 1 hour and 1 minute from now",
+			expectedYear:   2021,
+			expectedMonth:  4,
+			expectedDay:    23,
+			expectedHour:   intPtr(13),
+			expectedMinute: intPtr(31),
+		},
+		{
+			name:          "2 years, 3 months and 5 days from now",
+			text:          "2 years, 3 months and 5 days from now",
+			refDate:       time.Date(2020, 6, 15, 0, 0, 0, 0, time.UTC),
+			expectedText:  "2 years, 3 months and 5 days from now",
+			expectedYear:  2022,
+			expectedMonth: 9,
+			expectedDay:   20,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			parser := NewENTimeUnitLaterFormatParser(false)
+			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			chrono := kronos.NewChrono(config)
+
+			results := chrono.Parse(tt.text, tt.refDate, nil)
+
+			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+			if len(results) == 0 {
+				return
+			}
+
+			result := results[0]
+			assert.Contains(t, result.Text(), tt.expectedText, "Text mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch for: %s", tt.text)
+			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch for: %s", tt.text)
+
+			if tt.expectedHour != nil {
+				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch for: %s", tt.text)
+			}
+			if tt.expectedMinute != nil {
+				assert.Equal(t, *tt.expectedMinute, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch for: %s", tt.text)
+			}
+		})
+	}
+}
