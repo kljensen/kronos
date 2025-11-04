@@ -69,6 +69,29 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 	// The actual date text is the full match without the opening/ending boundaries
 	matchText := fullMatch[len(opening) : len(fullMatch)-len(ending)]
 
+	// Determine month and day group numbers based on DateOrder from context.
+	// Start with the construction-time default (based on littleEndian parameter).
+	groupMonth := p.groupNumberMonth
+	groupDay := p.groupNumberDay
+
+	// Allow DateOrder from context option to override the construction-time default.
+	// This enables the new builder API (DateOrder setting) to work correctly.
+	dateOrder := context.Option().DateOrder
+
+	// DateOrderDMY means day first (little-endian, DD/MM)
+	// DateOrderMDY means month first (middle-endian, MM/DD)
+	// DateOrderYMD falls back to construction-time default (not applicable for slash dates)
+	if dateOrder == kronos.DateOrderDMY {
+		groupMonth = slashSecondNumbersGroup
+		groupDay = slashFirstNumbersGroup
+	} else if dateOrder == kronos.DateOrderMDY && !p.littleEndian {
+		// Only override to MDY if the construction-time default was also MDY.
+		// This maintains backward compatibility with the old API.
+		groupMonth = slashFirstNumbersGroup
+		groupDay = slashSecondNumbersGroup
+	}
+	// Otherwise (DateOrderYMD or littleEndian with MDY default), use construction-time default values
+
 	// Check if this match is part of an invalid 3-component date like "4/13/1"
 	// This can happen in two ways:
 	// 1. Opening is empty and preceded by "digit/"
@@ -130,9 +153,9 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 		return nil
 	}
 
-	// Parse month and day
-	month, _ := strconv.Atoi(match[p.groupNumberMonth])
-	day, _ := strconv.Atoi(match[p.groupNumberDay])
+	// Parse month and day using the determined group numbers
+	month, _ := strconv.Atoi(match[groupMonth])
+	day, _ := strconv.Atoi(match[groupDay])
 
 	// Validate and swap if needed
 	if month < 1 || month > 12 {
