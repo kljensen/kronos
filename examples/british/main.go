@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== British English Date Parsing ===\n")
+	fmt.Println("=== British English Date Parsing ===")
 
 	// Example 1: Using the GB parser
 	fmt.Println("Example 1: GB parser with DMY format")

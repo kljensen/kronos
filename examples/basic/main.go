@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Basic Kronos Usage ===\n")
+	fmt.Println("=== Basic Kronos Usage ===")
 
 	// Example 1: Parse a single date
 	fmt.Println("Example 1: Parse a single date")

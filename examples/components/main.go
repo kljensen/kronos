@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Component Inspection Examples ===\n")
+	fmt.Println("=== Component Inspection Examples ===")
 
 	// Example 1: Certain vs Implied components
 	fmt.Println("Example 1: Certain vs Implied components")

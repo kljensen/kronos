@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Date Range Examples ===\n")
+	fmt.Println("=== Date Range Examples ===")
 
 	// Example 1: Basic date range
 	fmt.Println("Example 1: Basic date range")

@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Configured Parsing Examples ===\n")
+	fmt.Println("=== Configured Parsing Examples ===")
 
 	// Example 1: Custom reference date
 	fmt.Println("Example 1: Custom reference date")
