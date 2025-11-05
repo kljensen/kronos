@@ -261,7 +261,8 @@ func TestAddDurationAsImplied(t *testing.T) {
 	duration := Duration{
 		TimeunitDay: 5,
 	}
-	components.AddDurationAsImplied(duration)
+	result := components.AddDurationAsImplied(duration)
+	assert.NotNil(t, result, "AddDurationAsImplied should not return nil for valid duration")
 
 	// Certain values should remain certain
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -286,7 +287,8 @@ func TestAddDurationAsImplied_ImpliedValues(t *testing.T) {
 	duration := Duration{
 		TimeunitDay: 5,
 	}
-	components.AddDurationAsImplied(duration)
+	result := components.AddDurationAsImplied(duration)
+	assert.NotNil(t, result, "AddDurationAsImplied should not return nil for valid duration")
 
 	// Day should still be implied, but updated
 	assert.False(t, components.IsCertain(ComponentDay))

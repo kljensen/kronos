@@ -1,6 +1,21 @@
 package kronos
 
-import "time"
+import (
+	"fmt"
+	"math"
+	"time"
+)
+
+// Bounds constants for date arithmetic.
+const (
+	MinYear            = 1
+	MaxYear            = 9999
+	MaxYearsDuration   = 10000
+	MaxMonthsDuration  = 120000
+	MaxDaysDuration    = 3650000
+	MaxHoursDuration   = 87600000
+	MaxMinutesDuration = 5256000000
+)
 
 // Duration represents a directed time duration as a set of values by timeunits.
 // Positive values mean the duration goes into the future.
@@ -15,10 +30,96 @@ var EmptyDuration = Duration{
 	TimeunitMillisecond: 0,
 }
 
+// validateDate checks if a date is within valid bounds.
+func validateDate(t time.Time) error {
+	year := t.Year()
+	if year < MinYear || year > MaxYear {
+		return fmt.Errorf("date year %d is outside valid range [%d, %d]", year, MinYear, MaxYear)
+	}
+	return nil
+}
+
+// validateDuration checks if duration values are within reasonable bounds.
+func validateDuration(d Duration) error {
+	for unit, value := range d {
+		if math.IsNaN(value) || math.IsInf(value, 0) {
+			return fmt.Errorf("duration contains invalid value for %s: %f", unit, value)
+		}
+
+		absValue := math.Abs(value)
+		switch unit {
+		case TimeunitYear, TimeunitDecade:
+			if absValue > MaxYearsDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxYearsDuration)
+			}
+		case TimeunitMonth, TimeunitQuarter:
+			if absValue > MaxMonthsDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxMonthsDuration)
+			}
+		case TimeunitWeek, TimeunitDay:
+			if absValue > MaxDaysDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxDaysDuration)
+			}
+		case TimeunitHour:
+			if absValue > MaxHoursDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxHoursDuration)
+			}
+		case TimeunitMinute:
+			if absValue > MaxMinutesDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxMinutesDuration)
+			}
+		}
+	}
+	return nil
+}
+
+// checkCascadingOverflow checks if cascading operations will cause overflow.
+func checkCascadingOverflow(d Duration) error {
+	totalYears := d[TimeunitYear] + d[TimeunitDecade]*10
+	totalMonths := totalYears*MonthsPerYear + d[TimeunitMonth] + d[TimeunitQuarter]*MonthsPerQuarter
+	totalDays := d[TimeunitDay] + d[TimeunitWeek]*DaysPerWeek
+
+	if math.Abs(totalYears) > MaxYearsDuration {
+		return fmt.Errorf("cascading year duration %f exceeds maximum %d", totalYears, MaxYearsDuration)
+	}
+	if math.Abs(totalMonths) > MaxMonthsDuration {
+		return fmt.Errorf("cascading month duration %f exceeds maximum %d", totalMonths, MaxMonthsDuration)
+	}
+	if math.Abs(totalDays) > MaxDaysDuration {
+		return fmt.Errorf("cascading day duration %f exceeds maximum %d", totalDays, MaxDaysDuration)
+	}
+
+	return nil
+}
+
+// checkFloatToIntOverflow checks if converting a float to int would overflow.
+func checkFloatToIntOverflow(value float64, unit Timeunit) error {
+	if value > math.MaxInt32 || value < math.MinInt32 {
+		return fmt.Errorf("duration %s value %f would overflow int32 conversion", unit, value)
+	}
+	return nil
+}
+
 // AddDuration returns the date after adding the given duration to ref.
 // It handles fractional durations by cascading remainders to smaller units.
 // For example, 1.5 months becomes 1 month + 2 weeks.
-func AddDuration(ref time.Time, duration Duration) time.Time {
+// Returns an error if the duration or resulting date is out of bounds.
+func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
+	// Validate input date
+	if err := validateDate(ref); err != nil {
+		return time.Time{}, err
+	}
+
+	// Validate duration values
+	if err := validateDuration(duration); err != nil {
+		return time.Time{}, err
+	}
+
+	// Check for cascading overflow
+	if err := checkCascadingOverflow(duration); err != nil {
+		return time.Time{}, err
+	}
+
 	date := ref
 
 	// Create a working copy to handle fractional cascading
@@ -35,8 +136,14 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 
 	// Process years (cascade fractional part to months)
 	if val, exists := working[TimeunitYear]; exists {
+		if err := checkFloatToIntOverflow(val, TimeunitYear); err != nil {
+			return time.Time{}, err
+		}
 		floor := int(val)
 		date = addYears(date, floor)
+		if err := validateDate(date); err != nil {
+			return time.Time{}, err
+		}
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			working[TimeunitMonth] = working[TimeunitMonth] + remainder*MonthsPerYear
@@ -45,14 +152,26 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 
 	// Process quarters (convert to months)
 	if val, exists := working[TimeunitQuarter]; exists {
+		if err := checkFloatToIntOverflow(val, TimeunitQuarter); err != nil {
+			return time.Time{}, err
+		}
 		floor := int(val)
 		date = addMonths(date, floor*MonthsPerQuarter)
+		if err := validateDate(date); err != nil {
+			return time.Time{}, err
+		}
 	}
 
 	// Process months (cascade fractional part to weeks)
 	if val, exists := working[TimeunitMonth]; exists {
+		if err := checkFloatToIntOverflow(val, TimeunitMonth); err != nil {
+			return time.Time{}, err
+		}
 		floor := int(val)
 		date = addMonths(date, floor)
+		if err := validateDate(date); err != nil {
+			return time.Time{}, err
+		}
 		remainder := val - float64(floor)
 		if remainder > 0 {
 			working[TimeunitWeek] = working[TimeunitWeek] + remainder*WeeksPerMonthApprox
@@ -192,7 +311,12 @@ func AddDuration(ref time.Time, duration Duration) time.Time {
 		date = date.Add(time.Duration(floor) * time.Nanosecond)
 	}
 
-	return date
+	// Final validation of result date
+	if err := validateDate(date); err != nil {
+		return time.Time{}, err
+	}
+
+	return date, nil
 }
 
 // ReverseDuration returns the reversed duration (e.g., back into the past instead of future).

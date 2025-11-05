@@ -165,7 +165,11 @@ func Midnight(reference *ReferenceWithTimezone) *ParsingComponents {
 	// Unless it's very early morning (0-2 AM), assume midnight refers to the coming midnight
 	if targetDate.Hour() > 2 {
 		duration := Duration{TimeunitDay: 1}
-		newDate := AddDuration(targetDate, duration)
+		newDate, err := AddDuration(targetDate, duration)
+		if err != nil {
+			// Duration calculation failed - return nil
+			return nil
+		}
 		ImplySimilarDate(component, newDate)
 	}
 

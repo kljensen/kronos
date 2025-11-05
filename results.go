@@ -460,12 +460,17 @@ func DeterminePeriodFromComponents(pc *ParsingComponents) Period {
 // CreateRelativeFromReference creates a ParsingComponents from a duration relative to the reference.
 // It handles date-only durations (implies time) and time durations (assigns both date and time).
 // This is used for parsing relative expressions like "in 3 days", "2 hours ago", etc.
+// Returns nil if the duration calculation fails (e.g., overflow).
 func CreateRelativeFromReference(reference *ReferenceWithTimezone, duration Duration) *ParsingComponents {
 	if duration == nil {
 		duration = EmptyDuration
 	}
 
-	date := AddDuration(reference.GetDateWithAdjustedTimezone(), duration)
+	date, err := AddDuration(reference.GetDateWithAdjustedTimezone(), duration)
+	if err != nil {
+		// Duration calculation failed - return nil to indicate invalid result
+		return nil
+	}
 
 	components := NewParsingComponents(reference, nil)
 	components.AddTag("result/relativeDate")
@@ -538,12 +543,17 @@ func CreateRelativeFromReference(reference *ReferenceWithTimezone, duration Dura
 
 // AddDurationAsImplied adds the duration to the current components and implies the result.
 // This is useful for modifying existing parsing components with a relative offset.
+// Returns nil if the duration calculation fails (e.g., overflow).
 func (pc *ParsingComponents) AddDurationAsImplied(duration Duration) *ParsingComponents {
 	// Get the current date from this component
 	currentDate := pc.Date()
 
 	// Add the duration
-	newDate := AddDuration(currentDate, duration)
+	newDate, err := AddDuration(currentDate, duration)
+	if err != nil {
+		// Duration calculation failed - return nil to indicate invalid result
+		return nil
+	}
 
 	// Imply the new date components
 	ImplySimilarDate(pc, newDate)
