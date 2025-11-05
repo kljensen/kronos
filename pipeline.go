@@ -285,13 +285,9 @@ func (p *Pipeline) applyRequiredParts(results []*ParsingResult) []*ParsingResult
 }
 
 // applyTimezoneConversion converts results to the target timezone.
-//
-// TODO: EXPERIMENTAL/UNIMPLEMENTED
-// This function currently validates the timezone but does not modify the results.
-// A complete implementation needs to:
-// 1. Convert the time.Time value to the target timezone
-// 2. Update the ParsingResult's underlying components to reflect the conversion
-// 3. Handle cases where timezone conversion affects date boundaries (DST, etc.)
+// This function converts the parsed date/time to the specified timezone and updates
+// all components (year, month, day, hour, minute, second, timezone offset) to reflect
+// the new timezone. This handles DST transitions and date boundary changes correctly.
 func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*ParsingResult, error) {
 	targetLoc, err := time.LoadLocation(p.settings.ToTimezone)
 	if err != nil {
@@ -305,13 +301,120 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 			date := result.Start().Date()
 			convertedDate := date.In(targetLoc)
 
-			// TODO: Update the result's start components to reflect timezone conversion
-			// This requires modifying the underlying ParsingComponents struct
-			_ = convertedDate
+			// Update the start components to reflect timezone conversion
+			updateComponentsFromDate(result.start, convertedDate, targetLoc)
+		}
+
+		// Handle end components for range results
+		if result.End() != nil {
+			endComponents := result.end
+			endDate := endComponents.Date()
+			convertedEndDate := endDate.In(targetLoc)
+
+			// Update the end components to reflect timezone conversion
+			updateComponentsFromDate(endComponents, convertedEndDate, targetLoc)
 		}
 	}
 
 	return results, nil
+}
+
+// updateComponentsFromDate updates all date/time components in ParsingComponents
+// to match the values from the given time.Time in the target timezone.
+// This preserves the "certain" vs "implied" status of each component while updating values.
+func updateComponentsFromDate(components *ParsingComponents, date time.Time, location *time.Location) {
+	// Update date components (year, month, day) - preserve certain/implied status
+	if components.IsCertain(ComponentYear) {
+		components.Assign(ComponentYear, date.Year())
+	} else if components.Get(ComponentYear) != nil {
+		components.Imply(ComponentYear, date.Year())
+	}
+
+	if components.IsCertain(ComponentMonth) {
+		components.Assign(ComponentMonth, int(date.Month()))
+	} else if components.Get(ComponentMonth) != nil {
+		components.Imply(ComponentMonth, int(date.Month()))
+	}
+
+	if components.IsCertain(ComponentDay) {
+		components.Assign(ComponentDay, date.Day())
+	} else if components.Get(ComponentDay) != nil {
+		components.Imply(ComponentDay, date.Day())
+	}
+
+	// Update time components (hour, minute, second, subseconds)
+	if components.IsCertain(ComponentHour) {
+		components.Assign(ComponentHour, date.Hour())
+	} else if components.Get(ComponentHour) != nil {
+		components.Imply(ComponentHour, date.Hour())
+	}
+
+	if components.IsCertain(ComponentMinute) {
+		components.Assign(ComponentMinute, date.Minute())
+	} else if components.Get(ComponentMinute) != nil {
+		components.Imply(ComponentMinute, date.Minute())
+	}
+
+	if components.IsCertain(ComponentSecond) {
+		components.Assign(ComponentSecond, date.Second())
+	} else if components.Get(ComponentSecond) != nil {
+		components.Imply(ComponentSecond, date.Second())
+	}
+
+	// Update subsecond components (millisecond, microsecond, nanosecond)
+	totalNanos := date.Nanosecond()
+	millisecond := totalNanos / NanosecondsPerMS
+	remainingNanos := totalNanos % NanosecondsPerMS
+	microsecond := remainingNanos / NanosecondsPerMicro
+	nanosecond := remainingNanos % NanosecondsPerMicro
+
+	if components.IsCertain(ComponentMillisecond) {
+		components.Assign(ComponentMillisecond, millisecond)
+	} else if components.Get(ComponentMillisecond) != nil {
+		components.Imply(ComponentMillisecond, millisecond)
+	}
+
+	if components.IsCertain(ComponentMicrosecond) {
+		if microsecond > 0 {
+			components.Assign(ComponentMicrosecond, microsecond)
+		}
+	} else if components.Get(ComponentMicrosecond) != nil {
+		if microsecond > 0 {
+			components.Imply(ComponentMicrosecond, microsecond)
+		}
+	}
+
+	if components.IsCertain(ComponentNanosecond) {
+		if nanosecond > 0 {
+			components.Assign(ComponentNanosecond, nanosecond)
+		}
+	} else if components.Get(ComponentNanosecond) != nil {
+		if nanosecond > 0 {
+			components.Imply(ComponentNanosecond, nanosecond)
+		}
+	}
+
+	// Update meridiem based on new hour
+	newMeridiem := MeridiemAM
+	if date.Hour() >= HoursPerDay/2 {
+		newMeridiem = MeridiemPM
+	}
+
+	if components.IsCertain(ComponentMeridiem) {
+		components.Assign(ComponentMeridiem, int(newMeridiem))
+	} else if components.Get(ComponentMeridiem) != nil {
+		components.Imply(ComponentMeridiem, int(newMeridiem))
+	}
+
+	// Update timezone offset to match the target location
+	_, offset := date.Zone()
+	timezoneOffsetMinutes := offset / SecondsPerMinute
+
+	if components.IsCertain(ComponentTimezoneOffset) {
+		components.Assign(ComponentTimezoneOffset, timezoneOffsetMinutes)
+	} else if components.Get(ComponentTimezoneOffset) != nil {
+		components.Imply(ComponentTimezoneOffset, timezoneOffsetMinutes)
+	}
 }
 
 // ParseWithSettings is a convenience function that creates a pipeline
