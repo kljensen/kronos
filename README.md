@@ -1,6 +1,19 @@
-# Kronos
+<div align="center">
+  <img src="doc/gopher.png" alt="Kronos Gopher" width="300"/>
 
-A natural language date parser for Go, inspired by the excellent [chrono](https://github.com/wanasit/chrono) JavaScript library. Kronos makes it easy to parse human-friendly date expressions into structured date/time values.
+  # Kronos
+
+  *A natural language date parser for Go*
+
+  Inspired by the excellent [chrono](https://github.com/wanasit/chrono) JavaScript library
+
+  [![Go Reference](https://pkg.go.dev/badge/github.com/kljensen/kronos.svg)](https://pkg.go.dev/github.com/kljensen/kronos)
+
+</div>
+
+---
+
+Kronos makes it easy to parse human-friendly date expressions into structured date/time values.
 
 ## Features
 
