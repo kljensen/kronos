@@ -3,6 +3,7 @@
 
   # Kronos
 
+[![CI](https://img.shields.io/github/actions/workflow/status/kljensen/kronos/ci.yml?branch=main&style=for-the-badge&logo=github-actions&logoColor=white&label=CI)](https://github.com/kljensen/kronos/actions/workflows/ci.yml)
 [![Go Reference](https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&logo=go&logoColor=white)](https://pkg.go.dev/github.com/kljensen/kronos)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kljensen/kronos?style=for-the-badge)](https://goreportcard.com/report/github.com/kljensen/kronos)
 [![License: Unlicense](https://img.shields.io/badge/License-Unlicense-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/Unlicense)
