@@ -362,70 +362,37 @@ Each result includes:
 - Implied components (filled in from reference date)
 - A constructed `time.Time` object
 
-## Migrating from v1
-
-See [MIGRATION.md](MIGRATION.md) for a detailed migration guide.
-
-Quick summary of changes:
-
-**Old API:**
-```go
-// v1 - direct Chrono usage
-import "github.com/kljensen/kronos/en"
-
-results := en.Parse("tomorrow", time.Now(), nil)
-date := results[0].Date()
-```
-
-**New API:**
-```go
-// v2 - builder pattern
-import "github.com/kljensen/kronos/en"
-
-results, err := en.ParseSimple("tomorrow")
-date := results[0].Date()
-```
-
-Key changes:
-- Builder pattern for configuration
-- Error handling on Parse methods
-- Public `Result` and `Components` interfaces instead of internal types
-- `en.ParseSimple()` convenience functions
-
-## Testing
-
-Run the test suite:
-
-```bash
-go test ./...
-```
-
-Run with coverage:
-
-```bash
-go test -cover ./...
-```
-
-## Performance
-
-Kronos is designed for correctness and usability over raw speed, but performance is still good for most use cases. The parser pipeline processes text in a single pass, and refiners operate on already-matched results.
-
-For high-throughput scenarios:
-- Reuse `ParserBuilder` instances (they're mutable but not thread-safe)
-- Create one builder per goroutine
-- Consider using `ParseDate()` instead of `Parse()` if you only need the first result
-
 ## Contributing
 
-Contributions are welcome! Please feel free to submit issues, fork the repository, and create pull requests.
+Contributions are welcome! Please feel free to submit issues, fork the repository, and create pull requests. You must be comfy with the license (below).
 
-## License
+## License (the Unlicense)
 
-This project is licensed under the MIT License.
+This is free and unencumbered software released into the public domain.
 
-## Acknowledgments
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
 
-This library is a Go port of the excellent [chrono](https://github.com/wanasit/chrono) JavaScript library by Wanasit Tanakitrungruang. The design, patterns, and test cases are heavily inspired by the original implementation.
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <https://unlicense.org/>
+
 
 ## Related Projects
 
