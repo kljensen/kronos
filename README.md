@@ -1,21 +1,26 @@
 <div align="center">
-  <img src="doc/gopher.png" alt="Kronos Gopher" width="300"/>
+  <img src="doc/gopher.png" alt="Kronos Gopher" width="100"/>
 
   # Kronos
 
-  *A natural language date parser for Go*
-
-  Inspired by the excellent [chrono](https://github.com/wanasit/chrono) JavaScript library
-
-  [![Go Reference](https://pkg.go.dev/badge/github.com/kljensen/kronos.svg)](https://pkg.go.dev/github.com/kljensen/kronos)
+[![Go Reference](https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&logo=go&logoColor=white)](https://pkg.go.dev/github.com/kljensen/kronos)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kljensen/kronos?style=for-the-badge)](https://goreportcard.com/report/github.com/kljensen/kronos)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/kljensen/kronos?style=for-the-badge&logo=go)](https://github.com/kljensen/kronos)
 
 </div>
 
 ---
 
-Kronos makes it easy to parse human-friendly date expressions into structured date/time values.
+Kronos is a Go package for extracting structured datetimes from natural language.
+It is heavily inspired by the excellent
+[chrono](https://github.com/wanasit/chrono) JavaScript library.
 
 ## Features
+
+Using Kronos, you can turn text like "see you Thursday at 5:30pm", "4/5/2023 around 6",
+or "Thu, November 6th, 2025, 8:00 AM EST" in to Golang structures. Kronos will keep
+track of ambiguity (such as am/pm in the "around 6" example above).
 
 - **Natural Language Parsing**: Understands expressions like "tomorrow at 3pm", "next Friday", "in 2 weeks"
 - **Flexible Date Formats**: Supports ISO dates, slash dates, month names, and more
