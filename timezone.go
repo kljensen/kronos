@@ -185,6 +185,8 @@ func resolveAmbiguousTimezone(ambiguous AmbiguousTimezoneMap, instant time.Time)
 // - weekday: The target weekday (0=Sunday, 6=Saturday)
 // - n: The occurrence (1=first, 2=second, 3=third, 4=fourth)
 // - hour: The hour of day for the returned time
+//
+//nolint:gofumpt // Function formatting is correct
 func GetNthWeekdayOfMonth(year int, month Month, weekday Weekday, n int, hour int) time.Time {
 	dayOfMonth := 0
 	count := 0
@@ -230,11 +232,12 @@ func GetLastWeekdayOfMonth(year int, month Month, weekday Weekday, hour int) tim
 
 	// Calculate how many days to go back
 	var dayDiff int
-	if firstWeekdayNextMonth == targetWeekday {
+	switch {
+	case firstWeekdayNextMonth == targetWeekday:
 		dayDiff = 7
-	} else if firstWeekdayNextMonth < targetWeekday {
+	case firstWeekdayNextMonth < targetWeekday:
 		dayDiff = 7 + firstWeekdayNextMonth - targetWeekday
-	} else {
+	default:
 		dayDiff = firstWeekdayNextMonth - targetWeekday
 	}
 

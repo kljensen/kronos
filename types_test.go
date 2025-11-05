@@ -253,10 +253,8 @@ func TestTimezoneAbbrMap(t *testing.T) {
 
 	if atz, ok := tzMap["EDT"].(AmbiguousTimezoneMap); !ok {
 		t.Errorf("Expected EDT to be AmbiguousTimezoneMap, got %T", tzMap["EDT"])
-	} else {
-		if atz.TimezoneOffsetDuringDst != -240 {
-			t.Errorf("Expected EDT DST offset -240, got %d", atz.TimezoneOffsetDuringDst)
-		}
+	} else if atz.TimezoneOffsetDuringDst != -240 {
+		t.Errorf("Expected EDT DST offset -240, got %d", atz.TimezoneOffsetDuringDst)
 	}
 }
 
@@ -285,9 +283,9 @@ func TestParsingReference(t *testing.T) {
 func TestParsingReferenceWithOffset(t *testing.T) {
 	now := time.Now()
 	ref := ParsingReference{
-		Instant:  &now,
 		Timezone: -300, // EST offset in minutes
 	}
+	_ = now // Reference time not needed for this test
 
 	if offset, ok := ref.Timezone.(int); !ok || offset != -300 {
 		t.Errorf("Expected timezone offset -300, got %v", ref.Timezone)

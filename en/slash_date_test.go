@@ -435,6 +435,7 @@ func TestRangeExpressionsWithTime(t *testing.T) {
 	t.Skip("Requires date range merging refiner and time parsing")
 }
 
+//nolint:dupword // Commented-out test data has false positive "end,start" field ordering
 /*
 Skipped test data for range expressions with time
 

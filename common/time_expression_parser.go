@@ -415,7 +415,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 		}
 
 		minute = hour % hourCombinedFormat
-		hour = hour / hourCombinedFormat
+		hour /= hourCombinedFormat
 	}
 
 	if hour > maxHour24Format {
@@ -606,7 +606,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 	} else if hour > hourCombinedFormat {
 		minute = hour % hourCombinedFormat
-		hour = hour / hourCombinedFormat
+		hour /= hourCombinedFormat
 	}
 
 	if minute >= maxMinute || hour > maxHour24Format {
@@ -675,7 +675,8 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			}
 		}
 
-		if startAtPM {
+		switch {
+		case startAtPM:
 			if startHourVal := resultStart.Get(kronos.ComponentHour); startHourVal != nil && *startHourVal-maxHour12Format > hour {
 				// e.g., "10pm - 1" means 1am next day
 				components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
@@ -683,9 +684,9 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 				components.Assign(kronos.ComponentHour, hour+maxHour12Format)
 				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
 			}
-		} else if hour > maxHour12Format {
+		case hour > maxHour12Format:
 			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
-		} else if hour <= maxHour12Format {
+		case hour <= maxHour12Format:
 			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
 		}
 	}

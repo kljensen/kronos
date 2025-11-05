@@ -12,6 +12,7 @@ type AbstractMergeDateTimeRefiner struct {
 	PatternBetweenFunc func() *regexp.Regexp
 }
 
+// ShouldMergeResults determines if a date-only and time-only result should be merged.
 func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) bool {
 	// Check if one is date-only and the other is time-only
 	currentStart, okCurrent := kronos.AsParsingComponents(current.Start())
@@ -36,6 +37,7 @@ func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, cu
 	return false
 }
 
+// MergeResults merges a date-only and time-only result into a single date-time result.
 func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
 	currentStart, okCurrent := kronos.AsParsingComponents(current.Start())
 	if !okCurrent {
@@ -66,6 +68,7 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	return result
 }
 
+// Refine processes results to merge date and time components based on the pattern between them.
 func (r *AbstractMergeDateTimeRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	if len(results) < 2 {
 		return results

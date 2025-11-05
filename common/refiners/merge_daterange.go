@@ -13,6 +13,7 @@ type AbstractMergeDateRangeRefiner struct {
 	PatternBetweenFunc func() *regexp.Regexp
 }
 
+// ShouldMergeResults determines if two results should be merged into a date range.
 func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) bool {
 	// Both results should not already have an end
 	if current.End() != nil || next.End() != nil {
@@ -28,6 +29,7 @@ func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, c
 	return false
 }
 
+// MergeResults merges two date results into a single date range result.
 func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromResult, toResult *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
 	fromStart, okFrom := kronos.AsParsingComponents(fromResult.Start())
 	toStart, okTo := kronos.AsParsingComponents(toResult.Start())
@@ -71,8 +73,9 @@ func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromRes
 		fromDate := fromStart.Date()
 		toDate := toStart.Date()
 
-		// If toResult is only weekday, try adding 7 days
-		if toStart.IsOnlyWeekdayComponent() {
+		switch {
+		case toStart.IsOnlyWeekdayComponent():
+			// If toResult is only weekday, try adding 7 days
 			nextWeek := toDate.Add(7 * 24 * time.Hour)
 			if nextWeek.After(fromDate) {
 				toDate = nextWeek
@@ -80,7 +83,7 @@ func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromRes
 				toStart.Imply(kronos.ComponentMonth, int(toDate.Month()))
 				toStart.Imply(kronos.ComponentYear, toDate.Year())
 			}
-		} else if fromStart.IsOnlyWeekdayComponent() {
+		case fromStart.IsOnlyWeekdayComponent():
 			// If fromResult is only weekday, try subtracting 7 days
 			prevWeek := fromDate.Add(-7 * 24 * time.Hour)
 			if prevWeek.Before(toDate) {
@@ -89,21 +92,21 @@ func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromRes
 				fromStart.Imply(kronos.ComponentMonth, int(fromDate.Month()))
 				fromStart.Imply(kronos.ComponentYear, fromDate.Year())
 			}
-		} else if toStart.IsDateWithUnknownYear() {
+		case toStart.IsDateWithUnknownYear():
 			// Try adding a year to toResult
 			nextYear := toDate.AddDate(1, 0, 0)
 			if nextYear.After(fromDate) {
 				toDate = nextYear
 				toStart.Imply(kronos.ComponentYear, toDate.Year())
 			}
-		} else if fromStart.IsDateWithUnknownYear() {
+		case fromStart.IsDateWithUnknownYear():
 			// Try subtracting a year from fromResult
 			prevYear := fromDate.AddDate(-1, 0, 0)
 			if prevYear.Before(toDate) {
 				fromDate = prevYear
 				fromStart.Imply(kronos.ComponentYear, fromDate.Year())
 			}
-		} else {
+		default:
 			// Swap if still reversed
 			fromResult, toResult = toResult, fromResult
 			fromStart, toStart = toStart, fromStart
@@ -126,6 +129,7 @@ func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromRes
 	return result
 }
 
+// Refine processes results to merge date ranges based on the pattern between them.
 func (r *AbstractMergeDateRangeRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	if len(results) < 2 {
 		return results

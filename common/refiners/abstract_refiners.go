@@ -12,6 +12,7 @@ type Filter interface {
 // BaseFilter provides a default Refine implementation for filters.
 type BaseFilter struct{}
 
+// Refine filters results based on the IsValid method of the concrete filter implementation.
 func (f *BaseFilter) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	filtered := make([]*kronos.ParsingResult, 0, len(results))
 	for _, result := range results {
@@ -35,6 +36,7 @@ type MergingRefiner interface {
 // BaseMergingRefiner provides a default Refine implementation for merging refiners.
 type BaseMergingRefiner struct{}
 
+// Refine merges consecutive results based on the ShouldMergeResults and MergeResults methods.
 func (m *BaseMergingRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	if len(results) < 2 {
 		return results

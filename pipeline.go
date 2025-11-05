@@ -48,14 +48,15 @@ func NewPipelineWithSettings(config *Configuration, settings Settings) (*Pipelin
 	}
 
 	// Determine which parsers to use
-	if len(settings.EnabledParsers) > 0 {
+	switch {
+	case len(settings.EnabledParsers) > 0:
 		// Use specified parsers from registry
 		parsers := GlobalRegistry.GetParsers(settings.EnabledParsers)
 		pipeline.parsers = parsers
-	} else if config != nil {
+	case config != nil:
 		// Use all parsers from configuration
 		pipeline.parsers = append([]Parser{}, config.Parsers...)
-	} else {
+	default:
 		// Use all registered parsers
 		pipeline.parsers = GlobalRegistry.GetAllParsers()
 	}

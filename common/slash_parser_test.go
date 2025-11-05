@@ -4,10 +4,9 @@ import (
 	"testing"
 	"time"
 
+	kronos "github.com/kljensen/kronos"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	kronos "github.com/kljensen/kronos"
 )
 
 // Helper function to extract components from parser result

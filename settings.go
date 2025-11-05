@@ -217,6 +217,8 @@ func ApplySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 
 // removeToken removes all occurrences of a token from text.
 // This is a simple implementation that preserves spaces around tokens.
+//
+//nolint:gofumpt // Function formatting is correct
 func removeToken(text string, token string) string {
 	// Simple approach: iterate through the text and skip tokens
 	result := ""
