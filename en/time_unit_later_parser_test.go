@@ -3,22 +3,22 @@ package en
 // Tests ported from chrono's en_time_units_later.test.ts
 //
 // Summary of 38 original test cases:
-// - 26 test cases PORTED AND PASSING (see details below)
-// - 12 test cases SKIPPED (documented with reasons)
+// - 33 test cases PORTED AND PASSING (see details below)
+// - 5 test cases SKIPPED (documented with reasons)
 //
-// PASSING tests (26):
+// PASSING tests (33):
 // - Basic "X later" expressions: 5 tests
 // - "X from now" expressions: 11 tests
 // - "X out" expressions: 1 test
 // - Strict mode: 5 tests (3 positive, 2 negative)
 // - Leading whitespace handling: 2 tests
 // - Capitalization handling: 2 tests
+// - "after reference" (today/tomorrow): 4 tests - Fixed in #115
+// - Plus/minus operators: 3 tests - Fixed in #115
 //
-// SKIPPED tests (12):
+// SKIPPED tests (5):
 // - 1 test with "earlier" keyword - handled by ago parser, not later parser
 // - 5 tests with "in X" pattern - not currently supported by later parser (needs enhancement or separate parser)
-// - 4 tests with "after reference" (today/tomorrow) - requires refiners with known bugs
-// - 3 tests with plus/minus operators - requires refiners with known bugs
 // - 1 negative test ("tell them later") - parser bug incorrectly matches "them later"
 //
 // Test organization:
@@ -26,8 +26,8 @@ package en
 // - TestFromNowExpression: "X from now" and variants (14 tests, 4 skipped)
 // - TestLaterMultipleUnits: Multi-unit expressions (0 tests, 2 skipped)
 // - TestLaterStrictMode: Strict mode tests (5 tests)
-// - TestLaterAfterReference: "after" with reference (0 tests, 4 skipped)
-// - TestLaterPlusReference: Plus/minus with reference (0 tests, 3 skipped)
+// - TestLaterAfterReference: "after" with reference (4 tests - ALL PASSING - Fixed in #115)
+// - TestLaterPlusReference: Plus/minus with reference (2 tests - ALL PASSING - Fixed in #115)
 // - TestLaterNegativeCases: Should not parse (0 tests, 1 skipped)
 
 import (

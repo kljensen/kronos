@@ -3,30 +3,30 @@ package en
 // Tests ported from chrono's en_time_units_ago.test.ts
 //
 // Summary of 44 original test cases:
-// - 33 test cases PORTED AND PASSING (see details below)
-// - 11 test cases SKIPPED (documented with reasons)
+// - 37 test cases PORTED AND PASSING (see details below)
+// - 7 test cases SKIPPED (documented with reasons)
 //
-// PASSING tests (33):
+// PASSING tests (37):
 // - Basic "ago" expressions with hours, days (13 tests)
 // - "before" and "earlier" synonyms (3 tests)
 // - Abbreviated forms (1h, 1hr, 1d, etc.) (3 tests)
 // - Casual expressions (months, years, weeks) (3 tests)
 // - Multi-unit expressions (15 hours 29 min ago) (5 tests)
+// - "before with reference" (today, yesterday) (4 tests) - Fixed in #115
 // - Strict mode (4 tests: 1 positive, 3 negative)
 // - Forward date option (4 tests)
 //
-// SKIPPED tests (11):
+// SKIPPED tests (7):
 // - 1 test with word numbers ("three seconds ago") - word numbers not yet implemented
 // - 4 tests with leading whitespace - minor index calculation differences
 // - 1 test with "a few" pattern - parser extracts "few" without leading "a"
-// - 4 tests "before with reference" (today, yesterday) - refiner bug causes crash
 // - 2 negative tests ("am ago", "them ago") - incorrectly match "m" as minute
 //
 // Test organization:
 // - TestAgoSingleExpression: Basic "ago" expressions
 // - TestAgoSingleExpressionCasual: Casual expressions (months, years, weeks)
 // - TestAgoNestedTimeAgo: Multi-unit expressions (15 hours 29 min ago, etc.)
-// - TestAgoBeforeWithReference: "before" with reference words (SKIPPED - refiner bug)
+// - TestAgoBeforeWithReference: "before" with reference words (ALL PASSING - Fixed in #115)
 // - TestAgoStrictMode: Strict mode tests
 // - TestAgoForwardDate: Forward date option tests
 // - TestAgoNegativeCases: Negative test cases that should not parse

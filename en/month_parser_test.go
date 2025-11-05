@@ -3,7 +3,7 @@ package en
 // Tests ported from chrono's en_month.test.ts
 //
 // Summary of 32 original test cases:
-// - PASSING: 20 tests (all passing sub-tests)
+// - PASSING: 26 tests (all passing sub-tests)
 //   * 5/7 Month-Year expression tests ("September 2012", "Sept 2012", etc.)
 //   * 3/3 Month-Only expression tests ("In January", "in Jan", "May")
 //   * 2/4 Month with forwardDate option tests (single expressions work)
@@ -12,11 +12,11 @@ package en
 //   * 1/2 Year 90's parsing tests ("Aug 96")
 //   * 1/1 Month should not have timezone test
 //   * 2/4 Month only in different context tests ("May", "in May")
+//   * 6/6 Range tests (ALL PASSING - Fixed in #115)
+//   * 2/2 Range tests with forwardDate (ALL PASSING - Fixed in #115)
 //
-// - SKIPPED: 12 tests (documented with SKIP comments)
+// - SKIPPED: 6 tests (documented with SKIP comments)
 //   * 2 Month-Year tests (parsers misparse "Sep. 2012" as "Sep. 20" - day 20)
-//   * 6 Range tests (ENMergeDateRangeRefiner has panics/bugs)
-//   * 2 Range tests with forwardDate (require range refiner)
 //   * 1 context test (parser picks up "Mar" from name "Angie Mar")
 //   * 1 90's test (parser includes "6" prefix in "96 Aug 96")
 //   * 2 negative tests (parser too permissive with "may")
@@ -32,13 +32,13 @@ import (
 
 	kronos "github.com/kljensen/kronos"
 	commonrefiners "github.com/kljensen/kronos/common/refiners"
+	enrefiners "github.com/kljensen/kronos/en/refiners"
 	"github.com/stretchr/testify/assert"
 )
 
 // createMonthChrono creates a minimal Chrono instance for month parsing tests
 // Note: This configuration avoids ENTimeExpressionParser which has severe
 // regex compilation performance issues that cause tests to hang.
-// We also avoid ENMergeDateRangeRefiner due to bugs that cause panics.
 func createMonthChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
@@ -49,6 +49,7 @@ func createMonthChrono() *kronos.Chrono {
 		},
 		Refiners: []kronos.Refiner{
 			commonrefiners.NewForwardDateRefiner(),
+			enrefiners.NewENMergeDateRangeRefiner(),
 		},
 	}
 	return kronos.NewChrono(config)
@@ -246,7 +247,6 @@ func TestENMonth_MonthOnly(t *testing.T) {
 
 // TestENMonth_MonthOnlyRange tests month-only range expressions like "From May to December"
 func TestENMonth_MonthOnlyRange(t *testing.T) {
-	t.Skip("Skipping - ENMergeDateRangeRefiner has bugs causing panics")
 	tests := []struct {
 		name           string
 		text           string
@@ -355,23 +355,22 @@ func TestENMonth_ForwardDateOption(t *testing.T) {
 			expectedSYear:  2023,
 			expectedSMonth: 5,
 		},
-		// SKIP: Range tests require ENMergeDateRangeRefiner which has bugs
-		// {
-		// 	name:           "From May to December (forward range)",
-		// 	text:           "From May to December",
-		// 	expectedSYear:  2023,
-		// 	expectedSMonth: 5,
-		// 	expectedEYear:  intPtr(2023),
-		// 	expectedEMonth: intPtr(12),
-		// },
-		// {
-		// 	name:           "From December to May (forward range wraps year)",
-		// 	text:           "From December to May",
-		// 	expectedSYear:  2023,
-		// 	expectedSMonth: 12,
-		// 	expectedEYear:  intPtr(2024),
-		// 	expectedEMonth: intPtr(5),
-		// },
+		{
+			name:           "From May to December (forward range)",
+			text:           "From May to December",
+			expectedSYear:  2023,
+			expectedSMonth: 5,
+			expectedEYear:  intPtr(2023),
+			expectedEMonth: intPtr(12),
+		},
+		{
+			name:           "From December to May (forward range wraps year)",
+			text:           "From December to May",
+			expectedSYear:  2023,
+			expectedSMonth: 12,
+			expectedEYear:  intPtr(2024),
+			expectedEMonth: intPtr(5),
+		},
 	}
 
 	for _, tt := range tests {
