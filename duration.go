@@ -131,7 +131,7 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 	// Process decades (convert to years)
 	if val, exists := working[TimeunitDecade]; exists {
 		const yearsPerDecade = 10
-		working[TimeunitYear] = working[TimeunitYear] + val*yearsPerDecade
+		working[TimeunitYear] += val * yearsPerDecade
 	}
 
 	// Process years (cascade fractional part to months)
@@ -146,7 +146,7 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 		}
 		remainder := val - float64(floor)
 		if remainder != 0 {
-			working[TimeunitMonth] = working[TimeunitMonth] + remainder*MonthsPerYear
+			working[TimeunitMonth] += remainder * MonthsPerYear
 		}
 	}
 
@@ -174,7 +174,7 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 		}
 		remainder := val - float64(floor)
 		if remainder != 0 {
-			working[TimeunitWeek] = working[TimeunitWeek] + remainder*WeeksPerMonthApprox
+			working[TimeunitWeek] += remainder * WeeksPerMonthApprox
 		}
 	}
 
@@ -189,9 +189,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			days := remainder * DaysPerWeek
 			const roundingOffset = 0.5
 			if days > 0 {
-				working[TimeunitDay] = working[TimeunitDay] + float64(int(days+roundingOffset))
+				working[TimeunitDay] += float64(int(days + roundingOffset))
 			} else if days < 0 {
-				working[TimeunitDay] = working[TimeunitDay] + float64(int(days-roundingOffset))
+				working[TimeunitDay] += float64(int(days - roundingOffset))
 			}
 		}
 	}
@@ -207,9 +207,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			hours := remainder * HoursPerDay
 			const roundingOffset = 0.5
 			if hours > 0 {
-				working[TimeunitHour] = working[TimeunitHour] + float64(int(hours+roundingOffset))
+				working[TimeunitHour] += float64(int(hours + roundingOffset))
 			} else if hours < 0 {
-				working[TimeunitHour] = working[TimeunitHour] + float64(int(hours-roundingOffset))
+				working[TimeunitHour] += float64(int(hours - roundingOffset))
 			}
 		}
 	}
@@ -226,9 +226,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			minutes := remainder * MinutesPerHour
 			const roundingOffset = 0.5
 			if minutes > 0 {
-				working[TimeunitMinute] = working[TimeunitMinute] + float64(int(minutes+roundingOffset))
+				working[TimeunitMinute] += float64(int(minutes + roundingOffset))
 			} else if minutes < 0 {
-				working[TimeunitMinute] = working[TimeunitMinute] + float64(int(minutes-roundingOffset))
+				working[TimeunitMinute] += float64(int(minutes - roundingOffset))
 			}
 		}
 	}
@@ -245,9 +245,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			seconds := remainder * SecondsPerMinute
 			const roundingOffset = 0.5
 			if seconds > 0 {
-				working[TimeunitSecond] = working[TimeunitSecond] + float64(int(seconds+roundingOffset))
+				working[TimeunitSecond] += float64(int(seconds + roundingOffset))
 			} else if seconds < 0 {
-				working[TimeunitSecond] = working[TimeunitSecond] + float64(int(seconds-roundingOffset))
+				working[TimeunitSecond] += float64(int(seconds - roundingOffset))
 			}
 		}
 	}
@@ -264,9 +264,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			milliseconds := remainder * MillisecondsPerSecond
 			const roundingOffset = 0.5
 			if milliseconds > 0 {
-				working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(milliseconds+roundingOffset))
+				working[TimeunitMillisecond] += float64(int(milliseconds + roundingOffset))
 			} else if milliseconds < 0 {
-				working[TimeunitMillisecond] = working[TimeunitMillisecond] + float64(int(milliseconds-roundingOffset))
+				working[TimeunitMillisecond] += float64(int(milliseconds - roundingOffset))
 			}
 		}
 	}
@@ -281,9 +281,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			microseconds := remainder * MicrosecondsPerMS
 			const roundingOffset = 0.5
 			if microseconds > 0 {
-				working[TimeunitMicrosecond] = working[TimeunitMicrosecond] + float64(int(microseconds+roundingOffset))
+				working[TimeunitMicrosecond] += float64(int(microseconds + roundingOffset))
 			} else if microseconds < 0 {
-				working[TimeunitMicrosecond] = working[TimeunitMicrosecond] + float64(int(microseconds-roundingOffset))
+				working[TimeunitMicrosecond] += float64(int(microseconds - roundingOffset))
 			}
 		}
 	}
@@ -298,9 +298,9 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			nanoseconds := remainder * NanosecondsPerMicro
 			const roundingOffset = 0.5
 			if nanoseconds > 0 {
-				working[TimeunitNanosecond] = working[TimeunitNanosecond] + float64(int(nanoseconds+roundingOffset))
+				working[TimeunitNanosecond] += float64(int(nanoseconds + roundingOffset))
 			} else if nanoseconds < 0 {
-				working[TimeunitNanosecond] = working[TimeunitNanosecond] + float64(int(nanoseconds-roundingOffset))
+				working[TimeunitNanosecond] += float64(int(nanoseconds - roundingOffset))
 			}
 		}
 	}

@@ -285,7 +285,7 @@ func (p *Pipeline) applyRequiredParts(results []*ParsingResult) []*ParsingResult
 func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*ParsingResult, error) {
 	targetLoc, err := time.LoadLocation(p.settings.ToTimezone)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load timezone location: %w", err)
 	}
 
 	// Convert each result's date to the target timezone

@@ -1,3 +1,4 @@
+// Package common provides shared utilities and parsers for date/time parsing.
 package common
 
 import (

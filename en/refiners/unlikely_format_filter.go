@@ -12,10 +12,12 @@ var mayContextPattern = regexp.MustCompile(`(?i)\b(in)$`)
 // ENUnlikelyFormatFilter filters out unlikely English date formats.
 type ENUnlikelyFormatFilter struct{}
 
+// NewENUnlikelyFormatFilter creates a new ENUnlikelyFormatFilter
 func NewENUnlikelyFormatFilter() *ENUnlikelyFormatFilter {
 	return &ENUnlikelyFormatFilter{}
 }
 
+// Refine filters out unlikely English date formats from parsing results
 func (f *ENUnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	filtered := make([]*kronos.ParsingResult, 0, len(results))
 

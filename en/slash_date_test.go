@@ -435,8 +435,9 @@ func TestRangeExpressionsWithTime(t *testing.T) {
 	t.Skip("Requires date range merging refiner and time parsing")
 }
 
-// Skipped test data for range expressions with time
 /*
+Skipped test data for range expressions with time
+
 	tests := []struct {
 		name       string
 		text       string
@@ -445,6 +446,7 @@ func TestRangeExpressionsWithTime(t *testing.T) {
 		startDay   int
 		startHour  int
 		startMin   int
+
 		endYear    int
 		endMonth   int
 		endDay     int

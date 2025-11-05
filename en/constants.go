@@ -9,9 +9,9 @@ import (
 	kronos "github.com/kljensen/kronos"
 )
 
-// YEAR_PATTERN matches year patterns including BE, AD, BC, BCE, CE suffixes
+// YearPattern matches year patterns including BE, AD, BC, BCE, CE suffixes
 // Note: Longer alternatives (BCE) must come before shorter ones (BC, AD)
-const YEAR_PATTERN = `(?:[1-9][0-9]{0,3}\s{0,2}(?:BCE|BE|CE|AD|BC)|[1-2][0-9]{3}|[5-9][0-9]|2[0-5])`
+const YearPattern = `(?:[1-9][0-9]{0,3}\s{0,2}(?:BCE|BE|CE|AD|BC)|[1-2][0-9]{3}|[5-9][0-9]|2[0-5])`
 
 // MonthDictionary maps month names to month numbers (1-12)
 var MonthDictionary = map[string]int{
@@ -297,7 +297,6 @@ var (
 	IntegerWordPattern   = MatchAnyPattern(IntegerWordDictionary)
 	OrdinalWordPattern   = MatchAnyPattern(OrdinalWordDictionary)
 	OrdinalNumberPattern = `(?:` + OrdinalWordPattern + `|[0-9]{1,2}(?:st|nd|rd|th)?)`
-	YearPattern          = YEAR_PATTERN
 )
 
 // ParseOrdinalNumber parses an ordinal number pattern (e.g., "1st", "2nd", "first", "second")
@@ -513,7 +512,7 @@ func ParseDuration(text string) kronos.Duration {
 	return result
 }
 
-// IsEmpty returns true if the duration has no non-zero values
+// IsEmptyDuration returns true if the duration has no non-zero values
 func IsEmptyDuration(d kronos.Duration) bool {
 	if len(d) == 0 {
 		return true

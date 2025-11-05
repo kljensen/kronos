@@ -19,10 +19,12 @@ var yearSuffixPattern = regexp.MustCompile(`^\s*(` + yearPattern + `)`)
 // Example: "Dec 12, 2020" - pulls the year suffix
 type ENExtractYearSuffixRefiner struct{}
 
+// NewENExtractYearSuffixRefiner creates a new ENExtractYearSuffixRefiner
 func NewENExtractYearSuffixRefiner() *ENExtractYearSuffixRefiner {
 	return &ENExtractYearSuffixRefiner{}
 }
 
+// Refine extracts year suffixes from dates in parsing results
 func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	for i, result := range results {
 		resultStart, okStart := kronos.AsParsingComponents(result.Start())

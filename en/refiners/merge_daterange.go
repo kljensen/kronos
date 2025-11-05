@@ -1,3 +1,4 @@
+// Package refiners provides English language refiners for date/time parsing results.
 package refiners
 
 import (
@@ -14,12 +15,14 @@ type ENMergeDateRangeRefiner struct {
 	refiners.AbstractMergeDateRangeRefiner
 }
 
+// NewENMergeDateRangeRefiner creates a new ENMergeDateRangeRefiner
 func NewENMergeDateRangeRefiner() *ENMergeDateRangeRefiner {
 	r := &ENMergeDateRangeRefiner{}
 	r.PatternBetweenFunc = r.PatternBetween
 	return r
 }
 
+// PatternBetween returns the regex pattern for matching range separators
 func (r *ENMergeDateRangeRefiner) PatternBetween() *regexp.Regexp {
 	return regexp.MustCompile(`(?i)^\s*(to|-|–|until|through|till)\s*$`)
 }

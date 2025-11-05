@@ -3,6 +3,7 @@
 package en
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kljensen/kronos"
@@ -81,7 +82,11 @@ func ParseDate(text string, ref time.Time, option *kronos.ParsingOption) *time.T
 //
 //	results, err := en.ParseSimple("tomorrow at 3pm")
 func ParseSimple(text string) ([]kronos.Result, error) {
-	return New().Parse(text)
+	results, err := New().Parse(text)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse text: %w", err)
+	}
+	return results, nil
 }
 
 // ParseDateSimple is a convenience function that parses text and returns the first date.
@@ -91,5 +96,9 @@ func ParseSimple(text string) ([]kronos.Result, error) {
 //
 //	date, err := en.ParseDateSimple("tomorrow at 3pm")
 func ParseDateSimple(text string) (*time.Time, error) {
-	return New().ParseDate(text)
+	date, err := New().ParseDate(text)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse date: %w", err)
+	}
+	return date, nil
 }

@@ -36,7 +36,7 @@ func NewENYearParser() *ENYearParser {
 
 func (p *ENYearParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
 	// Match 4-digit years (1000-2999)
-	// This is more restrictive than YEAR_PATTERN to avoid matching other numbers
+	// This is more restrictive than YearPattern to avoid matching other numbers
 	// Note: AbstractParserWithWordBoundary will prepend (^|[\s,;:!?()]) for the left boundary
 	// Right boundary: must be followed by common punctuation, whitespace, or end of string
 	// This prevents matching years within date expressions like "2020-01-15" or "2020@01@15"

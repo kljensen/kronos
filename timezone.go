@@ -2,7 +2,7 @@ package kronos
 
 import "time"
 
-// TimezoneAbbrMap is a map of common timezone abbreviations to their offsets in minutes.
+// DefaultTimezoneAbbrMap is a map of common timezone abbreviations to their offsets in minutes.
 // Values can be either:
 // - int: a fixed offset in minutes
 // - AmbiguousTimezoneMap: for timezones that observe DST

@@ -14,12 +14,14 @@ type ENMergeDateTimeRefiner struct {
 	refiners.AbstractMergeDateTimeRefiner
 }
 
+// NewENMergeDateTimeRefiner creates a new ENMergeDateTimeRefiner
 func NewENMergeDateTimeRefiner() *ENMergeDateTimeRefiner {
 	r := &ENMergeDateTimeRefiner{}
 	r.PatternBetweenFunc = r.PatternBetween
 	return r
 }
 
+// PatternBetween returns the regex pattern for matching date-time separators
 func (r *ENMergeDateTimeRefiner) PatternBetween() *regexp.Regexp {
 	return regexp.MustCompile(`^\s*(T|at|after|before|on|of|,|-|\.|∙|:)?\s*$`)
 }

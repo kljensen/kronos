@@ -88,9 +88,11 @@ func NewENWeekdayParser() *ENWeekdayParser {
 
 			var weekday kronos.Weekday
 
-			if wd, ok := WeekdayDictionary[weekdayWord]; ok {
-				weekday = wd
-			} else if weekdayWord == "weekend" {
+			switch {
+			case WeekdayDictionary[weekdayWord] != 0 || weekdayWord == "sunday":
+				// Regular weekday from dictionary
+				weekday = WeekdayDictionary[weekdayWord]
+			case weekdayWord == "weekend":
 				// Handle weekend counting (e.g., "2 weekends ago", "1 weekend from now")
 				if countStr != "" || direction != "" {
 					refDate := context.Reference().GetDateWithAdjustedTimezone()
@@ -108,7 +110,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 				} else {
 					weekday = kronos.WeekdaySaturday
 				}
-			} else if weekdayWord == "weekday" {
+			case weekdayWord == "weekday":
 				// Weekday means any day of the week except weekend
 				refDate := context.Reference().GetDateWithAdjustedTimezone()
 				refWeekday := kronos.Weekday(refDate.Weekday())
@@ -123,14 +125,14 @@ func NewENWeekdayParser() *ENWeekdayParser {
 					// On a weekday, find the next/last weekday
 					wd := int(refWeekday) - 1
 					if modifier == "last" {
-						wd = wd - 1
+						wd--
 					} else {
-						wd = wd + 1
+						wd++
 					}
 					wd = (wd % 5) + 1
 					weekday = kronos.Weekday(wd)
 				}
-			} else {
+			default:
 				return nil
 			}
 
@@ -182,7 +184,8 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 	var daysOffset int
 	refWeekday := refDate.Weekday()
 
-	if direction == "ago" {
+	switch direction {
+	case "ago":
 		// Looking backward: resolve to Sunday
 		targetWeekday = kronos.WeekdaySunday
 
@@ -196,7 +199,7 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 
 		// Then go back (count-1) more weeks
 		daysOffset = -(daysToLastSunday + 7*(count-1))
-	} else if direction == "from now" {
+	case "from now":
 		// Looking forward: resolve to Saturday
 		targetWeekday = kronos.WeekdaySaturday
 
@@ -209,7 +212,7 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 
 		// Then go forward (count-1) more weeks
 		daysOffset = daysToNextSaturday + 7*(count-1)
-	} else {
+	default:
 		return nil
 	}
 

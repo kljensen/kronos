@@ -19,6 +19,7 @@ var (
 //   - "next tuesday +10 days"
 type ENMergeRelativeAfterDateRefiner struct{}
 
+// NewENMergeRelativeAfterDateRefiner creates a new ENMergeRelativeAfterDateRefiner
 func NewENMergeRelativeAfterDateRefiner() *ENMergeRelativeAfterDateRefiner {
 	return &ENMergeRelativeAfterDateRefiner{}
 }
@@ -31,6 +32,7 @@ func isNegativeFollowingReference(result *kronos.ParsingResult) bool {
 	return patternNegativeFollowing.MatchString(result.Text())
 }
 
+// Refine merges relative date expressions that come after absolute dates
 func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	if len(results) < 2 {
 		return results

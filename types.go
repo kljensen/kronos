@@ -6,7 +6,9 @@ import "time"
 // Components are used as keys in maps, so they are string constants.
 type Component string
 
+// Date/time component constants
 const (
+	// ComponentYear represents the year component
 	ComponentYear           Component = "year"
 	ComponentMonth          Component = "month"
 	ComponentDay            Component = "day"
@@ -24,7 +26,9 @@ const (
 // Timeunit represents a unit of time for calculations and operations.
 type Timeunit string
 
+// Time unit constants
 const (
+	// TimeunitYear represents the year time unit
 	TimeunitYear        Timeunit = "year"
 	TimeunitMonth       Timeunit = "month"
 	TimeunitWeek        Timeunit = "week"
@@ -42,7 +46,9 @@ const (
 // Meridiem represents the AM/PM indicator.
 type Meridiem int
 
+// Meridiem constants
 const (
+	// MeridiemAM represents AM (ante meridiem)
 	MeridiemAM Meridiem = 0
 	MeridiemPM Meridiem = 1
 )
@@ -102,7 +108,9 @@ const (
 // Weekday represents the day of the week.
 type Weekday int
 
+// Weekday constants
 const (
+	// WeekdaySunday represents Sunday
 	WeekdaySunday Weekday = iota
 	WeekdayMonday
 	WeekdayTuesday
@@ -115,7 +123,9 @@ const (
 // Month represents a calendar month.
 type Month int
 
+// Month constants
 const (
+	// MonthJanuary represents January
 	MonthJanuary Month = iota + 1
 	MonthFebruary
 	MonthMarch

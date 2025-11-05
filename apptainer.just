@@ -43,6 +43,7 @@ shell CPUS="4" MEM="12G" NODE="" PARTITION="cpunormal":
         --bind $HOME/.codex:$HOME/.codex \
         --bind $HOME/.npm:$HOME/.npm \
         --bind $HOME/.config:$HOME/.config \
+        --bind $HOME/go:$HOME/go \
         --bind $HOME/.gitconfig:$HOME/.gitconfig:ro \
         --bind $HOME/.ssh:$HOME/.ssh:ro \
         --bind $HOME/.nvm:$HOME/.nvm \

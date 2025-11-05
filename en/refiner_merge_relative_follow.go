@@ -15,6 +15,7 @@ var patternFollowBetween = regexp.MustCompile(`^\s*$`)
 //   - "2 days after next Friday"
 type ENMergeRelativeFollowByDateRefiner struct{}
 
+// NewENMergeRelativeFollowByDateRefiner creates a new ENMergeRelativeFollowByDateRefiner
 func NewENMergeRelativeFollowByDateRefiner() *ENMergeRelativeFollowByDateRefiner {
 	return &ENMergeRelativeFollowByDateRefiner{}
 }
@@ -29,6 +30,7 @@ func hasImpliedLaterReferenceDate(result *kronos.ParsingResult) bool {
 	return strings.HasSuffix(text, " after") || strings.HasSuffix(text, " since")
 }
 
+// Refine merges relative date expressions that follow absolute dates
 func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	if len(results) < 2 {
 		return results

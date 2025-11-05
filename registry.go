@@ -42,7 +42,7 @@ type registeredParser struct {
 	factory ParserFactory
 }
 
-// Global parser registry for all parsers.
+// GlobalRegistry is the global parser registry for all parsers.
 var GlobalRegistry = NewParserRegistry()
 
 // NewParserRegistry creates a new parser registry.

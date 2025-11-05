@@ -1,3 +1,4 @@
+// Package refiners provides common refiner utilities for post-processing parsing results.
 package refiners
 
 import "github.com/kljensen/kronos"
