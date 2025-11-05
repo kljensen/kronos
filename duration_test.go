@@ -58,6 +58,15 @@ func TestAddDuration(t *testing.T) {
 			expected: time.Date(2020, 2, 15, 12, 0, 0, 0, time.UTC),
 		},
 		{
+			name: "subtract fractional months cascades remainder",
+			ref:  time.Date(2020, 3, 15, 12, 0, 0, 0, time.UTC),
+			duration: Duration{
+				TimeunitMonth: -1.5,
+			},
+			// -1.5 months = -1 month + (-0.5 * 4) weeks = -1 month - 2 weeks
+			expected: time.Date(2020, 2, 1, 12, 0, 0, 0, time.UTC),
+		},
+		{
 			name: "add quarters",
 			ref:  time.Date(2020, 1, 1, 12, 0, 0, 0, time.UTC),
 			duration: Duration{

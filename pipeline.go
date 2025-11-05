@@ -296,23 +296,31 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 
 	// Convert each result's date to the target timezone
 	for _, result := range results {
-		if result.Start() != nil {
-			// Get the date and convert to target timezone
-			date := result.Start().Date()
-			convertedDate := date.In(targetLoc)
+		if result.start != nil {
+			// Convert the start date to the target timezone and update components
+			startDate := result.start.Date()
+			convertedStart := startDate.In(targetLoc)
+			updateComponentsFromDate(result.start, convertedStart)
 
-			// Update the start components to reflect timezone conversion
-			updateComponentsFromDate(result.start, convertedDate, targetLoc)
+			_, startOffsetSeconds := convertedStart.Zone()
+			startOffsetMinutes := startOffsetSeconds / SecondsPerMinute
+			startReference := NewReferenceWithTimezone(convertedStart, &startOffsetMinutes)
+			result.start.reference = startReference
+			result.reference = startReference
+			result.refDate = convertedStart
 		}
 
 		// Handle end components for range results
-		if result.End() != nil {
+		if result.end != nil {
 			endComponents := result.end
 			endDate := endComponents.Date()
-			convertedEndDate := endDate.In(targetLoc)
+			convertedEnd := endDate.In(targetLoc)
 
-			// Update the end components to reflect timezone conversion
-			updateComponentsFromDate(endComponents, convertedEndDate, targetLoc)
+			updateComponentsFromDate(endComponents, convertedEnd)
+
+			_, endOffsetSeconds := convertedEnd.Zone()
+			endOffsetMinutes := endOffsetSeconds / SecondsPerMinute
+			endComponents.reference = NewReferenceWithTimezone(convertedEnd, &endOffsetMinutes)
 		}
 	}
 
@@ -322,7 +330,7 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 // updateComponentsFromDate updates all date/time components in ParsingComponents
 // to match the values from the given time.Time in the target timezone.
 // This preserves the "certain" vs "implied" status of each component while updating values.
-func updateComponentsFromDate(components *ParsingComponents, date time.Time, location *time.Location) {
+func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
 	// Update date components (year, month, day) - preserve certain/implied status
 	if components.IsCertain(ComponentYear) {
 		components.Assign(ComponentYear, date.Year())
@@ -375,23 +383,15 @@ func updateComponentsFromDate(components *ParsingComponents, date time.Time, loc
 	}
 
 	if components.IsCertain(ComponentMicrosecond) {
-		if microsecond > 0 {
-			components.Assign(ComponentMicrosecond, microsecond)
-		}
+		components.Assign(ComponentMicrosecond, microsecond)
 	} else if components.Get(ComponentMicrosecond) != nil {
-		if microsecond > 0 {
-			components.Imply(ComponentMicrosecond, microsecond)
-		}
+		components.Imply(ComponentMicrosecond, microsecond)
 	}
 
 	if components.IsCertain(ComponentNanosecond) {
-		if nanosecond > 0 {
-			components.Assign(ComponentNanosecond, nanosecond)
-		}
+		components.Assign(ComponentNanosecond, nanosecond)
 	} else if components.Get(ComponentNanosecond) != nil {
-		if nanosecond > 0 {
-			components.Imply(ComponentNanosecond, nanosecond)
-		}
+		components.Imply(ComponentNanosecond, nanosecond)
 	}
 
 	// Update meridiem based on new hour

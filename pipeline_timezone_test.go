@@ -44,6 +44,35 @@ func TestPipeline_TimezoneConversion_BasicUTCToNY(t *testing.T) {
 	assert.Equal(t, 0, *start.Get(ComponentSecond))
 }
 
+func TestPipeline_TimezoneConversion_StartDateReflectsTargetTimezone(t *testing.T) {
+	settings := DefaultSettings()
+	settings.ToTimezone = "America/New_York"
+	pipeline := NewPipeline(nil, settings)
+
+	utc := time.UTC
+	ref := NewReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
+	startComponents := NewParsingComponents(ref, nil)
+	startComponents.Assign(ComponentYear, 2020)
+	startComponents.Assign(ComponentMonth, 6)
+	startComponents.Assign(ComponentDay, 15)
+	startComponents.Assign(ComponentHour, 18)
+	startComponents.Assign(ComponentMinute, 0)
+	startComponents.Assign(ComponentSecond, 0)
+
+	result := NewParsingResult(ref, 0, "June 15, 2020 at 6:00 PM", startComponents, nil)
+	results := []*ParsingResult{result}
+
+	converted, err := pipeline.applyTimezoneConversion(results)
+	assert.NoError(t, err)
+
+	targetLoc, _ := time.LoadLocation("America/New_York")
+	expected := time.Date(2020, 6, 15, 14, 0, 0, 0, targetLoc)
+
+	assert.True(t, converted[0].Date().Equal(expected), "converted date %v does not match expected %v", converted[0].Date(), expected)
+	assert.Equal(t, targetLoc.String(), converted[0].Date().Location().String())
+	assert.True(t, converted[0].RefDate().Equal(expected), "converted ref date %v does not match expected %v", converted[0].RefDate(), expected)
+}
+
 // TestPipeline_TimezoneConversion_UTCToTokyo tests conversion to Asia/Tokyo
 func TestPipeline_TimezoneConversion_UTCToTokyo(t *testing.T) {
 	settings := DefaultSettings()
@@ -449,6 +478,8 @@ func TestPipeline_TimezoneConversion_WithMilliseconds(t *testing.T) {
 	components.Assign(ComponentMinute, 30)
 	components.Assign(ComponentSecond, 45)
 	components.Assign(ComponentMillisecond, 123)
+	components.Assign(ComponentMicrosecond, 456)
+	components.Assign(ComponentNanosecond, 789)
 
 	result := NewParsingResult(ref, 0, "June 15, 2020 at 6:30:45.123 PM", components, nil)
 	results := []*ParsingResult{result}
@@ -549,12 +580,14 @@ func TestUpdateComponentsFromDate_AllComponents(t *testing.T) {
 	components.Assign(ComponentMinute, 30)
 	components.Assign(ComponentSecond, 45)
 	components.Assign(ComponentMillisecond, 123)
+	components.Assign(ComponentMicrosecond, 456)
+	components.Assign(ComponentNanosecond, 789)
 
 	// Create a new date in a different timezone
 	nyLoc, _ := time.LoadLocation("America/New_York")
 	newDate := time.Date(2020, 6, 15, 14, 30, 45, 123000000, nyLoc)
 
-	updateComponentsFromDate(components, newDate, nyLoc)
+	updateComponentsFromDate(components, newDate)
 
 	// Verify all components are updated
 	assert.Equal(t, 2020, *components.Get(ComponentYear))
@@ -564,4 +597,6 @@ func TestUpdateComponentsFromDate_AllComponents(t *testing.T) {
 	assert.Equal(t, 30, *components.Get(ComponentMinute))
 	assert.Equal(t, 45, *components.Get(ComponentSecond))
 	assert.Equal(t, 123, *components.Get(ComponentMillisecond))
+	assert.Equal(t, 0, *components.Get(ComponentMicrosecond))
+	assert.Equal(t, 0, *components.Get(ComponentNanosecond))
 }

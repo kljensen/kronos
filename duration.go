@@ -145,7 +145,7 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		remainder := val - float64(floor)
-		if remainder > 0 {
+		if remainder != 0 {
 			working[TimeunitMonth] = working[TimeunitMonth] + remainder*MonthsPerYear
 		}
 	}
@@ -173,7 +173,7 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		remainder := val - float64(floor)
-		if remainder > 0 {
+		if remainder != 0 {
 			working[TimeunitWeek] = working[TimeunitWeek] + remainder*WeeksPerMonthApprox
 		}
 	}
