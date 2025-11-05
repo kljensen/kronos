@@ -53,10 +53,8 @@ func TestValidateSettings_ValidToTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Europe/London"
 
-	err := ValidateSettings(settings)
-	if err == nil || err != nil {
-		// Either way is fine - just testing it doesn't panic
-	}
+	_ = ValidateSettings(settings)
+	// Either way is fine - just testing it doesn't panic
 }
 
 func TestValidateSettings_ValidRequireParts(t *testing.T) {
@@ -140,11 +138,8 @@ func TestApplySettings_Normalization(t *testing.T) {
 		t.Fatalf("ApplySettings failed: %v", err)
 	}
 
-	// Text should be normalized (non-breaking space converted)
-	if ctx.Text() == text {
-		// The text might be the same if normalization doesn't change it
-		// But we at least verify it doesn't error
-	}
+	// Text should be normalized - just verify it doesn't error
+	_ = ctx.Text()
 }
 
 func TestApplySettings_SkipTokens(t *testing.T) {
@@ -159,12 +154,8 @@ func TestApplySettings_SkipTokens(t *testing.T) {
 		t.Fatalf("ApplySettings failed: %v", err)
 	}
 
-	// Tokens should be removed
-	resultText := ctx.Text()
-	if resultText == text {
-		// Simple check - the text should be different after token removal
-		// But the exact result depends on the removeToken implementation
-	}
+	// Tokens should be removed - just verify it doesn't error
+	_ = ctx.Text()
 }
 
 func TestApplySettings_RelativeBase(t *testing.T) {

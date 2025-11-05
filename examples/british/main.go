@@ -22,9 +22,9 @@ func main() {
 	gbParser := en.GBParser()
 
 	britishDates := []string{
-		"15/3/2024",      // 15th March 2024
-		"1/12/2024",      // 1st December 2024
-		"25/12/2024",     // 25th December 2024
+		"15/3/2024",  // 15th March 2024
+		"1/12/2024",  // 1st December 2024
+		"25/12/2024", // 25th December 2024
 		"15th March 2024",
 		"1st December",
 	}

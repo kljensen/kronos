@@ -240,15 +240,13 @@ func (p *Pipeline) applyStrictValidation(results []*ParsingResult) []*ParsingRes
 	filtered := make([]*ParsingResult, 0, len(results))
 	for _, result := range results {
 		// In strict mode, require at least year and month
-		if result.Start() != nil {
-			start := result.Start()
-			hasYear := start.IsCertain(ComponentYear)
-			hasMonth := start.IsCertain(ComponentMonth)
+		start := result.Start()
+		hasYear := start.IsCertain(ComponentYear)
+		hasMonth := start.IsCertain(ComponentMonth)
 
-			// Accept if it has year and month
-			if hasYear && hasMonth {
-				filtered = append(filtered, result)
-			}
+		// Accept if it has year and month
+		if hasYear && hasMonth {
+			filtered = append(filtered, result)
 		}
 	}
 	return filtered
@@ -262,10 +260,6 @@ func (p *Pipeline) applyRequiredParts(results []*ParsingResult) []*ParsingResult
 
 	filtered := make([]*ParsingResult, 0, len(results))
 	for _, result := range results {
-		if result.Start() == nil {
-			continue
-		}
-
 		start := result.Start()
 		hasAllParts := true
 

@@ -17,7 +17,6 @@ func Example_parserBuilder() {
 	results, err := en.New().
 		WithReferenceDate(refDate).
 		Parse("tomorrow at 3pm")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -38,7 +37,6 @@ func Example_parserBuilder_preferPast() {
 		WithReferenceDate(refDate).
 		PreferPast().
 		ParseDate("March")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -59,7 +57,6 @@ func Example_parserBuilder_preferFuture() {
 		WithReferenceDate(refDate).
 		PreferFuture().
 		ParseDate("March")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -80,7 +77,6 @@ func Example_parserBuilder_dateOrder() {
 		WithReferenceDate(refDate).
 		DateOrder(kronos.DateOrderMDY).
 		ParseDate("03/15/2020")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -100,7 +96,6 @@ func Example_parserBuilder_strictMode() {
 	date, err := en.StrictParser().
 		WithReferenceDate(refDate).
 		ParseDate("2020-03-15")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -120,7 +115,6 @@ func Example_parserBuilder_gbFormat() {
 	date, err := en.GBParser().
 		WithReferenceDate(refDate).
 		ParseDate("15/03/2020")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -136,7 +130,6 @@ func Example_parserBuilder_gbFormat() {
 func Example_parserSimple() {
 	// Simple parsing with default settings and current time as reference
 	results, err := en.ParseSimple("tomorrow")
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -154,7 +147,6 @@ func Example_parserSimple() {
 func Example_packageLevelParse() {
 	// Using the package-level Parse function
 	results, err := kronos.Parse("tomorrow", en.Casual)
-
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return

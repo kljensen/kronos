@@ -47,7 +47,10 @@ func (p *ENYearMonthDayParser) innerExtract(context *kronos.ParsingContext, matc
 		return nil
 	}
 
-	year, _ := strconv.Atoi(match[1])
+	year, err := strconv.Atoi(match[1])
+	if err != nil {
+		return nil
+	}
 
 	var month, day int
 
@@ -57,10 +60,16 @@ func (p *ENYearMonthDayParser) innerExtract(context *kronos.ParsingContext, matc
 		month = MonthDictionary[strings.ToLower(match[2])]
 	} else {
 		// Numeric month
-		month, _ = strconv.Atoi(match[3])
+		month, err = strconv.Atoi(match[3])
+		if err != nil {
+			return nil
+		}
 	}
 
-	day, _ = strconv.Atoi(match[4])
+	day, err = strconv.Atoi(match[4])
+	if err != nil {
+		return nil
+	}
 
 	// Validate and potentially swap month/day if not in strict mode
 	if month < 1 || month > 12 {

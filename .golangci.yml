@@ -1,0 +1,84 @@
+run:
+  timeout: 5m
+  go: '1.21'
+
+linters:
+  enable-all: true
+  disable:
+    # Deprecated linters
+    - tenv  # Deprecated, replaced by usetesting
+
+    # Impractical linters for this codebase
+    - testpackage        # Tests in same package is acceptable for testing internal behavior
+    - exhaustruct        # Not practical to initialize all fields, especially for external types
+    - varnamelen         # Short variable names in loops/functions are idiomatic Go
+    - nonamedreturns     # Named returns are useful for documentation
+    - gochecknoglobals   # Package-level variables are necessary for patterns, configs
+    - gochecknoinits     # Init functions are necessary for registration patterns
+    - ireturn            # Returning interfaces is sometimes appropriate
+    - godox              # TODO/FIXME comments are useful during development
+    - funlen             # Function length can be overly restrictive
+    - gocognit           # Cognitive complexity can be overly restrictive
+    - cyclop             # Cyclomatic complexity can be overly restrictive
+    - maintidx           # Maintainability index can be overly restrictive
+    - nestif             # Nesting is sometimes clearer than extraction
+    - lll                # Line length varies in this codebase
+    - wsl                # Whitespace linting is too opinionated
+    - dupl               # Some duplication is acceptable in similar patterns
+    - nlreturn           # Blank lines before returns is too opinionated
+    - tagliatelle        # Struct tag formats don't need to be enforced
+    - depguard           # Import restrictions not needed for this project
+    - paralleltest       # Not all tests need to be parallel
+    - godot              # Period at end of comments is too opinionated
+    - thelper            # Helper function detection can be overly restrictive
+    - gocyclo            # Cyclomatic complexity already covered by cyclop (disabled)
+    - mnd                # Magic number detection is too strict for test values and date/time constants
+    - testifylint        # Test-specific linting can be overly restrictive
+    - forcetypeassert    # Type assertions in parsing code are validated by regex patterns
+    - exhaustive         # Exhaustive switch checks are too strict
+    - unparam            # Unused parameter detection can be too aggressive
+    - nilnil             # Returning nil,nil is sometimes appropriate
+    - gosmopolitan       # Time.Local usage is intentional
+    - predeclared        # Shadowing predeclared identifiers is sometimes clearer
+    - err113             # Dynamic errors are appropriate for detailed validation messages
+    - goconst            # Repeated strings in tests don't always need to be constants
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment  # Disable field alignment checks as they're too pedantic and can hurt readability
+
+  gofmt:
+    simplify: true
+
+  gofumpt:
+    extra-rules: true
+
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+
+  misspell:
+    locale: US
+
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - "checkPrivateReceivers"
+          - "disableStutteringCheck"
+
+issues:
+  max-same-issues: 0
+  max-issues-per-linter: 0
+  exclude-use-default: false
+  exclude-rules:
+    # Disable errcheck for test files
+    - path: _test\.go
+      linters:
+        - errcheck

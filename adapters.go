@@ -31,9 +31,6 @@ func (r *resultAdapter) Date() time.Time {
 // Start returns the starting date/time components.
 func (r *resultAdapter) Start() Components {
 	parsed := r.result.Start()
-	if parsed == nil {
-		return nil
-	}
 	// The ParsedComponents interface is implemented by ParsingComponents,
 	// so we can wrap it in a componentsAdapter
 	if pc, ok := parsed.(*ParsingComponents); ok {

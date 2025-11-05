@@ -7,9 +7,7 @@ import (
 	kronos "github.com/kljensen/kronos"
 )
 
-var (
-	timezoneOffsetPattern = regexp.MustCompile(`(?i)^\s*(?:\(?(?:GMT|UTC)\s?)?([+-])(\d{1,2})(?::?(\d{2}))?` + `\)?`)
-)
+var timezoneOffsetPattern = regexp.MustCompile(`(?i)^\s*(?:\(?(?:GMT|UTC)\s?)?([+-])(\d{1,2})(?::?(\d{2}))?` + `\)?`)
 
 const (
 	timezoneOffsetSignGroup         = 1
@@ -55,10 +53,16 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 			})
 		}
 
-		hourOffset, _ := strconv.Atoi(match[timezoneOffsetHourOffsetGroup])
+		hourOffset, err := strconv.Atoi(match[timezoneOffsetHourOffsetGroup])
+		if err != nil {
+			continue
+		}
 		minuteOffset := 0
 		if match[timezoneOffsetMinuteOffsetGroup] != "" {
-			minuteOffset, _ = strconv.Atoi(match[timezoneOffsetMinuteOffsetGroup])
+			minuteOffset, err = strconv.Atoi(match[timezoneOffsetMinuteOffsetGroup])
+			if err != nil {
+				continue
+			}
 		}
 
 		timezoneOffset := hourOffset*60 + minuteOffset

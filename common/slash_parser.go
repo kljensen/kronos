@@ -154,8 +154,14 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 	}
 
 	// Parse month and day using the determined group numbers
-	month, _ := strconv.Atoi(match[groupMonth])
-	day, _ := strconv.Atoi(match[groupDay])
+	month, err := strconv.Atoi(match[groupMonth])
+	if err != nil {
+		return nil
+	}
+	day, err := strconv.Atoi(match[groupDay])
+	if err != nil {
+		return nil
+	}
 
 	// Validate and swap if needed
 	if month < 1 || month > 12 {
@@ -186,7 +192,10 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 
 	// Handle year
 	if match[slashYearGroup] != "" {
-		rawYear, _ := strconv.Atoi(match[slashYearGroup])
+		rawYear, err := strconv.Atoi(match[slashYearGroup])
+		if err != nil {
+			return nil
+		}
 		year := kronos.FindMostLikelyADYear(rawYear)
 		components.Assign(kronos.ComponentYear, year)
 	} else {

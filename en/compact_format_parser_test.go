@@ -166,25 +166,25 @@ func TestENCompactFormatParser(t *testing.T) {
 
 		// 4-digit time (HHmm)
 		{
-			name:        "4-digit time HHmm",
-			text:        "1430",
+			name:         "4-digit time HHmm",
+			text:         "1430",
 			expectedHour: intPtr(14),
 			expectedMin:  intPtr(30),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 		{
-			name:        "4-digit time midnight",
-			text:        "0000",
+			name:         "4-digit time midnight",
+			text:         "0000",
 			expectedHour: intPtr(0),
 			expectedMin:  intPtr(0),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 		{
-			name:        "4-digit time end of day",
-			text:        "2359",
+			name:         "4-digit time end of day",
+			text:         "2359",
 			expectedHour: intPtr(23),
 			expectedMin:  intPtr(59),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 		{
 			name:        "Invalid 4-digit time (hour 24)",
@@ -199,20 +199,20 @@ func TestENCompactFormatParser(t *testing.T) {
 
 		// 6-digit time (HHmmss)
 		{
-			name:        "6-digit time HHmmss",
-			text:        "143045",
+			name:         "6-digit time HHmmss",
+			text:         "143045",
 			expectedHour: intPtr(14),
 			expectedMin:  intPtr(30),
 			expectedSec:  intPtr(45),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 		{
-			name:        "6-digit time with zero seconds",
-			text:        "143000",
+			name:         "6-digit time with zero seconds",
+			text:         "143000",
 			expectedHour: intPtr(14),
 			expectedMin:  intPtr(30),
 			expectedSec:  intPtr(0),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 		{
 			name:        "Invalid 6-digit time (second 60)",
@@ -236,18 +236,18 @@ func TestENCompactFormatParser(t *testing.T) {
 			shouldParse:   true,
 		},
 		{
-			name:        "4-digit ambiguous 1332 (could be time 13:32)",
-			text:        "1332",
+			name:         "4-digit ambiguous 1332 (could be time 13:32)",
+			text:         "1332",
 			expectedHour: intPtr(13),
 			expectedMin:  intPtr(32),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 		{
-			name:        "4-digit ambiguous 0132 (could be date 01-32 or time 01:32)",
-			text:        "0132",
+			name:         "4-digit ambiguous 0132 (could be date 01-32 or time 01:32)",
+			text:         "0132",
 			expectedHour: intPtr(1),
 			expectedMin:  intPtr(32),
-			shouldParse: true,
+			shouldParse:  true,
 		},
 
 		// Edge cases

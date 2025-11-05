@@ -311,7 +311,10 @@ func ParseOrdinalNumber(match string) int {
 
 	// Remove ordinal suffix (st, nd, rd, th)
 	cleaned := regexp.MustCompile(`(?i)(st|nd|rd|th)$`).ReplaceAllString(lower, "")
-	val, _ := strconv.Atoi(cleaned)
+	val, err := strconv.Atoi(cleaned)
+	if err != nil {
+		return 0
+	}
 	return val
 }
 
@@ -320,26 +323,38 @@ func ParseYear(match string) int {
 	// Buddhist Era
 	if regexp.MustCompile(`(?i)BE`).MatchString(match) {
 		cleaned := regexp.MustCompile(`(?i)\s*BE`).ReplaceAllString(match, "")
-		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		year, err := strconv.Atoi(strings.TrimSpace(cleaned))
+		if err != nil {
+			return 0
+		}
 		return year - 543
 	}
 
 	// Before Christ / Before Common Era
 	if regexp.MustCompile(`(?i)BCE?`).MatchString(match) {
 		cleaned := regexp.MustCompile(`(?i)\s*BCE?`).ReplaceAllString(match, "")
-		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		year, err := strconv.Atoi(strings.TrimSpace(cleaned))
+		if err != nil {
+			return 0
+		}
 		return -year
 	}
 
 	// Anno Domini / Common Era
 	if regexp.MustCompile(`(?i)(AD|CE)`).MatchString(match) {
 		cleaned := regexp.MustCompile(`(?i)\s*(AD|CE)`).ReplaceAllString(match, "")
-		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		year, err := strconv.Atoi(strings.TrimSpace(cleaned))
+		if err != nil {
+			return 0
+		}
 		return year
 	}
 
 	// Regular year number
-	year, _ := strconv.Atoi(strings.TrimSpace(match))
+	year, err := strconv.Atoi(strings.TrimSpace(match))
+	if err != nil {
+		return 0
+	}
 	return kronos.FindMostLikelyADYear(year)
 }
 
@@ -362,7 +377,10 @@ func ParseNumberPattern(match string) float64 {
 	normalized := strings.ReplaceAll(lower, ",", ".")
 
 	// Try parsing as number
-	val, _ := strconv.ParseFloat(normalized, 64)
+	val, err := strconv.ParseFloat(normalized, 64)
+	if err != nil {
+		return 0
+	}
 	return val
 }
 

@@ -200,7 +200,7 @@ func TestPeriodPreservationInMerging(t *testing.T) {
 		input          string
 		expectedPeriod kronos.Period
 	}{
-		{"yesterday at 3pm", kronos.PeriodTime}, // Merged: day + time = time
+		{"yesterday at 3pm", kronos.PeriodTime},  // Merged: day + time = time
 		{"March 15 at 10:30", kronos.PeriodTime}, // Merged: date + time = time
 	}
 

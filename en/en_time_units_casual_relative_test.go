@@ -770,14 +770,14 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedMinute: ptrInt(0),
 		},
 		{
-			name:           "0.5 weeks from now",
-			text:           "next 0.5 weeks",
-			refDate:        time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
-			expectedText:   "next 0.5 weeks",
-			expectedYear:   2016,
-			expectedMonth:  10,
-			expectedDay:    5, // 0.5 weeks = 3.5 days, rounded to 4 days
-			expectedHour:   ptrInt(12),
+			name:          "0.5 weeks from now",
+			text:          "next 0.5 weeks",
+			refDate:       time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC),
+			expectedText:  "next 0.5 weeks",
+			expectedYear:  2016,
+			expectedMonth: 10,
+			expectedDay:   5, // 0.5 weeks = 3.5 days, rounded to 4 days
+			expectedHour:  ptrInt(12),
 		},
 		{
 			name:           "3.25 minutes ago",

@@ -111,7 +111,7 @@ func TestChronoParse(t *testing.T) {
 			extractFunc: func(context *ParsingContext, match []string) interface{} {
 				year := 0
 				if len(match) > 1 {
-					fmt.Sscanf(match[1], "%d", &year)
+					_, _ = fmt.Sscanf(match[1], "%d", &year)
 				}
 				return map[Component]int{
 					ComponentYear: year,

@@ -38,8 +38,14 @@ func (p *ENSlashMonthFormatParser) innerExtract(context *kronos.ParsingContext, 
 		return nil
 	}
 
-	month, _ := strconv.Atoi(match[1])
-	year, _ := strconv.Atoi(match[2])
+	month, err := strconv.Atoi(match[1])
+	if err != nil {
+		return nil
+	}
+	year, err := strconv.Atoi(match[2])
+	if err != nil {
+		return nil
+	}
 
 	return context.CreateParsingComponents(nil).
 		Assign(kronos.ComponentMonth, month).

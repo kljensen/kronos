@@ -63,9 +63,18 @@ func (p *ISOFormatParser) innerPattern(context *kronos.ParsingContext) *regexp.R
 
 func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
 	// Parse year, month, day
-	year, _ := strconv.Atoi(match[isoYearGroup])
-	month, _ := strconv.Atoi(match[isoMonthGroup])
-	day, _ := strconv.Atoi(match[isoDayGroup])
+	year, err := strconv.Atoi(match[isoYearGroup])
+	if err != nil {
+		return nil
+	}
+	month, err := strconv.Atoi(match[isoMonthGroup])
+	if err != nil {
+		return nil
+	}
+	day, err := strconv.Atoi(match[isoDayGroup])
+	if err != nil {
+		return nil
+	}
 
 	components := context.CreateParsingComponents(map[kronos.Component]int{
 		kronos.ComponentYear:  year,
@@ -84,15 +93,24 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 
 	// Parse time components if present
 	if match[isoHourGroup] != "" {
-		hour, _ := strconv.Atoi(match[isoHourGroup])
-		minute, _ := strconv.Atoi(match[isoMinuteGroup])
+		hour, err := strconv.Atoi(match[isoHourGroup])
+		if err != nil {
+			return nil
+		}
+		minute, err := strconv.Atoi(match[isoMinuteGroup])
+		if err != nil {
+			return nil
+		}
 
 		components.Assign(kronos.ComponentHour, hour)
 		components.Assign(kronos.ComponentMinute, minute)
 
 		// Parse seconds if present
 		if match[isoSecondGroup] != "" {
-			second, _ := strconv.Atoi(match[isoSecondGroup])
+			second, err := strconv.Atoi(match[isoSecondGroup])
+			if err != nil {
+				return nil
+			}
 			components.Assign(kronos.ComponentSecond, second)
 		}
 
@@ -106,7 +124,10 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 			if len(fracStr) > 9 {
 				fracStr = fracStr[:9]
 			}
-			nanos, _ := strconv.Atoi(fracStr)
+			nanos, err := strconv.Atoi(fracStr)
+			if err != nil {
+				return nil
+			}
 
 			// Store as milliseconds, microseconds, and nanoseconds for compatibility
 			millisecond := nanos / kronos.NanosecondsPerMS
@@ -129,10 +150,16 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 		if match[isoTZDGroup] != "" {
 			offset := 0
 			if match[isoTZDHourGroup] != "" {
-				hourOffset, _ := strconv.Atoi(match[isoTZDHourGroup])
+				hourOffset, err := strconv.Atoi(match[isoTZDHourGroup])
+				if err != nil {
+					return nil
+				}
 				minuteOffset := 0
 				if match[isoTZDMinuteGroup] != "" {
-					minuteOffset, _ = strconv.Atoi(match[isoTZDMinuteGroup])
+					minuteOffset, err = strconv.Atoi(match[isoTZDMinuteGroup])
+					if err != nil {
+						return nil
+					}
 				}
 
 				offset = hourOffset * 60

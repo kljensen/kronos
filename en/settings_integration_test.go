@@ -19,10 +19,8 @@ func TestIntegration_ParseWithSettings(t *testing.T) {
 			t.Fatalf("ParseWithSettings failed: %v", err)
 		}
 
-		if len(results) == 0 {
-			// This is expected since we're using default settings with existing parsers
-			// The integration confirms the API works
-		}
+		// This is expected to return results with default settings
+		_ = results
 	})
 
 	t.Run("strict parsing mode", func(t *testing.T) {

@@ -7,9 +7,7 @@ import (
 	kronos "github.com/kljensen/kronos"
 )
 
-var (
-	timezoneNamePattern = regexp.MustCompile(`(?i)^\s*,?\s*\(?([A-Z]{2,4})\)?(?:\W|$)`)
-)
+var timezoneNamePattern = regexp.MustCompile(`(?i)^\s*,?\s*\(?([A-Z]{2,4})\)?(?:\W|$)`)
 
 // ExtractTimezoneAbbrRefiner extracts timezone abbreviations from text following a parsed result.
 // Examples: "UTC", "PST", "JST", "EST"

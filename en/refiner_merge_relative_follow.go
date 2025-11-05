@@ -7,9 +7,7 @@ import (
 	"github.com/kljensen/kronos"
 )
 
-var (
-	patternFollowBetween = regexp.MustCompile(`^\s*$`)
-)
+var patternFollowBetween = regexp.MustCompile(`^\s*$`)
 
 // ENMergeRelativeFollowByDateRefiner merges a relative date/time that follows an absolute date.
 // Examples:

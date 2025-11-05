@@ -7,9 +7,7 @@ import (
 	"github.com/kljensen/kronos"
 )
 
-var (
-	mayContextPattern = regexp.MustCompile(`(?i)\b(in)$`)
-)
+var mayContextPattern = regexp.MustCompile(`(?i)\b(in)$`)
 
 // ENUnlikelyFormatFilter filters out unlikely English date formats.
 type ENUnlikelyFormatFilter struct{}

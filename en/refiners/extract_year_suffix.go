@@ -13,9 +13,7 @@ const (
 	yearPattern = `(?:[1-9][0-9]{0,3}\s{0,2}(?:BE|AD|BC|BCE|CE)|[1-2][0-9]{3}|[5-9][0-9]|2[0-5])`
 )
 
-var (
-	yearSuffixPattern = regexp.MustCompile(`^\s*(` + yearPattern + `)`)
-)
+var yearSuffixPattern = regexp.MustCompile(`^\s*(` + yearPattern + `)`)
 
 // ENExtractYearSuffixRefiner extracts year suffixes from dates.
 // Example: "Dec 12, 2020" - pulls the year suffix
@@ -74,25 +72,37 @@ func parseYear(match string) int {
 	// Buddhist Era
 	if regexp.MustCompile(`(?i)BE`).MatchString(match) {
 		cleaned := regexp.MustCompile(`(?i)\s*BE`).ReplaceAllString(match, "")
-		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		year, err := strconv.Atoi(strings.TrimSpace(cleaned))
+		if err != nil {
+			return 0
+		}
 		return year - 543
 	}
 
 	// Before Christ / Before Common Era
 	if regexp.MustCompile(`(?i)BCE?`).MatchString(match) {
 		cleaned := regexp.MustCompile(`(?i)\s*BCE?`).ReplaceAllString(match, "")
-		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		year, err := strconv.Atoi(strings.TrimSpace(cleaned))
+		if err != nil {
+			return 0
+		}
 		return -year
 	}
 
 	// Anno Domini / Common Era
 	if regexp.MustCompile(`(?i)(AD|CE)`).MatchString(match) {
 		cleaned := regexp.MustCompile(`(?i)\s*(AD|CE)`).ReplaceAllString(match, "")
-		year, _ := strconv.Atoi(strings.TrimSpace(cleaned))
+		year, err := strconv.Atoi(strings.TrimSpace(cleaned))
+		if err != nil {
+			return 0
+		}
 		return year
 	}
 
 	// Regular year number
-	year, _ := strconv.Atoi(strings.TrimSpace(match))
+	year, err := strconv.Atoi(strings.TrimSpace(match))
+	if err != nil {
+		return 0
+	}
 	return kronos.FindMostLikelyADYear(year)
 }

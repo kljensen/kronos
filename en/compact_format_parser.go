@@ -9,6 +9,16 @@ import (
 	"github.com/kljensen/kronos/common"
 )
 
+// atoiSafe converts a string to an integer, returning 0 and false on error.
+// Returns the value and true on success.
+func atoiSafe(s string) (int, bool) {
+	val, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, false
+	}
+	return val, true
+}
+
 // ENCompactFormatParser handles dates/times without separators
 // Supports formats like:
 // - 20200315 (YYYYMMDD)
@@ -106,8 +116,14 @@ func (p *ENCompactFormatParser) innerExtract(context *kronos.ParsingContext, mat
 // Prioritize time if hours >= 13 (clearly not a month)
 // Otherwise prioritize date if month is valid
 func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	first2, _ := strconv.Atoi(s[0:2])
-	last2, _ := strconv.Atoi(s[2:4])
+	first2, ok := atoiSafe(s[0:2])
+	if !ok {
+		return nil
+	}
+	last2, ok := atoiSafe(s[2:4])
+	if !ok {
+		return nil
+	}
 
 	// If first 2 digits > 12, it can only be time (hours)
 	if first2 > 12 {
@@ -148,9 +164,18 @@ func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.ParsingCon
 // Prioritize date if first 2 digits look like a year (> 23 or starts with 0)
 // Otherwise prioritize time
 func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	first2, _ := strconv.Atoi(s[0:2])
-	middle2, _ := strconv.Atoi(s[2:4])
-	last2, _ := strconv.Atoi(s[4:6])
+	first2, ok := atoiSafe(s[0:2])
+	if !ok {
+		return nil
+	}
+	middle2, ok := atoiSafe(s[2:4])
+	if !ok {
+		return nil
+	}
+	last2, ok := atoiSafe(s[4:6])
+	if !ok {
+		return nil
+	}
 
 	// If first 2 digits > 23, it's more likely a year (YYMMDD)
 	// Also check if middle2 looks like a valid month
@@ -193,9 +218,18 @@ func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.ParsingCon
 // tryParse8Digits attempts to parse 8-digit strings
 // Format: YYYYMMDD
 func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, _ := strconv.Atoi(s[0:4])
-	month, _ := strconv.Atoi(s[4:6])
-	day, _ := strconv.Atoi(s[6:8])
+	year, ok := atoiSafe(s[0:4])
+	if !ok {
+		return nil
+	}
+	month, ok := atoiSafe(s[4:6])
+	if !ok {
+		return nil
+	}
+	day, ok := atoiSafe(s[6:8])
+	if !ok {
+		return nil
+	}
 
 	if isValidDate(year, month, day) {
 		components := ctx.CreateParsingComponents(nil)
@@ -212,10 +246,22 @@ func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.ParsingCon
 // tryParse10Digits attempts to parse 10-digit strings
 // Format: YYYYMMDDHHmm
 func (p *ENCompactFormatParser) tryParse10Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, _ := strconv.Atoi(s[0:4])
-	month, _ := strconv.Atoi(s[4:6])
-	day, _ := strconv.Atoi(s[6:8])
-	hour, _ := strconv.Atoi(s[8:10])
+	year, ok := atoiSafe(s[0:4])
+	if !ok {
+		return nil
+	}
+	month, ok := atoiSafe(s[4:6])
+	if !ok {
+		return nil
+	}
+	day, ok := atoiSafe(s[6:8])
+	if !ok {
+		return nil
+	}
+	hour, ok := atoiSafe(s[8:10])
+	if !ok {
+		return nil
+	}
 	minute := 0
 
 	if isValidDate(year, month, day) && isValidTime(hour, minute, 0) {
@@ -235,11 +281,26 @@ func (p *ENCompactFormatParser) tryParse10Digits(s string, ctx *kronos.ParsingCo
 // tryParse12Digits attempts to parse 12-digit strings
 // Format: YYYYMMDDHHmmss
 func (p *ENCompactFormatParser) tryParse12Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, _ := strconv.Atoi(s[0:4])
-	month, _ := strconv.Atoi(s[4:6])
-	day, _ := strconv.Atoi(s[6:8])
-	hour, _ := strconv.Atoi(s[8:10])
-	minute, _ := strconv.Atoi(s[10:12])
+	year, ok := atoiSafe(s[0:4])
+	if !ok {
+		return nil
+	}
+	month, ok := atoiSafe(s[4:6])
+	if !ok {
+		return nil
+	}
+	day, ok := atoiSafe(s[6:8])
+	if !ok {
+		return nil
+	}
+	hour, ok := atoiSafe(s[8:10])
+	if !ok {
+		return nil
+	}
+	minute, ok := atoiSafe(s[10:12])
+	if !ok {
+		return nil
+	}
 	second := 0
 
 	if isValidDate(year, month, day) && isValidTime(hour, minute, second) {
@@ -260,12 +321,30 @@ func (p *ENCompactFormatParser) tryParse12Digits(s string, ctx *kronos.ParsingCo
 // tryParse14Digits attempts to parse 14-digit strings
 // Format: YYYYMMDDHHmmss
 func (p *ENCompactFormatParser) tryParse14Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, _ := strconv.Atoi(s[0:4])
-	month, _ := strconv.Atoi(s[4:6])
-	day, _ := strconv.Atoi(s[6:8])
-	hour, _ := strconv.Atoi(s[8:10])
-	minute, _ := strconv.Atoi(s[10:12])
-	second, _ := strconv.Atoi(s[12:14])
+	year, ok := atoiSafe(s[0:4])
+	if !ok {
+		return nil
+	}
+	month, ok := atoiSafe(s[4:6])
+	if !ok {
+		return nil
+	}
+	day, ok := atoiSafe(s[6:8])
+	if !ok {
+		return nil
+	}
+	hour, ok := atoiSafe(s[8:10])
+	if !ok {
+		return nil
+	}
+	minute, ok := atoiSafe(s[10:12])
+	if !ok {
+		return nil
+	}
+	second, ok := atoiSafe(s[12:14])
+	if !ok {
+		return nil
+	}
 
 	if isValidDate(year, month, day) && isValidTime(hour, minute, second) {
 		components := ctx.CreateParsingComponents(nil)

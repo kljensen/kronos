@@ -941,14 +941,14 @@ func TestAgoFractionalTimeUnits(t *testing.T) {
 			expectedMinute: intPtr(0),
 		},
 		{
-			name:           "0.5 weeks ago",
-			text:           "0.5 weeks ago",
-			refDate:        time.Date(2016, 10, 5, 12, 0, 0, 0, time.UTC),
-			expectedText:   "0.5 weeks ago",
-			expectedYear:   2016,
-			expectedMonth:  10,
-			expectedDay:    1, // -0.5 weeks = -3.5 days (rounded to -4 days)
-			expectedHour:   intPtr(12),
+			name:          "0.5 weeks ago",
+			text:          "0.5 weeks ago",
+			refDate:       time.Date(2016, 10, 5, 12, 0, 0, 0, time.UTC),
+			expectedText:  "0.5 weeks ago",
+			expectedYear:  2016,
+			expectedMonth: 10,
+			expectedDay:   1, // -0.5 weeks = -3.5 days (rounded to -4 days)
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:           "3.25 minutes ago",

@@ -84,11 +84,11 @@ func main() {
 	fmt.Println("Example 3: Detecting and handling ranges")
 
 	testExpressions := []string{
-		"tomorrow",                     // Single date
-		"from Monday to Friday",        // Range
-		"March 15",                     // Single date
-		"between 9am and 5pm",          // Range
-		"next week",                    // Single date (could be range-like)
+		"tomorrow",              // Single date
+		"from Monday to Friday", // Range
+		"March 15",              // Single date
+		"between 9am and 5pm",   // Range
+		"next week",             // Single date (could be range-like)
 	}
 
 	for _, expr := range testExpressions {

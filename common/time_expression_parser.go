@@ -8,13 +8,23 @@ import (
 	kronos "github.com/kljensen/kronos"
 )
 
+// atoiSafe converts a string to an integer, returning 0 and false on error.
+// Returns the value and true on success.
+func atoiSafe(s string) (int, bool) {
+	val, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, false
+	}
+	return val, true
+}
+
 // Time parsing capture group constants
 const (
-	TimeHourGroup            = 2
-	TimeMinuteGroup          = 3
-	TimeSecondGroup          = 4
-	TimeFractionalSecGroup   = 5
-	TimeAMPMGroup            = 6
+	TimeHourGroup          = 2
+	TimeMinuteGroup        = 3
+	TimeSecondGroup        = 4
+	TimeFractionalSecGroup = 5
+	TimeAMPMGroup          = 6
 )
 
 // Time validation constants
@@ -387,7 +397,10 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	var meridiem *kronos.Meridiem
 
 	// Parse hour
-	hour, _ := strconv.Atoi(match[TimeHourGroup])
+	hour, ok := atoiSafe(match[TimeHourGroup])
+	if !ok {
+		return nil
+	}
 
 	// Handle combined hour-minute format (e.g., "1430" for 14:30)
 	if hour > hourCombinedFormat {
@@ -414,7 +427,10 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 			// Skip single digit minute e.g., "at 1.1 xx"
 			return nil
 		}
-		minute, _ = strconv.Atoi(match[TimeMinuteGroup])
+		minute, ok = atoiSafe(match[TimeMinuteGroup])
+		if !ok {
+			return nil
+		}
 	}
 
 	if minute >= maxMinute {
@@ -451,7 +467,10 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {
-		second, _ := strconv.Atoi(match[TimeSecondGroup])
+		second, ok := atoiSafe(match[TimeSecondGroup])
+		if !ok {
+			return nil
+		}
 		if second >= maxSecond {
 			return nil
 		}
@@ -468,7 +487,10 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 		if len(fracStr) > maxNanoDigits {
 			fracStr = fracStr[:maxNanoDigits]
 		}
-		nanos, _ := strconv.Atoi(fracStr)
+		nanos, ok := atoiSafe(fracStr)
+		if !ok {
+			return nil
+		}
 
 		// Store as milliseconds, microseconds, and nanoseconds for compatibility
 		millisecond := nanos / kronos.NanosecondsPerMS
@@ -513,7 +535,10 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {
-		second, _ := strconv.Atoi(match[TimeSecondGroup])
+		second, ok := atoiSafe(match[TimeSecondGroup])
+		if !ok {
+			return nil
+		}
 		if second >= maxSecond {
 			return nil
 		}
@@ -530,7 +555,10 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		if len(fracStr) > maxNanoDigits {
 			fracStr = fracStr[:maxNanoDigits]
 		}
-		nanos, _ := strconv.Atoi(fracStr)
+		nanos, ok := atoiSafe(fracStr)
+		if !ok {
+			return nil
+		}
 
 		// Store as milliseconds, microseconds, and nanoseconds for compatibility
 		millisecond := nanos / kronos.NanosecondsPerMS
@@ -558,7 +586,10 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 	}
 
-	hour, _ := strconv.Atoi(match[TimeHourGroup])
+	hour, ok := atoiSafe(match[TimeHourGroup])
+	if !ok {
+		return nil
+	}
 	minute := 0
 	meridiem := noMeridiem
 
@@ -568,7 +599,10 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			// Skip single digit minute in following time e.g., "10 - 10.1"
 			return nil
 		}
-		minute, _ = strconv.Atoi(match[TimeMinuteGroup])
+		minute, ok = atoiSafe(match[TimeMinuteGroup])
+		if !ok {
+			return nil
+		}
 	} else if hour > hourCombinedFormat {
 		minute = hour % hourCombinedFormat
 		hour = hour / hourCombinedFormat
@@ -735,7 +769,7 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(res
 			}
 
 			// Reject hours above 24
-			if val, _ := strconv.Atoi(nums); val > maxHour24Format {
+			if val, ok := atoiSafe(nums); ok && val > maxHour24Format {
 				return nil
 			}
 		}
@@ -780,10 +814,10 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithFollowingPattern(result
 		}
 
 		// Reject hours above 24
-		if startVal, _ := strconv.Atoi(startNum); startVal > maxHour24Format {
+		if startVal, ok := atoiSafe(startNum); ok && startVal > maxHour24Format {
 			return nil
 		}
-		if endVal, _ := strconv.Atoi(endNum); endVal > maxHour24Format {
+		if endVal, ok := atoiSafe(endNum); ok && endVal > maxHour24Format {
 			return nil
 		}
 	}
