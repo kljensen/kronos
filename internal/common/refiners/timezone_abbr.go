@@ -64,7 +64,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		// Determine the reference date for timezone lookup
 		// Use DateUTC to avoid circular DST logic issues - we want the "wall clock" time
 		// in UTC for DST calculations
-		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
+		resultStart, okStart := helpers.AsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -164,7 +164,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 
 		var resultEnd *kronos.ParsingComponents
 		if result.End() != nil {
-			if endComponents, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+			if endComponents, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents
 				if !resultEnd.IsCertain(kronos.ComponentTimezoneOffset) {
 					resultEnd.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)

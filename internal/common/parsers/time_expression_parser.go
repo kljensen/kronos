@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/types"
 )
 
@@ -535,7 +536,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	const noMeridiem = -1
 
 	components := context.CreateParsingComponents(nil)
-	resultStart, hasStart := kronos.XAsParsingComponents(result.Start())
+	resultStart, hasStart := helpers.AsParsingComponents(result.Start())
 
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {

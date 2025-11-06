@@ -29,7 +29,7 @@ func NewExtractTimezoneOffsetRefiner() *ExtractTimezoneOffsetRefiner {
 // Refine extracts timezone offsets and adds them to results
 func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	for i, result := range results {
-		resultStart, ok := kronos.XAsParsingComponents(result.Start())
+		resultStart, ok := helpers.AsParsingComponents(result.Start())
 		if !ok {
 			continue
 		}
@@ -80,7 +80,7 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 
 		var resultEnd *kronos.ParsingComponents
 		if result.End() != nil {
-			if endComponents, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+			if endComponents, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents
 				resultEnd.Assign(kronos.ComponentTimezoneOffset, timezoneOffset)
 			}

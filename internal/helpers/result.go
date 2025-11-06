@@ -21,7 +21,7 @@ func CreateRelativeFromReference(reference *kronos.ReferenceWithTimezone, durati
 		return nil
 	}
 
-	components := kronos.XNewParsingComponents(reference, nil)
+	components := NewParsingComponents(reference, nil)
 	components.AddTag("result/relativeDate")
 
 	// Determine and set the period based on the duration
@@ -101,8 +101,8 @@ func MergeDateTimeResult(dateResult, timeResult *kronos.ParsingResult) *kronos.P
 	// This implementation is a simplified version that works with public APIs only.
 	// The full implementation with private field access remains in the kronos package.
 	result := dateResult.Clone()
-	beginDate, okDate := kronos.XAsParsingComponents(dateResult.Start())
-	beginTime, okTime := kronos.XAsParsingComponents(timeResult.Start())
+	beginDate, okDate := AsParsingComponents(dateResult.Start())
+	beginTime, okTime := AsParsingComponents(timeResult.Start())
 	if !okDate || !okTime {
 		return result
 	}
@@ -114,14 +114,14 @@ func MergeDateTimeResult(dateResult, timeResult *kronos.ParsingResult) *kronos.P
 	if dateResult.End() != nil || timeResult.End() != nil {
 		var endDate, endTime *kronos.ParsingComponents
 		if dateResult.End() == nil {
-			endDate, okDate = kronos.XAsParsingComponents(dateResult.Start())
+			endDate, okDate = AsParsingComponents(dateResult.Start())
 		} else {
-			endDate, okDate = kronos.XAsParsingComponents(dateResult.End())
+			endDate, okDate = AsParsingComponents(dateResult.End())
 		}
 		if timeResult.End() == nil {
-			endTime, okTime = kronos.XAsParsingComponents(timeResult.Start())
+			endTime, okTime = AsParsingComponents(timeResult.Start())
 		} else {
-			endTime, okTime = kronos.XAsParsingComponents(timeResult.End())
+			endTime, okTime = AsParsingComponents(timeResult.End())
 		}
 		if !okDate || !okTime {
 			return result

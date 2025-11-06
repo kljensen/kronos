@@ -17,8 +17,8 @@ type AbstractMergeDateTimeRefiner struct {
 // ShouldMergeResults determines if a date-only and time-only result should be merged.
 func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) bool {
 	// Check if one is date-only and the other is time-only
-	currentStart, okCurrent := kronos.XAsParsingComponents(current.Start())
-	nextStart, okNext := kronos.XAsParsingComponents(next.Start())
+	currentStart, okCurrent := helpers.AsParsingComponents(current.Start())
+	nextStart, okNext := helpers.AsParsingComponents(next.Start())
 	if !okCurrent || !okNext {
 		return false
 	}
@@ -41,7 +41,7 @@ func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, cu
 
 // MergeResults merges a date-only and time-only result into a single date-time result.
 func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
-	currentStart, okCurrent := kronos.XAsParsingComponents(current.Start())
+	currentStart, okCurrent := helpers.AsParsingComponents(current.Start())
 	if !okCurrent {
 		return current
 	}
@@ -61,7 +61,7 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	}
 
 	// Create new result with correct index and text
-	startComponents, okStart := kronos.XAsParsingComponents(result.Start())
+	startComponents, okStart := helpers.AsParsingComponents(result.Start())
 	if !okStart {
 		return current
 	}

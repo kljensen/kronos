@@ -37,7 +37,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 	refInstant := context.Reference().Instant()
 
 	for _, result := range results {
-		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
+		resultStart, okStart := helpers.AsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -49,7 +49,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 
 			// Also adjust end time if it's a time range
 			if result.End() != nil {
-				if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+				if resultEnd, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 					if resultEnd.IsOnlyTime() {
 						r.adjustTimeOnlyComponents(resultEnd, refDate, refInstant, preference, context)
 

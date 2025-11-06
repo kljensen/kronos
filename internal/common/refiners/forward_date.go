@@ -29,7 +29,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 		refInstant := context.Reference().Instant()
 
 		// Handle time-only results
-		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
+		resultStart, okStart := helpers.AsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -45,7 +45,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 			}
 
 			if result.End() != nil {
-				if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+				if resultEnd, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 					if resultEnd.IsOnlyTime() {
 						helpers.ImplySimilarDate(resultEnd, refFollowingDay)
 						if resultStart.Date().After(resultEnd.Date()) {
@@ -80,7 +80,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 				}
 
 				if result.End() != nil {
-					if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+					if resultEnd, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 						if resultEnd.IsOnlyWeekdayComponent() {
 							endWeekdayVal := resultEnd.Get(kronos.ComponentWeekday)
 							if endWeekdayVal != nil {
@@ -120,7 +120,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 					}
 
 					if result.End() != nil {
-						if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+						if resultEnd, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 							if !resultEnd.IsCertain(kronos.ComponentYear) {
 								endYearVal := resultEnd.Get(kronos.ComponentYear)
 								if endYearVal != nil {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // YearPattern matches year patterns including BE, AD, BC, BCE, CE suffixes
@@ -355,7 +356,7 @@ func ParseYear(match string) int {
 	if err != nil {
 		return 0
 	}
-	return kronos.XFindMostLikelyADYear(year)
+	return helpers.FindMostLikelyADYear(year)
 }
 
 // ParseNumberPattern parses number-like patterns including words

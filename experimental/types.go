@@ -50,15 +50,15 @@ const (
 )
 
 // Factory functions for creating parsing types
-// These are re-exported from the main package for use by custom parser authors.
+// These are re-exported for use by custom parser authors.
 
 // NewParsingContext creates a new parsing context.
-// Re-exported from the main package for the experimental API.
+// Re-exported from the helpers package for the experimental API.
 var NewParsingContext = kronos.XNewParsingContext
 
 // NewParsingComponents creates a new ParsingComponents instance.
-// Re-exported from the main package for the experimental API.
-var NewParsingComponents = kronos.XNewParsingComponents
+// Re-exported from the helpers package for the experimental API.
+var NewParsingComponents = helpers.NewParsingComponents
 
 // NewParsingResult creates a new ParsingResult instance.
 // Re-exported from the main package for the experimental API.

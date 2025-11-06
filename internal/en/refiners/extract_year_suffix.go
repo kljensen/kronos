@@ -29,7 +29,7 @@ func NewENExtractYearSuffixRefiner() *ENExtractYearSuffixRefiner {
 // Refine extracts year suffixes from dates in parsing results
 func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	for i, result := range results {
-		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
+		resultStart, okStart := helpers.AsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -55,7 +55,7 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, resu
 		year := parseYear(match[1])
 		var resultEnd *kronos.ParsingComponents
 		if result.End() != nil {
-			if endComponents, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
+			if endComponents, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents
 				resultEnd.Assign(kronos.ComponentYear, year)
 			}

@@ -70,8 +70,8 @@ func (r *MergeWeekdayComponentRefiner) shouldMergeResults(
 	// 2. Current result has no certain hour
 	// 3. Next result has a certain day
 	// 4. Text between is just optional comma and whitespace
-	currentStart, okCurrent := kronos.XAsParsingComponents(currentResult.Start())
-	nextStart, okNext := kronos.XAsParsingComponents(nextResult.Start())
+	currentStart, okCurrent := helpers.AsParsingComponents(currentResult.Start())
+	nextStart, okNext := helpers.AsParsingComponents(nextResult.Start())
 	if !okCurrent || !okNext {
 		return false
 	}
@@ -95,8 +95,8 @@ func (r *MergeWeekdayComponentRefiner) mergeResults(
 	context *kronos.ParsingContext,
 ) *kronos.ParsingResult {
 	// Get start components
-	currentStart, okCurrent := kronos.XAsParsingComponents(currentResult.Start())
-	nextStart, okNext := kronos.XAsParsingComponents(nextResult.Start())
+	currentStart, okCurrent := helpers.AsParsingComponents(currentResult.Start())
+	nextStart, okNext := helpers.AsParsingComponents(nextResult.Start())
 	if !okCurrent || !okNext {
 		return currentResult
 	}
@@ -113,7 +113,7 @@ func (r *MergeWeekdayComponentRefiner) mergeResults(
 	// Handle end components if present
 	var newEnd *kronos.ParsingComponents
 	if nextResult.End() != nil {
-		if nextEnd, ok := kronos.XAsParsingComponents(nextResult.End()); ok {
+		if nextEnd, ok := helpers.AsParsingComponents(nextResult.End()); ok {
 			newEnd = nextEnd.Clone()
 			if weekdayVal != nil {
 				newEnd.Assign(kronos.ComponentWeekday, *weekdayVal)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -535,7 +536,7 @@ func TestStripApproximationWords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaned, isApprox := kronos.XStripApproximationWords(tt.input)
+			cleaned, isApprox := helpers.StripApproximationWords(tt.input)
 			assert.Equal(t, tt.expectedClean, cleaned, "Cleaned text mismatch")
 			assert.Equal(t, tt.isApproximate, isApprox, "isApproximate flag mismatch")
 		})
