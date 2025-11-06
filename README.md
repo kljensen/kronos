@@ -289,6 +289,59 @@ for _, r := range results {
 
 ## Advanced Usage
 
+### Experimental Package
+
+For advanced use cases like custom parsers, date math utilities, or internal APIs, Kronos provides the `experimental` package:
+
+```go
+import "github.com/kljensen/kronos/experimental"
+```
+
+The experimental package includes:
+
+- **Custom parser infrastructure**: `Parser`, `Refiner`, `Configuration`, `Chrono`
+- **Helper functions**: `Today()`, `Tomorrow()`, `FindMostLikelyADYear()`, etc.
+- **Date math utilities**: `AddDuration()`, `ReverseDuration()`, `GetLastWeekday()`, etc.
+- **Parsing internals**: `ParsingComponents`, `ParsingResult`, `ParsingContext`
+- **Internal constants**: `ApproximationWords`, `DefaultTimezoneAbbrMap`, `EmptyDuration`
+- **Advanced options**: Experimental configuration via `Option` functions
+
+**Stability Warning**: The experimental package may change between minor versions. Use only if you need features not available in the main package.
+
+Example: Creating a custom parser:
+
+```go
+import (
+    "github.com/kljensen/kronos"
+    "github.com/kljensen/kronos/experimental"
+)
+
+type MyParser struct{}
+
+func (p *MyParser) Pattern() string {
+    return `\bpayday\b`
+}
+
+func (p *MyParser) Parse(ctx *experimental.ParsingContext) []*experimental.ParsingResult {
+    // Custom parsing logic
+    comp := experimental.NewParsingComponents(ctx.Reference, nil)
+    comp.Assign(experimental.ComponentDay, 15)
+    // ... create and return results
+}
+
+func main() {
+    config := &experimental.Configuration{
+        Parsers: []experimental.Parser{&MyParser{}},
+    }
+    chrono := experimental.NewChrono(config)
+    parser := kronos.New(chrono)
+
+    results, _ := parser.Parse("Reminder: payday is coming!")
+}
+```
+
+See the [experimental package documentation](https://pkg.go.dev/github.com/kljensen/kronos/experimental) for complete details.
+
 ### Component Inspection
 
 Determine which parts of a date were explicitly mentioned:
@@ -324,29 +377,9 @@ for _, c := range components {
 // second: 0 (implied)
 ```
 
-### Custom Chrono Configuration
+### Migration Guide
 
-For advanced use cases, you can create your own `Chrono` instance with custom parsers and refiners:
-
-```go
-import (
-    "github.com/kljensen/kronos"
-    "github.com/kljensen/kronos/en"
-)
-
-// Create a custom configuration
-config := &kronos.Configuration{
-    Parsers: []kronos.Parser{
-        // Add your custom parsers
-    },
-    Refiners: []kronos.Refiner{
-        // Add your custom refiners
-    },
-}
-
-chrono := kronos.NewChrono(config)
-parser := kronos.New(chrono)
-```
+If you're upgrading from an older version of Kronos, see the [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for detailed migration instructions. **Note**: 95%+ of users are unaffected by recent API changes and can upgrade without any code modifications.
 
 ## Architecture
 
