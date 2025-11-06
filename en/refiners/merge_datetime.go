@@ -1,27 +1,15 @@
 package refiners
 
 import (
-	"regexp"
-
-	"github.com/kljensen/kronos/common/refiners"
+	"github.com/kljensen/kronos/internal/en/refiners"
 )
 
-// ENMergeDateTimeRefiner merges date-only result and time-only result.
-// Examples:
-//   - "2020-02-13 at 6pm"
-//   - "Tomorrow after 7am"
-type ENMergeDateTimeRefiner struct {
-	refiners.AbstractMergeDateTimeRefiner
-}
+// ENMergeDateTimeRefiner is deprecated: use en.New() to create a parser instance.
+// This type alias is maintained for backward compatibility.
+type ENMergeDateTimeRefiner = refiners.ENMergeDateTimeRefiner
 
-// NewENMergeDateTimeRefiner creates a new ENMergeDateTimeRefiner
+// NewENMergeDateTimeRefiner is deprecated: use en.New() to create a parser instance.
+// This constructor is maintained for backward compatibility.
 func NewENMergeDateTimeRefiner() *ENMergeDateTimeRefiner {
-	r := &ENMergeDateTimeRefiner{}
-	r.PatternBetweenFunc = r.PatternBetween
-	return r
-}
-
-// PatternBetween returns the regex pattern for matching date-time separators
-func (r *ENMergeDateTimeRefiner) PatternBetween() *regexp.Regexp {
-	return regexp.MustCompile(`^\s*(T|at|after|before|on|of|,|-|\.|∙|:)?\s*$`)
+	return refiners.NewENMergeDateTimeRefiner()
 }

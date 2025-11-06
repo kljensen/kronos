@@ -3,8 +3,9 @@ package en
 import (
 	"github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/common"
-	"github.com/kljensen/kronos/common/refiners"
-	enrefiners "github.com/kljensen/kronos/en/refiners"
+	commonrefiners "github.com/kljensen/kronos/common/refiners"
+	"github.com/kljensen/kronos/internal/en/parsers"
+	"github.com/kljensen/kronos/internal/en/refiners"
 )
 
 // includeCommonConfiguration adds common parsers and refiners to a configuration.
@@ -14,18 +15,18 @@ func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *
 
 	// Add common refiners at the beginning
 	config.Refiners = append([]kronos.Refiner{
-		refiners.NewMergeWeekdayComponentRefiner(),
-		refiners.NewExtractTimezoneOffsetRefiner(),
-		refiners.NewOverlapRemovalRefiner(),
+		commonrefiners.NewMergeWeekdayComponentRefiner(),
+		commonrefiners.NewExtractTimezoneOffsetRefiner(),
+		commonrefiners.NewOverlapRemovalRefiner(),
 	}, config.Refiners...)
 
 	// Add common refiners at the end
 	config.Refiners = append(config.Refiners,
-		refiners.NewExtractTimezoneAbbrRefiner(nil),
-		refiners.NewOverlapRemovalRefiner(),
-		refiners.NewDatePreferenceRefiner(), // Apply date preferences before ForwardDateRefiner
-		refiners.NewForwardDateRefiner(),    // ForwardDate option overrides preferences
-		refiners.NewUnlikelyFormatFilter(strictMode),
+		commonrefiners.NewExtractTimezoneAbbrRefiner(nil),
+		commonrefiners.NewOverlapRemovalRefiner(),
+		commonrefiners.NewDatePreferenceRefiner(), // Apply date preferences before ForwardDateRefiner
+		commonrefiners.NewForwardDateRefiner(),    // ForwardDate option overrides preferences
+		commonrefiners.NewUnlikelyFormatFilter(strictMode),
 	)
 
 	return config
@@ -33,38 +34,44 @@ func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *
 
 // CreateCasualConfiguration creates a casual English configuration.
 // This is now an alias for CreateConfiguration since casual parsers are included by default.
+//
+// Deprecated: Use en.New() to create a parser instance instead of accessing configurations directly.
+// This function is maintained for backward compatibility.
 func CreateCasualConfiguration(littleEndian bool) *kronos.Configuration {
 	config := CreateConfiguration(false, littleEndian)
 
 	// Add unlikely format filter for additional filtering
-	config.Refiners = append(config.Refiners, enrefiners.NewENUnlikelyFormatFilter())
+	config.Refiners = append(config.Refiners, refiners.NewENUnlikelyFormatFilter())
 
 	return config
 }
 
 // CreateConfiguration creates a standard English configuration.
+//
+// Deprecated: Use en.New() to create a parser instance instead of accessing configurations directly.
+// This function is maintained for backward compatibility.
 func CreateConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
 			common.NewSlashDateFormatParser(littleEndian),
-			NewENTimeUnitWithinFormatParser(strictMode),
-			NewENMonthNameLittleEndianParser(),
-			NewENMonthNameMiddleEndianParser(littleEndian), // shouldSkipYearLikeDate
-			NewENWeekdayParser(),
-			NewENSlashMonthFormatParser(),
-			NewENTimeExpressionParser(strictMode),
-			NewENTimeUnitAgoFormatParser(strictMode),
-			NewENTimeUnitLaterFormatParser(strictMode),
-			NewENCasualDateParser(),
-			NewENCasualTimeParser(),
-			NewENMonthNameParser(),
-			NewENRelativeDateFormatParser(),
-			NewENTimeUnitCasualRelativeFormatParser(true),
-			NewENYearParser(),          // Add year-only parser before compact format
-			NewENCompactFormatParser(), // Add compact format parser last as catch-all
+			parsers.NewENTimeUnitWithinFormatParser(strictMode),
+			parsers.NewENMonthNameLittleEndianParser(),
+			parsers.NewENMonthNameMiddleEndianParser(littleEndian), // shouldSkipYearLikeDate
+			parsers.NewENWeekdayParser(),
+			parsers.NewENSlashMonthFormatParser(),
+			parsers.NewENTimeExpressionParser(strictMode),
+			parsers.NewENTimeUnitAgoFormatParser(strictMode),
+			parsers.NewENTimeUnitLaterFormatParser(strictMode),
+			parsers.NewENCasualDateParser(),
+			parsers.NewENCasualTimeParser(),
+			parsers.NewENMonthNameParser(),
+			parsers.NewENRelativeDateFormatParser(),
+			parsers.NewENTimeUnitCasualRelativeFormatParser(true),
+			parsers.NewENYearParser(),          // Add year-only parser before compact format
+			parsers.NewENCompactFormatParser(), // Add compact format parser last as catch-all
 		},
 		Refiners: []kronos.Refiner{
-			enrefiners.NewENMergeDateTimeRefiner(),
+			refiners.NewENMergeDateTimeRefiner(),
 		},
 	}
 
@@ -72,23 +79,23 @@ func CreateConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 	config = includeCommonConfiguration(config, strictMode)
 
 	// Add year/month/day parser at the beginning
-	config.Parsers = append([]kronos.Parser{NewENYearMonthDayParser(strictMode)}, config.Parsers...)
+	config.Parsers = append([]kronos.Parser{parsers.NewENYearMonthDayParser(strictMode)}, config.Parsers...)
 
 	// Add relative date refiners at the beginning
 	config.Refiners = append([]kronos.Refiner{
-		NewENMergeRelativeFollowByDateRefiner(),
-		NewENMergeRelativeAfterDateRefiner(),
-		refiners.NewOverlapRemovalRefiner(),
+		refiners.NewENMergeRelativeFollowByDateRefiner(),
+		refiners.NewENMergeRelativeAfterDateRefiner(),
+		commonrefiners.NewOverlapRemovalRefiner(),
 	}, config.Refiners...)
 
 	// Re-apply date time refiner after timezone refinement
-	config.Refiners = append(config.Refiners, enrefiners.NewENMergeDateTimeRefiner())
+	config.Refiners = append(config.Refiners, refiners.NewENMergeDateTimeRefiner())
 
 	// Extract year after merging date and time
-	config.Refiners = append(config.Refiners, enrefiners.NewENExtractYearSuffixRefiner())
+	config.Refiners = append(config.Refiners, refiners.NewENExtractYearSuffixRefiner())
 
 	// Keep date range refiner at the end
-	config.Refiners = append(config.Refiners, enrefiners.NewENMergeDateRangeRefiner())
+	config.Refiners = append(config.Refiners, refiners.NewENMergeDateRangeRefiner())
 
 	return config
 }

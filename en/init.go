@@ -3,6 +3,7 @@ package en
 import (
 	"github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/common"
+	"github.com/kljensen/kronos/internal/en/parsers"
 )
 
 // init registers all English parsers with the global registry.
@@ -46,7 +47,7 @@ func registerEnglishParsers() {
 		Priority:    90,
 		Tags:        []string{"formal", "english"},
 	}, func() kronos.Parser {
-		return NewENYearMonthDayParser(false)
+		return parsers.NewENYearMonthDayParser(false)
 	})
 
 	kronos.Register("en_time_unit_within", kronos.ParserInfo{
@@ -54,7 +55,7 @@ func registerEnglishParsers() {
 		Priority:    70,
 		Tags:        []string{"relative", "english"},
 	}, func() kronos.Parser {
-		return NewENTimeUnitWithinFormatParser(false)
+		return parsers.NewENTimeUnitWithinFormatParser(false)
 	})
 
 	kronos.Register("en_month_name_little_endian", kronos.ParserInfo{
@@ -62,7 +63,7 @@ func registerEnglishParsers() {
 		Priority:    75,
 		Tags:        []string{"formal", "english", "uk"},
 	}, func() kronos.Parser {
-		return NewENMonthNameLittleEndianParser()
+		return parsers.NewENMonthNameLittleEndianParser()
 	})
 
 	kronos.Register("en_month_name_middle_endian", kronos.ParserInfo{
@@ -70,7 +71,7 @@ func registerEnglishParsers() {
 		Priority:    75,
 		Tags:        []string{"formal", "english", "us"},
 	}, func() kronos.Parser {
-		return NewENMonthNameMiddleEndianParser(false)
+		return parsers.NewENMonthNameMiddleEndianParser(false)
 	})
 
 	kronos.Register("en_weekday", kronos.ParserInfo{
@@ -78,7 +79,7 @@ func registerEnglishParsers() {
 		Priority:    65,
 		Tags:        []string{"casual", "english"},
 	}, func() kronos.Parser {
-		return NewENWeekdayParser()
+		return parsers.NewENWeekdayParser()
 	})
 
 	kronos.Register("en_slash_month", kronos.ParserInfo{
@@ -86,7 +87,7 @@ func registerEnglishParsers() {
 		Priority:    60,
 		Tags:        []string{"informal", "english"},
 	}, func() kronos.Parser {
-		return NewENSlashMonthFormatParser()
+		return parsers.NewENSlashMonthFormatParser()
 	})
 
 	kronos.Register("en_time_expression", kronos.ParserInfo{
@@ -94,7 +95,7 @@ func registerEnglishParsers() {
 		Priority:    70,
 		Tags:        []string{"time", "english"},
 	}, func() kronos.Parser {
-		return NewENTimeExpressionParser(false)
+		return parsers.NewENTimeExpressionParser(false)
 	})
 
 	kronos.Register("en_time_unit_ago", kronos.ParserInfo{
@@ -102,7 +103,7 @@ func registerEnglishParsers() {
 		Priority:    65,
 		Tags:        []string{"relative", "english"},
 	}, func() kronos.Parser {
-		return NewENTimeUnitAgoFormatParser(false)
+		return parsers.NewENTimeUnitAgoFormatParser(false)
 	})
 
 	kronos.Register("en_time_unit_later", kronos.ParserInfo{
@@ -110,7 +111,7 @@ func registerEnglishParsers() {
 		Priority:    65,
 		Tags:        []string{"relative", "english"},
 	}, func() kronos.Parser {
-		return NewENTimeUnitLaterFormatParser(false)
+		return parsers.NewENTimeUnitLaterFormatParser(false)
 	})
 
 	kronos.Register("en_casual_date", kronos.ParserInfo{
@@ -118,7 +119,7 @@ func registerEnglishParsers() {
 		Priority:    60,
 		Tags:        []string{"casual", "english"},
 	}, func() kronos.Parser {
-		return NewENCasualDateParser()
+		return parsers.NewENCasualDateParser()
 	})
 
 	kronos.Register("en_casual_time", kronos.ParserInfo{
@@ -126,7 +127,7 @@ func registerEnglishParsers() {
 		Priority:    60,
 		Tags:        []string{"casual", "english", "time"},
 	}, func() kronos.Parser {
-		return NewENCasualTimeParser()
+		return parsers.NewENCasualTimeParser()
 	})
 
 	kronos.Register("en_month_name", kronos.ParserInfo{
@@ -134,7 +135,7 @@ func registerEnglishParsers() {
 		Priority:    50,
 		Tags:        []string{"casual", "english"},
 	}, func() kronos.Parser {
-		return NewENMonthNameParser()
+		return parsers.NewENMonthNameParser()
 	})
 
 	kronos.Register("en_relative_date", kronos.ParserInfo{
@@ -142,7 +143,7 @@ func registerEnglishParsers() {
 		Priority:    55,
 		Tags:        []string{"relative", "english"},
 	}, func() kronos.Parser {
-		return NewENRelativeDateFormatParser()
+		return parsers.NewENRelativeDateFormatParser()
 	})
 
 	kronos.Register("en_time_unit_casual_relative", kronos.ParserInfo{
@@ -150,7 +151,7 @@ func registerEnglishParsers() {
 		Priority:    55,
 		Tags:        []string{"relative", "casual", "english"},
 	}, func() kronos.Parser {
-		return NewENTimeUnitCasualRelativeFormatParser(true)
+		return parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 	})
 
 	kronos.Register("en_compact", kronos.ParserInfo{
@@ -158,7 +159,7 @@ func registerEnglishParsers() {
 		Priority:    30, // Low priority - catch-all
 		Tags:        []string{"numeric", "informal", "english"},
 	}, func() kronos.Parser {
-		return NewENCompactFormatParser()
+		return parsers.NewENCompactFormatParser()
 	})
 }
 

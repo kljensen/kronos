@@ -1,76 +1,15 @@
 package en
 
 import (
-	"regexp"
-	"strings"
-
-	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common"
+	"github.com/kljensen/kronos/internal/en/parsers"
 )
 
-// ENMonthNameParser parses standalone month names with optional year
-// Examples: "January", "January, 2012", "in June of 2022", "Sep 2012"
-type ENMonthNameParser struct {
-	*common.AbstractParserWithWordBoundary
-}
+// ENMonthNameParser is deprecated: use en.New() to create a parser instance.
+// This type alias is maintained for backward compatibility.
+type ENMonthNameParser = parsers.ENMonthNameParser
 
-// NewENMonthNameParser creates a new ENMonthNameParser
+// NewENMonthNameParser is deprecated: use en.New() to create a parser instance.
+// This constructor is maintained for backward compatibility.
 func NewENMonthNameParser() *ENMonthNameParser {
-	parser := &ENMonthNameParser{}
-
-	parser.AbstractParserWithWordBoundary = common.NewAbstractParserWithWordBoundary(
-		parser.innerPattern,
-		parser.innerExtract,
-		nil, // use default word boundary
-	)
-
-	return parser
-}
-
-func (p *ENMonthNameParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
-	// Pattern: (in)? MONTH (,|-|of)? YEAR?
-	pattern := `(?i)((?:in)\s*)?` +
-		`(` + MonthPattern + `)` +
-		`(?:` +
-		`(?:\s*(?:,|-|of))?\s*(` + YearPattern + `)` +
-		`)?`
-
-	return regexp.MustCompile(pattern)
-}
-
-func (p *ENMonthNameParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
-	if len(match) < 3 {
-		return nil
-	}
-
-	monthName := strings.ToLower(match[2])
-
-	// Skip unlikely short words unless they're full month names
-	if len(match[0]) <= 3 {
-		if _, ok := FullMonthNameDictionary[monthName]; !ok {
-			return nil
-		}
-	}
-
-	month := MonthDictionary[monthName]
-
-	components := context.CreateParsingComponents(nil).
-		Assign(kronos.ComponentMonth, month).
-		Imply(kronos.ComponentDay, 1).
-		AddTag("parser/ENMonthNameParser")
-
-	// Handle year if present
-	if len(match) > 3 && match[3] != "" {
-		year := ParseYear(match[3])
-		components.Assign(kronos.ComponentYear, year)
-	} else {
-		// Find closest year to reference using preference setting
-		year := kronos.FindYearClosestToRefWithPreference(context.RefDate(), 1, month, context.Option().Preference)
-		components.Imply(kronos.ComponentYear, year)
-	}
-
-	// Set period to month-level
-	components.SetPeriod(kronos.PeriodMonth)
-
-	return components
+	return parsers.NewENMonthNameParser()
 }

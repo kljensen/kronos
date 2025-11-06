@@ -1,79 +1,15 @@
 package en
 
 import (
-	"regexp"
-
-	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common"
+	"github.com/kljensen/kronos/internal/en/parsers"
 )
 
-// ENTimeUnitLaterFormatParser parses expressions like:
-// "in 3 days", "3 hours later", "5 minutes from now", "2 weeks after"
-type ENTimeUnitLaterFormatParser struct {
-	*common.AbstractParserWithWordBoundary
-	strictMode bool
-}
+// ENTimeUnitLaterFormatParser is deprecated: use en.New() to create a parser instance.
+// This type alias is maintained for backward compatibility.
+type ENTimeUnitLaterFormatParser = parsers.ENTimeUnitLaterFormatParser
 
-// NewENTimeUnitLaterFormatParser creates a new parser for "time later" expressions
+// NewENTimeUnitLaterFormatParser is deprecated: use en.New() to create a parser instance.
+// This constructor is maintained for backward compatibility.
 func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParser {
-	parser := &ENTimeUnitLaterFormatParser{
-		strictMode: strictMode,
-	}
-
-	parser.AbstractParserWithWordBoundary = common.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
-			timeUnitPattern := TimeUnitPattern
-			if parser.strictMode {
-				timeUnitPattern = TimeUnitNoAbbrPattern
-			}
-
-			// Add optional approximation words at the beginning
-			// Tilde is handled separately because it's a symbol, not a word
-			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
-			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
-			// Separator between units: space, comma+space, or " and "
-			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
-			// Word numbers pattern includes 1-19 and tens (20, 30, ..., 90)
-			wordNumbers := `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
-			pattern := approximationPattern +
-				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
-				timeUnitPattern +
-				`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
-				timeUnitPattern + `)*)\s{0,5}(?:later|after|from now|henceforth|forward|out)(?:\s|$|\b)`
-
-			return regexp.MustCompile("(?i)" + pattern)
-		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
-			if len(match) < 2 {
-				return nil
-			}
-
-			// Check if approximation words were used by examining the full match
-			fullMatch := match[0]
-			_, isApproximate := kronos.StripApproximationWords(fullMatch)
-
-			duration := ParseDuration(match[1])
-			if IsEmptyDuration(duration) {
-				return nil
-			}
-
-			// Create relative result from reference (forward in time)
-			components := kronos.CreateRelativeFromReference(context.Reference(), duration)
-			if components != nil {
-				components.AddTag("result/relativeDate")
-				// Add tag for relative date and time if time components are present
-				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {
-					components.AddTag("result/relativeDateAndTime")
-				}
-				// Add approximation tag if approximation words were detected
-				if isApproximate {
-					components.AddTag("result/approximate")
-				}
-			}
-			return components
-		},
-		nil,
-	)
-
-	return parser
+	return parsers.NewENTimeUnitLaterFormatParser(strictMode)
 }

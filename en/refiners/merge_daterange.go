@@ -1,28 +1,15 @@
-// Package refiners provides English language refiners for date/time parsing results.
 package refiners
 
 import (
-	"regexp"
-
-	"github.com/kljensen/kronos/common/refiners"
+	"github.com/kljensen/kronos/internal/en/refiners"
 )
 
-// ENMergeDateRangeRefiner merges before and after results.
-// Examples:
-//   - "2020-02-13 to 2020-02-15"
-//   - "Wednesday - Friday"
-type ENMergeDateRangeRefiner struct {
-	refiners.AbstractMergeDateRangeRefiner
-}
+// ENMergeDateRangeRefiner is deprecated: use en.New() to create a parser instance.
+// This type alias is maintained for backward compatibility.
+type ENMergeDateRangeRefiner = refiners.ENMergeDateRangeRefiner
 
-// NewENMergeDateRangeRefiner creates a new ENMergeDateRangeRefiner
+// NewENMergeDateRangeRefiner is deprecated: use en.New() to create a parser instance.
+// This constructor is maintained for backward compatibility.
 func NewENMergeDateRangeRefiner() *ENMergeDateRangeRefiner {
-	r := &ENMergeDateRangeRefiner{}
-	r.PatternBetweenFunc = r.PatternBetween
-	return r
-}
-
-// PatternBetween returns the regex pattern for matching range separators
-func (r *ENMergeDateRangeRefiner) PatternBetween() *regexp.Regexp {
-	return regexp.MustCompile(`(?i)^\s*(to|-|–|until|through|till)\s*$`)
+	return refiners.NewENMergeDateRangeRefiner()
 }

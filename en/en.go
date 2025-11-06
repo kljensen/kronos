@@ -12,16 +12,29 @@ import (
 var (
 	// Casual is a Chrono instance configured for parsing casual English.
 	// It recognizes informal expressions like "today", "tomorrow", "next week", etc.
+	//
+	// Deprecated: Use New() to create a parser instance with the builder pattern API.
+	// Migration example:
+	//   Before: results := en.Casual.Parse("tomorrow", now, nil)
+	//   After:  results, _ := en.New().Parse("tomorrow")
 	Casual = kronos.NewChrono(CreateCasualConfiguration(false))
 
 	// Strict is a Chrono instance configured for parsing strict English.
 	// It only recognizes formal date/time patterns and avoids casual expressions.
-	// Deprecated: Use StrictParser() for the builder pattern API.
+	//
+	// Deprecated: Use NewStrict() to create a parser instance with the builder pattern API.
+	// Migration example:
+	//   Before: results := en.Strict.Parse("2020-03-15", now, nil)
+	//   After:  results, _ := en.NewStrict().Parse("2020-03-15")
 	Strict = kronos.NewChrono(CreateConfiguration(true, false))
 
 	// GB is a Chrono instance configured for parsing UK-style English.
 	// It uses little-endian date format (day/month/year) and casual expressions.
-	// Deprecated: Use GBParser() for the builder pattern API.
+	//
+	// Deprecated: Use NewGB() to create a parser instance with the builder pattern API.
+	// Migration example:
+	//   Before: results := en.GB.Parse("15/03/2020", now, nil)
+	//   After:  results, _ := en.NewGB().Parse("15/03/2020")
 	GB = kronos.NewChrono(CreateCasualConfiguration(true))
 )
 
@@ -38,26 +51,38 @@ func New() *kronos.ParserBuilder {
 	return kronos.New(Casual)
 }
 
-// StrictParser creates a new ParserBuilder using strict English configuration.
+// NewStrict creates a new ParserBuilder using strict English configuration.
 // In strict mode, only formal date/time patterns are recognized.
 //
 // Example:
 //
-//	parser := en.StrictParser().WithReferenceDate(time.Now())
+//	parser := en.NewStrict().WithReferenceDate(time.Now())
 //	results, err := parser.Parse("2020-03-15")
-func StrictParser() *kronos.ParserBuilder {
+func NewStrict() *kronos.ParserBuilder {
 	return kronos.New(Strict)
 }
 
-// GBParser creates a new ParserBuilder using UK-style English configuration.
+// NewGB creates a new ParserBuilder using UK-style English configuration.
 // It uses little-endian date format (day/month/year) and casual expressions.
 //
 // Example:
 //
-//	parser := en.GBParser().WithReferenceDate(time.Now())
+//	parser := en.NewGB().WithReferenceDate(time.Now())
 //	results, err := parser.Parse("15/03/2020")
-func GBParser() *kronos.ParserBuilder {
+func NewGB() *kronos.ParserBuilder {
 	return kronos.New(GB).DateOrder(kronos.DateOrderDMY)
+}
+
+// StrictParser is deprecated: use NewStrict() instead.
+// This function is maintained for backward compatibility.
+func StrictParser() *kronos.ParserBuilder {
+	return NewStrict()
+}
+
+// GBParser is deprecated: use NewGB() instead.
+// This function is maintained for backward compatibility.
+func GBParser() *kronos.ParserBuilder {
+	return NewGB()
 }
 
 // Parse parses the text and returns all parsed results.
