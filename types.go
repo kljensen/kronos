@@ -1,6 +1,10 @@
 package kronos
 
-import "time"
+import (
+	"time"
+
+	"github.com/kljensen/kronos/internal/types"
+)
 
 // Component represents a date/time component that can be parsed.
 // Components are used as keys in maps, so they are string constants.
@@ -24,11 +28,23 @@ const (
 )
 
 // Timeunit represents a unit of time for calculations and operations.
+// This type is used as a key in the Duration map type for specifying time durations.
+//
+// Note: While Timeunit is part of the public API (used by Duration), it is primarily
+// an implementation detail. Future versions may move this to a more restricted scope
+// while maintaining backward compatibility for Duration operations.
 type Timeunit string
 
-// Time unit constants
+// Time unit constants for use with Duration type.
+// These constants are required for working with Duration maps.
+//
+// Example:
+//
+//	duration := kronos.Duration{
+//	    kronos.TimeunitDay: 5,
+//	    kronos.TimeunitHour: 3,
+//	}
 const (
-	// TimeunitYear represents the year time unit
 	TimeunitYear        Timeunit = "year"
 	TimeunitMonth       Timeunit = "month"
 	TimeunitWeek        Timeunit = "week"
@@ -44,13 +60,15 @@ const (
 )
 
 // Meridiem represents the AM/PM indicator.
-type Meridiem int
+// Deprecated: This type has been moved to internal/types and will be removed in a future version.
+// It is kept here for backward compatibility.
+type Meridiem = types.Meridiem
 
-// Meridiem constants
+// Meridiem constants for internal use.
+// Deprecated: These constants have been moved to internal/types and will be removed in a future version.
 const (
-	// MeridiemAM represents AM (ante meridiem)
-	MeridiemAM Meridiem = 0
-	MeridiemPM Meridiem = 1
+	MeridiemAM = types.MeridiemAM
+	MeridiemPM = types.MeridiemPM
 )
 
 // DatePreference specifies how ambiguous dates (with missing components) should be resolved.
@@ -86,58 +104,61 @@ const (
 	PreferFuture
 )
 
-// Common time constants
+// Common time constants for internal use.
+// Deprecated: These constants have been moved to internal/types and will be removed in a future version.
 const (
-	HoursPerDay            = 24
-	MinutesPerHour         = 60
-	SecondsPerMinute       = 60
-	MillisecondsPerSecond  = 1000
-	MicrosecondsPerMS      = 1000
-	MicrosecondsPerSecond  = 1000000
-	NanosecondsPerMicro    = 1000
-	NanosecondsPerMS       = 1000000
-	SecondsPerHour         = 3600
-	MinutesPerDay          = 1440
-	DaysPerWeek            = 7
-	MonthsPerYear          = 12
-	MonthsPerQuarter       = 3
-	WeeksPerMonthApprox    = 4
-	YearLookAheadThreshold = 20 // For 2-digit year conversion
+	HoursPerDay            = types.HoursPerDay
+	MinutesPerHour         = types.MinutesPerHour
+	SecondsPerMinute       = types.SecondsPerMinute
+	MillisecondsPerSecond  = types.MillisecondsPerSecond
+	MicrosecondsPerMS      = types.MicrosecondsPerMS
+	MicrosecondsPerSecond  = types.MicrosecondsPerSecond
+	NanosecondsPerMicro    = types.NanosecondsPerMicro
+	NanosecondsPerMS       = types.NanosecondsPerMS
+	SecondsPerHour         = types.SecondsPerHour
+	MinutesPerDay          = types.MinutesPerDay
+	DaysPerWeek            = types.DaysPerWeek
+	MonthsPerYear          = types.MonthsPerYear
+	MonthsPerQuarter       = types.MonthsPerQuarter
+	WeeksPerMonthApprox    = types.WeeksPerMonthApprox
+	YearLookAheadThreshold = types.YearLookAheadThreshold
 )
 
 // Weekday represents the day of the week.
-type Weekday int
+// Deprecated: Use time.Weekday from the standard library instead.
+type Weekday = time.Weekday
 
-// Weekday constants
+// Weekday constants.
+// Deprecated: Use time.Sunday, time.Monday, etc. from the standard library instead.
 const (
-	// WeekdaySunday represents Sunday
-	WeekdaySunday Weekday = iota
-	WeekdayMonday
-	WeekdayTuesday
-	WeekdayWednesday
-	WeekdayThursday
-	WeekdayFriday
-	WeekdaySaturday
+	WeekdaySunday    = time.Sunday
+	WeekdayMonday    = time.Monday
+	WeekdayTuesday   = time.Tuesday
+	WeekdayWednesday = time.Wednesday
+	WeekdayThursday  = time.Thursday
+	WeekdayFriday    = time.Friday
+	WeekdaySaturday  = time.Saturday
 )
 
 // Month represents a calendar month.
-type Month int
+// Deprecated: Use time.Month from the standard library instead.
+type Month = time.Month
 
-// Month constants
+// Month constants.
+// Deprecated: Use time.January, time.February, etc. from the standard library instead.
 const (
-	// MonthJanuary represents January
-	MonthJanuary Month = iota + 1
-	MonthFebruary
-	MonthMarch
-	MonthApril
-	MonthMay
-	MonthJune
-	MonthJuly
-	MonthAugust
-	MonthSeptember
-	MonthOctober
-	MonthNovember
-	MonthDecember
+	MonthJanuary   = time.January
+	MonthFebruary  = time.February
+	MonthMarch     = time.March
+	MonthApril     = time.April
+	MonthMay       = time.May
+	MonthJune      = time.June
+	MonthJuly      = time.July
+	MonthAugust    = time.August
+	MonthSeptember = time.September
+	MonthOctober   = time.October
+	MonthNovember  = time.November
+	MonthDecember  = time.December
 )
 
 // Period represents the granularity of a parsed date/time expression.
