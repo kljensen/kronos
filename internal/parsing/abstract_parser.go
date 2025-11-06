@@ -1,3 +1,4 @@
+//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package parsing
 
 import (

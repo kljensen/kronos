@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestsanitizeInput(t *testing.T) {
+func TestSanitizeInput(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -346,7 +346,7 @@ func TestRemoveZeroWidthChars(t *testing.T) {
 }
 
 // Benchmark tests for performance
-func BenchmarksanitizeInput(b *testing.B) {
+func BenchmarkSanitizeInput(b *testing.B) {
 	testCases := []struct {
 		name  string
 		input string

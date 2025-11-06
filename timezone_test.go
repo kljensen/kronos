@@ -149,7 +149,7 @@ func TestToTimezoneOffset_AmbiguousWithZeroInstant(t *testing.T) {
 	assert.Nil(t, result)
 }
 
-func TestgetNthWeekdayOfMonth(t *testing.T) {
+func TestGetNthWeekdayOfMonth(t *testing.T) {
 	tests := []struct {
 		name     string
 		year     int
@@ -214,7 +214,7 @@ func TestgetNthWeekdayOfMonth(t *testing.T) {
 	}
 }
 
-func TestgetLastWeekdayOfMonth(t *testing.T) {
+func TestGetLastWeekdayOfMonth(t *testing.T) {
 	tests := []struct {
 		name     string
 		year     int

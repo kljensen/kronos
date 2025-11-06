@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestassignSimilarDate(t *testing.T) {
+func TestAssignSimilarDate(t *testing.T) {
 	reference := newReferenceWithTimezone(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), nil)
 	components := newParsingComponents(reference, nil)
 
@@ -23,7 +23,7 @@ func TestassignSimilarDate(t *testing.T) {
 	assert.Equal(t, 15, *components.Get(ComponentDay))
 }
 
-func TestassignSimilarTime(t *testing.T) {
+func TestAssignSimilarTime(t *testing.T) {
 	reference := newReferenceWithTimezone(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), nil)
 	components := newParsingComponents(reference, nil)
 
@@ -56,7 +56,7 @@ func TestAssignSimilarTime_PM(t *testing.T) {
 	assert.Equal(t, int(MeridiemPM), *components.Get(ComponentMeridiem))
 }
 
-func TestimplySimilarDate(t *testing.T) {
+func TestImplySimilarDate(t *testing.T) {
 	reference := newReferenceWithTimezone(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), nil)
 	components := newParsingComponents(reference, nil)
 
@@ -77,7 +77,7 @@ func TestimplySimilarDate(t *testing.T) {
 	assert.Equal(t, 15, *components.Get(ComponentDay))
 }
 
-func TestimplySimilarTime(t *testing.T) {
+func TestImplySimilarTime(t *testing.T) {
 	reference := newReferenceWithTimezone(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), nil)
 	components := newParsingComponents(reference, nil)
 
@@ -98,7 +98,7 @@ func TestimplySimilarTime(t *testing.T) {
 	assert.Equal(t, 45, *components.Get(ComponentSecond))
 }
 
-func TestfindMostLikelyADYear(t *testing.T) {
+func TestFindMostLikelyADYear(t *testing.T) {
 	tests := []struct {
 		name     string
 		rawYear  int
@@ -154,7 +154,7 @@ func TestfindMostLikelyADYear(t *testing.T) {
 	}
 }
 
-func TestfindYearClosestToRef(t *testing.T) {
+func TestFindYearClosestToRef(t *testing.T) {
 	tests := []struct {
 		name     string
 		refDate  time.Time
@@ -243,7 +243,7 @@ func TestAssignOverridesImply(t *testing.T) {
 	assert.Equal(t, 2022, *components.Get(ComponentYear))
 }
 
-func TestisLeapYear(t *testing.T) {
+func TestIsLeapYear(t *testing.T) {
 	tests := []struct {
 		name   string
 		year   int
@@ -278,7 +278,7 @@ func TestisLeapYear(t *testing.T) {
 	}
 }
 
-func TestfindPreviousLeapYear(t *testing.T) {
+func TestFindPreviousLeapYear(t *testing.T) {
 	tests := []struct {
 		name     string
 		baseYear int
@@ -303,7 +303,7 @@ func TestfindPreviousLeapYear(t *testing.T) {
 	}
 }
 
-func TestfindNextLeapYear(t *testing.T) {
+func TestFindNextLeapYear(t *testing.T) {
 	tests := []struct {
 		name     string
 		baseYear int
@@ -327,7 +327,7 @@ func TestfindNextLeapYear(t *testing.T) {
 	}
 }
 
-func TestfindNearestLeapYear(t *testing.T) {
+func TestFindNearestLeapYear(t *testing.T) {
 	tests := []struct {
 		name       string
 		baseYear   int

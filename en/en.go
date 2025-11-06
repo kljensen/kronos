@@ -1,5 +1,6 @@
 // Package en provides English language support for Chrono.
 // It includes parsers, refiners, and configurations for parsing English dates and times.
+//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (

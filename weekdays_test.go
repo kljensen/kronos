@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestgetNextWeekday(t *testing.T) {
+func TestGetNextWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -60,7 +60,7 @@ func TestgetNextWeekday(t *testing.T) {
 	}
 }
 
-func TestgetLastWeekday(t *testing.T) {
+func TestGetLastWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -101,7 +101,7 @@ func TestgetLastWeekday(t *testing.T) {
 	}
 }
 
-func TestgetThisWeekday(t *testing.T) {
+func TestGetThisWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -161,7 +161,7 @@ func TestgetThisWeekday(t *testing.T) {
 	}
 }
 
-func TestgetDaysToWeekday(t *testing.T) {
+func TestGetDaysToWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time

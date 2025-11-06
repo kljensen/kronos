@@ -1,3 +1,4 @@
+//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from: github.com/olebedev/when - rules/en/en_test.go

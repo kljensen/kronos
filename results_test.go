@@ -45,7 +45,7 @@ func TestReferenceWithTimezone(t *testing.T) {
 	})
 }
 
-func TestfromInput(t *testing.T) {
+func TestFromInput(t *testing.T) {
 	t.Run("FromInput with time.Time", func(t *testing.T) {
 		instant := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
 		ref := fromInput(instant, nil)

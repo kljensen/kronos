@@ -32,7 +32,7 @@ type ParsingOption struct {
 // The actual definition is in the main package.
 type Settings struct {
 	// Simplified structure - actual fields are in main package
-	_placeholder byte
+	_placeholder byte //nolint:unused // Placeholder to prevent empty struct, actual fields are in main package
 }
 
 // ReferenceWithTimezone represents a reference date/time with an optional timezone offset.

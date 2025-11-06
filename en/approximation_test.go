@@ -1,3 +1,4 @@
+//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -450,7 +451,7 @@ func TestApproximationInContext(t *testing.T) {
 }
 
 // TestStripApproximationWords tests the StripApproximationWords utility function
-func TeststripApproximationWords(t *testing.T) {
+func TestStripApproximationWords(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         string

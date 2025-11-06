@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TeststripApproximationWords(t *testing.T) {
+func TestStripApproximationWords(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         string

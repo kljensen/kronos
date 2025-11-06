@@ -1,4 +1,5 @@
 // Package common provides shared utilities and parsers for date/time parsing.
+//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package parsers
 
 import (

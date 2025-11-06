@@ -1,4 +1,5 @@
 // Package refiners provides common refiner utilities for post-processing parsing results.
+//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package refiners
 
 import "github.com/kljensen/kronos"
