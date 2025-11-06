@@ -5,6 +5,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // ForwardDateRefiner enforces the 'forwardDate' option on results.
@@ -36,7 +37,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 			refFollowingDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
 
-			kronos.XImplySimilarDate(resultStart, refFollowingDay)
+			helpers.ImplySimilarDate(resultStart, refFollowingDay)
 			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: ForwardDateRefiner adjusted time from ref date to following day
@@ -46,10 +47,10 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 			if result.End() != nil {
 				if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 					if resultEnd.IsOnlyTime() {
-						kronos.XImplySimilarDate(resultEnd, refFollowingDay)
+						helpers.ImplySimilarDate(resultEnd, refFollowingDay)
 						if resultStart.Date().After(resultEnd.Date()) {
 							refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
-							kronos.XImplySimilarDate(resultEnd, refFollowingDay)
+							helpers.ImplySimilarDate(resultEnd, refFollowingDay)
 						}
 					}
 				}
@@ -65,12 +66,12 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 					daysToAdd += 7
 				}
 
-				adjustedDate, err := kronos.XAddDuration(refDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
+				adjustedDate, err := helpers.AddDuration(refDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
 				if err != nil {
 					// Duration calculation failed - skip this adjustment
 					continue
 				}
-				kronos.XImplySimilarDate(resultStart, adjustedDate)
+				helpers.ImplySimilarDate(resultStart, adjustedDate)
 
 				if context.Option().Debug != nil {
 					context.Debug(func() {
@@ -87,12 +88,12 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 								if daysToAdd <= 0 {
 									daysToAdd += 7
 								}
-								adjustedDate, err = kronos.XAddDuration(adjustedDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
+								adjustedDate, err = helpers.AddDuration(adjustedDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
 								if err != nil {
 									// Duration calculation failed - skip this adjustment
 									continue
 								}
-								kronos.XImplySimilarDate(resultEnd, adjustedDate)
+								helpers.ImplySimilarDate(resultEnd, adjustedDate)
 
 								if context.Option().Debug != nil {
 									context.Debug(func() {

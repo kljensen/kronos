@@ -5,6 +5,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // DatePreferenceRefiner adjusts ambiguous dates based on the Preference setting.
@@ -57,7 +58,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 						if resultStart.Date().After(resultEnd.Date()) {
 							// Move end time to next day
 							nextDay := resultEnd.Date().AddDate(0, 0, 1)
-							kronos.XImplySimilarDate(resultEnd, nextDay)
+							helpers.ImplySimilarDate(resultEnd, nextDay)
 						}
 					}
 				}
@@ -89,7 +90,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 		if constructedDate.After(refInstant) {
 			refPreviousDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refPreviousDay = refPreviousDay.AddDate(0, 0, -1)
-			kronos.XImplySimilarDate(components, refPreviousDay)
+			helpers.ImplySimilarDate(components, refPreviousDay)
 
 			if context.Option().Debug != nil {
 				context.Debug(func() {
@@ -104,7 +105,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 		if constructedDate.Before(refInstant) || constructedDate.Equal(refInstant) {
 			refFollowingDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
-			kronos.XImplySimilarDate(components, refFollowingDay)
+			helpers.ImplySimilarDate(components, refFollowingDay)
 
 			if context.Option().Debug != nil {
 				context.Debug(func() {

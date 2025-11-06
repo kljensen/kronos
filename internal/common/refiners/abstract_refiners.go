@@ -2,7 +2,10 @@
 //nolint:staticcheck // SA1019: Must use deprecated types during transition
 package refiners
 
-import "github.com/kljensen/kronos"
+import (
+	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
+)
 
 // Filter is a special type of Refiner that filters results based on validity.
 type Filter interface {
@@ -50,7 +53,7 @@ func (m *BaseMergingRefiner) Refine(context *kronos.ParsingContext, results []*k
 		next := results[i]
 		start := current.Index() + len(current.Text())
 		end := next.Index()
-		textBetween, okRange := kronos.XSafeSlice(context.Text(), start, end)
+		textBetween, okRange := helpers.SafeSlice(context.Text(), start, end)
 		if !okRange {
 			merged = append(merged, current)
 			current = next

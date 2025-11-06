@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 var timezoneNamePattern = regexp.MustCompile(`(?i)^\s*,?\s*\(?([A-Z]{2,4})\)?(?:\W|$)`)
@@ -42,7 +44,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 	for _, result := range results {
 		// Calculate the position after the result text
 		suffixStart := result.Index() + len(result.Text())
-		suffix, okSlice := kronos.XSafeSlice(context.Text(), suffixStart, len(context.Text()))
+		suffix, okSlice := helpers.SafeSlice(context.Text(), suffixStart, len(context.Text()))
 		if !okSlice {
 			continue
 		}
@@ -75,7 +77,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		}
 
 		// Look up timezone offset
-		extractedTimezoneOffsetPtr := kronos.XToTimezoneOffset(timezoneAbbr, refDate, timezoneOverrides)
+		extractedTimezoneOffsetPtr := helpers.ToTimezoneOffset(timezoneAbbr, refDate, timezoneOverrides, data.DefaultTimezoneAbbrMap)
 		if extractedTimezoneOffsetPtr == nil {
 			continue
 		}

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 var timezoneOffsetPattern = regexp.MustCompile(`(?i)^\s*(?:\(?(?:GMT|UTC)\s?)?([+-])(\d{1,2})(?::?(\d{2}))?` + `\)?`)
@@ -39,7 +40,7 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 		// Calculate the position after the result text
 		suffixStart := result.Index() + len(result.Text())
 		// Check if we're beyond the end of the text
-		suffix, okSlice := kronos.XSafeSlice(context.Text(), suffixStart, len(context.Text()))
+		suffix, okSlice := helpers.SafeSlice(context.Text(), suffixStart, len(context.Text()))
 		if !okSlice {
 			continue
 		}

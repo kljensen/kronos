@@ -5,8 +5,10 @@ import (
 	"regexp"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/data"
+	endata "github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
-	"github.com/kljensen/kronos/internal/en/data"
 )
 
 // ENTimeUnitAgoFormatParser parses expressions like:
@@ -24,9 +26,9 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			timeUnitPattern := data.TimeUnitPattern
+			timeUnitPattern := endata.TimeUnitPattern
 			if parser.strictMode {
-				timeUnitPattern = data.TimeUnitNoAbbrPattern
+				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
 			// Add optional approximation words at the beginning
@@ -52,18 +54,18 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 
 			// Check if approximation words were used by examining the full match
 			fullMatch := match[0]
-			_, isApproximate := kronos.XStripApproximationWords(fullMatch)
+			_, isApproximate := helpers.StripApproximationWords(fullMatch)
 
-			duration := data.ParseDuration(match[1])
-			if data.IsEmptyDuration(duration) {
+			duration := endata.ParseDuration(match[1])
+			if endata.IsEmptyDuration(duration) {
 				return nil
 			}
 
 			// Reverse the duration (go backwards in time)
-			reversedDuration := kronos.XReverseDuration(duration)
+			reversedDuration := helpers.ReverseDuration(duration)
 
 			// Create relative result from reference
-			components := kronos.XCreateRelativeFromReference(context.Reference(), reversedDuration)
+			components := helpers.CreateRelativeFromReference(context.Reference(), reversedDuration, data.EmptyDuration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				// Add tag for relative date and time if time components are present

@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // MergeWeekdayComponentRefiner merges weekday-only results with adjacent date results.
@@ -35,7 +36,7 @@ func (r *MergeWeekdayComponentRefiner) Refine(context *kronos.ParsingContext, re
 			nextResult := results[i+1]
 			start := currentResult.Index() + len(currentResult.Text())
 			end := nextResult.Index()
-			textBetween, okRange := kronos.XSafeSlice(context.Text(), start, end)
+			textBetween, okRange := helpers.SafeSlice(context.Text(), start, end)
 			if !okRange {
 				merged = append(merged, currentResult)
 				i++

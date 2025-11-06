@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // AbstractMergeDateRangeRefiner merges two date results into a date range.
@@ -143,7 +144,7 @@ func (r *AbstractMergeDateRangeRefiner) Refine(context *kronos.ParsingContext, r
 		next := results[i]
 		start := current.Index() + len(current.Text())
 		end := next.Index()
-		textBetween, okRange := kronos.XSafeSlice(context.Text(), start, end)
+		textBetween, okRange := helpers.SafeSlice(context.Text(), start, end)
 		if !okRange {
 			merged = append(merged, current)
 			current = next

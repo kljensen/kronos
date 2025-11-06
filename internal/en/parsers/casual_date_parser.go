@@ -7,6 +7,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
 )
 
@@ -46,22 +47,22 @@ func (p *ENCasualDateParser) innerExtract(context *kronos.ParsingContext, match 
 
 	switch {
 	case lowerText == "now":
-		component = kronos.XNow(context.Reference())
+		component = helpers.Now(context.Reference())
 
 	case lowerText == "today":
-		component = kronos.XToday(context.Reference())
+		component = helpers.Today(context.Reference())
 
 	case lowerText == "yesterday":
-		component = kronos.XYesterday(context.Reference())
+		component = helpers.Yesterday(context.Reference())
 
 	case lowerText == "tomorrow" || lowerText == "tmr" || lowerText == "tmrw":
-		component = kronos.XTomorrow(context.Reference())
+		component = helpers.Tomorrow(context.Reference())
 
 	case lowerText == "tonight":
-		component = kronos.XTonightWithHour(context.Reference(), 22)
+		component = helpers.TonightWithHour(context.Reference(), 22)
 
 	case lowerText == "overmorrow":
-		component = kronos.XTheDayAfter(context.Reference(), 2)
+		component = helpers.TheDayAfter(context.Reference(), 2)
 
 	case strings.Contains(lowerText, "last") && strings.Contains(lowerText, "night"):
 		// Handle "last night"
@@ -72,7 +73,7 @@ func (p *ENCasualDateParser) innerExtract(context *kronos.ParsingContext, match 
 		}
 
 		component = context.CreateParsingComponents(nil)
-		kronos.XAssignSimilarDate(component, targetDate)
+		helpers.AssignSimilarDate(component, targetDate)
 		component.Imply(kronos.ComponentHour, 0)
 		component.SetPeriod(kronos.PeriodDay)
 

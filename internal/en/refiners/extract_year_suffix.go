@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 const (
@@ -37,7 +38,7 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, resu
 		}
 
 		start := result.Index() + len(result.Text())
-		suffix, okSlice := kronos.XSafeSlice(context.Text(), start, len(context.Text()))
+		suffix, okSlice := helpers.SafeSlice(context.Text(), start, len(context.Text()))
 		if !okSlice {
 			continue
 		}
@@ -107,5 +108,5 @@ func parseYear(match string) int {
 	if err != nil {
 		return 0
 	}
-	return kronos.XFindMostLikelyADYear(year)
+	return helpers.FindMostLikelyADYear(year)
 }

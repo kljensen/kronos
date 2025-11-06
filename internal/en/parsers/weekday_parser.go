@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/parsing"
 	"github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
+	"github.com/kljensen/kronos/internal/parsing"
 )
 
 // ENWeekdayParser parses standalone weekdays with optional modifiers:
@@ -152,11 +153,11 @@ func NewENWeekdayParser() *ENWeekdayParser {
 				thisModifier := "this"
 				modPtr = &thisModifier
 			}
-			daysOffset := kronos.XGetDaysToWeekday(refDate, weekday, modPtr)
+			daysOffset := helpers.GetDaysToWeekday(refDate, weekday, modPtr)
 			targetDate := refDate.AddDate(0, 0, daysOffset)
 
 			// Day/month/year are implied (uncertain) - they're calculated from the weekday
-			kronos.XImplySimilarDate(components, targetDate)
+			helpers.ImplySimilarDate(components, targetDate)
 			// Only weekday is certain
 			components.Assign(kronos.ComponentWeekday, int(weekday))
 			// Set period to week-level since we're parsing weekday
@@ -222,7 +223,7 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 
 	// Create components
 	components := context.CreateParsingComponents(nil)
-	kronos.XImplySimilarDate(components, targetDate)
+	helpers.ImplySimilarDate(components, targetDate)
 	components.Assign(kronos.ComponentWeekday, int(targetWeekday))
 	components.SetPeriod(kronos.PeriodWeek)
 

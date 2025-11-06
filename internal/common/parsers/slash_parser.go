@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // SlashDateFormatParser parses date formats with slash, dot, or dash separators.
@@ -197,11 +198,11 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 		if err != nil {
 			return nil
 		}
-		year := kronos.XFindMostLikelyADYear(rawYear)
+		year := helpers.FindMostLikelyADYear(rawYear)
 		components.Assign(kronos.ComponentYear, year)
 	} else {
 		// Use preference-aware year selection, which handles Feb 29 leap years
-		year := kronos.XFindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
+		year := helpers.FindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
 		components.Imply(kronos.ComponentYear, year)
 	}
 

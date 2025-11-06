@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // AbstractMergeDateTimeRefiner merges date-only and time-only results.
@@ -54,9 +55,9 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	// Determine which is date and which is time, then merge
 	var result *kronos.ParsingResult
 	if currentStart.IsOnlyDate() {
-		result = kronos.XMergeDateTimeResult(current, next)
+		result = helpers.MergeDateTimeResult(current, next)
 	} else {
-		result = kronos.XMergeDateTimeResult(next, current)
+		result = helpers.MergeDateTimeResult(next, current)
 	}
 
 	// Create new result with correct index and text
@@ -82,7 +83,7 @@ func (r *AbstractMergeDateTimeRefiner) Refine(context *kronos.ParsingContext, re
 		next := results[i]
 		start := current.Index() + len(current.Text())
 		end := next.Index()
-		textBetween, okRange := kronos.XSafeSlice(context.Text(), start, end)
+		textBetween, okRange := helpers.SafeSlice(context.Text(), start, end)
 		if !okRange {
 			merged = append(merged, current)
 			current = next

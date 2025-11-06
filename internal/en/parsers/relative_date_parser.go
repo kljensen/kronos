@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/data"
+	endata "github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
-	"github.com/kljensen/kronos/internal/en/data"
 )
 
 // ENRelativeDateFormatParser parses expressions like:
@@ -41,7 +43,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Add optional approximation words at the beginning
 			// Tilde is handled separately because it's a symbol, not a word
 			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
-			pattern := approximationPattern + `(this|last|past|next|after\s*this)\s*(` + data.MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
+			pattern := approximationPattern + `(this|last|past|next|after\s*this)\s*(` + endata.MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
 			return regexp.MustCompile("(?i)" + pattern)
 		},
 		func(context *kronos.ParsingContext, match []string) interface{} {
@@ -51,7 +53,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 
 			// Check if approximation words were used by examining the full match
 			fullMatch := match[0]
-			_, isApproximate := kronos.XStripApproximationWords(fullMatch)
+			_, isApproximate := helpers.StripApproximationWords(fullMatch)
 
 			modifier := strings.ToLower(match[1])
 			unitWord := strings.ToLower(match[2])
@@ -63,7 +65,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "next" and "after this"
 			if modifier == "next" || strings.HasPrefix(modifier, "after") {
 				duration := kronos.Duration{timeunit: 1}
-				components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
+				components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "next month" means "the next month period" starting on the 1st
@@ -84,7 +86,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "last" and "past"
 			if modifier == "last" || modifier == "past" {
 				duration := kronos.Duration{timeunit: -1}
-				components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
+				components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "last month" means "the previous month period" starting on the 1st

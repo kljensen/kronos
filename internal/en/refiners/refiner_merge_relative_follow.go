@@ -2,11 +2,13 @@
 package refiners
 
 import (
-	"github.com/kljensen/kronos/internal/en/data"
 	"regexp"
 	"strings"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/data"
+	endata "github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
 )
 
 var patternFollowBetween = regexp.MustCompile(`^\s*$`)
@@ -55,7 +57,7 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.ParsingConte
 			continue
 		}
 
-		textBetween, ok := kronos.XSafeSlice(context.Text(), startIdx, endIdx)
+		textBetween, ok := helpers.SafeSlice(context.Text(), startIdx, endIdx)
 		if !ok || !patternFollowBetween.MatchString(textBetween) {
 			merged = append(merged, current)
 			current = next
@@ -80,14 +82,14 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.ParsingConte
 		}
 
 		// Merge the results
-		duration := data.ParseDuration(current.Text())
+		duration := endata.ParseDuration(current.Text())
 		if hasImpliedEarlierReferenceDate(current) {
-			duration = kronos.XReverseDuration(duration)
+			duration = helpers.ReverseDuration(duration)
 		}
 
 		// Create new reference from next result's date
 		newRef := context.Reference().FromDate(next.Start().Date())
-		components := kronos.XCreateRelativeFromReference(newRef, duration)
+		components := helpers.CreateRelativeFromReference(newRef, duration, data.EmptyDuration)
 
 		// Create merged result
 		resultIndex := current.Index()

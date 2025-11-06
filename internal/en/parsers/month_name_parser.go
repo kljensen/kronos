@@ -6,8 +6,9 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/parsing"
 	"github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
+	"github.com/kljensen/kronos/internal/parsing"
 )
 
 // ENMonthNameParser parses standalone month names with optional year
@@ -67,7 +68,7 @@ func (p *ENMonthNameParser) innerExtract(context *kronos.ParsingContext, match [
 		components.Assign(kronos.ComponentYear, year)
 	} else {
 		// Find closest year to reference using preference setting
-		year := kronos.XFindYearClosestToRefWithPreference(context.RefDate(), 1, month, context.Option().Preference)
+		year := helpers.FindYearClosestToRefWithPreference(context.RefDate(), 1, month, context.Option().Preference)
 		components.Imply(kronos.ComponentYear, year)
 	}
 

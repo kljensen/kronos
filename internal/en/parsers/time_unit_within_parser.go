@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/data"
+	endata "github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
-	"github.com/kljensen/kronos/internal/en/data"
 )
 
 // ENTimeUnitWithinFormatParser parses expressions like:
@@ -26,9 +28,9 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			timeUnitPattern := data.TimeUnitPattern
+			timeUnitPattern := endata.TimeUnitPattern
 			if parser.strictMode {
-				timeUnitPattern = data.TimeUnitNoAbbrPattern
+				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
 			// With optional prefix if forwardDate is enabled, required prefix otherwise
@@ -68,13 +70,13 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 				return nil
 			}
 
-			duration := data.ParseDuration(match[1])
-			if data.IsEmptyDuration(duration) {
+			duration := endata.ParseDuration(match[1])
+			if endata.IsEmptyDuration(duration) {
 				return nil
 			}
 
 			// Create relative result from reference (forward in time)
-			components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
+			components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
 )
 
@@ -43,26 +44,26 @@ func (p *ENCasualTimeParser) innerExtract(context *kronos.ParsingContext, match 
 
 	// Check if approximation words were used by examining the full match
 	fullMatch := match[0]
-	_, isApproximate := kronos.XStripApproximationWords(fullMatch)
+	_, isApproximate := helpers.StripApproximationWords(fullMatch)
 
 	timeWord := strings.ToLower(match[1])
 	var component *kronos.ParsingComponents
 
 	switch timeWord {
 	case "afternoon":
-		component = kronos.XAfternoonWithHour(context.Reference(), 15)
+		component = helpers.AfternoonWithHour(context.Reference(), 15)
 
 	case "evening", "night":
-		component = kronos.XEveningWithHour(context.Reference(), 20)
+		component = helpers.EveningWithHour(context.Reference(), 20)
 
 	case "midnight":
-		component = kronos.XMidnight(context.Reference())
+		component = helpers.Midnight(context.Reference())
 
 	case "morning":
-		component = kronos.XMorningWithHour(context.Reference(), 6)
+		component = helpers.MorningWithHour(context.Reference(), 6)
 
 	case "noon", "midday":
-		component = kronos.XNoon(context.Reference())
+		component = helpers.Noon(context.Reference())
 
 	default:
 		return nil

@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/data"
+	endata "github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
-	"github.com/kljensen/kronos/internal/en/data"
 )
 
 // ENTimeUnitCasualRelativeFormatParser parses expressions like:
@@ -25,9 +27,9 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			timeUnitPattern := data.TimeUnitPattern
+			timeUnitPattern := endata.TimeUnitPattern
 			if !parser.allowAbbreviations {
-				timeUnitPattern = data.TimeUnitNoAbbrPattern
+				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
 			// Add optional approximation words at the beginning
@@ -49,22 +51,22 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 
 			// Check if approximation words were used by examining the full match
 			fullMatch := match[0]
-			_, isApproximate := kronos.XStripApproximationWords(fullMatch)
+			_, isApproximate := helpers.StripApproximationWords(fullMatch)
 
 			prefix := strings.ToLower(match[1])
-			duration := data.ParseDuration(match[2])
-			if data.IsEmptyDuration(duration) {
+			duration := endata.ParseDuration(match[2])
+			if endata.IsEmptyDuration(duration) {
 				return nil
 			}
 
 			// Reverse duration for "last", "past", and "-"
 			switch prefix {
 			case "last", "past", "-":
-				duration = kronos.XReverseDuration(duration)
+				duration = helpers.ReverseDuration(duration)
 			}
 
 			// Create relative result from reference
-			components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
+			components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {

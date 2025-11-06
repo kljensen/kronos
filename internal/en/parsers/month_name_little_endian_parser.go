@@ -6,8 +6,9 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/parsing"
 	"github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/helpers"
+	"github.com/kljensen/kronos/internal/parsing"
 )
 
 // ENMonthNameLittleEndianParser parses "DD Month YYYY" format (little-endian)
@@ -76,7 +77,7 @@ func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.ParsingCont
 		components.Assign(kronos.ComponentYear, year)
 	} else {
 		// Find closest year to reference using preference setting
-		year := kronos.XFindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
+		year := helpers.FindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
 		components.Imply(kronos.ComponentYear, year)
 	}
 
