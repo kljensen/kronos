@@ -378,7 +378,7 @@ func TestENMonthNameLittleEndianParser_ForwardOption(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Skip("ForwardDate refiner integration pending")
-			options := &kronos.ParsingOption{ForwardDate: tt.forwardDate}
+			_ = tt.forwardDate // options will be used when ForwardDate is implemented
 			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, results)
@@ -408,9 +408,10 @@ func TestENMonthNameLittleEndianParser_ImpossibleDatesStrictMode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
 			t.Skip("Strict mode date validation refiners not yet implemented")
-			results := Strict.Parse(tt.text, tt.refDate, nil)
-			t.Logf("Text: %s, Reason: %s, Results: %d", tt.text, tt.reason, len(results))
+			t.Logf("Text: %s, Reason: %s", tt.text, tt.reason)
 			// TODO: When strict mode refiners are implemented:
+			// strictChrono := experimental.EnglishStrictChrono()
+			// results := strictChrono.Parse(tt.text, tt.refDate, nil)
 			// assert.Empty(t, results, "Should not parse in strict mode: %s (%s)", tt.text, tt.reason)
 		})
 	}

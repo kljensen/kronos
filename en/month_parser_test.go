@@ -45,11 +45,11 @@ func createMonthChrono() *kronos.Chrono {
 		Parsers: []kronos.Parser{
 			parsers.NewENMonthNameParser(),
 			parsers.NewENMonthNameLittleEndianParser(),
-			NewENMonthNameMiddleEndianParser(false),
+			parsers.NewENMonthNameMiddleEndianParser(false),
 			parsers.NewENSlashMonthFormatParser(),
 		},
 		Refiners: []kronos.Refiner{
-			commonrefiners.XNewForwardDateRefiner(),
+			commonrefiners.NewForwardDateRefiner(),
 			enrefiners.NewENMergeDateRangeRefiner(),
 		},
 	}

@@ -22,16 +22,18 @@ import (
 // 3. If it must be public, update MAX_EXPORTS with justification
 func TestAPIExports(t *testing.T) {
 	const (
-		// Maximum allowed public exports. This should trend downward over time as we
-		// deprecate and remove unnecessary exports. Current breakdown:
-		// - 3 essential enum types (Component 12, DateOrder 3, DatePreference 3) = 18 consts
-		// - 1 enum type (Timeunit 12 consts) - needed for Duration
-		// - 1 enum type (Period 6 consts)
-		// - Deprecated: Weekday (8 items) + Month (13 items) + Meridiem (3 items) + numeric helpers (16 consts)
-		// - Duration type + helper functions
-		// - Builder API, parser types, configuration
-		// - Component access interfaces
-		MAX_EXPORTS = 200 // Current baseline - should decrease in future versions
+		// Maximum allowed public exports after Phase 1-4 API minimization.
+		// Current breakdown (~126 exports):
+		// - Essential enum types: Component (13), DateOrder (4), DatePreference (4) = 21 consts
+		// - Duration/Time: Timeunit (13), Period (7) = 20 consts + Duration type
+		// - Deprecated (kept for backward compatibility):
+		//   * Weekday (8) + Month (13) + Meridiem (3) = 24 items
+		//   * Numeric helpers (2 items: DayPreferMonday, DayPreferSunday)
+		// - Core API: Builder, Parser, Chrono, Configuration, Result/Components interfaces
+		// - Helper functions: parsing, configuration, component access
+		// Target: ~60-70 exports (after removing deprecated types in major version bump)
+		// Current: 126 (includes ~39 deprecated items marked for removal)
+		MAX_EXPORTS = 150 // Reduced from 200, allows headroom while preventing API bloat
 	)
 
 	// Use go doc to list all exports

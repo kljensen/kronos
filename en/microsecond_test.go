@@ -6,6 +6,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/experimental"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -128,8 +129,7 @@ func TestMicrosecondPrecisionInTimestamps(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
+			chrono := experimental.EnglishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, nil)
 
 			assert.NotEmpty(t, results, "Should parse: %s", tt.input)
@@ -199,8 +199,7 @@ func TestRelativeTimeWithMicroseconds(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
+			chrono := experimental.EnglishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, nil)
 
 			assert.NotEmpty(t, results, "Should parse: %s", tt.input)
@@ -294,8 +293,7 @@ func TestTrailingZerosInFractionalSeconds(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
+			chrono := experimental.EnglishCasualChrono()
 
 			results1 := chrono.Parse(tt.input1, refDate, nil)
 			assert.NotEmpty(t, results1)

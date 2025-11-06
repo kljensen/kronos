@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/experimental"
 )
 
 // TestSanitizationIntegration tests that sanitization works correctly during actual parsing.
@@ -62,8 +63,7 @@ func TestSanitizationIntegration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a basic English chrono parser
-			config := CreateConfiguration(false, false)
-			chrono := kronos.NewChrono(config)
+			chrono := experimental.EnglishCasualChrono()
 			refDate := time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)
 
 			// Parse the input
@@ -86,8 +86,7 @@ func TestSanitizationIntegration(t *testing.T) {
 // TestSanitizationPreservesSemantics tests that sanitization doesn't change
 // the semantic meaning of the text, only normalizes the representation.
 func TestSanitizationPreservesSemantics(t *testing.T) {
-	config := CreateConfiguration(false, false)
-	chrono := kronos.NewChrono(config)
+	chrono := experimental.EnglishCasualChrono()
 	refDate := time.Date(2024, 3, 10, 12, 0, 0, 0, time.UTC)
 
 	// Test that the same semantic date with different Unicode representations

@@ -39,11 +39,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// ptrInt creates a pointer to an int
-func ptrInt(i int) *int {
-	return &i
-}
-
 // createTestChrono creates a chrono instance for testing slash dates (US-style, casual)
 func createTestChrono() *kronos.Chrono {
 	config := &kronos.Configuration{

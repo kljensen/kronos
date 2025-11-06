@@ -392,12 +392,12 @@ func createHawkingChrono() *kronos.Chrono {
 			parsers.NewENCasualDateParser(),
 			parsers.NewENCasualTimeParser(),
 			parsers.NewENWeekdayParser(),
-			NewENTimeExpressionParser(false),
+			parsers.NewENTimeExpressionParser(false),
 			parsers.NewENMonthNameParser(),
 			parsers.NewENSlashMonthFormatParser(),
-			NewENTimeUnitAgoFormatParser(false),
-			NewENTimeUnitLaterFormatParser(false),
-			NewENTimeUnitWithinFormatParser(false),
+			parsers.NewENTimeUnitAgoFormatParser(false),
+			parsers.NewENTimeUnitLaterFormatParser(false),
+			parsers.NewENTimeUnitWithinFormatParser(false),
 		},
 	}
 	return kronos.NewChrono(config)

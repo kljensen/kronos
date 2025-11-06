@@ -6,6 +6,7 @@ import (
 
 	kronos "github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/internal/common/refiners"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +22,7 @@ import (
 // TOTAL: 41 test cases (note: TypeScript had some duplicates)
 
 func TestENMonthNameMiddleEndian_FullDateExpressions(t *testing.T) {
-	parser := NewENMonthNameMiddleEndianParser(false)
+	parser := parsers.NewENMonthNameMiddleEndianParser(false)
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -174,7 +175,7 @@ func TestENMonthNameMiddleEndian_FullDateExpressions(t *testing.T) {
 }
 
 func TestENMonthNameMiddleEndian_SingleExpressionWithSeparators(t *testing.T) {
-	parser := NewENMonthNameMiddleEndianParser(false)
+	parser := parsers.NewENMonthNameMiddleEndianParser(false)
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -234,7 +235,7 @@ func TestENMonthNameMiddleEndian_SingleExpressionWithSeparators(t *testing.T) {
 }
 
 func TestENMonthNameMiddleEndian_RangeExpression(t *testing.T) {
-	parser := NewENMonthNameMiddleEndianParser(false)
+	parser := parsers.NewENMonthNameMiddleEndianParser(false)
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -354,7 +355,7 @@ func TestENMonthNameMiddleEndian_RangeExpression(t *testing.T) {
 }
 
 func TestENMonthNameMiddleEndian_OrdinalWords(t *testing.T) {
-	parser := NewENMonthNameMiddleEndianParser(false)
+	parser := parsers.NewENMonthNameMiddleEndianParser(false)
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -427,13 +428,13 @@ func TestENMonthNameMiddleEndian_OrdinalWords(t *testing.T) {
 }
 
 func TestENMonthNameMiddleEndian_ForwardOption(t *testing.T) {
-	parser := NewENMonthNameMiddleEndianParser(false)
+	parser := parsers.NewENMonthNameMiddleEndianParser(false)
 	refDate := time.Date(2016, 2, 15, 0, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{parser},
 		Refiners: []kronos.Refiner{
-			refiners.XNewForwardDateRefiner(),
+			refiners.NewForwardDateRefiner(),
 		},
 	}
 
@@ -488,7 +489,7 @@ func TestENMonthNameMiddleEndian_ForwardOption(t *testing.T) {
 }
 
 func TestENMonthNameMiddleEndian_Year90sParsing(t *testing.T) {
-	parser := NewENMonthNameMiddleEndianParser(false)
+	parser := parsers.NewENMonthNameMiddleEndianParser(false)
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -569,7 +570,7 @@ func TestENMonthNameMiddleEndian_SkipYearLikeOnLittleEndian(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENMonthNameMiddleEndianParser(tt.littleEndian)
+			parser := parsers.NewENMonthNameMiddleEndianParser(tt.littleEndian)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 			results := chrono.Parse(tt.text, tt.refDate, nil)

@@ -77,8 +77,8 @@ func TestNew_PreferFuture(t *testing.T) {
 }
 
 func TestStrictParser(t *testing.T) {
-	// Test that StrictParser() returns a builder
-	builder := StrictParser()
+	// Test that NewStrict() returns a builder
+	builder := NewStrict()
 	assert.NotNil(t, builder)
 
 	// Strict mode should still parse formal dates
@@ -88,8 +88,8 @@ func TestStrictParser(t *testing.T) {
 }
 
 func TestGBParser(t *testing.T) {
-	// Test that GBParser() returns a builder
-	builder := GBParser()
+	// Test that NewGB() returns a builder
+	builder := NewGB()
 	assert.NotNil(t, builder)
 
 	// GB format should parse day/month/year
