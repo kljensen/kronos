@@ -16,6 +16,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -388,12 +389,12 @@ func TestHawkingParity_MultipleDetection(t *testing.T) {
 func createHawkingChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			NewENCasualDateParser(),
-			NewENCasualTimeParser(),
-			NewENWeekdayParser(),
+			parsers.NewENCasualDateParser(),
+			parsers.NewENCasualTimeParser(),
+			parsers.NewENWeekdayParser(),
 			NewENTimeExpressionParser(false),
-			NewENMonthNameParser(),
-			NewENSlashMonthFormatParser(),
+			parsers.NewENMonthNameParser(),
+			parsers.NewENSlashMonthFormatParser(),
 			NewENTimeUnitAgoFormatParser(false),
 			NewENTimeUnitLaterFormatParser(false),
 			NewENTimeUnitWithinFormatParser(false),

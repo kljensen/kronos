@@ -51,7 +51,8 @@ func TestENMonthNameLittleEndianParser_SingleExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -78,7 +79,8 @@ func TestENMonthNameLittleEndianParser_WithWeekday(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -110,7 +112,8 @@ func TestENMonthNameLittleEndianParser_OrdinalNumbers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -130,7 +133,8 @@ func TestENMonthNameLittleEndianParser_InvalidDates(t *testing.T) {
 	for _, text := range tests {
 		t.Run(text, func(t *testing.T) {
 			t.Skip("Invalid date validation not yet implemented")
-			results := Casual.Parse(text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(text)
+			assert.NoError(t, err)
 			assert.Empty(t, results, "Should not parse: %s", text)
 		})
 	}
@@ -153,7 +157,8 @@ func TestENMonthNameLittleEndianParser_WithSeparators(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -189,7 +194,8 @@ func TestENMonthNameLittleEndianParser_RangeExpression(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Skip("Range parsing requires range refiner integration")
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -221,7 +227,8 @@ func TestENMonthNameLittleEndianParser_CombinedWithTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -253,7 +260,8 @@ func TestENMonthNameLittleEndianParser_OrdinalWords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -287,7 +295,8 @@ func TestENMonthNameLittleEndianParser_DateFollowedByTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -318,7 +327,8 @@ func TestENMonthNameLittleEndianParser_Year90s(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.text, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
 				return
@@ -336,7 +346,8 @@ func TestENMonthNameLittleEndianParser_LowercaseMonth(t *testing.T) {
 	text := "23rd february, 2016"
 
 	t.Run(text, func(t *testing.T) {
-		results := Casual.Parse(text, refDate, nil)
+		results, err := New().WithReferenceDate(refDate).Parse(text)
+			assert.NoError(t, err)
 		assert.NotEmpty(t, results, "Expected to parse: %s", text)
 		if len(results) == 0 {
 			return
@@ -368,7 +379,8 @@ func TestENMonthNameLittleEndianParser_ForwardOption(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Skip("ForwardDate refiner integration pending")
 			options := &kronos.ParsingOption{ForwardDate: tt.forwardDate}
-			results := Casual.Parse(tt.text, refDate, options)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 			assert.NotEmpty(t, results)
 			if len(results) == 0 {
 				return

@@ -106,22 +106,22 @@ func XEvening(reference *ReferenceWithTimezone) *ParsingComponents {
 }
 
 // XGetDaysToWeekday is an internal helper for internal/ packages.
-func XGetDaysToWeekday(refDate time.Time, targetWeekday Weekday, modifier *string) int {
+func XGetDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *string) int {
 	return getDaysToWeekday(refDate, targetWeekday, modifier)
 }
 
 // XGetLastWeekday is an internal helper for internal/ packages.
-func XGetLastWeekday(refDate time.Time, targetWeekday Weekday) time.Time {
+func XGetLastWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	return getLastWeekday(refDate, targetWeekday)
 }
 
 // XGetNextWeekday is an internal helper for internal/ packages.
-func XGetNextWeekday(refDate time.Time, targetWeekday Weekday) time.Time {
+func XGetNextWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	return getNextWeekday(refDate, targetWeekday)
 }
 
 // XGetThisWeekday is an internal helper for internal/ packages.
-func XGetThisWeekday(refDate time.Time, targetWeekday Weekday, forward bool) time.Time {
+func XGetThisWeekday(refDate time.Time, targetWeekday time.Weekday, forward bool) time.Time {
 	return getThisWeekday(refDate, targetWeekday, forward)
 }
 
@@ -156,12 +156,12 @@ func XToTimezoneOffset(tz interface{}, instant time.Time, overrides TimezoneAbbr
 }
 
 // XGetLastWeekdayOfMonth is an internal helper for internal/ packages.
-func XGetLastWeekdayOfMonth(year int, month Month, weekday Weekday, hour int) time.Time {
+func XGetLastWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, hour int) time.Time {
 	return getLastWeekdayOfMonth(year, month, weekday, hour)
 }
 
 // XGetNthWeekdayOfMonth is an internal helper for internal/ packages.
-func XGetNthWeekdayOfMonth(year int, month Month, weekday Weekday, n int, hour int) time.Time {
+func XGetNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int, hour int) time.Time {
 	return getNthWeekdayOfMonth(year, month, weekday, n, hour)
 }
 

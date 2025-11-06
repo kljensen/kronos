@@ -7,7 +7,7 @@ import "time"
 //
 // For example, if refDate is Monday and targetWeekday is Monday, it returns
 // the following Monday (7 days later).
-func getNextWeekday(refDate time.Time, targetWeekday Weekday) time.Time {
+func getNextWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
@@ -25,7 +25,7 @@ func getNextWeekday(refDate time.Time, targetWeekday Weekday) time.Time {
 //
 // For example, if refDate is Monday and targetWeekday is Monday, it returns
 // the previous Monday (7 days earlier).
-func getLastWeekday(refDate time.Time, targetWeekday Weekday) time.Time {
+func getLastWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
@@ -49,7 +49,7 @@ func getLastWeekday(refDate time.Time, targetWeekday Weekday) time.Time {
 // - getThisWeekday(Wednesday, Monday, forward=false) -> previous Monday (2 days back)
 // - getThisWeekday(Wednesday, Wednesday, forward=true) -> same Wednesday (0 days)
 // - getThisWeekday(Wednesday, Wednesday, forward=false) -> same Wednesday (0 days)
-func getThisWeekday(refDate time.Time, targetWeekday Weekday, forward bool) time.Time {
+func getThisWeekday(refDate time.Time, targetWeekday time.Weekday, forward bool) time.Time {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
@@ -83,8 +83,8 @@ func getThisWeekday(refDate time.Time, targetWeekday Weekday, forward bool) time
 // - "next": Returns the target weekday in the next occurrence
 // - "last": Returns the target weekday in the last occurrence (negative value)
 // - nil/empty: Returns the closest weekday (forward or backward)
-func getDaysToWeekday(refDate time.Time, targetWeekday Weekday, modifier *string) int {
-	refWeekday := Weekday(refDate.Weekday())
+func getDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *string) int {
+	refWeekday := time.Weekday(refDate.Weekday())
 
 	if modifier == nil {
 		return getDaysToWeekdayClosest(refDate, targetWeekday)
@@ -97,25 +97,25 @@ func getDaysToWeekday(refDate time.Time, targetWeekday Weekday, modifier *string
 		return getBackwardDaysToWeekday(refDate, targetWeekday)
 	case "next":
 		// Special handling for "next" based on the current weekday
-		if refWeekday == WeekdaySunday {
-			if targetWeekday == WeekdaySunday {
+		if refWeekday == time.Sunday {
+			if targetWeekday == time.Sunday {
 				return 7
 			}
 			return int(targetWeekday)
 		}
 
-		if refWeekday == WeekdaySaturday {
-			if targetWeekday == WeekdaySaturday {
+		if refWeekday == time.Saturday {
+			if targetWeekday == time.Saturday {
 				return 7
 			}
-			if targetWeekday == WeekdaySunday {
+			if targetWeekday == time.Sunday {
 				return 8
 			}
 			return 1 + int(targetWeekday)
 		}
 
 		// For weekdays (Mon-Fri)
-		if targetWeekday < refWeekday && targetWeekday != WeekdaySunday {
+		if targetWeekday < refWeekday && targetWeekday != time.Sunday {
 			return getDaysForwardToWeekday(refDate, targetWeekday)
 		}
 		return getDaysForwardToWeekday(refDate, targetWeekday) + 7
@@ -126,7 +126,7 @@ func getDaysToWeekday(refDate time.Time, targetWeekday Weekday, modifier *string
 
 // getDaysForwardToWeekday returns the number of days forward to reach the target weekday.
 // Returns 0 if already on the target weekday.
-func getDaysForwardToWeekday(refDate time.Time, targetWeekday Weekday) int {
+func getDaysForwardToWeekday(refDate time.Time, targetWeekday time.Weekday) int {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
@@ -140,7 +140,7 @@ func getDaysForwardToWeekday(refDate time.Time, targetWeekday Weekday) int {
 
 // getBackwardDaysToWeekday returns the number of days backward to reach the target weekday.
 // Returns a negative number (or 0 if already on the target weekday).
-func getBackwardDaysToWeekday(refDate time.Time, targetWeekday Weekday) int {
+func getBackwardDaysToWeekday(refDate time.Time, targetWeekday time.Weekday) int {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
@@ -154,7 +154,7 @@ func getBackwardDaysToWeekday(refDate time.Time, targetWeekday Weekday) int {
 
 // getDaysToWeekdayClosest returns the number of days to the closest occurrence
 // of the target weekday (either forward or backward).
-func getDaysToWeekdayClosest(refDate time.Time, targetWeekday Weekday) int {
+func getDaysToWeekdayClosest(refDate time.Time, targetWeekday time.Weekday) int {
 	backward := getBackwardDaysToWeekday(refDate, targetWeekday)
 	forward := getDaysForwardToWeekday(refDate, targetWeekday)
 

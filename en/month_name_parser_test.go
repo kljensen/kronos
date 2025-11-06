@@ -6,11 +6,12 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestENMonthNameParser_MonthYear(t *testing.T) {
-	parser := NewENMonthNameParser()
+	parser := parsers.NewENMonthNameParser()
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -94,7 +95,7 @@ func TestENMonthNameParser_MonthYear(t *testing.T) {
 }
 
 func TestENMonthNameParser_MonthOnly(t *testing.T) {
-	parser := NewENMonthNameParser()
+	parser := parsers.NewENMonthNameParser()
 
 	tests := []struct {
 		name          string

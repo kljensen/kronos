@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -6,6 +5,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/experimental"
 )
 
 // TestPerformanceWhitespaceBacktracking tests that parsing doesn't exhibit
@@ -33,8 +33,11 @@ func TestPerformanceWhitespaceBacktracking(t *testing.T) {
 
 	start := time.Now()
 	refDate := time.Now()
-	chrono := kronos.NewChrono(CreateConfiguration(false, true))
-	results := chrono.Parse(str, refDate, nil)
+	chrono := experimental.EnglishCasualChrono()
+	results, err := kronos.New(chrono).WithReferenceDate(refDate).Parse(str)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
 	elapsed := time.Since(start)
 
 	// Should find no valid results (numbers are too far from units)

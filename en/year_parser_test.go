@@ -11,7 +11,7 @@ import (
 
 func TestENYearParser(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	parser := NewENYearParser()
+	parser := parsers.NewENYearParser()
 
 	tests := []struct {
 		input         string
@@ -62,7 +62,7 @@ func TestENYearParser(t *testing.T) {
 
 func TestENYearParserWithContext(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	parser := NewENYearParser()
+	parser := parsers.NewENYearParser()
 
 	tests := []struct {
 		text string

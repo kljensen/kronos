@@ -12,15 +12,15 @@ func TestBuilderWithCommonOptions(t *testing.T) {
 	builder := New(nil).
 		WithReferenceDate(refDate).
 		WithDateOrder(DateOrderDMY).
-		WithForwardDate(true).
+		PreferFuture().
 		Strict()
 
 	// Verify settings are applied
 	if builder.settings.DateOrder != DateOrderDMY {
 		t.Errorf("Expected DateOrderDMY, got %v", builder.settings.DateOrder)
 	}
-	if !builder.settings.ForwardDate {
-		t.Error("Expected ForwardDate to be true")
+	if builder.settings.PreferDatesFrom != PreferFuture {
+		t.Errorf("Expected PreferFuture, got %v", builder.settings.PreferDatesFrom)
 	}
 	if !builder.settings.StrictParsing {
 		t.Error("Expected StrictParsing to be true")
@@ -94,8 +94,7 @@ func TestBuilderChaining(t *testing.T) {
 	_ = New(nil).
 		WithReferenceDate(refDate).
 		WithDateOrder(DateOrderYMD).
-		WithForwardDate(false).
-		Strict().
 		PreferPast().
+		Strict().
 		Timezone("UTC")
 }

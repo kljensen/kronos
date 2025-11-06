@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package kronos_test
 
 import (
@@ -6,7 +5,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common"
+	"github.com/kljensen/kronos/internal/common/parsers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,7 +16,7 @@ func TestChronoIntegration(t *testing.T) {
 		// Create a configuration with ISO parser
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewISOFormatParser(),
+				parsers.NewISOFormatParser(),
 			},
 		}
 
@@ -42,7 +41,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("parse ISO datetime with timezone", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewISOFormatParser(),
+				parsers.NewISOFormatParser(),
 			},
 		}
 
@@ -69,7 +68,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("parse slash date MM/DD/YYYY", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewSlashDateFormatParser(false), // US format
+				parsers.NewSlashDateFormatParser(false), // US format
 			},
 		}
 
@@ -93,7 +92,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("parse slash date DD/MM/YYYY", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewSlashDateFormatParser(true), // UK/EU format
+				parsers.NewSlashDateFormatParser(true), // UK/EU format
 			},
 		}
 
@@ -116,8 +115,8 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("multiple parsers - multiple matches", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewISOFormatParser(),
-				common.NewSlashDateFormatParser(false),
+				parsers.NewISOFormatParser(),
+				parsers.NewSlashDateFormatParser(false),
 			},
 		}
 
@@ -148,7 +147,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("ParseDate returns first result date", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewISOFormatParser(),
+				parsers.NewISOFormatParser(),
 			},
 		}
 
@@ -173,7 +172,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("ParseDate returns nil when no match", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewISOFormatParser(),
+				parsers.NewISOFormatParser(),
 			},
 		}
 
@@ -191,7 +190,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("2-digit year inference", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewSlashDateFormatParser(false),
+				parsers.NewSlashDateFormatParser(false),
 			},
 		}
 
@@ -213,7 +212,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("year inference without year", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewSlashDateFormatParser(false),
+				parsers.NewSlashDateFormatParser(false),
 			},
 		}
 
@@ -236,7 +235,7 @@ func TestChronoIntegration(t *testing.T) {
 	t.Run("word boundaries prevent false matches", func(t *testing.T) {
 		config := &kronos.Configuration{
 			Parsers: []kronos.Parser{
-				common.NewISOFormatParser(),
+				parsers.NewISOFormatParser(),
 			},
 		}
 

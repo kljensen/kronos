@@ -2,8 +2,6 @@ package kronos
 
 import (
 	"time"
-
-	"github.com/kljensen/kronos/internal/types"
 )
 
 // Component represents a date/time component that can be parsed.
@@ -59,18 +57,6 @@ const (
 	TimeunitDecade      Timeunit = "decade"
 )
 
-// Meridiem represents the AM/PM indicator.
-// Deprecated: This type has been moved to internal/types and will be removed in a future version.
-// It is kept here for backward compatibility.
-type Meridiem = types.Meridiem
-
-// Meridiem constants for internal use.
-// Deprecated: These constants have been moved to internal/types and will be removed in a future version.
-const (
-	MeridiemAM = types.MeridiemAM
-	MeridiemPM = types.MeridiemPM
-)
-
 // DatePreference specifies how ambiguous dates (with missing components) should be resolved.
 // This controls whether dates like "March 15" (without year) or "10:00" (without date)
 // should be interpreted as being in the past, future, or current period relative to the reference time.
@@ -102,63 +88,6 @@ const (
 	//   - "10:00" → Feb 16, 2015 10:00 (tomorrow morning, since 10:00 already passed today)
 	//   - "18:00" → Feb 15, 2015 18:00 (later today)
 	PreferFuture
-)
-
-// Common time constants for internal use.
-// Deprecated: These constants have been moved to internal/types and will be removed in a future version.
-const (
-	HoursPerDay            = types.HoursPerDay
-	MinutesPerHour         = types.MinutesPerHour
-	SecondsPerMinute       = types.SecondsPerMinute
-	MillisecondsPerSecond  = types.MillisecondsPerSecond
-	MicrosecondsPerMS      = types.MicrosecondsPerMS
-	MicrosecondsPerSecond  = types.MicrosecondsPerSecond
-	NanosecondsPerMicro    = types.NanosecondsPerMicro
-	NanosecondsPerMS       = types.NanosecondsPerMS
-	SecondsPerHour         = types.SecondsPerHour
-	MinutesPerDay          = types.MinutesPerDay
-	DaysPerWeek            = types.DaysPerWeek
-	MonthsPerYear          = types.MonthsPerYear
-	MonthsPerQuarter       = types.MonthsPerQuarter
-	WeeksPerMonthApprox    = types.WeeksPerMonthApprox
-	YearLookAheadThreshold = types.YearLookAheadThreshold
-)
-
-// Weekday represents the day of the week.
-// Deprecated: Use time.Weekday from the standard library instead.
-type Weekday = time.Weekday
-
-// Weekday constants.
-// Deprecated: Use time.Sunday, time.Monday, etc. from the standard library instead.
-const (
-	WeekdaySunday    = time.Sunday
-	WeekdayMonday    = time.Monday
-	WeekdayTuesday   = time.Tuesday
-	WeekdayWednesday = time.Wednesday
-	WeekdayThursday  = time.Thursday
-	WeekdayFriday    = time.Friday
-	WeekdaySaturday  = time.Saturday
-)
-
-// Month represents a calendar month.
-// Deprecated: Use time.Month from the standard library instead.
-type Month = time.Month
-
-// Month constants.
-// Deprecated: Use time.January, time.February, etc. from the standard library instead.
-const (
-	MonthJanuary   = time.January
-	MonthFebruary  = time.February
-	MonthMarch     = time.March
-	MonthApril     = time.April
-	MonthMay       = time.May
-	MonthJune      = time.June
-	MonthJuly      = time.July
-	MonthAugust    = time.August
-	MonthSeptember = time.September
-	MonthOctober   = time.October
-	MonthNovember  = time.November
-	MonthDecember  = time.December
 )
 
 // Period represents the granularity of a parsed date/time expression.

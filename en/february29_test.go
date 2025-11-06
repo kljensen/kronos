@@ -99,11 +99,18 @@ func TestFebruary29SmartLeapYearSelection(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := kronos.ParsingOption{
-				Preference: tt.preference,
+			builder := New().WithReferenceDate(tt.refDate)
+			switch tt.preference {
+			case kronos.PreferPast:
+				builder = builder.PreferPast()
+			case kronos.PreferFuture:
+				builder = builder.PreferFuture()
+			case kronos.PreferCurrentPeriod:
+				builder = builder.PreferCurrentPeriod()
 			}
 
-			results := Casual.Parse(tt.input, tt.refDate, &option)
+			results, err := builder.Parse(tt.input)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Should parse %s", tt.input)
 			if len(results) > 0 {
@@ -147,11 +154,18 @@ func TestFebruary29WithTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := kronos.ParsingOption{
-				Preference: tt.preference,
+			builder := New().WithReferenceDate(tt.refDate)
+			switch tt.preference {
+			case kronos.PreferPast:
+				builder = builder.PreferPast()
+			case kronos.PreferFuture:
+				builder = builder.PreferFuture()
+			case kronos.PreferCurrentPeriod:
+				builder = builder.PreferCurrentPeriod()
 			}
 
-			results := Casual.Parse(tt.input, tt.refDate, &option)
+			results, err := builder.Parse(tt.input)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Should parse %s", tt.input)
 			if len(results) > 0 {

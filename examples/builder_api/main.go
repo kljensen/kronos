@@ -64,7 +64,7 @@ func demonstrateCommonOptions() {
 	// European format (Day/Month/Year)
 	parser = en.New().
 		WithDateOrder(kronos.DateOrderDMY).
-		WithForwardDate(true) // Prefer future dates
+		PreferFuture() // Prefer future dates
 
 	results, _ = parser.Parse("25/12/2024")
 	if len(results) > 0 {

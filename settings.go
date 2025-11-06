@@ -109,9 +109,18 @@ type Settings struct {
 	// Performance
 	MaxParsers int           // Maximum number of parsers to run (0 = unlimited)
 	Timeout    time.Duration // Parsing timeout (0 = no timeout)
+}
 
-	// Compatibility
-	ForwardDate bool // Legacy: parse only forward dates
+// ToParsingOption converts Settings to ParsingOption for backward compatibility.
+// This method is used internally to bridge Settings and ParsingOption.
+func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
+	return ParsingOption{
+		ForwardDate: s.PreferDatesFrom == PreferFuture,
+		Preference:  s.PreferDatesFrom,
+		DateOrder:   s.DateOrder,
+		Timezones:   timezones,
+		Debug:       nil,
+	}
 }
 
 // DefaultSettings returns sensible default settings that maintain
@@ -134,7 +143,6 @@ func DefaultSettings() Settings {
 		ParserOrder:         []string{},
 		MaxParsers:          0,
 		Timeout:             0,
-		ForwardDate:         false,
 	}
 }
 
@@ -188,18 +196,6 @@ func ValidateSettings(s Settings) error {
 	return nil
 }
 
-// ToParsingOption converts Settings to the legacy ParsingOption format
-// for backward compatibility with existing parsers.
-func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
-	return ParsingOption{
-		ForwardDate: s.ForwardDate,
-		Preference:  s.PreferDatesFrom,
-		DateOrder:   s.DateOrder,
-		Timezones:   timezones,
-		Debug:       nil,
-	}
-}
-
 // ApplySettings creates a new ParsingContext with settings applied.
 // This allows settings to influence the parsing context.
 func applySettings(text string, refDate time.Time, settings Settings) (*ParsingContext, error) {
@@ -226,7 +222,12 @@ func applySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 	}
 
 	// Create parsing option from settings
-	opt := settings.ToParsingOption(nil)
+	opt := ParsingOption{
+		Preference: settings.PreferDatesFrom,
+		DateOrder:  settings.DateOrder,
+		Timezones:  nil,
+		Debug:      nil,
+	}
 
 	// Create context
 	ctx := newParsingContext(text, ref, &opt)

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kljensen/kronos/internal/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,7 +42,7 @@ func TestAssignSimilarTime(t *testing.T) {
 	assert.Equal(t, 30, *components.Get(ComponentMinute))
 	assert.Equal(t, 45, *components.Get(ComponentSecond))
 	assert.Equal(t, 123, *components.Get(ComponentMillisecond))
-	assert.Equal(t, int(MeridiemAM), *components.Get(ComponentMeridiem))
+	assert.Equal(t, int(types.MeridiemAM), *components.Get(ComponentMeridiem))
 }
 
 func TestAssignSimilarTime_PM(t *testing.T) {
@@ -53,7 +54,7 @@ func TestAssignSimilarTime_PM(t *testing.T) {
 	assignSimilarTime(components, targetDate)
 
 	assert.Equal(t, 14, *components.Get(ComponentHour))
-	assert.Equal(t, int(MeridiemPM), *components.Get(ComponentMeridiem))
+	assert.Equal(t, int(types.MeridiemPM), *components.Get(ComponentMeridiem))
 }
 
 func TestImplySimilarDate(t *testing.T) {

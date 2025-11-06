@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -6,7 +5,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common/refiners"
+	"github.com/kljensen/kronos/internal/common/refiners"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -434,7 +433,7 @@ func TestENMonthNameMiddleEndian_ForwardOption(t *testing.T) {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{parser},
 		Refiners: []kronos.Refiner{
-			refiners.NewForwardDateRefiner(),
+			refiners.XNewForwardDateRefiner(),
 		},
 	}
 

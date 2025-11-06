@@ -113,7 +113,8 @@ func TestApproximationWordsAgo(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -129,8 +130,10 @@ func TestApproximationWordsAgo(t *testing.T) {
 				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
 			}
 
-			// Check approximation tag
-			tags := result.Tags()
+			// Check approximation tag (access internal Tags method via type assertion)
+			// The result is actually a *resultAdapter wrapping a *ParsingResult
+			type tagsProvider interface{ Tags() map[string]bool }
+			tags := result.(tagsProvider).Tags()
 			hasApproximateTag := tags["result/approximate"]
 			assert.Equal(t, tt.isApproximate, hasApproximateTag,
 				"Approximation tag mismatch for '%s': expected=%v, got=%v",
@@ -193,7 +196,8 @@ func TestApproximationWordsLater(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -208,8 +212,9 @@ func TestApproximationWordsLater(t *testing.T) {
 				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
 			}
 
-			// Check approximation tag
-			tags := result.Tags()
+			// Check approximation tag (access internal Tags method via type assertion)
+			type tagsProvider interface{ Tags() map[string]bool }
+			tags := result.(tagsProvider).Tags()
 			hasApproximateTag := tags["result/approximate"]
 			assert.Equal(t, tt.isApproximate, hasApproximateTag,
 				"Approximation tag mismatch for '%s': expected=%v, got=%v",
@@ -269,7 +274,8 @@ func TestApproximationWordsCasualRelative(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -281,8 +287,9 @@ func TestApproximationWordsCasualRelative(t *testing.T) {
 			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
 			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
 
-			// Check approximation tag
-			tags := result.Tags()
+			// Check approximation tag (access internal Tags method via type assertion)
+			type tagsProvider interface{ Tags() map[string]bool }
+			tags := result.(tagsProvider).Tags()
 			hasApproximateTag := tags["result/approximate"]
 			assert.Equal(t, tt.isApproximate, hasApproximateTag,
 				"Approximation tag mismatch for '%s': expected=%v, got=%v",
@@ -341,7 +348,8 @@ func TestApproximationWordsCasualTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -351,8 +359,9 @@ func TestApproximationWordsCasualTime(t *testing.T) {
 			result := results[0]
 			assert.Equal(t, tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
 
-			// Check approximation tag
-			tags := result.Tags()
+			// Check approximation tag (access internal Tags method via type assertion)
+			type tagsProvider interface{ Tags() map[string]bool }
+			tags := result.(tagsProvider).Tags()
 			hasApproximateTag := tags["result/approximate"]
 			assert.Equal(t, tt.isApproximate, hasApproximateTag,
 				"Approximation tag mismatch for '%s': expected=%v, got=%v",
@@ -379,7 +388,8 @@ func TestApproximationCaseInsensitive(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -387,7 +397,8 @@ func TestApproximationCaseInsensitive(t *testing.T) {
 			}
 
 			result := results[0]
-			tags := result.Tags()
+			type tagsProvider interface{ Tags() map[string]bool }
+			tags := result.(tagsProvider).Tags()
 			hasApproximateTag := tags["result/approximate"]
 			assert.True(t, hasApproximateTag,
 				"Approximation tag should be set for '%s'", tt.text)
@@ -421,7 +432,8 @@ func TestApproximationInContext(t *testing.T) {
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -429,7 +441,7 @@ func TestApproximationInContext(t *testing.T) {
 			}
 
 			// Find the result with the expected text
-			var targetResult *kronos.ParsingResult
+			var targetResult kronos.Result
 			for _, result := range results {
 				if result.Text() == tt.expectedText {
 					targetResult = result
@@ -442,7 +454,8 @@ func TestApproximationInContext(t *testing.T) {
 				return
 			}
 
-			tags := targetResult.Tags()
+			type tagsProvider interface{ Tags() map[string]bool }
+			tags := targetResult.(tagsProvider).Tags()
 			hasApproximateTag := tags["result/approximate"]
 			assert.Equal(t, tt.isApproximate, hasApproximateTag,
 				"Approximation tag mismatch for '%s'", tt.expectedText)

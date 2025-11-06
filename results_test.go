@@ -266,7 +266,7 @@ func TestParsingComponents(t *testing.T) {
 
 	t.Run("IsOnlyWeekdayComponent", func(t *testing.T) {
 		pc := newParsingComponents(ref, nil)
-		pc.Assign(ComponentWeekday, int(WeekdayMonday))
+		pc.Assign(ComponentWeekday, int(time.Monday))
 
 		if !pc.IsOnlyWeekdayComponent() {
 			t.Errorf("Expected IsOnlyWeekdayComponent to be true")

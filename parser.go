@@ -89,16 +89,6 @@ func (p *ParserBuilder) WithDateOrder(order DateOrder) *ParserBuilder {
 	return p.DateOrder(order)
 }
 
-// WithForwardDate enables forward date parsing (prefer future dates).
-// This is equivalent to PreferFuture() but uses the legacy ForwardDate setting.
-func (p *ParserBuilder) WithForwardDate(forward bool) *ParserBuilder {
-	p.settings.ForwardDate = forward
-	if forward {
-		p.settings.PreferDatesFrom = PreferFuture
-	}
-	return p
-}
-
 // PreferPast configures the parser to prefer past dates when ambiguous.
 // For example, "March" in November would be interpreted as last March.
 func (p *ParserBuilder) PreferPast() *ParserBuilder {
@@ -137,13 +127,6 @@ func (p *ParserBuilder) Timezone(tz string) *ParserBuilder {
 // TODO: Complete the timezone conversion implementation in pipeline.go:applyTimezoneConversion
 func (p *ParserBuilder) ToTimezone(tz string) *ParserBuilder {
 	p.settings.ToTimezone = tz
-	return p
-}
-
-// ForwardDate enables forward date parsing (legacy compatibility).
-// When enabled, only future dates are parsed.
-func (p *ParserBuilder) ForwardDate() *ParserBuilder {
-	p.settings.ForwardDate = true
 	return p
 }
 

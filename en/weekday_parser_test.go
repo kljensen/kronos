@@ -6,12 +6,13 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 // Helper to create a casual parser with weekday support
 func createWeekdayParser() kronos.Parser {
-	return NewENWeekdayParser()
+	return parsers.NewENWeekdayParser()
 }
 
 func TestENWeekdayParser_SingleExpression(t *testing.T) {
@@ -690,8 +691,8 @@ func TestENWeekdayParser_WithCasualTime(t *testing.T) {
 	t.Skip("This test requires a refiner to merge weekday + casual time results - not yet implemented")
 
 	// This test requires both weekday parser and casual time parser
-	weekdayParser := NewENWeekdayParser()
-	casualTimeParser := NewENCasualTimeParser()
+	weekdayParser := parsers.NewENWeekdayParser()
+	casualTimeParser := parsers.NewENCasualTimeParser()
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{weekdayParser, casualTimeParser}}
 	chrono := kronos.NewChrono(config)
@@ -716,9 +717,9 @@ func TestENWeekdayParser_Overlap(t *testing.T) {
 	t.Skip("This test requires a refiner to merge weekday + date results - not yet implemented")
 
 	// These tests need multiple parsers to handle weekday + date overlap
-	weekdayParser := NewENWeekdayParser()
+	weekdayParser := parsers.NewENWeekdayParser()
 	monthNameParser := NewENMonthNameMiddleEndianParser(false)
-	slashParser := NewENSlashMonthFormatParser()
+	slashParser := parsers.NewENSlashMonthFormatParser()
 
 	tests := []struct {
 		name            string
@@ -983,7 +984,7 @@ func TestENWeekdayParser_ForwardDatesOnly(t *testing.T) {
 				return
 			}
 
-			casualTimeParser := NewENCasualTimeParser()
+			casualTimeParser := parsers.NewENCasualTimeParser()
 			config := &kronos.Configuration{
 				Parsers: []kronos.Parser{parser, casualTimeParser},
 			}

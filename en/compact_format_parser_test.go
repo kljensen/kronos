@@ -6,11 +6,12 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestENCompactFormatParser(t *testing.T) {
-	parser := NewENCompactFormatParser()
+	parser := parsers.NewENCompactFormatParser()
 	refDate := time.Date(2023, 6, 15, 12, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -382,7 +383,7 @@ func TestENCompactFormatParser_Integration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENCompactFormatParser()
+			parser := parsers.NewENCompactFormatParser()
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 			results := chrono.Parse(tt.text, refDate, nil)

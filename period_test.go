@@ -153,7 +153,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 			name: "weekday certain without day",
 			setup: func() *ParsingComponents {
 				pc := newParsingComponents(ref, nil)
-				pc.Assign(ComponentWeekday, int(WeekdayMonday))
+				pc.Assign(ComponentWeekday, int(time.Monday))
 				return pc
 			},
 			expected: PeriodWeek,

@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_year.test.ts
@@ -55,10 +54,8 @@ func TestYearWithBCECE(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err, "Unexpected error parsing: %s", tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -105,10 +102,8 @@ func TestYearWithBCAD(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err, "Unexpected error parsing: %s", tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -146,10 +141,8 @@ func TestYearWithBuddhistEra(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err, "Unexpected error parsing: %s", tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -196,10 +189,8 @@ func TestYearAfterDateTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err, "Unexpected error parsing: %s", tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -248,10 +239,8 @@ func TestYearAfterDateRange(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := CreateCasualConfiguration(false)
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, err := New().WithReferenceDate(tt.refDate).Parse(tt.text)
+			assert.NoError(t, err, "Unexpected error parsing: %s", tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 		})
 	}

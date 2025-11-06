@@ -132,10 +132,10 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 			}
 
 			// Store as milliseconds, microseconds, and nanoseconds for compatibility
-			millisecond := nanos / kronos.NanosecondsPerMS
-			remainingNanos := nanos % kronos.NanosecondsPerMS
-			microsecond := remainingNanos / kronos.NanosecondsPerMicro
-			nanosecond := remainingNanos % kronos.NanosecondsPerMicro
+			millisecond := nanos / 1000000
+			remainingNanos := nanos % 1000000
+			microsecond := remainingNanos / 1000
+			nanosecond := remainingNanos % 1000
 
 			if millisecond > 0 {
 				components.Assign(kronos.ComponentMillisecond, millisecond)

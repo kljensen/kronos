@@ -15,6 +15,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -258,11 +259,11 @@ func TestWhenParity_DistanceClustering(t *testing.T) {
 func createFullChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			NewENCasualDateParser(),
-			NewENCasualTimeParser(),
-			NewENWeekdayParser(),
+			parsers.NewENCasualDateParser(),
+			parsers.NewENCasualTimeParser(),
+			parsers.NewENWeekdayParser(),
 			NewENTimeExpressionParser(false),
-			NewENMonthNameParser(),
+			parsers.NewENMonthNameParser(),
 		},
 	}
 	return kronos.NewChrono(config)

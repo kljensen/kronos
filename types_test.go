@@ -81,58 +81,9 @@ func TestTimeunitConstants(t *testing.T) {
 	}
 }
 
-// TestMeridiemValues verifies Meridiem enum values match expected constants.
-func TestMeridiemValues(t *testing.T) {
-	if MeridiemAM != 0 {
-		t.Errorf("MeridiemAM should be 0, got %d", MeridiemAM)
-	}
-	if MeridiemPM != 1 {
-		t.Errorf("MeridiemPM should be 1, got %d", MeridiemPM)
-	}
-}
-
-// TestWeekdayValues verifies Weekday enum values match expected constants.
-func TestWeekdayValues(t *testing.T) {
-	expected := map[Weekday]int{
-		WeekdaySunday:    0,
-		WeekdayMonday:    1,
-		WeekdayTuesday:   2,
-		WeekdayWednesday: 3,
-		WeekdayThursday:  4,
-		WeekdayFriday:    5,
-		WeekdaySaturday:  6,
-	}
-
-	for weekday, expectedValue := range expected {
-		if int(weekday) != expectedValue {
-			t.Errorf("Weekday %d should be %d, got %d", weekday, expectedValue, int(weekday))
-		}
-	}
-}
-
-// TestMonthValues verifies Month enum values match expected constants.
-func TestMonthValues(t *testing.T) {
-	expected := map[Month]int{
-		MonthJanuary:   1,
-		MonthFebruary:  2,
-		MonthMarch:     3,
-		MonthApril:     4,
-		MonthMay:       5,
-		MonthJune:      6,
-		MonthJuly:      7,
-		MonthAugust:    8,
-		MonthSeptember: 9,
-		MonthOctober:   10,
-		MonthNovember:  11,
-		MonthDecember:  12,
-	}
-
-	for month, expectedValue := range expected {
-		if int(month) != expectedValue {
-			t.Errorf("Month %d should be %d, got %d", month, expectedValue, int(month))
-		}
-	}
-}
+// NOTE: Tests for Meridiem, Weekday, and Month constants have been removed.
+// These types are now internal only. Users should use time.Weekday and time.Month
+// from the standard library instead.
 
 // TestParsingOptionDefaults verifies ParsingOption struct can be created with defaults.
 func TestParsingOptionDefaults(t *testing.T) {

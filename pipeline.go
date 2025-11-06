@@ -298,7 +298,7 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 			updateComponentsFromDate(result.start, convertedStart)
 
 			_, startOffsetSeconds := convertedStart.Zone()
-			startOffsetMinutes := startOffsetSeconds / SecondsPerMinute
+			startOffsetMinutes := startOffsetSeconds / 60
 			startReference := newReferenceWithTimezone(convertedStart, &startOffsetMinutes)
 			result.start.reference = startReference
 			result.reference = startReference
@@ -314,7 +314,7 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 			updateComponentsFromDate(endComponents, convertedEnd)
 
 			_, endOffsetSeconds := convertedEnd.Zone()
-			endOffsetMinutes := endOffsetSeconds / SecondsPerMinute
+			endOffsetMinutes := endOffsetSeconds / 60
 			endComponents.reference = newReferenceWithTimezone(convertedEnd, &endOffsetMinutes)
 		}
 	}
@@ -366,10 +366,10 @@ func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
 
 	// Update subsecond components (millisecond, microsecond, nanosecond)
 	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / NanosecondsPerMS
-	remainingNanos := totalNanos % NanosecondsPerMS
-	microsecond := remainingNanos / NanosecondsPerMicro
-	nanosecond := remainingNanos % NanosecondsPerMicro
+	millisecond := totalNanos / 1000000
+	remainingNanos := totalNanos % 1000000
+	microsecond := remainingNanos / 1000
+	nanosecond := remainingNanos % 1000
 
 	if components.IsCertain(ComponentMillisecond) {
 		components.Assign(ComponentMillisecond, millisecond)
@@ -390,20 +390,20 @@ func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
 	}
 
 	// Update meridiem based on new hour
-	newMeridiem := MeridiemAM
-	if date.Hour() >= HoursPerDay/2 {
-		newMeridiem = MeridiemPM
+	newMeridiem := 0 // AM
+	if date.Hour() >= 12 {
+		newMeridiem = 1 // PM
 	}
 
 	if components.IsCertain(ComponentMeridiem) {
-		components.Assign(ComponentMeridiem, int(newMeridiem))
+		components.Assign(ComponentMeridiem, newMeridiem)
 	} else if components.Get(ComponentMeridiem) != nil {
-		components.Imply(ComponentMeridiem, int(newMeridiem))
+		components.Imply(ComponentMeridiem, newMeridiem)
 	}
 
 	// Update timezone offset to match the target location
 	_, offset := date.Zone()
-	timezoneOffsetMinutes := offset / SecondsPerMinute
+	timezoneOffsetMinutes := offset / 60
 
 	if components.IsCertain(ComponentTimezoneOffset) {
 		components.Assign(ComponentTimezoneOffset, timezoneOffsetMinutes)

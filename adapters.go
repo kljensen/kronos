@@ -53,6 +53,12 @@ func (r *resultAdapter) End() Components {
 	return nil
 }
 
+// Tags returns metadata tags for this result.
+// This is exposed for testing purposes to verify parser behavior.
+func (r *resultAdapter) Tags() map[string]bool {
+	return r.result.Tags()
+}
+
 // componentsAdapter adapts an internal ParsingComponents to implement the public Components interface.
 type componentsAdapter struct {
 	components *ParsingComponents
@@ -76,4 +82,10 @@ func (c *componentsAdapter) IsCertain(component Component) bool {
 // Date returns a time.Time object constructed from the components.
 func (c *componentsAdapter) Date() time.Time {
 	return c.components.Date()
+}
+
+// Tags returns metadata tags for these components.
+// This is exposed for testing purposes to verify parser behavior.
+func (c *componentsAdapter) Tags() map[string]bool {
+	return c.components.Tags()
 }

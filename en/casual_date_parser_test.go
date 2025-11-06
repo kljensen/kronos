@@ -6,11 +6,12 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestENCasualDateParser_now(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 8, 9, 10, 11000000, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -30,7 +31,7 @@ func TestENCasualDateParser_now(t *testing.T) {
 }
 
 func TestENCasualDateParser_today(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 14, 12, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -47,7 +48,7 @@ func TestENCasualDateParser_today(t *testing.T) {
 }
 
 func TestENCasualDateParser_tomorrow(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 
 	tests := []struct {
 		name        string
@@ -98,7 +99,7 @@ func TestENCasualDateParser_tomorrow(t *testing.T) {
 }
 
 func TestENCasualDateParser_yesterday(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -115,7 +116,7 @@ func TestENCasualDateParser_yesterday(t *testing.T) {
 }
 
 func TestENCasualDateParser_lastNight(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -133,7 +134,7 @@ func TestENCasualDateParser_lastNight(t *testing.T) {
 }
 
 func TestENCasualDateParser_tonight(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 18, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -152,7 +153,7 @@ func TestENCasualDateParser_tonight(t *testing.T) {
 }
 
 func TestENCasualDateParser_Overmorrow(t *testing.T) {
-	parser := NewENCasualDateParser()
+	parser := parsers.NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}

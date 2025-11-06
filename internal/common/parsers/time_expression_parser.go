@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/types"
 )
 
 // atoiSafe converts a string to an integer, returning 0 and false on error.
@@ -354,14 +355,14 @@ func isPartOfLargerNumber(context *kronos.ParsingContext, match []string) bool {
 // parseMeridiem parses AM/PM indicator and adjusts hour accordingly.
 // Returns the adjusted hour, meridiem value, and success status.
 // For AM: hour 12 becomes 0 (midnight). For PM: hours 1-11 add 12.
-func parseMeridiem(ampmStr string, hour int) (int, *kronos.Meridiem, bool) {
+func parseMeridiem(ampmStr string, hour int) (int, *types.Meridiem, bool) {
 	if hour > maxHour12Format {
 		return 0, nil, false
 	}
 
 	ampm := strings.ToLower(string(ampmStr[0]))
 	if ampm == "a" {
-		m := kronos.MeridiemAM
+		m := types.MeridiemAM
 		if hour == maxHour12Format {
 			hour = 0
 		}
@@ -369,7 +370,7 @@ func parseMeridiem(ampmStr string, hour int) (int, *kronos.Meridiem, bool) {
 	}
 
 	if ampm == "p" {
-		m := kronos.MeridiemPM
+		m := types.MeridiemPM
 		if hour != maxHour12Format {
 			hour += maxHour12Format
 		}
@@ -396,7 +397,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 
 	components := context.CreateParsingComponents(nil)
 	minute := 0
-	var meridiem *kronos.Meridiem
+	var meridiem *types.Meridiem
 
 	// Parse hour
 	hour, ok := atoiSafe(match[TimeHourGroup])
@@ -441,7 +442,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 
 	// Infer PM for 24-hour format
 	if hour > maxHour12Format {
-		m := kronos.MeridiemPM
+		m := types.MeridiemPM
 		meridiem = &m
 	}
 
@@ -461,9 +462,9 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 		components.Assign(kronos.ComponentMeridiem, int(*meridiem))
 	} else {
 		if hour < maxHour12Format {
-			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			components.Imply(kronos.ComponentMeridiem, int(types.MeridiemAM))
 		} else {
-			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+			components.Imply(kronos.ComponentMeridiem, int(types.MeridiemPM))
 		}
 	}
 
@@ -495,10 +496,10 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 		}
 
 		// Store as milliseconds, microseconds, and nanoseconds for compatibility
-		millisecond := nanos / kronos.NanosecondsPerMS
-		remainingNanos := nanos % kronos.NanosecondsPerMS
-		microsecond := remainingNanos / kronos.NanosecondsPerMicro
-		nanosecond := remainingNanos % kronos.NanosecondsPerMicro
+		millisecond := nanos / 1000000
+		remainingNanos := nanos % 1000000
+		microsecond := remainingNanos / 1000
+		nanosecond := remainingNanos % 1000
 
 		if millisecond > 0 {
 			components.Assign(kronos.ComponentMillisecond, millisecond)
@@ -563,10 +564,10 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 
 		// Store as milliseconds, microseconds, and nanoseconds for compatibility
-		millisecond := nanos / kronos.NanosecondsPerMS
-		remainingNanos := nanos % kronos.NanosecondsPerMS
-		microsecond := remainingNanos / kronos.NanosecondsPerMicro
-		nanosecond := remainingNanos % kronos.NanosecondsPerMicro
+		millisecond := nanos / 1000000
+		remainingNanos := nanos % 1000000
+		microsecond := remainingNanos / 1000
+		nanosecond := remainingNanos % 1000
 
 		if millisecond > 0 {
 			components.Assign(kronos.ComponentMillisecond, millisecond)
@@ -615,7 +616,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	}
 
 	if hour >= maxHour12Format {
-		meridiem = int(kronos.MeridiemPM)
+		meridiem = int(types.MeridiemPM)
 	}
 
 	// Parse AM/PM
@@ -626,7 +627,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 
 		ampm := strings.ToLower(string(match[TimeAMPMGroup][0]))
 		if ampm == "a" {
-			meridiem = int(kronos.MeridiemAM)
+			meridiem = int(types.MeridiemAM)
 			if hour == maxHour12Format {
 				hour = 0
 				// Crossing midnight - advance day
@@ -639,7 +640,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 
 		if ampm == "p" {
-			meridiem = int(kronos.MeridiemPM)
+			meridiem = int(types.MeridiemPM)
 			if hour != maxHour12Format {
 				hour += maxHour12Format
 			}
@@ -647,13 +648,13 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 
 		// Backfill meridiem to start time if not certain
 		if hasStart && !resultStart.IsCertain(kronos.ComponentMeridiem) {
-			if meridiem == int(kronos.MeridiemAM) {
-				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			if meridiem == int(types.MeridiemAM) {
+				resultStart.Imply(kronos.ComponentMeridiem, int(types.MeridiemAM))
 				if hourVal := resultStart.Get(kronos.ComponentHour); hourVal != nil && *hourVal == maxHour12Format {
 					resultStart.Assign(kronos.ComponentHour, 0)
 				}
 			} else {
-				resultStart.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+				resultStart.Imply(kronos.ComponentMeridiem, int(types.MeridiemPM))
 				if hourVal := resultStart.Get(kronos.ComponentHour); hourVal != nil && *hourVal != maxHour12Format {
 					resultStart.Assign(kronos.ComponentHour, *hourVal+maxHour12Format)
 				}
@@ -680,15 +681,15 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		case startAtPM:
 			if startHourVal := resultStart.Get(kronos.ComponentHour); startHourVal != nil && *startHourVal-maxHour12Format > hour {
 				// e.g., "10pm - 1" means 1am next day
-				components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+				components.Imply(kronos.ComponentMeridiem, int(types.MeridiemAM))
 			} else if hour <= maxHour12Format {
 				components.Assign(kronos.ComponentHour, hour+maxHour12Format)
-				components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+				components.Assign(kronos.ComponentMeridiem, int(types.MeridiemPM))
 			}
 		case hour > maxHour12Format:
-			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+			components.Imply(kronos.ComponentMeridiem, int(types.MeridiemPM))
 		case hour <= maxHour12Format:
-			components.Imply(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			components.Imply(kronos.ComponentMeridiem, int(types.MeridiemAM))
 		}
 	}
 

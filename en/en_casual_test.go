@@ -27,6 +27,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,11 +35,11 @@ import (
 func createCasualChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			NewENCasualDateParser(),
-			NewENCasualTimeParser(),
-			NewENWeekdayParser(),
-			NewENTimeExpressionParser(false),
-			NewENMonthNameParser(),
+			parsers.NewENCasualDateParser(),
+			parsers.NewENCasualTimeParser(),
+			parsers.NewENWeekdayParser(),
+			parsers.NewENTimeExpressionParser(false),
+			parsers.NewENMonthNameParser(),
 		},
 	}
 	return kronos.NewChrono(config)

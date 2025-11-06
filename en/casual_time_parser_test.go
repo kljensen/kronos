@@ -6,11 +6,12 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestENCasualTimeParser_ThisMorning(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -28,7 +29,7 @@ func TestENCasualTimeParser_ThisMorning(t *testing.T) {
 }
 
 func TestENCasualTimeParser_ThisAfternoon(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -46,7 +47,7 @@ func TestENCasualTimeParser_ThisAfternoon(t *testing.T) {
 }
 
 func TestENCasualTimeParser_ThisEvening(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -64,7 +65,7 @@ func TestENCasualTimeParser_ThisEvening(t *testing.T) {
 }
 
 func TestENCasualTimeParser_Night(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
@@ -79,7 +80,7 @@ func TestENCasualTimeParser_Night(t *testing.T) {
 }
 
 func TestENCasualTimeParser_noon(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 8, 0, 0, 0, time.UTC)
 
 	tests := []string{"noon", "midday"}
@@ -104,7 +105,7 @@ func TestENCasualTimeParser_noon(t *testing.T) {
 }
 
 func TestENCasualTimeParser_midnight(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 
 	tests := []struct {
 		name        string
@@ -143,7 +144,7 @@ func TestENCasualTimeParser_midnight(t *testing.T) {
 }
 
 func TestENCasualTimeParser_WithoutThis(t *testing.T) {
-	parser := NewENCasualTimeParser()
+	parser := parsers.NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
 	tests := []struct {

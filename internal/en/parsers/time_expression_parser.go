@@ -6,6 +6,7 @@ import (
 
 	"github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/internal/common/parsers"
+	"github.com/kljensen/kronos/internal/types"
 )
 
 // ENTimeExpressionParser parses English time expressions with keywords:
@@ -51,16 +52,16 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 				hour := *hourVal
 				if hour >= 6 && hour < 12 {
 					components.Assign(kronos.ComponentHour, hour+12)
-					components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+					components.Assign(kronos.ComponentMeridiem, int(types.MeridiemPM))
 				} else if hour < 6 {
-					components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+					components.Assign(kronos.ComponentMeridiem, int(types.MeridiemAM))
 				}
 			}
 		}
 
 		// Handle "in the afternoon"
 		if strings.Contains(fullMatch, "afternoon") {
-			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemPM))
+			components.Assign(kronos.ComponentMeridiem, int(types.MeridiemPM))
 			hourVal := components.Get(kronos.ComponentHour)
 			if hourVal != nil {
 				hour := *hourVal
@@ -72,7 +73,7 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 
 		// Handle "in the morning"
 		if strings.Contains(fullMatch, "morning") {
-			components.Assign(kronos.ComponentMeridiem, int(kronos.MeridiemAM))
+			components.Assign(kronos.ComponentMeridiem, int(types.MeridiemAM))
 			// Hour stays as-is for morning times
 		}
 	}

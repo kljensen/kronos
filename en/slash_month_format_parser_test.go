@@ -6,11 +6,12 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestENSlashMonthFormatParser(t *testing.T) {
-	parser := NewENSlashMonthFormatParser()
+	parser := parsers.NewENSlashMonthFormatParser()
 	refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {

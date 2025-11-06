@@ -1,6 +1,5 @@
 // Package en provides English language support for Chrono.
 // It includes parsers, refiners, and configurations for parsing English dates and times.
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -8,35 +7,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
-)
-
-var (
-	// Casual is a Chrono instance configured for parsing casual English.
-	// It recognizes informal expressions like "today", "tomorrow", "next week", etc.
-	//
-	// Deprecated: Use New() to create a parser instance with the builder pattern API.
-	// Migration example:
-	//   Before: results := en.Casual.Parse("tomorrow", now, nil)
-	//   After:  results, _ := en.New().Parse("tomorrow")
-	Casual = kronos.NewChrono(CreateCasualConfiguration(false))
-
-	// Strict is a Chrono instance configured for parsing strict English.
-	// It only recognizes formal date/time patterns and avoids casual expressions.
-	//
-	// Deprecated: Use NewStrict() to create a parser instance with the builder pattern API.
-	// Migration example:
-	//   Before: results := en.Strict.Parse("2020-03-15", now, nil)
-	//   After:  results, _ := en.NewStrict().Parse("2020-03-15")
-	Strict = kronos.NewChrono(CreateConfiguration(true, false))
-
-	// GB is a Chrono instance configured for parsing UK-style English.
-	// It uses little-endian date format (day/month/year) and casual expressions.
-	//
-	// Deprecated: Use NewGB() to create a parser instance with the builder pattern API.
-	// Migration example:
-	//   Before: results := en.GB.Parse("15/03/2020", now, nil)
-	//   After:  results, _ := en.NewGB().Parse("15/03/2020")
-	GB = kronos.NewChrono(CreateCasualConfiguration(true))
+	"github.com/kljensen/kronos/experimental"
 )
 
 // New creates a new ParserBuilder using the casual English configuration.
@@ -49,7 +20,7 @@ var (
 //	    PreferPast()
 //	results, err := parser.Parse("last Monday")
 func New() *kronos.ParserBuilder {
-	return kronos.New(Casual)
+	return kronos.New(experimental.EnglishCasualChrono())
 }
 
 // NewStrict creates a new ParserBuilder using strict English configuration.
@@ -60,7 +31,7 @@ func New() *kronos.ParserBuilder {
 //	parser := en.NewStrict().WithReferenceDate(time.Now())
 //	results, err := parser.Parse("2020-03-15")
 func NewStrict() *kronos.ParserBuilder {
-	return kronos.New(Strict)
+	return kronos.New(experimental.EnglishStrictChrono())
 }
 
 // NewGB creates a new ParserBuilder using UK-style English configuration.
@@ -71,34 +42,7 @@ func NewStrict() *kronos.ParserBuilder {
 //	parser := en.NewGB().WithReferenceDate(time.Now())
 //	results, err := parser.Parse("15/03/2020")
 func NewGB() *kronos.ParserBuilder {
-	return kronos.New(GB).DateOrder(kronos.DateOrderDMY)
-}
-
-// StrictParser is deprecated: use NewStrict() instead.
-// This function is maintained for backward compatibility.
-func StrictParser() *kronos.ParserBuilder {
-	return NewStrict()
-}
-
-// GBParser is deprecated: use NewGB() instead.
-// This function is maintained for backward compatibility.
-func GBParser() *kronos.ParserBuilder {
-	return NewGB()
-}
-
-// Parse parses the text and returns all parsed results.
-// It uses the casual English configuration.
-// This is the legacy API - for the new builder pattern, use New() instead.
-func Parse(text string, ref time.Time, option *kronos.ParsingOption) []*kronos.ParsingResult {
-	return Casual.Parse(text, ref, option)
-}
-
-// ParseDate parses the text and returns the first parsed date.
-// It uses the casual English configuration.
-// Returns nil if no date is found.
-// This is the legacy API - for the new builder pattern, use New().ParseDate() instead.
-func ParseDate(text string, ref time.Time, option *kronos.ParsingOption) *time.Time {
-	return Casual.ParseDate(text, ref, option)
+	return kronos.New(experimental.EnglishGBChrono()).DateOrder(kronos.DateOrderDMY)
 }
 
 // ParseSimple is a convenience function that parses text using the new builder API.

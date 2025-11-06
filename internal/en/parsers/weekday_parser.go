@@ -88,7 +88,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 			// Remove plural 's' if present
 			weekdayWord = strings.TrimSuffix(weekdayWord, "s")
 
-			var weekday kronos.Weekday
+			var weekday time.Weekday
 
 			switch {
 			case data.WeekdayDictionary[weekdayWord] != 0 || weekdayWord == "sunday":
@@ -108,20 +108,20 @@ func NewENWeekdayParser() *ENWeekdayParser {
 				// "This/next weekend" means the coming Saturday,
 				// "last weekend" means last Sunday
 				if modifier == "last" {
-					weekday = kronos.WeekdaySunday
+					weekday = time.Sunday
 				} else {
-					weekday = kronos.WeekdaySaturday
+					weekday = time.Saturday
 				}
 			case weekdayWord == "weekday":
 				// Weekday means any day of the week except weekend
 				refDate := context.Reference().GetDateWithAdjustedTimezone()
-				refWeekday := kronos.Weekday(refDate.Weekday())
+				refWeekday := time.Weekday(refDate.Weekday())
 
-				if refWeekday == kronos.WeekdaySunday || refWeekday == kronos.WeekdaySaturday {
+				if refWeekday == time.Sunday || refWeekday == time.Saturday {
 					if modifier == "last" {
-						weekday = kronos.WeekdayFriday
+						weekday = time.Friday
 					} else {
-						weekday = kronos.WeekdayMonday
+						weekday = time.Monday
 					}
 				} else {
 					// On a weekday, find the next/last weekday
@@ -132,7 +132,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 						wd++
 					}
 					wd = (wd % 5) + 1
-					weekday = kronos.Weekday(wd)
+					weekday = time.Weekday(wd)
 				}
 			default:
 				return nil
@@ -182,14 +182,14 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 		}
 	}
 
-	var targetWeekday kronos.Weekday
+	var targetWeekday time.Weekday
 	var daysOffset int
 	refWeekday := refDate.Weekday()
 
 	switch direction {
 	case "ago":
 		// Looking backward: resolve to Sunday
-		targetWeekday = kronos.WeekdaySunday
+		targetWeekday = time.Sunday
 
 		// Calculate days back to the Nth previous Sunday
 		// First, find days to last Sunday
@@ -203,7 +203,7 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 		daysOffset = -(daysToLastSunday + 7*(count-1))
 	case "from now":
 		// Looking forward: resolve to Saturday
-		targetWeekday = kronos.WeekdaySaturday
+		targetWeekday = time.Saturday
 
 		// Calculate days forward to the Nth next Saturday
 		daysToNextSaturday := (int(time.Saturday) - int(refWeekday) + 7) % 7

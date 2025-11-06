@@ -83,11 +83,11 @@ func TestToTimezoneOffset_AmbiguousTimezone(t *testing.T) {
 		TimezoneOffsetNonDst:    -300, // EST = UTC-5
 		DstStart: func(year int) time.Time {
 			// DST starts 2nd Sunday of March at 2 AM
-			return getNthWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2, 2)
+			return getNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends 1st Sunday of November at 2 AM
-			return getNthWeekdayOfMonth(year, MonthNovember, WeekdaySunday, 1, 2)
+			return getNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
 		},
 	}
 
@@ -153,8 +153,8 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 	tests := []struct {
 		name     string
 		year     int
-		month    Month
-		weekday  Weekday
+		month    time.Month
+		weekday  time.Weekday
 		n        int
 		hour     int
 		expected time.Time
@@ -162,8 +162,8 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 		{
 			name:     "2nd Sunday of March 2020",
 			year:     2020,
-			month:    MonthMarch,
-			weekday:  WeekdaySunday,
+			month:    time.March,
+			weekday:  time.Sunday,
 			n:        2,
 			hour:     2,
 			expected: time.Date(2020, 3, 8, 2, 0, 0, 0, time.UTC),
@@ -171,8 +171,8 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 		{
 			name:     "1st Monday of November 2020",
 			year:     2020,
-			month:    MonthNovember,
-			weekday:  WeekdayMonday,
+			month:    time.November,
+			weekday:  time.Monday,
 			n:        1,
 			hour:     2,
 			expected: time.Date(2020, 11, 2, 2, 0, 0, 0, time.UTC),
@@ -180,8 +180,8 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 		{
 			name:     "4th Thursday of November 2020 (Thanksgiving)",
 			year:     2020,
-			month:    MonthNovember,
-			weekday:  WeekdayThursday,
+			month:    time.November,
+			weekday:  time.Thursday,
 			n:        4,
 			hour:     0,
 			expected: time.Date(2020, 11, 26, 0, 0, 0, 0, time.UTC),
@@ -189,8 +189,8 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 		{
 			name:     "1st Friday of January 2021",
 			year:     2021,
-			month:    MonthJanuary,
-			weekday:  WeekdayFriday,
+			month:    time.January,
+			weekday:  time.Friday,
 			n:        1,
 			hour:     12,
 			expected: time.Date(2021, 1, 1, 12, 0, 0, 0, time.UTC),
@@ -198,8 +198,8 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 		{
 			name:     "3rd Tuesday of July 2020",
 			year:     2020,
-			month:    MonthJuly,
-			weekday:  WeekdayTuesday,
+			month:    time.July,
+			weekday:  time.Tuesday,
 			n:        3,
 			hour:     6,
 			expected: time.Date(2020, 7, 21, 6, 0, 0, 0, time.UTC),
@@ -218,48 +218,48 @@ func TestGetLastWeekdayOfMonth(t *testing.T) {
 	tests := []struct {
 		name     string
 		year     int
-		month    Month
-		weekday  Weekday
+		month    time.Month
+		weekday  time.Weekday
 		hour     int
 		expected time.Time
 	}{
 		{
 			name:     "Last Sunday of October 2020",
 			year:     2020,
-			month:    MonthOctober,
-			weekday:  WeekdaySunday,
+			month:    time.October,
+			weekday:  time.Sunday,
 			hour:     3,
 			expected: time.Date(2020, 10, 25, 3, 0, 0, 0, time.UTC),
 		},
 		{
 			name:     "Last Monday of December 2020",
 			year:     2020,
-			month:    MonthDecember,
-			weekday:  WeekdayMonday,
+			month:    time.December,
+			weekday:  time.Monday,
 			hour:     0,
 			expected: time.Date(2020, 12, 28, 0, 0, 0, 0, time.UTC),
 		},
 		{
 			name:     "Last Friday of February 2020 (leap year)",
 			year:     2020,
-			month:    MonthFebruary,
-			weekday:  WeekdayFriday,
+			month:    time.February,
+			weekday:  time.Friday,
 			hour:     12,
 			expected: time.Date(2020, 2, 28, 12, 0, 0, 0, time.UTC),
 		},
 		{
 			name:     "Last Saturday of April 2021",
 			year:     2021,
-			month:    MonthApril,
-			weekday:  WeekdaySaturday,
+			month:    time.April,
+			weekday:  time.Saturday,
 			hour:     18,
 			expected: time.Date(2021, 4, 24, 18, 0, 0, 0, time.UTC),
 		},
 		{
 			name:     "Last Wednesday of June 2020",
 			year:     2020,
-			month:    MonthJune,
-			weekday:  WeekdayWednesday,
+			month:    time.June,
+			weekday:  time.Wednesday,
 			hour:     9,
 			expected: time.Date(2020, 6, 24, 9, 0, 0, 0, time.UTC),
 		},

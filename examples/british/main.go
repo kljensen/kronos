@@ -19,7 +19,7 @@ func main() {
 
 	// Example 1: Using the GB parser
 	fmt.Println("Example 1: GB parser with DMY format")
-	gbParser := en.GBParser()
+	gbParser := en.NewGB()
 
 	britishDates := []string{
 		"15/3/2024",  // 15th March 2024
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	usParser := en.New().DateOrder(kronos.DateOrderMDY)
-	gbParser = en.GBParser() // DMY order
+	gbParser = en.NewGB() // DMY order
 
 	fmt.Println("  Date       | US (M/D/Y)         | British (D/M/Y)")
 	fmt.Println("  -----------|--------------------|-----------------")

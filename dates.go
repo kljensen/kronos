@@ -19,10 +19,10 @@ func assignSimilarTime(components *ParsingComponents, date time.Time) {
 
 	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
 	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / NanosecondsPerMS
-	remainingNanos := totalNanos % NanosecondsPerMS
-	microsecond := remainingNanos / NanosecondsPerMicro
-	nanosecond := remainingNanos % NanosecondsPerMicro
+	millisecond := totalNanos / 1000000
+	remainingNanos := totalNanos % 1000000
+	microsecond := remainingNanos / 1000
+	nanosecond := remainingNanos % 1000
 
 	components.Assign(ComponentMillisecond, millisecond)
 	if microsecond > 0 {
@@ -33,10 +33,10 @@ func assignSimilarTime(components *ParsingComponents, date time.Time) {
 	}
 
 	// Set meridiem based on hour
-	if date.Hour() < HoursPerDay/2 {
-		components.Assign(ComponentMeridiem, int(MeridiemAM))
+	if date.Hour() < 12 {
+		components.Assign(ComponentMeridiem, 0) // AM
 	} else {
-		components.Assign(ComponentMeridiem, int(MeridiemPM))
+		components.Assign(ComponentMeridiem, 1) // PM
 	}
 }
 
@@ -57,10 +57,10 @@ func implySimilarTime(components *ParsingComponents, date time.Time) {
 
 	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
 	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / NanosecondsPerMS
-	remainingNanos := totalNanos % NanosecondsPerMS
-	microsecond := remainingNanos / NanosecondsPerMicro
-	nanosecond := remainingNanos % NanosecondsPerMicro
+	millisecond := totalNanos / 1000000
+	remainingNanos := totalNanos % 1000000
+	microsecond := remainingNanos / 1000
+	nanosecond := remainingNanos % 1000
 
 	components.Imply(ComponentMillisecond, millisecond)
 	if microsecond > 0 {
@@ -71,10 +71,10 @@ func implySimilarTime(components *ParsingComponents, date time.Time) {
 	}
 
 	// Set meridiem based on hour
-	if date.Hour() < HoursPerDay/2 {
-		components.Imply(ComponentMeridiem, int(MeridiemAM))
+	if date.Hour() < 12 {
+		components.Imply(ComponentMeridiem, 0) // AM
 	} else {
-		components.Imply(ComponentMeridiem, int(MeridiemPM))
+		components.Imply(ComponentMeridiem, 1) // PM
 	}
 }
 
@@ -106,7 +106,7 @@ func findMostLikelyADYear(rawYear int) int {
 	year2000s := year2000Base + rawYear
 
 	// If the year in 2000s would be within threshold of current year, use it
-	if year2000s <= currentYear+YearLookAheadThreshold {
+	if year2000s <= currentYear+20 {
 		return year2000s
 	}
 

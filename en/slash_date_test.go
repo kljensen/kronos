@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_slash.test.ts
@@ -35,8 +34,8 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common"
-	"github.com/kljensen/kronos/common/refiners"
+	commonparsers "github.com/kljensen/kronos/internal/common/parsers"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,9 +48,9 @@ func ptrInt(i int) *int {
 func createTestChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			common.NewSlashDateFormatParser(false), // middle-endian (MM/DD)
-			NewENSlashMonthFormatParser(),
-			NewENMonthNameLittleEndianParser(),
+			commonparsers.NewSlashDateFormatParser(false), // middle-endian (MM/DD)
+			parsers.NewENSlashMonthFormatParser(),
+			parsers.NewENMonthNameLittleEndianParser(),
 			NewENMonthNameMiddleEndianParser(false),
 		},
 		Refiners: []kronos.Refiner{
@@ -65,9 +64,9 @@ func createTestChrono() *kronos.Chrono {
 func createStrictTestChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			common.NewSlashDateFormatParser(false), // middle-endian (MM/DD)
-			NewENSlashMonthFormatParser(),
-			NewENMonthNameLittleEndianParser(),
+			commonparsers.NewSlashDateFormatParser(false), // middle-endian (MM/DD)
+			parsers.NewENSlashMonthFormatParser(),
+			parsers.NewENMonthNameLittleEndianParser(),
 			NewENMonthNameMiddleEndianParser(false),
 		},
 		Refiners: []kronos.Refiner{},
@@ -79,9 +78,9 @@ func createStrictTestChrono() *kronos.Chrono {
 func createGBTestChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			common.NewSlashDateFormatParser(true), // little-endian (DD/MM)
-			NewENSlashMonthFormatParser(),
-			NewENMonthNameLittleEndianParser(),
+			commonparsers.NewSlashDateFormatParser(true), // little-endian (DD/MM)
+			parsers.NewENSlashMonthFormatParser(),
+			parsers.NewENMonthNameLittleEndianParser(),
 			NewENMonthNameMiddleEndianParser(true),
 		},
 		Refiners: []kronos.Refiner{},

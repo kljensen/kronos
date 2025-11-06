@@ -20,11 +20,11 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 		TimezoneOffsetNonDst:    -300, // EST = UTC-5
 		DstStart: func(year int) time.Time {
 			// DST starts 2nd Sunday of March at 2 AM
-			return getNthWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2, 2)
+			return getNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends 1st Sunday of November at 2 AM
-			return getNthWeekdayOfMonth(year, MonthNovember, WeekdaySunday, 1, 2)
+			return getNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
 		},
 	},
 	"CST":  -360,
@@ -49,11 +49,11 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 		TimezoneOffsetNonDst:    60,  // CET = UTC+1
 		DstStart: func(year int) time.Time {
 			// DST starts last Sunday of March at 2 AM
-			return getLastWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2)
+			return getLastWeekdayOfMonth(year, time.March, time.Sunday, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends last Sunday of October at 3 AM
-			return getLastWeekdayOfMonth(year, MonthOctober, WeekdaySunday, 3)
+			return getLastWeekdayOfMonth(year, time.October, time.Sunday, 3)
 		},
 	},
 	"CEST": 120,
@@ -187,7 +187,7 @@ func resolveAmbiguousTimezone(ambiguous AmbiguousTimezoneMap, instant time.Time)
 // - hour: The hour of day for the returned time
 //
 //nolint:gofumpt // Function formatting is correct
-func getNthWeekdayOfMonth(year int, month Month, weekday Weekday, n int, hour int) time.Time {
+func getNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int, hour int) time.Time {
 	dayOfMonth := 0
 	count := 0
 
@@ -215,7 +215,7 @@ func getNthWeekdayOfMonth(year int, month Month, weekday Weekday, n int, hour in
 // - month: The month (1-12)
 // - weekday: The target weekday (0=Sunday, 6=Saturday)
 // - hour: The hour of day for the returned time
-func getLastWeekdayOfMonth(year int, month Month, weekday Weekday, hour int) time.Time {
+func getLastWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, hour int) time.Time {
 	// Start with the first day of the next month
 	nextMonth := time.Date(year, time.Month(month)+1, 1, 12, 0, 0, 0, time.UTC)
 

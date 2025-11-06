@@ -113,14 +113,10 @@ func TestDayPreferenceString(t *testing.T) {
 
 func TestToParsingOption(t *testing.T) {
 	settings := DefaultSettings()
-	settings.ForwardDate = true
 	settings.PreferDatesFrom = PreferFuture
 
 	opt := settings.ToParsingOption(nil)
 
-	if !opt.ForwardDate {
-		t.Error("Expected ForwardDate to be true")
-	}
 	if opt.Preference != PreferFuture {
 		t.Errorf("Expected PreferFuture, got %v", opt.Preference)
 	}

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -475,12 +476,12 @@ func TestDucklingParity_GrainPrecision(t *testing.T) {
 func createDucklingChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			NewENCasualDateParser(),
-			NewENCasualTimeParser(),
-			NewENWeekdayParser(),
-			NewENTimeExpressionParser(false),
-			NewENMonthNameParser(),
-			NewENSlashMonthFormatParser(),
+			parsers.NewENCasualDateParser(),
+			parsers.NewENCasualTimeParser(),
+			parsers.NewENWeekdayParser(),
+			parsers.NewENTimeExpressionParser(false),
+			parsers.NewENMonthNameParser(),
+			parsers.NewENSlashMonthFormatParser(),
 		},
 	}
 	return kronos.NewChrono(config)

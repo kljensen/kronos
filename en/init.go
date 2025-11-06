@@ -3,7 +3,7 @@ package en
 
 import (
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common"
+	commonparsers "github.com/kljensen/kronos/internal/common/parsers"
 	"github.com/kljensen/kronos/internal/en/parsers"
 )
 
@@ -21,7 +21,7 @@ func registerCommonParsers() {
 		Priority:    100, // High priority - most specific
 		Tags:        []string{"iso", "formal"},
 	}, func() kronos.Parser {
-		return common.NewISOFormatParser()
+		return commonparsers.NewISOFormatParser()
 	})
 
 	kronos.Register("slash_date", kronos.ParserInfo{
@@ -29,7 +29,7 @@ func registerCommonParsers() {
 		Priority:    80,
 		Tags:        []string{"formal", "numeric"},
 	}, func() kronos.Parser {
-		return common.NewSlashDateFormatParser(false) // US format by default
+		return commonparsers.NewSlashDateFormatParser(false) // US format by default
 	})
 
 	kronos.Register("slash_date_little_endian", kronos.ParserInfo{
@@ -37,7 +37,7 @@ func registerCommonParsers() {
 		Priority:    80,
 		Tags:        []string{"formal", "numeric", "uk"},
 	}, func() kronos.Parser {
-		return common.NewSlashDateFormatParser(true)
+		return commonparsers.NewSlashDateFormatParser(true)
 	})
 }
 

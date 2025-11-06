@@ -15,7 +15,8 @@ func TestIntegration_ParseWithSettings(t *testing.T) {
 	t.Run("basic settings parsing", func(t *testing.T) {
 		settings := kronos.DefaultSettings()
 
-		results, err := Casual.ParseWithSettings("March 20, 2020", refDate, settings)
+		config := CreateConfiguration(false, false)
+		results, err := kronos.ParseWithSettings("March 20, 2020", refDate, settings, config)
 		if err != nil {
 			t.Fatalf("ParseWithSettings failed: %v", err)
 		}
@@ -29,7 +30,8 @@ func TestIntegration_ParseWithSettings(t *testing.T) {
 		settings.StrictParsing = true
 		settings.RequireParts = []string{"year", "month", "day"}
 
-		results, err := Casual.ParseWithSettings("March 20, 2020", refDate, settings)
+		config := CreateConfiguration(false, false)
+		results, err := kronos.ParseWithSettings("March 20, 2020", refDate, settings, config)
 		if err != nil {
 			t.Fatalf("ParseWithSettings failed: %v", err)
 		}
@@ -42,7 +44,8 @@ func TestIntegration_ParseWithSettings(t *testing.T) {
 		settings := kronos.DefaultSettings()
 		settings.PreferDatesFrom = kronos.PreferFuture
 
-		results, err := Casual.ParseWithSettings("March 10", refDate, settings)
+		config := CreateConfiguration(false, false)
+		results, err := kronos.ParseWithSettings("March 10", refDate, settings, config)
 		if err != nil {
 			t.Fatalf("ParseWithSettings failed: %v", err)
 		}
@@ -56,7 +59,8 @@ func TestIntegration_ParseWithSettings(t *testing.T) {
 		settings.Timezone = "America/New_York"
 		settings.ToTimezone = "Europe/London"
 
-		results, err := Casual.ParseWithSettings("March 20, 2020 3pm", refDate, settings)
+		config := CreateConfiguration(false, false)
+		results, err := kronos.ParseWithSettings("March 20, 2020 3pm", refDate, settings, config)
 		if err != nil {
 			t.Fatalf("ParseWithSettings failed: %v", err)
 		}
@@ -71,7 +75,8 @@ func TestIntegration_ParseDateWithSettings(t *testing.T) {
 
 	settings := kronos.DefaultSettings()
 
-	date, err := Casual.ParseDateWithSettings("March 20, 2020", refDate, settings)
+	config := CreateConfiguration(false, false)
+	date, err := kronos.ParseDateWithSettings("March 20, 2020", refDate, settings, config)
 	if err != nil {
 		t.Fatalf("ParseDateWithSettings failed: %v", err)
 	}

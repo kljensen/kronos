@@ -94,7 +94,7 @@ func Example_parserBuilder_strictMode() {
 	refDate := time.Date(2020, 1, 1, 12, 0, 0, 0, time.UTC)
 
 	// Strict mode validates more strictly
-	date, err := en.StrictParser().
+	date, err := en.NewStrict().
 		WithReferenceDate(refDate).
 		ParseDate("2020-03-15")
 	if err != nil {
@@ -113,7 +113,7 @@ func Example_parserBuilder_gbFormat() {
 	refDate := time.Date(2020, 1, 1, 12, 0, 0, 0, time.UTC)
 
 	// GB format uses day/month/year
-	date, err := en.GBParser().
+	date, err := en.NewGB().
 		WithReferenceDate(refDate).
 		ParseDate("15/03/2020")
 	if err != nil {
@@ -146,8 +146,8 @@ func Example_parserSimple() {
 
 // Example_packageLevelParse demonstrates the package-level Parse function.
 func Example_packageLevelParse() {
-	// Using the package-level Parse function
-	results, err := kronos.Parse("tomorrow", en.Casual)
+	// Using the new builder API
+	results, err := en.New().Parse("tomorrow")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return

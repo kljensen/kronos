@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -6,7 +5,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/common/refiners"
+	"github.com/kljensen/kronos/internal/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -67,7 +66,7 @@ func TestENTimeExpression_Basic(t *testing.T) {
 	assert.Equal(t, 20, *result.Start().Get(kronos.ComponentHour))
 	assert.Equal(t, 32, *result.Start().Get(kronos.ComponentMinute))
 	assert.Equal(t, 13, *result.Start().Get(kronos.ComponentSecond))
-	assert.Equal(t, int(kronos.MeridiemPM), *result.Start().Get(kronos.ComponentMeridiem))
+	assert.Equal(t, int(types.MeridiemPM), *result.Start().Get(kronos.ComponentMeridiem))
 
 	assert.Contains(t, result.Tags(), "parser/ENTimeExpressionParser")
 	assert.Contains(t, result.Start().Tags(), "parser/ENTimeExpressionParser")
@@ -88,13 +87,13 @@ func TestENTimeExpression_WithClues(t *testing.T) {
 			name:             "1 at night",
 			text:             "1 at night",
 			expectedHour:     1,
-			expectedMeridiem: int(kronos.MeridiemAM),
+			expectedMeridiem: int(types.MeridiemAM),
 		},
 		{
 			name:             "1 in the afternoon",
 			text:             "1 in the afternoon",
 			expectedHour:     13,
-			expectedMeridiem: int(kronos.MeridiemPM),
+			expectedMeridiem: int(types.MeridiemPM),
 		},
 	}
 
@@ -172,7 +171,7 @@ func TestENTimeExpression_AfterDate(t *testing.T) {
 			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay))
 			assert.Equal(t, tt.expectedHour, *result.Start().Get(kronos.ComponentHour))
 			assert.Equal(t, tt.expectedMin, *result.Start().Get(kronos.ComponentMinute))
-			assert.Equal(t, int(kronos.MeridiemPM), *result.Start().Get(kronos.ComponentMeridiem))
+			assert.Equal(t, int(types.MeridiemPM), *result.Start().Get(kronos.ComponentMeridiem))
 
 			assert.Contains(t, result.Tags(), "parser/ENTimeExpressionParser")
 			assert.Contains(t, result.Start().Tags(), "parser/ENTimeExpressionParser")
@@ -202,7 +201,7 @@ func TestENTimeExpression_BeforeDate(t *testing.T) {
 			expectedDay:      31,
 			expectedHour:     14,
 			expectedMin:      15,
-			expectedMeridiem: int(kronos.MeridiemPM),
+			expectedMeridiem: int(types.MeridiemPM),
 		},
 		{
 			name:             "AM time with comma and month",
@@ -212,7 +211,7 @@ func TestENTimeExpression_BeforeDate(t *testing.T) {
 			expectedDay:      9,
 			expectedHour:     8,
 			expectedMin:      23,
-			expectedMeridiem: int(kronos.MeridiemAM),
+			expectedMeridiem: int(types.MeridiemAM),
 		},
 		{
 			name:             "AM time with bullet separator",
@@ -222,7 +221,7 @@ func TestENTimeExpression_BeforeDate(t *testing.T) {
 			expectedDay:      9,
 			expectedHour:     8,
 			expectedMin:      23,
-			expectedMeridiem: int(kronos.MeridiemAM),
+			expectedMeridiem: int(types.MeridiemAM),
 		},
 	}
 
@@ -272,11 +271,11 @@ func TestENTimeExpression_TimeRange(t *testing.T) {
 			startHour:     10,
 			startMin:      0,
 			startSec:      0,
-			startMeridiem: int(kronos.MeridiemAM),
+			startMeridiem: int(types.MeridiemAM),
 			endHour:       21,
 			endMin:        45,
 			endSec:        0,
-			endMeridiem:   int(kronos.MeridiemPM),
+			endMeridiem:   int(types.MeridiemPM),
 		},
 		{
 			name:          "time range with until",
@@ -285,11 +284,11 @@ func TestENTimeExpression_TimeRange(t *testing.T) {
 			startHour:     10,
 			startMin:      0,
 			startSec:      0,
-			startMeridiem: int(kronos.MeridiemAM),
+			startMeridiem: int(types.MeridiemAM),
 			endHour:       21,
 			endMin:        45,
 			endSec:        0,
-			endMeridiem:   int(kronos.MeridiemPM),
+			endMeridiem:   int(types.MeridiemPM),
 		},
 		{
 			name:          "time range with till",
@@ -298,11 +297,11 @@ func TestENTimeExpression_TimeRange(t *testing.T) {
 			startHour:     10,
 			startMin:      0,
 			startSec:      0,
-			startMeridiem: int(kronos.MeridiemAM),
+			startMeridiem: int(types.MeridiemAM),
 			endHour:       21,
 			endMin:        45,
 			endSec:        0,
-			endMeridiem:   int(kronos.MeridiemPM),
+			endMeridiem:   int(types.MeridiemPM),
 		},
 		{
 			name:          "time range with through",
@@ -311,11 +310,11 @@ func TestENTimeExpression_TimeRange(t *testing.T) {
 			startHour:     10,
 			startMin:      0,
 			startSec:      0,
-			startMeridiem: int(kronos.MeridiemAM),
+			startMeridiem: int(types.MeridiemAM),
 			endHour:       21,
 			endMin:        45,
 			endSec:        0,
-			endMeridiem:   int(kronos.MeridiemPM),
+			endMeridiem:   int(types.MeridiemPM),
 		},
 	}
 
@@ -363,7 +362,7 @@ func TestENTimeExpression_NonRange(t *testing.T) {
 	assert.Equal(t, 10, *result.Start().Get(kronos.ComponentHour))
 	assert.Equal(t, 0, *result.Start().Get(kronos.ComponentMinute))
 	assert.Equal(t, 0, *result.Start().Get(kronos.ComponentSecond))
-	assert.Equal(t, int(kronos.MeridiemAM), *result.Start().Get(kronos.ComponentMeridiem))
+	assert.Equal(t, int(types.MeridiemAM), *result.Start().Get(kronos.ComponentMeridiem))
 }
 
 // TestENTimeExpression_CasualTimeNumber tests casual time expressions with time of day
@@ -405,7 +404,7 @@ func TestENTimeExpression_CasualTimeNumber(t *testing.T) {
 			expectedDay:      1,
 			expectedHour:     6,
 			expectedMin:      intPtr(0),
-			expectedMeridiem: intPtr(int(kronos.MeridiemAM)),
+			expectedMeridiem: intPtr(int(types.MeridiemAM)),
 		},
 		{
 			name:             "6 in the afternoon",
@@ -415,7 +414,7 @@ func TestENTimeExpression_CasualTimeNumber(t *testing.T) {
 			expectedDay:      1,
 			expectedHour:     18,
 			expectedMin:      intPtr(0),
-			expectedMeridiem: intPtr(int(kronos.MeridiemPM)),
+			expectedMeridiem: intPtr(int(types.MeridiemPM)),
 		},
 	}
 
@@ -487,12 +486,12 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:    10,
 			startDay:      1,
 			startHour:     20,
-			startMeridiem: intPtr(int(kronos.MeridiemPM)),
+			startMeridiem: intPtr(int(types.MeridiemPM)),
 			endYear:       2016,
 			endMonth:      10,
 			endDay:        1,
 			endHour:       23,
-			endMeridiem:   intPtr(int(kronos.MeridiemPM)),
+			endMeridiem:   intPtr(int(types.MeridiemPM)),
 		},
 		{
 			name:          "8 - 11pm",
@@ -502,12 +501,12 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:    10,
 			startDay:      1,
 			startHour:     20,
-			startMeridiem: intPtr(int(kronos.MeridiemPM)),
+			startMeridiem: intPtr(int(types.MeridiemPM)),
 			endYear:       2016,
 			endMonth:      10,
 			endDay:        1,
 			endHour:       23,
-			endMeridiem:   intPtr(int(kronos.MeridiemPM)),
+			endMeridiem:   intPtr(int(types.MeridiemPM)),
 		},
 		{
 			name:          "7 - 8",
@@ -517,12 +516,12 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:    10,
 			startDay:      1,
 			startHour:     7,
-			startMeridiem: intPtr(int(kronos.MeridiemAM)),
+			startMeridiem: intPtr(int(types.MeridiemAM)),
 			endYear:       2016,
 			endMonth:      10,
 			endDay:        1,
 			endHour:       8,
-			endMeridiem:   intPtr(int(kronos.MeridiemAM)),
+			endMeridiem:   intPtr(int(types.MeridiemAM)),
 		},
 		{
 			name:                 "1pm-3",
@@ -532,13 +531,13 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:           8,
 			startDay:             10,
 			startHour:            13,
-			startMeridiem:        intPtr(int(kronos.MeridiemPM)),
+			startMeridiem:        intPtr(int(types.MeridiemPM)),
 			startMeridiemCertain: boolPtr(true),
 			endYear:              2012,
 			endMonth:             8,
 			endDay:               10,
 			endHour:              15,
-			endMeridiem:          intPtr(int(kronos.MeridiemPM)),
+			endMeridiem:          intPtr(int(types.MeridiemPM)),
 			endMeridiemCertain:   boolPtr(true),
 		},
 		{
@@ -549,13 +548,13 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:           8,
 			startDay:             10,
 			startHour:            1,
-			startMeridiem:        intPtr(int(kronos.MeridiemAM)),
+			startMeridiem:        intPtr(int(types.MeridiemAM)),
 			startMeridiemCertain: boolPtr(true),
 			endYear:              2012,
 			endMonth:             8,
 			endDay:               10,
 			endHour:              3,
-			endMeridiem:          intPtr(int(kronos.MeridiemAM)),
+			endMeridiem:          intPtr(int(types.MeridiemAM)),
 			endMeridiemCertain:   boolPtr(false),
 		},
 		{
@@ -566,13 +565,13 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:           8,
 			startDay:             10,
 			startHour:            23,
-			startMeridiem:        intPtr(int(kronos.MeridiemPM)),
+			startMeridiem:        intPtr(int(types.MeridiemPM)),
 			startMeridiemCertain: boolPtr(true),
 			endYear:              2012,
 			endMonth:             8,
 			endDay:               11,
 			endHour:              3,
-			endMeridiem:          intPtr(int(kronos.MeridiemAM)),
+			endMeridiem:          intPtr(int(types.MeridiemAM)),
 			endMeridiemCertain:   boolPtr(false),
 		},
 		{
@@ -583,12 +582,12 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:         8,
 			startDay:           10,
 			startHour:          0,
-			startMeridiem:      intPtr(int(kronos.MeridiemAM)),
+			startMeridiem:      intPtr(int(types.MeridiemAM)),
 			endYear:            2012,
 			endMonth:           8,
 			endDay:             10,
 			endHour:            3,
-			endMeridiem:        intPtr(int(kronos.MeridiemAM)),
+			endMeridiem:        intPtr(int(types.MeridiemAM)),
 			endMeridiemCertain: boolPtr(true),
 		},
 		{
@@ -599,12 +598,12 @@ func TestENTimeExpression_TimeRangeMeridiemHandling(t *testing.T) {
 			startMonth:         8,
 			startDay:           10,
 			startHour:          12,
-			startMeridiem:      intPtr(int(kronos.MeridiemPM)),
+			startMeridiem:      intPtr(int(types.MeridiemPM)),
 			endYear:            2012,
 			endMonth:           8,
 			endDay:             10,
 			endHour:            15,
-			endMeridiem:        intPtr(int(kronos.MeridiemPM)),
+			endMeridiem:        intPtr(int(types.MeridiemPM)),
 			endMeridiemCertain: boolPtr(true),
 		},
 	}
@@ -667,7 +666,7 @@ func TestENTimeExpression_TimeRangeNextDay(t *testing.T) {
 			startMonth:    12,
 			startYear:     2022,
 			startHour:     22,
-			startMeridiem: int(kronos.MeridiemPM),
+			startMeridiem: int(types.MeridiemPM),
 		},
 		{
 			name:          "Dec 31 10pm - midnight",
@@ -676,7 +675,7 @@ func TestENTimeExpression_TimeRangeNextDay(t *testing.T) {
 			startMonth:    12,
 			startYear:     2022,
 			startHour:     22,
-			startMeridiem: int(kronos.MeridiemPM),
+			startMeridiem: int(types.MeridiemPM),
 		},
 	}
 

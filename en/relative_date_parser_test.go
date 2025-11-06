@@ -22,7 +22,8 @@ import (
 func TestRelativeDateNextHour(t *testing.T) {
 	refDate := time.Date(2016, 10, 1, 12, 0, 0, 0, time.UTC)
 
-	results := Casual.Parse("next hour", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next hour")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next hour'")
 	assert.Equal(t, "next hour", results[0].Text())
@@ -40,7 +41,8 @@ func TestRelativeDateLastHour(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("last hour", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("last hour")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'last hour'")
 	assert.Equal(t, "last hour", results[0].Text())
@@ -58,7 +60,8 @@ func TestRelativeDateNextDay(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next day", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next day")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next day'")
 	assert.Equal(t, "next day", results[0].Text())
@@ -76,7 +79,8 @@ func TestRelativeDateLastDay(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("last day", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("last day")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'last day'")
 	assert.Equal(t, "last day", results[0].Text())
@@ -94,7 +98,8 @@ func TestRelativeDateNextWeek(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next week", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next week")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next week'")
 	assert.Equal(t, "next week", results[0].Text())
@@ -111,7 +116,8 @@ func TestRelativeDateLastWeek(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("last week", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("last week")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'last week'")
 	assert.Equal(t, "last week", results[0].Text())
@@ -129,7 +135,8 @@ func TestRelativeDateLastMonthBoundary(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("last month", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("last month")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'last month'")
 	assert.Equal(t, "last month", results[0].Text())
@@ -146,7 +153,8 @@ func TestRelativeDateNextMonthBoundary(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next month", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next month")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next month'")
 	assert.Equal(t, "next month", results[0].Text())
@@ -163,7 +171,8 @@ func TestRelativeDateLastMonth(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("last month", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("last month")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'last month'")
 	assert.Equal(t, "last month", results[0].Text())
@@ -180,7 +189,8 @@ func TestRelativeDateNextMonth(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next month", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next month")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next month'")
 	assert.Equal(t, "next month", results[0].Text())
@@ -197,7 +207,8 @@ func TestRelativeDateNextYear(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next year", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next year")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next year'")
 	assert.Equal(t, "next year", results[0].Text())
@@ -214,7 +225,8 @@ func TestRelativeDateLastYear(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("last year", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("last year")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'last year'")
 	assert.Equal(t, "last year", results[0].Text())
@@ -231,7 +243,8 @@ func TestRelativeDateThisHour(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("this hour", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("this hour")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'this hour'")
 	assert.Equal(t, "this hour", results[0].Text())
@@ -250,7 +263,8 @@ func TestRelativeDateThisDay(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("this day", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("this day")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'this day'")
 	assert.Equal(t, "this day", results[0].Text())
@@ -268,7 +282,8 @@ func TestRelativeDatePastDay(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("past day", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("past day")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'past day'")
 	assert.Equal(t, "past day", results[0].Text())
@@ -285,7 +300,8 @@ func TestRelativeDateHourDayBoundary(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next hour", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next hour")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next hour'")
 
@@ -302,7 +318,8 @@ func TestRelativeDateDayMonthBoundary(t *testing.T) {
 
 	// Using Casual parser
 	// Using Casual parser
-	results := Casual.Parse("next day", refDate, nil)
+	results, err := New().WithReferenceDate(refDate).Parse("next day")
+	assert.NoError(t, err)
 
 	assert.NotEmpty(t, results, "Expected to parse 'next day'")
 
@@ -330,7 +347,7 @@ func TestRelativeDatePluralForms(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text, refDate, nil)
 			assert.NotEmpty(t, results, "Expected to parse '%s'", tt.text)
 			assert.Equal(t, tt.text, results[0].Text())
 		})
@@ -355,7 +372,7 @@ func TestRelativeDateApproximation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := Casual.Parse(tt.text, refDate, nil)
+			results, err := New().WithReferenceDate(refDate).Parse(tt.text, refDate, nil)
 			assert.NotEmpty(t, results, "Expected to parse '%s'", tt.text)
 			// Check for approximation tag
 			tags := results[0].Tags()

@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_month.test.ts
@@ -32,8 +31,9 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	commonrefiners "github.com/kljensen/kronos/common/refiners"
-	enrefiners "github.com/kljensen/kronos/en/refiners"
+	"github.com/kljensen/kronos/internal/en/parsers"
+	enrefiners "github.com/kljensen/kronos/internal/en/refiners"
+	commonrefiners "github.com/kljensen/kronos/internal/common/refiners"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,13 +43,13 @@ import (
 func createMonthChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
-			NewENMonthNameParser(),
-			NewENMonthNameLittleEndianParser(),
+			parsers.NewENMonthNameParser(),
+			parsers.NewENMonthNameLittleEndianParser(),
 			NewENMonthNameMiddleEndianParser(false),
-			NewENSlashMonthFormatParser(),
+			parsers.NewENSlashMonthFormatParser(),
 		},
 		Refiners: []kronos.Refiner{
-			commonrefiners.NewForwardDateRefiner(),
+			commonrefiners.XNewForwardDateRefiner(),
 			enrefiners.NewENMergeDateRangeRefiner(),
 		},
 	}

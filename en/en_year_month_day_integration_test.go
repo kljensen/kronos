@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_year_month_day.test.ts
@@ -23,6 +22,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -91,7 +91,7 @@ func TestYearMonthDayNumeric(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENYearMonthDayParser(true) // strict mode
+			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -170,7 +170,7 @@ func TestYearMonthDayWithMonthName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENYearMonthDayParser(true) // strict mode
+			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -259,7 +259,7 @@ func TestYearMonthDayUnlikelyPatterns(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENYearMonthDayParser(true) // strict mode
+			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -287,7 +287,7 @@ func TestYearMonthDayImpossibleDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENYearMonthDayParser(true) // strict mode
+			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 

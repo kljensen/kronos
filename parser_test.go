@@ -123,8 +123,8 @@ func TestParserBuilder_ForwardDate(t *testing.T) {
 	}
 	chrono := NewChrono(config)
 
-	builder := New(chrono).ForwardDate()
-	assert.True(t, builder.settings.ForwardDate)
+	builder := New(chrono).PreferFuture()
+	assert.Equal(t, PreferFuture, builder.settings.PreferDatesFrom)
 }
 
 func TestPackageLevelParse(t *testing.T) {

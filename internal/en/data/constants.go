@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	kronos "github.com/kljensen/kronos"
 )
@@ -72,32 +73,32 @@ var FullMonthNameDictionary = map[string]int{
 }
 
 // WeekdayDictionary maps weekday names to weekday numbers (0-6)
-var WeekdayDictionary = map[string]kronos.Weekday{
-	"sunday":    kronos.WeekdaySunday,
-	"sun":       kronos.WeekdaySunday,
-	"sun.":      kronos.WeekdaySunday,
-	"monday":    kronos.WeekdayMonday,
-	"mon":       kronos.WeekdayMonday,
-	"mon.":      kronos.WeekdayMonday,
-	"tuesday":   kronos.WeekdayTuesday,
-	"tue":       kronos.WeekdayTuesday,
-	"tue.":      kronos.WeekdayTuesday,
-	"wednesday": kronos.WeekdayWednesday,
-	"wed":       kronos.WeekdayWednesday,
-	"wed.":      kronos.WeekdayWednesday,
-	"thursday":  kronos.WeekdayThursday,
-	"thurs":     kronos.WeekdayThursday,
-	"thurs.":    kronos.WeekdayThursday,
-	"thur":      kronos.WeekdayThursday,
-	"thur.":     kronos.WeekdayThursday,
-	"thu":       kronos.WeekdayThursday,
-	"thu.":      kronos.WeekdayThursday,
-	"friday":    kronos.WeekdayFriday,
-	"fri":       kronos.WeekdayFriday,
-	"fri.":      kronos.WeekdayFriday,
-	"saturday":  kronos.WeekdaySaturday,
-	"sat":       kronos.WeekdaySaturday,
-	"sat.":      kronos.WeekdaySaturday,
+var WeekdayDictionary = map[string]time.Weekday{
+	"sunday":    time.Sunday,
+	"sun":       time.Sunday,
+	"sun.":      time.Sunday,
+	"monday":    time.Monday,
+	"mon":       time.Monday,
+	"mon.":      time.Monday,
+	"tuesday":   time.Tuesday,
+	"tue":       time.Tuesday,
+	"tue.":      time.Tuesday,
+	"wednesday": time.Wednesday,
+	"wed":       time.Wednesday,
+	"wed.":      time.Wednesday,
+	"thursday":  time.Thursday,
+	"thurs":     time.Thursday,
+	"thurs.":    time.Thursday,
+	"thur":      time.Thursday,
+	"thur.":     time.Thursday,
+	"thu":       time.Thursday,
+	"thu.":      time.Thursday,
+	"friday":    time.Friday,
+	"fri":       time.Friday,
+	"fri.":      time.Friday,
+	"saturday":  time.Saturday,
+	"sat":       time.Saturday,
+	"sat.":      time.Saturday,
 }
 
 // IntegerWordDictionary maps word numbers to integers
@@ -269,7 +270,7 @@ func MatchAnyPattern(dict interface{}) string {
 		for k := range d {
 			keys = append(keys, regexp.QuoteMeta(k))
 		}
-	case map[string]kronos.Weekday:
+	case map[string]time.Weekday:
 		for k := range d {
 			keys = append(keys, regexp.QuoteMeta(k))
 		}

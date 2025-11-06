@@ -91,7 +91,7 @@ func main() {
 	}
 
 	casualParser := en.New().Casual()
-	strictParser := en.StrictParser()
+	strictParser := en.NewStrict()
 
 	fmt.Println("  Casual mode (informal expressions allowed):")
 	for _, expr := range casualExamples {

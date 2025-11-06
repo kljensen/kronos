@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_time_units_casual_relative.test.ts
@@ -27,8 +26,14 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
+
+// ptrInt returns a pointer to the given int value
+func ptrInt(i int) *int {
+	return &i
+}
 
 // TestCasualRelativePositiveTimeUnits tests positive time unit expressions
 func TestCasualRelativePositiveTimeUnits(t *testing.T) {
@@ -108,7 +113,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -191,7 +196,7 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -266,7 +271,7 @@ func TestCasualRelativePlusSign(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -330,7 +335,7 @@ func TestCasualRelativeMinusSign(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -399,7 +404,7 @@ func TestCasualRelativeWithoutAbbreviations(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(false) // No abbreviations
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(false) // No abbreviations
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -472,7 +477,7 @@ func TestCasualRelativeNegativeCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -704,7 +709,7 @@ func TestExtendedNumberWords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -886,7 +891,7 @@ func TestFractionalTimeUnits(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
 			chrono := kronos.NewChrono(config)
 
@@ -1088,8 +1093,8 @@ func TestDecadeTimeUnit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewENTimeUnitCasualRelativeFormatParser(true)
-			agoParser := NewENTimeUnitAgoFormatParser(false)
+			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
+			agoParser := parsers.NewENTimeUnitAgoFormatParser(false)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser, agoParser}}
 			chrono := kronos.NewChrono(config)
 
