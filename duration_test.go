@@ -235,10 +235,16 @@ func TestReverseDuration(t *testing.T) {
 }
 
 func TestEmptyDuration(t *testing.T) {
-	assert.NotNil(t, EmptyDuration)
-	assert.Equal(t, float64(0), EmptyDuration[TimeunitDay])
-	assert.Equal(t, float64(0), EmptyDuration[TimeunitSecond])
-	assert.Equal(t, float64(0), EmptyDuration[TimeunitMillisecond])
+	// EmptyDuration is now in internal/data package
+	// Test that createRelativeFromReference handles nil duration correctly
+	reference := newReferenceWithTimezone(time.Date(2020, 1, 1, 12, 0, 0, 0, time.UTC), nil)
+	components := createRelativeFromReference(reference, nil)
+	assert.NotNil(t, components)
+	// When nil duration is passed, it should use EmptyDuration internally
+	// and the result should equal the reference date
+	assert.Equal(t, 2020, *components.Get(ComponentYear))
+	assert.Equal(t, 1, *components.Get(ComponentMonth))
+	assert.Equal(t, 1, *components.Get(ComponentDay))
 }
 
 func TestAddDurationDoesNotMutateInput(t *testing.T) {

@@ -22,14 +22,6 @@ const (
 // Duration supports fractional values (e.g., 1.5 months).
 type Duration map[Timeunit]float64
 
-// EmptyDuration represents an explicit empty duration.
-// This is defined as zero day, second, and millisecond.
-var EmptyDuration = Duration{
-	TimeunitDay:         0,
-	TimeunitSecond:      0,
-	TimeunitMillisecond: 0,
-}
-
 // validateDate checks if a date is within valid bounds.
 func validateDate(t time.Time) error {
 	year := t.Year()

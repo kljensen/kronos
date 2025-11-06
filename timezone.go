@@ -2,11 +2,9 @@ package kronos
 
 import "time"
 
-// DefaultTimezoneAbbrMap is a map of common timezone abbreviations to their offsets in minutes.
-// Values can be either:
-// - int: a fixed offset in minutes
-// - AmbiguousTimezoneMap: for timezones that observe DST
-var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
+// defaultTimezoneAbbrMap is an internal copy of timezone abbreviations for use within the root package.
+// External code should use the types and functions provided by the public API.
+var defaultTimezoneAbbrMap = TimezoneAbbrMap{
 	// UTC/GMT
 	"UTC": 0,
 	"GMT": 0,
@@ -91,7 +89,7 @@ var DefaultTimezoneAbbrMap = TimezoneAbbrMap{
 // ToTimezoneOffset converts various timezone representations to an offset in minutes.
 // It supports:
 // - Numeric offsets (int) - returned as-is
-// - Timezone names (string) - looked up in overrides map or DefaultTimezoneAbbrMap
+// - Timezone names (string) - looked up in overrides map or default timezone map
 // - Ambiguous timezones with DST - determined based on the instant time
 //
 // Returns nil if the timezone cannot be resolved.
@@ -115,7 +113,7 @@ func toTimezoneOffset(tz interface{}, instant time.Time, overrides TimezoneAbbrM
 		}
 
 		// Then check default map
-		if val, exists := DefaultTimezoneAbbrMap[name]; exists {
+		if val, exists := defaultTimezoneAbbrMap[name]; exists {
 			return resolveTimezoneValue(val, instant)
 		}
 

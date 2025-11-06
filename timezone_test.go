@@ -274,13 +274,29 @@ func TestGetLastWeekdayOfMonth(t *testing.T) {
 }
 
 func TestDefaultTimezoneAbbrMap(t *testing.T) {
-	// Test that common timezones are present
-	assert.NotNil(t, DefaultTimezoneAbbrMap)
-	assert.Equal(t, 0, DefaultTimezoneAbbrMap["UTC"])
-	assert.Equal(t, 0, DefaultTimezoneAbbrMap["GMT"])
-	assert.Equal(t, -300, DefaultTimezoneAbbrMap["EST"])
-	assert.Equal(t, -480, DefaultTimezoneAbbrMap["PST"])
-	assert.Equal(t, 540, DefaultTimezoneAbbrMap["JST"])
+	// Test that common timezones are present in the internal data package
+	// Note: DefaultTimezoneAbbrMap is now in internal/data package
+	// This test validates the timezone functionality still works
+	instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		tz       string
+		expected int
+	}{
+		{"UTC", 0},
+		{"GMT", 0},
+		{"EST", -300},
+		{"PST", -480},
+		{"JST", 540},
+	}
+
+	for _, tt := range tests {
+		offset := toTimezoneOffset(tt.tz, instant, nil)
+		assert.NotNil(t, offset, "timezone %s should resolve", tt.tz)
+		if offset != nil {
+			assert.Equal(t, tt.expected, *offset, "timezone %s offset", tt.tz)
+		}
+	}
 }
 
 // TestTimezoneAbbreviations_Comprehensive tests comprehensive timezone abbreviations

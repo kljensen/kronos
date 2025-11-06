@@ -225,7 +225,8 @@ func TestCreateRelativeFromReference_EmptyDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
 	reference := newReferenceWithTimezone(refDate, nil)
 
-	components := createRelativeFromReference(reference, EmptyDuration)
+	// Test with nil duration (which internally uses EmptyDuration)
+	components := createRelativeFromReference(reference, nil)
 
 	// Should be same as reference date (no change)
 	assert.Equal(t, 2020, *components.Get(ComponentYear))

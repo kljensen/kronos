@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// ApproximationWords is a list of words that indicate approximate time expressions
-var ApproximationWords = []string{
+// approximationWords is a list of words that indicate approximate time expressions
+var approximationWords = []string{
 	"about",
 	"around",
 	"roughly",
@@ -30,7 +30,7 @@ func stripApproximationWords(input string) (cleaned string, isApproximate bool) 
 	}
 
 	// Check for approximation words
-	for _, word := range ApproximationWords {
+	for _, word := range approximationWords {
 		// Use word boundaries to avoid matching words like "about" in "roundabout"
 		pattern := regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
 		if pattern.MatchString(cleaned) {
