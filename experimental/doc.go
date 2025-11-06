@@ -61,6 +61,9 @@
 //   - Data constants: DefaultTimezoneAbbrMap, ApproximationWords, EmptyDuration
 //   - Configuration types: Settings, DateOrder, DayPreference, DatePreference
 //   - Duration types: Duration, Timeunit, Period
+//   - Advanced parsing: Chrono, Configuration, Parser, Refiner, Pipeline
+//   - Registry: ParserRegistry, ParserInfo, ParserFactory, GlobalRegistry, Register
+//   - Pipeline functions: NewPipeline, NewPipelineWithSettings, ParseWithSettings
 //
 // See the package documentation and type definitions for detailed information
 // about each exported item.
