@@ -20,7 +20,7 @@ type ParsingContext struct {
 // If refDate is nil, the current time is used.
 // If option is nil, default options are used.
 // The input text is sanitized to normalize Unicode characters before parsing.
-func NewParsingContext(text string, refDate interface{}, option *ParsingOption) *ParsingContext {
+func newParsingContext(text string, refDate interface{}, option *ParsingOption) *ParsingContext {
 	var opt ParsingOption
 	if option != nil {
 		opt = *option
@@ -31,10 +31,10 @@ func NewParsingContext(text string, refDate interface{}, option *ParsingOption) 
 		timezones = opt.Timezones
 	}
 
-	reference := FromInput(refDate, timezones)
+	reference := fromInput(refDate, timezones)
 
 	// Sanitize input text to handle Unicode normalization issues
-	text = SanitizeInput(text)
+	text = sanitizeInput(text)
 
 	return &ParsingContext{
 		text:      text,
@@ -47,15 +47,15 @@ func NewParsingContext(text string, refDate interface{}, option *ParsingOption) 
 
 // NewParsingContextWithSettings creates a new ParsingContext with settings.
 // Settings provide more comprehensive configuration than ParsingOption.
-func NewParsingContextWithSettings(text string, refDate interface{}, settings Settings) *ParsingContext {
+func newParsingContextWithSettings(text string, refDate interface{}, settings Settings) *ParsingContext {
 	// Convert settings to ParsingOption for backward compatibility
 	opt := settings.ToParsingOption(nil)
 
-	reference := FromInput(refDate, nil)
+	reference := fromInput(refDate, nil)
 
 	// Apply normalization if enabled
 	if settings.Normalize {
-		text = SanitizeInput(text)
+		text = sanitizeInput(text)
 	}
 
 	ctx := &ParsingContext{
@@ -74,16 +74,16 @@ func NewParsingContextWithSettings(text string, refDate interface{}, settings Se
 // Otherwise, it creates new ParsingComponents with the provided values.
 func (ctx *ParsingContext) CreateParsingComponents(components interface{}) *ParsingComponents {
 	if components == nil {
-		return NewParsingComponents(ctx.reference, nil)
+		return newParsingComponents(ctx.reference, nil)
 	}
 
 	switch v := components.(type) {
 	case *ParsingComponents:
 		return v
 	case map[Component]int:
-		return NewParsingComponents(ctx.reference, v)
+		return newParsingComponents(ctx.reference, v)
 	default:
-		return NewParsingComponents(ctx.reference, nil)
+		return newParsingComponents(ctx.reference, nil)
 	}
 }
 
@@ -141,7 +141,7 @@ func (ctx *ParsingContext) CreateParsingResult(index int, textOrEndIndex interfa
 		}
 	}
 
-	return NewParsingResult(ctx.reference, index, text, start, end)
+	return newParsingResult(ctx.reference, index, text, start, end)
 }
 
 // Debug executes the provided function if debugging is enabled.

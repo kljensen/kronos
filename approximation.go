@@ -18,7 +18,7 @@ var ApproximationWords = []string{
 // StripApproximationWords removes approximation modifiers from the input text
 // and returns the cleaned text along with a flag indicating if approximation was present.
 // The approximation words are matched case-insensitively and removed with their trailing whitespace.
-func StripApproximationWords(input string) (cleaned string, isApproximate bool) {
+func stripApproximationWords(input string) (cleaned string, isApproximate bool) {
 	cleaned = input
 	isApproximate = false
 

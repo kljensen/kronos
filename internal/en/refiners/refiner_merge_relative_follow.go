@@ -54,7 +54,7 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.ParsingConte
 			continue
 		}
 
-		textBetween, ok := kronos.SafeSlice(context.Text(), startIdx, endIdx)
+		textBetween, ok := kronos.XSafeSlice(context.Text(), startIdx, endIdx)
 		if !ok || !patternFollowBetween.MatchString(textBetween) {
 			merged = append(merged, current)
 			current = next
@@ -81,12 +81,12 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.ParsingConte
 		// Merge the results
 		duration := data.ParseDuration(current.Text())
 		if hasImpliedEarlierReferenceDate(current) {
-			duration = kronos.ReverseDuration(duration)
+			duration = kronos.XReverseDuration(duration)
 		}
 
 		// Create new reference from next result's date
 		newRef := context.Reference().FromDate(next.Start().Date())
-		components := kronos.CreateRelativeFromReference(newRef, duration)
+		components := kronos.XCreateRelativeFromReference(newRef, duration)
 
 		// Create merged result
 		resultIndex := current.Index()

@@ -258,7 +258,7 @@ func TestMicrosecondInDurationCalculations(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := kronos.AddDuration(refDate, tt.duration)
+			result, err := kronos.addDuration(refDate, tt.duration)
 			assert.NoError(t, err)
 			expected := refDate.Add(tt.expectedDuration)
 

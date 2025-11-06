@@ -92,7 +92,7 @@ func reorderParsers(parsers []Parser, order []string) []Parser {
 // It returns all parsed results after applying refiners.
 func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, error) {
 	// Create parsing context with settings
-	ctx, err := ApplySettings(text, refDate, p.settings)
+	ctx, err := applySettings(text, refDate, p.settings)
 	if err != nil {
 		return nil, fmt.Errorf("failed to apply settings: %w", err)
 	}
@@ -299,7 +299,7 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 
 			_, startOffsetSeconds := convertedStart.Zone()
 			startOffsetMinutes := startOffsetSeconds / SecondsPerMinute
-			startReference := NewReferenceWithTimezone(convertedStart, &startOffsetMinutes)
+			startReference := newReferenceWithTimezone(convertedStart, &startOffsetMinutes)
 			result.start.reference = startReference
 			result.reference = startReference
 			result.refDate = convertedStart
@@ -315,7 +315,7 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 
 			_, endOffsetSeconds := convertedEnd.Zone()
 			endOffsetMinutes := endOffsetSeconds / SecondsPerMinute
-			endComponents.reference = NewReferenceWithTimezone(convertedEnd, &endOffsetMinutes)
+			endComponents.reference = newReferenceWithTimezone(convertedEnd, &endOffsetMinutes)
 		}
 	}
 

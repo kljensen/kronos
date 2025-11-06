@@ -104,8 +104,8 @@ func TestDeterminePeriodFromDuration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := DeterminePeriodFromDuration(tt.duration); got != tt.expected {
-				t.Errorf("DeterminePeriodFromDuration() = %v, want %v", got, tt.expected)
+			if got := determinePeriodFromDuration(tt.duration); got != tt.expected {
+				t.Errorf("determinePeriodFromDuration() = %v, want %v", got, tt.expected)
 			}
 		})
 	}
@@ -114,7 +114,7 @@ func TestDeterminePeriodFromDuration(t *testing.T) {
 // TestDeterminePeriodFromComponents tests the DeterminePeriodFromComponents function
 func TestDeterminePeriodFromComponents(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	ref := NewReferenceWithTimezone(refTime, nil)
+	ref := newReferenceWithTimezone(refTime, nil)
 
 	tests := []struct {
 		name     string
@@ -131,7 +131,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		{
 			name: "time components certain",
 			setup: func() *ParsingComponents {
-				pc := NewParsingComponents(ref, nil)
+				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentHour, 10)
 				pc.Assign(ComponentMinute, 30)
 				return pc
@@ -141,7 +141,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		{
 			name: "day certain",
 			setup: func() *ParsingComponents {
-				pc := NewParsingComponents(ref, nil)
+				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentYear, 2020)
 				pc.Assign(ComponentMonth, 3)
 				pc.Assign(ComponentDay, 15)
@@ -152,7 +152,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		{
 			name: "weekday certain without day",
 			setup: func() *ParsingComponents {
-				pc := NewParsingComponents(ref, nil)
+				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentWeekday, int(WeekdayMonday))
 				return pc
 			},
@@ -161,7 +161,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		{
 			name: "month certain without day",
 			setup: func() *ParsingComponents {
-				pc := NewParsingComponents(ref, nil)
+				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentYear, 2020)
 				pc.Assign(ComponentMonth, 3)
 				return pc
@@ -171,7 +171,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		{
 			name: "only year certain",
 			setup: func() *ParsingComponents {
-				pc := NewParsingComponents(ref, nil)
+				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentYear, 2020)
 				return pc
 			},
@@ -180,7 +180,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		{
 			name: "nothing certain",
 			setup: func() *ParsingComponents {
-				pc := NewParsingComponents(ref, nil)
+				pc := newParsingComponents(ref, nil)
 				return pc
 			},
 			expected: PeriodUnknown,
@@ -190,8 +190,8 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pc := tt.setup()
-			if got := DeterminePeriodFromComponents(pc); got != tt.expected {
-				t.Errorf("DeterminePeriodFromComponents() = %v, want %v", got, tt.expected)
+			if got := determinePeriodFromComponents(pc); got != tt.expected {
+				t.Errorf("determinePeriodFromComponents() = %v, want %v", got, tt.expected)
 			}
 		})
 	}
@@ -200,26 +200,26 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 // TestCasualReferencesPeriod tests that casual reference functions set appropriate periods
 func TestCasualReferencesPeriod(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	ref := NewReferenceWithTimezone(refTime, nil)
+	ref := newReferenceWithTimezone(refTime, nil)
 
 	tests := []struct {
 		name     string
 		fn       func() *ParsingComponents
 		expected Period
 	}{
-		{"Now", func() *ParsingComponents { return Now(ref) }, PeriodTime},
-		{"Today", func() *ParsingComponents { return Today(ref) }, PeriodDay},
-		{"Yesterday", func() *ParsingComponents { return Yesterday(ref) }, PeriodDay},
-		{"Tomorrow", func() *ParsingComponents { return Tomorrow(ref) }, PeriodDay},
-		{"TheDayAfter", func() *ParsingComponents { return TheDayAfter(ref, 2) }, PeriodDay},
-		{"TheDayBefore", func() *ParsingComponents { return TheDayBefore(ref, 1) }, PeriodDay},
-		{"Tonight", func() *ParsingComponents { return Tonight(ref) }, PeriodDay},
-		{"LastNight", func() *ParsingComponents { return LastNight(ref) }, PeriodDay},
-		{"Morning", func() *ParsingComponents { return Morning(ref) }, PeriodTime},
-		{"Afternoon", func() *ParsingComponents { return Afternoon(ref) }, PeriodTime},
-		{"Evening", func() *ParsingComponents { return Evening(ref) }, PeriodTime},
-		{"Midnight", func() *ParsingComponents { return Midnight(ref) }, PeriodTime},
-		{"Noon", func() *ParsingComponents { return Noon(ref) }, PeriodTime},
+		{"Now", func() *ParsingComponents { return now(ref) }, PeriodTime},
+		{"Today", func() *ParsingComponents { return today(ref) }, PeriodDay},
+		{"Yesterday", func() *ParsingComponents { return yesterday(ref) }, PeriodDay},
+		{"Tomorrow", func() *ParsingComponents { return tomorrow(ref) }, PeriodDay},
+		{"TheDayAfter", func() *ParsingComponents { return theDayAfter(ref, 2) }, PeriodDay},
+		{"TheDayBefore", func() *ParsingComponents { return theDayBefore(ref, 1) }, PeriodDay},
+		{"Tonight", func() *ParsingComponents { return tonight(ref) }, PeriodDay},
+		{"LastNight", func() *ParsingComponents { return lastNight(ref) }, PeriodDay},
+		{"Morning", func() *ParsingComponents { return morning(ref) }, PeriodTime},
+		{"Afternoon", func() *ParsingComponents { return afternoon(ref) }, PeriodTime},
+		{"Evening", func() *ParsingComponents { return evening(ref) }, PeriodTime},
+		{"Midnight", func() *ParsingComponents { return midnight(ref) }, PeriodTime},
+		{"Noon", func() *ParsingComponents { return noon(ref) }, PeriodTime},
 	}
 
 	for _, tt := range tests {
@@ -235,7 +235,7 @@ func TestCasualReferencesPeriod(t *testing.T) {
 // TestRelativeDatePeriod tests that CreateRelativeFromReference sets appropriate periods
 func TestRelativeDatePeriod(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	ref := NewReferenceWithTimezone(refTime, nil)
+	ref := newReferenceWithTimezone(refTime, nil)
 
 	tests := []struct {
 		name     string
@@ -281,9 +281,9 @@ func TestRelativeDatePeriod(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pc := CreateRelativeFromReference(ref, tt.duration)
+			pc := createRelativeFromReference(ref, tt.duration)
 			if got := pc.Period(); got != tt.expected {
-				t.Errorf("CreateRelativeFromReference(%v) period = %v, want %v",
+				t.Errorf("createRelativeFromReference(%v) period = %v, want %v",
 					tt.duration, got, tt.expected)
 			}
 		})
@@ -293,9 +293,9 @@ func TestRelativeDatePeriod(t *testing.T) {
 // TestPeriodClone tests that Period is properly copied when cloning ParsingComponents
 func TestPeriodClone(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	ref := NewReferenceWithTimezone(refTime, nil)
+	ref := newReferenceWithTimezone(refTime, nil)
 
-	original := NewParsingComponents(ref, nil)
+	original := newParsingComponents(ref, nil)
 	original.SetPeriod(PeriodMonth)
 
 	clone := original.Clone()
@@ -316,9 +316,9 @@ func TestPeriodClone(t *testing.T) {
 // TestPeriodGetterSetter tests the Period getter and setter methods
 func TestPeriodGetterSetter(t *testing.T) {
 	refTime := time.Date(2020, 3, 15, 14, 30, 0, 0, time.UTC)
-	ref := NewReferenceWithTimezone(refTime, nil)
+	ref := newReferenceWithTimezone(refTime, nil)
 
-	pc := NewParsingComponents(ref, nil)
+	pc := newParsingComponents(ref, nil)
 
 	// Default should be PeriodUnknown
 	if pc.Period() != PeriodUnknown {

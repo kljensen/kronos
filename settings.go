@@ -202,7 +202,7 @@ func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
 
 // ApplySettings creates a new ParsingContext with settings applied.
 // This allows settings to influence the parsing context.
-func ApplySettings(text string, refDate time.Time, settings Settings) (*ParsingContext, error) {
+func applySettings(text string, refDate time.Time, settings Settings) (*ParsingContext, error) {
 	// Validate settings first
 	if err := ValidateSettings(settings); err != nil {
 		return nil, err
@@ -210,7 +210,7 @@ func ApplySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 
 	// Apply normalization if enabled
 	if settings.Normalize {
-		text = SanitizeInput(text)
+		text = sanitizeInput(text)
 	}
 
 	// Apply skip tokens
@@ -229,7 +229,7 @@ func ApplySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 	opt := settings.ToParsingOption(nil)
 
 	// Create context
-	ctx := NewParsingContext(text, ref, &opt)
+	ctx := newParsingContext(text, ref, &opt)
 
 	return ctx, nil
 }

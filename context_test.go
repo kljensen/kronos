@@ -10,7 +10,7 @@ func TestNewParsingContext(t *testing.T) {
 		text := "tomorrow at 3pm"
 		refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
 
-		ctx := NewParsingContext(text, refDate, nil)
+		ctx := newParsingContext(text, refDate, nil)
 
 		if ctx.Text() != text {
 			t.Errorf("Expected text '%s', got '%s'", text, ctx.Text())
@@ -35,7 +35,7 @@ func TestNewParsingContext(t *testing.T) {
 			Timezone: offset,
 		}
 
-		ctx := NewParsingContext(text, parsingRef, nil)
+		ctx := newParsingContext(text, parsingRef, nil)
 
 		if !ctx.RefDate().Equal(instant) {
 			t.Errorf("Expected refDate %v, got %v", instant, ctx.RefDate())
@@ -49,7 +49,7 @@ func TestNewParsingContext(t *testing.T) {
 	t.Run("NewParsingContext with nil refDate uses current time", func(t *testing.T) {
 		text := "tomorrow"
 		before := time.Now()
-		ctx := NewParsingContext(text, nil, nil)
+		ctx := newParsingContext(text, nil, nil)
 		after := time.Now()
 
 		if ctx.RefDate().Before(before) || ctx.RefDate().After(after) {
@@ -59,7 +59,7 @@ func TestNewParsingContext(t *testing.T) {
 
 	t.Run("NewParsingContext with nil option uses defaults", func(t *testing.T) {
 		text := "tomorrow"
-		ctx := NewParsingContext(text, nil, nil)
+		ctx := newParsingContext(text, nil, nil)
 
 		opt := ctx.Option()
 
@@ -88,7 +88,7 @@ func TestNewParsingContext(t *testing.T) {
 			Debug:       debugHandler,
 		}
 
-		ctx := NewParsingContext(text, nil, option)
+		ctx := newParsingContext(text, nil, option)
 
 		opt := ctx.Option()
 
@@ -113,7 +113,7 @@ func TestNewParsingContext(t *testing.T) {
 
 func TestCreateParsingComponents(t *testing.T) {
 	refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-	ctx := NewParsingContext("test", refDate, nil)
+	ctx := newParsingContext("test", refDate, nil)
 
 	t.Run("CreateParsingComponents with nil creates default", func(t *testing.T) {
 		pc := ctx.CreateParsingComponents(nil)
@@ -155,7 +155,7 @@ func TestCreateParsingComponents(t *testing.T) {
 	})
 
 	t.Run("CreateParsingComponents with existing ParsingComponents returns as-is", func(t *testing.T) {
-		original := NewParsingComponents(ctx.Reference(), nil)
+		original := newParsingComponents(ctx.Reference(), nil)
 		original.Assign(ComponentYear, 2026)
 
 		result := ctx.CreateParsingComponents(original)
@@ -172,7 +172,7 @@ func TestCreateParsingComponents(t *testing.T) {
 
 func TestCreateParsingResult(t *testing.T) {
 	refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-	ctx := NewParsingContext("tomorrow at 3pm", refDate, nil)
+	ctx := newParsingContext("tomorrow at 3pm", refDate, nil)
 
 	t.Run("CreateParsingResult with text", func(t *testing.T) {
 		result := ctx.CreateParsingResult(0, "tomorrow")
@@ -256,10 +256,10 @@ func TestCreateParsingResult(t *testing.T) {
 	})
 
 	t.Run("CreateParsingResult with ParsingComponents instances", func(t *testing.T) {
-		start := NewParsingComponents(ctx.Reference(), nil)
+		start := newParsingComponents(ctx.Reference(), nil)
 		start.Assign(ComponentYear, 2024)
 
-		end := NewParsingComponents(ctx.Reference(), nil)
+		end := newParsingComponents(ctx.Reference(), nil)
 		end.Assign(ComponentYear, 2025)
 
 		result := ctx.CreateParsingResult(0, "test", start, end)
@@ -301,7 +301,7 @@ func TestDebug(t *testing.T) {
 			Debug: debugHandler,
 		}
 
-		ctx := NewParsingContext("test", nil, option)
+		ctx := newParsingContext("test", nil, option)
 
 		ctx.Debug(func() {
 			debugHandler("test message")
@@ -313,7 +313,7 @@ func TestDebug(t *testing.T) {
 	})
 
 	t.Run("Debug does nothing when handler not set", func(t *testing.T) {
-		ctx := NewParsingContext("test", nil, nil)
+		ctx := newParsingContext("test", nil, nil)
 
 		// Should not panic
 		ctx.Debug(func() {
@@ -330,7 +330,7 @@ func TestContextAccessors(t *testing.T) {
 		ForwardDate: true,
 	}
 
-	ctx := NewParsingContext(text, refDate, option)
+	ctx := newParsingContext(text, refDate, option)
 
 	t.Run("Text returns input text", func(t *testing.T) {
 		if ctx.Text() != text {

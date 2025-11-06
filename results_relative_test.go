@@ -9,13 +9,13 @@ import (
 
 func TestCreateRelativeFromReference_DateOnly(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitDay: 3,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Date components should be certain
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -41,13 +41,13 @@ func TestCreateRelativeFromReference_DateOnly(t *testing.T) {
 
 func TestCreateRelativeFromReference_WithTime(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitHour: 2,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Both date and time components should be certain
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -73,13 +73,13 @@ func TestCreateRelativeFromReference_WithTime(t *testing.T) {
 
 func TestCreateRelativeFromReference_WeekDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitWeek: 2,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Date components should be certain
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -102,13 +102,13 @@ func TestCreateRelativeFromReference_WeekDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_MonthDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitMonth: 3,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Month and year should be certain
 	assert.True(t, components.IsCertain(ComponentMonth))
@@ -130,13 +130,13 @@ func TestCreateRelativeFromReference_MonthDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_YearDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitYear: 1,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Year should be certain
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -153,13 +153,13 @@ func TestCreateRelativeFromReference_YearDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_QuarterDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitQuarter: 1,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Year should be certain
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -176,13 +176,13 @@ func TestCreateRelativeFromReference_QuarterDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_NegativeDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitDay: -5,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Should be 5 days before reference (June 10, 2020)
 	assert.Equal(t, 2020, *components.Get(ComponentYear))
@@ -192,7 +192,7 @@ func TestCreateRelativeFromReference_NegativeDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_MixedDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	duration := Duration{
 		TimeunitDay:    2,
@@ -200,7 +200,7 @@ func TestCreateRelativeFromReference_MixedDuration(t *testing.T) {
 		TimeunitMinute: 15,
 	}
 
-	components := CreateRelativeFromReference(reference, duration)
+	components := createRelativeFromReference(reference, duration)
 
 	// Both date and time should be certain (has time components)
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -223,9 +223,9 @@ func TestCreateRelativeFromReference_MixedDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_EmptyDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	components := CreateRelativeFromReference(reference, EmptyDuration)
+	components := createRelativeFromReference(reference, EmptyDuration)
 
 	// Should be same as reference date (no change)
 	assert.Equal(t, 2020, *components.Get(ComponentYear))
@@ -235,9 +235,9 @@ func TestCreateRelativeFromReference_EmptyDuration(t *testing.T) {
 
 func TestCreateRelativeFromReference_NilDuration(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	components := CreateRelativeFromReference(reference, nil)
+	components := createRelativeFromReference(reference, nil)
 
 	// Should handle nil duration gracefully (treat as empty)
 	assert.NotNil(t, components)
@@ -248,9 +248,9 @@ func TestCreateRelativeFromReference_NilDuration(t *testing.T) {
 
 func TestAddDurationAsImplied(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	components := NewParsingComponents(reference, nil)
+	components := newParsingComponents(reference, nil)
 
 	// Set some initial certain values
 	components.Assign(ComponentYear, 2020)
@@ -277,9 +277,9 @@ func TestAddDurationAsImplied(t *testing.T) {
 
 func TestAddDurationAsImplied_ImpliedValues(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	components := NewParsingComponents(reference, nil)
+	components := newParsingComponents(reference, nil)
 
 	// Don't set day as certain - it will be implied
 

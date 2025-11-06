@@ -260,7 +260,7 @@ func TestPipeline_ApplyStrictValidation(t *testing.T) {
 	ref := &ReferenceWithTimezone{}
 
 	// Result with year and month - should pass strict validation
-	components1 := NewParsingComponents(ref, map[Component]int{
+	components1 := newParsingComponents(ref, map[Component]int{
 		ComponentYear:  2020,
 		ComponentMonth: 3,
 	})
@@ -269,7 +269,7 @@ func TestPipeline_ApplyStrictValidation(t *testing.T) {
 	result1 := &ParsingResult{start: components1}
 
 	// Result with only month - should fail strict validation
-	components2 := NewParsingComponents(ref, map[Component]int{
+	components2 := newParsingComponents(ref, map[Component]int{
 		ComponentMonth: 3,
 	})
 	components2.Assign(ComponentMonth, 3)
@@ -292,7 +292,7 @@ func TestPipeline_ApplyRequiredParts(t *testing.T) {
 	ref := &ReferenceWithTimezone{}
 
 	// Result with year and month - should pass
-	components1 := NewParsingComponents(ref, map[Component]int{
+	components1 := newParsingComponents(ref, map[Component]int{
 		ComponentYear:  2020,
 		ComponentMonth: 3,
 	})
@@ -301,7 +301,7 @@ func TestPipeline_ApplyRequiredParts(t *testing.T) {
 	result1 := &ParsingResult{start: components1}
 
 	// Result with only month - should fail
-	components2 := NewParsingComponents(ref, map[Component]int{
+	components2 := newParsingComponents(ref, map[Component]int{
 		ComponentMonth: 3,
 	})
 	components2.Assign(ComponentMonth, 3)
@@ -321,7 +321,7 @@ func TestPipeline_ApplyRequiredParts_NoRequirements(t *testing.T) {
 	pipeline := NewPipeline(nil, settings)
 
 	ref := &ReferenceWithTimezone{}
-	components := NewParsingComponents(ref, nil)
+	components := newParsingComponents(ref, nil)
 	result := &ParsingResult{start: components}
 	results := []*ParsingResult{result}
 
@@ -339,7 +339,7 @@ func TestPipeline_ApplyTimezoneConversion(t *testing.T) {
 	pipeline := NewPipeline(nil, settings)
 
 	ref := &ReferenceWithTimezone{}
-	components := NewParsingComponents(ref, nil)
+	components := newParsingComponents(ref, nil)
 	result := &ParsingResult{start: components}
 	results := []*ParsingResult{result}
 
@@ -359,7 +359,7 @@ func TestPipeline_ApplyTimezoneConversion_InvalidTimezone(t *testing.T) {
 	pipeline := NewPipeline(nil, settings)
 
 	ref := &ReferenceWithTimezone{}
-	components := NewParsingComponents(ref, nil)
+	components := newParsingComponents(ref, nil)
 	result := &ParsingResult{start: components}
 	results := []*ParsingResult{result}
 

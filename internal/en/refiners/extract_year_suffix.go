@@ -27,7 +27,7 @@ func NewENExtractYearSuffixRefiner() *ENExtractYearSuffixRefiner {
 // Refine extracts year suffixes from dates in parsing results
 func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
 	for i, result := range results {
-		resultStart, okStart := kronos.AsParsingComponents(result.Start())
+		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -36,7 +36,7 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, resu
 		}
 
 		start := result.Index() + len(result.Text())
-		suffix, okSlice := kronos.SafeSlice(context.Text(), start, len(context.Text()))
+		suffix, okSlice := kronos.XSafeSlice(context.Text(), start, len(context.Text()))
 		if !okSlice {
 			continue
 		}
@@ -53,7 +53,7 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, resu
 		year := parseYear(match[1])
 		var resultEnd *kronos.ParsingComponents
 		if result.End() != nil {
-			if endComponents, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+			if endComponents, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents
 				resultEnd.Assign(kronos.ComponentYear, year)
 			}
@@ -106,5 +106,5 @@ func parseYear(match string) int {
 	if err != nil {
 		return 0
 	}
-	return kronos.FindMostLikelyADYear(year)
+	return kronos.XFindMostLikelyADYear(year)
 }

@@ -35,7 +35,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 	refInstant := context.Reference().Instant()
 
 	for _, result := range results {
-		resultStart, okStart := kronos.AsParsingComponents(result.Start())
+		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -47,7 +47,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 
 			// Also adjust end time if it's a time range
 			if result.End() != nil {
-				if resultEnd, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+				if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 					if resultEnd.IsOnlyTime() {
 						r.adjustTimeOnlyComponents(resultEnd, refDate, refInstant, preference, context)
 
@@ -56,7 +56,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 						if resultStart.Date().After(resultEnd.Date()) {
 							// Move end time to next day
 							nextDay := resultEnd.Date().AddDate(0, 0, 1)
-							kronos.ImplySimilarDate(resultEnd, nextDay)
+							kronos.XImplySimilarDate(resultEnd, nextDay)
 						}
 					}
 				}
@@ -88,7 +88,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 		if constructedDate.After(refInstant) {
 			refPreviousDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refPreviousDay = refPreviousDay.AddDate(0, 0, -1)
-			kronos.ImplySimilarDate(components, refPreviousDay)
+			kronos.XImplySimilarDate(components, refPreviousDay)
 
 			if context.Option().Debug != nil {
 				context.Debug(func() {
@@ -103,7 +103,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 		if constructedDate.Before(refInstant) || constructedDate.Equal(refInstant) {
 			refFollowingDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
-			kronos.ImplySimilarDate(components, refFollowingDay)
+			kronos.XImplySimilarDate(components, refFollowingDay)
 
 			if context.Option().Debug != nil {
 				context.Debug(func() {

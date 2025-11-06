@@ -532,7 +532,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	const noMeridiem = -1
 
 	components := context.CreateParsingComponents(nil)
-	resultStart, hasStart := kronos.AsParsingComponents(result.Start())
+	resultStart, hasStart := kronos.XAsParsingComponents(result.Start())
 
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {

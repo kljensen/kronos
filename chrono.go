@@ -93,7 +93,7 @@ func (c *Chrono) ParseDateWithSettings(text string, referenceDate time.Time, set
 // 4. Apply all refiners sequentially
 // 5. Return final results
 func (c *Chrono) Parse(text string, referenceDate interface{}, option *ParsingOption) []*ParsingResult {
-	context := NewParsingContext(text, referenceDate, option)
+	context := newParsingContext(text, referenceDate, option)
 
 	results := make([]*ParsingResult, 0)
 	for _, parser := range c.parsers {

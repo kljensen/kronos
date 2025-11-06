@@ -41,7 +41,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 		// Check if it's a 4-digit year
 		if regexp.MustCompile(`^[12]\d{3}$`).MatchString(textWithoutSpaces) {
 			// Check if the result has a year-level period
-			if resultStart, okStart := kronos.AsParsingComponents(result.Start()); okStart {
+			if resultStart, okStart := kronos.XAsParsingComponents(result.Start()); okStart {
 				if resultStart.Period() == kronos.PeriodYear {
 					// This is a valid year-only expression, don't filter it
 					return true
@@ -57,7 +57,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 	}
 
 	// Check if start date is valid
-	resultStart, okStart := kronos.AsParsingComponents(result.Start())
+	resultStart, okStart := kronos.XAsParsingComponents(result.Start())
 	if !okStart {
 		return false
 	}
@@ -72,7 +72,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 
 	// Check if end date is valid
 	if result.End() != nil {
-		if resultEnd, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+		if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 			if !resultEnd.IsValidDate() {
 				if context.Option().Debug != nil {
 					context.Debug(func() {
@@ -101,7 +101,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 
 func (f *UnlikelyFormatFilter) isStrictModeValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
 	// In strict mode, remove weekday-only components
-	resultStart, okStart := kronos.AsParsingComponents(result.Start())
+	resultStart, okStart := kronos.XAsParsingComponents(result.Start())
 	if !okStart {
 		return false
 	}

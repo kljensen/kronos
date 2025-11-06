@@ -15,7 +15,7 @@ type ReferenceWithTimezone struct {
 // NewReferenceWithTimezone creates a new ReferenceWithTimezone with the given instant and timezone offset.
 // If instant is zero, the current time is used.
 // If timezoneOffset is nil, the system timezone is used.
-func NewReferenceWithTimezone(instant time.Time, timezoneOffset *int) *ReferenceWithTimezone {
+func newReferenceWithTimezone(instant time.Time, timezoneOffset *int) *ReferenceWithTimezone {
 	if instant.IsZero() {
 		instant = time.Now()
 	}
@@ -27,19 +27,19 @@ func NewReferenceWithTimezone(instant time.Time, timezoneOffset *int) *Reference
 
 // FromDate creates a ReferenceWithTimezone from a Date.
 func (r *ReferenceWithTimezone) FromDate(date time.Time) *ReferenceWithTimezone {
-	return NewReferenceWithTimezone(date, nil)
+	return newReferenceWithTimezone(date, nil)
 }
 
 // FromInput creates a ReferenceWithTimezone from either a ParsingReference or a time.Time.
 // It also handles timezone conversion using the provided timezoneOverrides.
-func FromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceWithTimezone {
+func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceWithTimezone {
 	if input == nil {
-		return NewReferenceWithTimezone(time.Time{}, nil)
+		return newReferenceWithTimezone(time.Time{}, nil)
 	}
 
 	switch v := input.(type) {
 	case time.Time:
-		return NewReferenceWithTimezone(v, nil)
+		return newReferenceWithTimezone(v, nil)
 	case ParsingReference:
 		instant := time.Now()
 		if v.Instant != nil {
@@ -48,12 +48,12 @@ func FromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceW
 
 		var timezoneOffset *int
 		if v.Timezone != nil {
-			timezoneOffset = ToTimezoneOffset(v.Timezone, instant, timezoneOverrides)
+			timezoneOffset = toTimezoneOffset(v.Timezone, instant, timezoneOverrides)
 		}
 
-		return NewReferenceWithTimezone(instant, timezoneOffset)
+		return newReferenceWithTimezone(instant, timezoneOffset)
 	default:
-		return NewReferenceWithTimezone(time.Time{}, nil)
+		return newReferenceWithTimezone(time.Time{}, nil)
 	}
 }
 
@@ -125,7 +125,7 @@ type ParsingComponents struct {
 
 // NewParsingComponents creates a new ParsingComponents with the given reference.
 // It initializes implied values based on the reference date.
-func NewParsingComponents(reference *ReferenceWithTimezone, knownComponents map[Component]int) *ParsingComponents {
+func newParsingComponents(reference *ReferenceWithTimezone, knownComponents map[Component]int) *ParsingComponents {
 	pc := &ParsingComponents{
 		knownValues:   make(map[Component]int),
 		impliedValues: make(map[Component]int),
@@ -385,7 +385,7 @@ func (pc *ParsingComponents) SetPeriod(period Period) *ParsingComponents {
 // DeterminePeriodFromDuration determines the granularity/period based on a duration.
 // The period represents the finest time unit present in the duration.
 // This follows the pattern from Python's dateparser.
-func DeterminePeriodFromDuration(duration Duration) Period {
+func determinePeriodFromDuration(duration Duration) Period {
 	if duration == nil {
 		return PeriodDay // Default
 	}
@@ -427,7 +427,7 @@ func DeterminePeriodFromDuration(duration Duration) Period {
 // DeterminePeriodFromComponents determines the granularity/period based on which
 // components are certain (explicitly mentioned). The period represents the finest
 // granularity of date/time information that was directly parsed.
-func DeterminePeriodFromComponents(pc *ParsingComponents) Period {
+func determinePeriodFromComponents(pc *ParsingComponents) Period {
 	if pc == nil {
 		return PeriodUnknown
 	}
@@ -465,22 +465,22 @@ func DeterminePeriodFromComponents(pc *ParsingComponents) Period {
 // It handles date-only durations (implies time) and time durations (assigns both date and time).
 // This is used for parsing relative expressions like "in 3 days", "2 hours ago", etc.
 // Returns nil if the duration calculation fails (e.g., overflow).
-func CreateRelativeFromReference(reference *ReferenceWithTimezone, duration Duration) *ParsingComponents {
+func createRelativeFromReference(reference *ReferenceWithTimezone, duration Duration) *ParsingComponents {
 	if duration == nil {
 		duration = EmptyDuration
 	}
 
-	date, err := AddDuration(reference.GetDateWithAdjustedTimezone(), duration)
+	date, err := addDuration(reference.GetDateWithAdjustedTimezone(), duration)
 	if err != nil {
 		// Duration calculation failed - return nil to indicate invalid result
 		return nil
 	}
 
-	components := NewParsingComponents(reference, nil)
+	components := newParsingComponents(reference, nil)
 	components.AddTag("result/relativeDate")
 
 	// Determine and set the period based on the duration
-	period := DeterminePeriodFromDuration(duration)
+	period := determinePeriodFromDuration(duration)
 	components.SetPeriod(period)
 
 	// Check if duration contains time components
@@ -495,12 +495,12 @@ func CreateRelativeFromReference(reference *ReferenceWithTimezone, duration Dura
 	if hasTimeComponents {
 		// Duration includes time - assign both date and time as certain
 		components.AddTag("result/relativeDateAndTime")
-		AssignSimilarTime(components, date)
-		AssignSimilarDate(components, date)
+		assignSimilarTime(components, date)
+		assignSimilarDate(components, date)
 		components.Assign(ComponentTimezoneOffset, reference.GetTimezoneOffset())
 	} else {
 		// Duration is date-only - imply time components
-		ImplySimilarTime(components, date)
+		implySimilarTime(components, date)
 		components.Imply(ComponentTimezoneOffset, reference.GetTimezoneOffset())
 
 		// Handle different date granularities
@@ -553,15 +553,15 @@ func (pc *ParsingComponents) AddDurationAsImplied(duration Duration) *ParsingCom
 	currentDate := pc.Date()
 
 	// Add the duration
-	newDate, err := AddDuration(currentDate, duration)
+	newDate, err := addDuration(currentDate, duration)
 	if err != nil {
 		// Duration calculation failed - return nil to indicate invalid result
 		return nil
 	}
 
 	// Imply the new date components
-	ImplySimilarDate(pc, newDate)
-	ImplySimilarTime(pc, newDate)
+	implySimilarDate(pc, newDate)
+	implySimilarTime(pc, newDate)
 
 	return pc
 }
@@ -581,9 +581,9 @@ type ParsingResult struct {
 }
 
 // NewParsingResult creates a new ParsingResult.
-func NewParsingResult(reference *ReferenceWithTimezone, index int, text string, start, end *ParsingComponents) *ParsingResult {
+func newParsingResult(reference *ReferenceWithTimezone, index int, text string, start, end *ParsingComponents) *ParsingResult {
 	if start == nil {
-		start = NewParsingComponents(reference, nil)
+		start = newParsingComponents(reference, nil)
 	}
 
 	return &ParsingResult{
@@ -608,7 +608,7 @@ func (pr *ParsingResult) Clone() *ParsingResult {
 		endClone = pr.end.Clone()
 	}
 
-	return NewParsingResult(pr.reference, pr.index, pr.text, startClone, endClone)
+	return newParsingResult(pr.reference, pr.index, pr.text, startClone, endClone)
 }
 
 // Date returns a time.Time object created from the start components.

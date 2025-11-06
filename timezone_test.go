@@ -12,19 +12,19 @@ func TestToTimezoneOffset_NumericOffset(t *testing.T) {
 
 	// Test positive offset
 	offset := 300
-	result := ToTimezoneOffset(offset, instant, nil)
+	result := toTimezoneOffset(offset, instant, nil)
 	assert.NotNil(t, result)
 	assert.Equal(t, 300, *result)
 
 	// Test negative offset
 	offset = -480
-	result = ToTimezoneOffset(offset, instant, nil)
+	result = toTimezoneOffset(offset, instant, nil)
 	assert.NotNil(t, result)
 	assert.Equal(t, -480, *result)
 
 	// Test zero offset
 	offset = 0
-	result = ToTimezoneOffset(offset, instant, nil)
+	result = toTimezoneOffset(offset, instant, nil)
 	assert.NotNil(t, result)
 	assert.Equal(t, 0, *result)
 }
@@ -49,7 +49,7 @@ func TestToTimezoneOffset_StringTimezone(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ToTimezoneOffset(tt.tz, instant, nil)
+			result := toTimezoneOffset(tt.tz, instant, nil)
 			assert.NotNil(t, result)
 			assert.Equal(t, tt.expected, *result)
 		})
@@ -65,13 +65,13 @@ func TestToTimezoneOffset_WithOverrides(t *testing.T) {
 	}
 
 	// Test custom timezone
-	result := ToTimezoneOffset("CUSTOM", instant, overrides)
+	result := toTimezoneOffset("CUSTOM", instant, overrides)
 	assert.NotNil(t, result)
 	assert.Equal(t, 123, *result)
 
 	// Test override taking precedence over default
 	overrides["UTC"] = 999
-	result = ToTimezoneOffset("UTC", instant, overrides)
+	result = toTimezoneOffset("UTC", instant, overrides)
 	assert.NotNil(t, result)
 	assert.Equal(t, 999, *result)
 }
@@ -83,11 +83,11 @@ func TestToTimezoneOffset_AmbiguousTimezone(t *testing.T) {
 		TimezoneOffsetNonDst:    -300, // EST = UTC-5
 		DstStart: func(year int) time.Time {
 			// DST starts 2nd Sunday of March at 2 AM
-			return GetNthWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2, 2)
+			return getNthWeekdayOfMonth(year, MonthMarch, WeekdaySunday, 2, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends 1st Sunday of November at 2 AM
-			return GetNthWeekdayOfMonth(year, MonthNovember, WeekdaySunday, 1, 2)
+			return getNthWeekdayOfMonth(year, MonthNovember, WeekdaySunday, 1, 2)
 		},
 	}
 
@@ -97,38 +97,38 @@ func TestToTimezoneOffset_AmbiguousTimezone(t *testing.T) {
 
 	// Test during DST (June 1, 2020)
 	instantDuringDst := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
-	result := ToTimezoneOffset("ET", instantDuringDst, overrides)
+	result := toTimezoneOffset("ET", instantDuringDst, overrides)
 	assert.NotNil(t, result)
 	assert.Equal(t, -240, *result, "Should use DST offset during summer")
 
 	// Test during non-DST (January 1, 2020)
 	instantNonDst := time.Date(2020, 1, 1, 12, 0, 0, 0, time.UTC)
-	result = ToTimezoneOffset("ET", instantNonDst, overrides)
+	result = toTimezoneOffset("ET", instantNonDst, overrides)
 	assert.NotNil(t, result)
 	assert.Equal(t, -300, *result, "Should use non-DST offset during winter")
 
 	// Test right at DST start (should be non-DST)
 	instantAtDstStart := time.Date(2020, 3, 8, 1, 0, 0, 0, time.UTC)
-	result = ToTimezoneOffset("ET", instantAtDstStart, overrides)
+	result = toTimezoneOffset("ET", instantAtDstStart, overrides)
 	assert.NotNil(t, result)
 	assert.Equal(t, -300, *result, "Should use non-DST offset before DST starts")
 
 	// Test right after DST start (should be DST)
 	instantAfterDstStart := time.Date(2020, 3, 8, 8, 0, 0, 0, time.UTC)
-	result = ToTimezoneOffset("ET", instantAfterDstStart, overrides)
+	result = toTimezoneOffset("ET", instantAfterDstStart, overrides)
 	assert.NotNil(t, result)
 	assert.Equal(t, -240, *result, "Should use DST offset after DST starts")
 }
 
 func TestToTimezoneOffset_NilTimezone(t *testing.T) {
 	instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
-	result := ToTimezoneOffset(nil, instant, nil)
+	result := toTimezoneOffset(nil, instant, nil)
 	assert.Nil(t, result)
 }
 
 func TestToTimezoneOffset_UnknownTimezone(t *testing.T) {
 	instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
-	result := ToTimezoneOffset("UNKNOWN_TZ", instant, nil)
+	result := toTimezoneOffset("UNKNOWN_TZ", instant, nil)
 	assert.Nil(t, result)
 }
 
@@ -145,11 +145,11 @@ func TestToTimezoneOffset_AmbiguousWithZeroInstant(t *testing.T) {
 	}
 
 	// Zero instant should return nil for ambiguous timezone
-	result := ToTimezoneOffset("ET", time.Time{}, overrides)
+	result := toTimezoneOffset("ET", time.Time{}, overrides)
 	assert.Nil(t, result)
 }
 
-func TestGetNthWeekdayOfMonth(t *testing.T) {
+func TestgetNthWeekdayOfMonth(t *testing.T) {
 	tests := []struct {
 		name     string
 		year     int
@@ -208,13 +208,13 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetNthWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.n, tt.hour)
+			result := getNthWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.n, tt.hour)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
 
-func TestGetLastWeekdayOfMonth(t *testing.T) {
+func TestgetLastWeekdayOfMonth(t *testing.T) {
 	tests := []struct {
 		name     string
 		year     int
@@ -267,7 +267,7 @@ func TestGetLastWeekdayOfMonth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetLastWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.hour)
+			result := getLastWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.hour)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -376,7 +376,7 @@ func TestTimezoneAbbreviations_Comprehensive(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ToTimezoneOffset(tt.tz, instant, nil)
+			result := toTimezoneOffset(tt.tz, instant, nil)
 			assert.NotNil(t, result, "Timezone %s should be recognized", tt.tz)
 			assert.Equal(t, tt.expected, *result, "Timezone %s offset mismatch", tt.tz)
 		})
@@ -467,7 +467,7 @@ func TestToTimezoneOffset_IANATimezones(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ToTimezoneOffset(tt.location, tt.instant, nil)
+			result := toTimezoneOffset(tt.location, tt.instant, nil)
 			assert.NotNil(t, result, "Location %s should be recognized", tt.location)
 			assert.Equal(t, tt.expectedOffsetMi, *result, "Location %s offset mismatch", tt.location)
 		})
@@ -479,7 +479,7 @@ func TestToTimezoneOffset_EdgeCases(t *testing.T) {
 	t.Run("negative numeric offset", func(t *testing.T) {
 		instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
 		offset := -480
-		result := ToTimezoneOffset(offset, instant, nil)
+		result := toTimezoneOffset(offset, instant, nil)
 		assert.NotNil(t, result)
 		assert.Equal(t, -480, *result)
 	})
@@ -487,27 +487,27 @@ func TestToTimezoneOffset_EdgeCases(t *testing.T) {
 	t.Run("positive numeric offset", func(t *testing.T) {
 		instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
 		offset := 330
-		result := ToTimezoneOffset(offset, instant, nil)
+		result := toTimezoneOffset(offset, instant, nil)
 		assert.NotNil(t, result)
 		assert.Equal(t, 330, *result)
 	})
 
 	t.Run("nil timezone", func(t *testing.T) {
 		instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
-		result := ToTimezoneOffset(nil, instant, nil)
+		result := toTimezoneOffset(nil, instant, nil)
 		assert.Nil(t, result)
 	})
 
 	t.Run("unknown string timezone", func(t *testing.T) {
 		instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
-		result := ToTimezoneOffset("INVALID_TZ", instant, nil)
+		result := toTimezoneOffset("INVALID_TZ", instant, nil)
 		assert.Nil(t, result)
 	})
 
 	t.Run("case-sensitive timezone", func(t *testing.T) {
 		instant := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
 		// Lowercase should not match
-		result := ToTimezoneOffset("utc", instant, nil)
+		result := toTimezoneOffset("utc", instant, nil)
 		assert.Nil(t, result)
 	})
 }
@@ -533,7 +533,7 @@ func TestToTimezoneOffset_OffsetFormats(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ToTimezoneOffset(tt.offset, instant, nil)
+			result := toTimezoneOffset(tt.offset, instant, nil)
 			assert.NotNil(t, result)
 			assert.Equal(t, tt.expected, *result)
 		})
@@ -602,7 +602,7 @@ func TestToTimezoneOffset_DSTTransitions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ToTimezoneOffset(tt.tz, tt.instant, nil)
+			result := toTimezoneOffset(tt.tz, tt.instant, nil)
 			assert.NotNil(t, result, "Timezone %s should be recognized", tt.tz)
 			assert.Equal(t, tt.expected, *result, "Timezone %s offset mismatch at %s", tt.tz, tt.instant)
 		})
@@ -617,7 +617,7 @@ func TestToTimezoneOffset_OverridePrecedence(t *testing.T) {
 		overrides := TimezoneAbbrMap{
 			"UTC": 123, // Override UTC to non-zero
 		}
-		result := ToTimezoneOffset("UTC", instant, overrides)
+		result := toTimezoneOffset("UTC", instant, overrides)
 		assert.NotNil(t, result)
 		assert.Equal(t, 123, *result, "Override should take precedence")
 	})
@@ -626,7 +626,7 @@ func TestToTimezoneOffset_OverridePrecedence(t *testing.T) {
 		overrides := TimezoneAbbrMap{
 			"CUSTOM": 456,
 		}
-		result := ToTimezoneOffset("CUSTOM", instant, overrides)
+		result := toTimezoneOffset("CUSTOM", instant, overrides)
 		assert.NotNil(t, result)
 		assert.Equal(t, 456, *result, "Custom timezone should work")
 	})
@@ -635,7 +635,7 @@ func TestToTimezoneOffset_OverridePrecedence(t *testing.T) {
 		overrides := TimezoneAbbrMap{
 			"CUSTOM": 456,
 		}
-		result := ToTimezoneOffset("EST", instant, overrides)
+		result := toTimezoneOffset("EST", instant, overrides)
 		assert.NotNil(t, result)
 		assert.Equal(t, -300, *result, "Default timezone should still work")
 	})
@@ -679,7 +679,7 @@ func TestToTimezoneOffset_AmbiguousDSTBoundaries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ToTimezoneOffset(tt.tz, tt.instant, nil)
+			result := toTimezoneOffset(tt.tz, tt.instant, nil)
 			assert.NotNil(t, result, "Timezone %s should be recognized", tt.tz)
 			assert.Equal(t, tt.expected, *result, "Timezone %s offset mismatch at boundary %s", tt.tz, tt.instant)
 		})

@@ -15,7 +15,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("basic ISO date YYYY-MM-DD", func(t *testing.T) {
 		text := "Let's finish this before this 2013-2-7."
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -48,7 +48,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("ISO datetime with timezone offset", func(t *testing.T) {
 		text := "1994-11-05T08:15:30-05:30"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -77,7 +77,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("ISO datetime with Z timezone", func(t *testing.T) {
 		text := "1994-11-05T13:15:30Z"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -106,7 +106,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("ISO datetime with milliseconds", func(t *testing.T) {
 		text := "2016-05-07T23:45:00.487+01:00"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -136,7 +136,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("ISO datetime with microseconds (4 digits)", func(t *testing.T) {
 		text := "2016-05-07T23:45:00.4876+01:00"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -160,7 +160,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("ISO datetime without seconds", func(t *testing.T) {
 		text := "2016-05-07T23:45+01:00"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -189,7 +189,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("ISO datetime without timezone", func(t *testing.T) {
 		text := "1994-11-05T13:15:30"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -218,7 +218,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("with leading dash", func(t *testing.T) {
 		text := "- 1994-11-05T13:15:30Z"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -243,7 +243,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("word boundary prevents false match", func(t *testing.T) {
 		text := "Version1994-11-05T13:15:30Z"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 
@@ -253,7 +253,7 @@ func TestISOFormatParser(t *testing.T) {
 
 	t.Run("single digit month and day", func(t *testing.T) {
 		text := "2023-1-5"
-		context := kronos.NewParsingContext(text, refDate, nil)
+		context := kronos.newParsingContext(text, refDate, nil)
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch(text)
 

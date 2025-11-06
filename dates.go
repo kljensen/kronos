@@ -2,9 +2,9 @@ package kronos
 
 import "time"
 
-// AssignSimilarDate assigns (force updates) the parsing components to the same day as the target.
+// assignSimilarDate assigns (force updates) the parsing components to the same day as the target.
 // This sets year, month, and day as certain (known) values.
-func AssignSimilarDate(components *ParsingComponents, date time.Time) {
+func assignSimilarDate(components *ParsingComponents, date time.Time) {
 	components.Assign(ComponentDay, date.Day())
 	components.Assign(ComponentMonth, int(date.Month()))
 	components.Assign(ComponentYear, date.Year())
@@ -12,7 +12,7 @@ func AssignSimilarDate(components *ParsingComponents, date time.Time) {
 
 // AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
-func AssignSimilarTime(components *ParsingComponents, date time.Time) {
+func assignSimilarTime(components *ParsingComponents, date time.Time) {
 	components.Assign(ComponentHour, date.Hour())
 	components.Assign(ComponentMinute, date.Minute())
 	components.Assign(ComponentSecond, date.Second())
@@ -42,7 +42,7 @@ func AssignSimilarTime(components *ParsingComponents, date time.Time) {
 
 // ImplySimilarDate implies (weakly updates) the parsing components to the same day as the target.
 // This sets year, month, and day as implied values (only if not already certain).
-func ImplySimilarDate(components *ParsingComponents, date time.Time) {
+func implySimilarDate(components *ParsingComponents, date time.Time) {
 	components.Imply(ComponentDay, date.Day())
 	components.Imply(ComponentMonth, int(date.Month()))
 	components.Imply(ComponentYear, date.Year())
@@ -50,7 +50,7 @@ func ImplySimilarDate(components *ParsingComponents, date time.Time) {
 
 // ImplySimilarTime implies (weakly updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
-func ImplySimilarTime(components *ParsingComponents, date time.Time) {
+func implySimilarTime(components *ParsingComponents, date time.Time) {
 	components.Imply(ComponentHour, date.Hour())
 	components.Imply(ComponentMinute, date.Minute())
 	components.Imply(ComponentSecond, date.Second())
@@ -90,7 +90,7 @@ func ImplySimilarTime(components *ParsingComponents, date time.Time) {
 //   - 40 -> 2040 (within 20 years of current)
 //   - 50 -> 1950 (would be 2050, which is > 2040, so use 1900s)
 //   - 99 -> 1999
-func FindMostLikelyADYear(rawYear int) int {
+func findMostLikelyADYear(rawYear int) int {
 	const twoDigitThreshold = 100
 
 	// If it's already a 4-digit year, return as-is
@@ -115,7 +115,7 @@ func FindMostLikelyADYear(rawYear int) int {
 	return year1900Base + rawYear
 }
 
-// FindYearClosestToRef finds the year (past or future) that is closest to the reference date
+// findYearClosestToRef finds the year (past or future) that is closest to the reference date
 // for a given day and month.
 //
 // This is useful when parsing dates without a year (e.g., "March 15").
@@ -127,8 +127,8 @@ func FindMostLikelyADYear(rawYear int) int {
 //   - Could be 2020-03-20 (about 2 months ahead)
 //   - Could be 2021-03-20 (about 14 months ahead)
 //   - Returns 2020 (closest match)
-func FindYearClosestToRef(refDate time.Time, day, month int) int {
-	return FindYearClosestToRefWithPreference(refDate, day, month, PreferCurrentPeriod)
+func findYearClosestToRef(refDate time.Time, day, month int) int {
+	return findYearClosestToRefWithPreference(refDate, day, month, PreferCurrentPeriod)
 }
 
 // FindYearClosestToRefWithPreference finds the year based on date preference settings.
@@ -153,7 +153,7 @@ func FindYearClosestToRef(refDate time.Time, day, month int) int {
 //   - PreferPast: "February 29" → February 29, 2020 (previous leap year)
 //   - PreferFuture: "February 29" → February 29, 2024 (next leap year)
 //   - PreferCurrentPeriod: "February 29" → February 29, 2024 (nearest leap year)
-func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, preference DatePreference) int {
+func findYearClosestToRefWithPreference(refDate time.Time, day, month int, preference DatePreference) int {
 	const defaultImpliedHour = 12 // Use noon for comparison
 
 	refYear := refDate.Year()
@@ -161,7 +161,7 @@ func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, prefe
 
 	// Special case: February 29 requires leap year selection
 	if month == 2 && day == 29 {
-		return FindNearestLeapYear(refYear, preference)
+		return findNearestLeapYear(refYear, preference)
 	}
 
 	// Create candidate dates for the reference year and adjacent years
@@ -226,7 +226,7 @@ func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, prefe
 //   - 1900: NOT leap year (divisible by 100 but not 400)
 //   - 2004: Leap year (divisible by 4, not by 100)
 //   - 2001: NOT leap year (not divisible by 4)
-func IsLeapYear(year int) bool {
+func isLeapYear(year int) bool {
 	if year%400 == 0 {
 		return true
 	}
@@ -241,13 +241,13 @@ func IsLeapYear(year int) bool {
 // The search is bounded at year 1900 to avoid excessive searching.
 //
 // Examples:
-//   - FindPreviousLeapYear(2023) → 2020
-//   - FindPreviousLeapYear(2024) → 2024
-//   - FindPreviousLeapYear(1901) → 1900 (bounded)
-func FindPreviousLeapYear(baseYear int) int {
+//   - findPreviousLeapYear(2023) → 2020
+//   - findPreviousLeapYear(2024) → 2024
+//   - findPreviousLeapYear(1901) → 1900 (bounded)
+func findPreviousLeapYear(baseYear int) int {
 	const lowerBound = 1900
 	for year := baseYear; year >= lowerBound; year-- {
-		if IsLeapYear(year) {
+		if isLeapYear(year) {
 			return year
 		}
 	}
@@ -260,13 +260,13 @@ func FindPreviousLeapYear(baseYear int) int {
 // The search is bounded at year 9999 to avoid excessive searching.
 //
 // Examples:
-//   - FindNextLeapYear(2023) → 2024
-//   - FindNextLeapYear(2024) → 2024
-//   - FindNextLeapYear(9997) → 9998 (bounded)
-func FindNextLeapYear(baseYear int) int {
+//   - findNextLeapYear(2023) → 2024
+//   - findNextLeapYear(2024) → 2024
+//   - findNextLeapYear(9997) → 9998 (bounded)
+func findNextLeapYear(baseYear int) int {
 	const upperBound = 9999
 	for year := baseYear; year <= upperBound; year++ {
-		if IsLeapYear(year) {
+		if isLeapYear(year) {
 			return year
 		}
 	}
@@ -286,24 +286,24 @@ func FindNextLeapYear(baseYear int) int {
 //   - PreferPast → 2020 (previous leap year)
 //   - PreferFuture → 2024 (next leap year)
 //   - PreferCurrentPeriod → 2024 (prefer future when current isn't leap)
-func FindNearestLeapYear(baseYear int, preference DatePreference) int {
+func findNearestLeapYear(baseYear int, preference DatePreference) int {
 	// If the base year is already a leap year, use it for all preferences
-	if IsLeapYear(baseYear) {
+	if isLeapYear(baseYear) {
 		return baseYear
 	}
 
 	switch preference {
 	case PreferPast:
-		return FindPreviousLeapYear(baseYear)
+		return findPreviousLeapYear(baseYear)
 
 	case PreferFuture:
-		return FindNextLeapYear(baseYear)
+		return findNextLeapYear(baseYear)
 
 	default: // PreferCurrentPeriod
 		// When current year is not a leap year, prefer the nearest one
 		// Break ties by preferring the future
-		next := FindNextLeapYear(baseYear)
-		prev := FindPreviousLeapYear(baseYear)
+		next := findNextLeapYear(baseYear)
+		prev := findPreviousLeapYear(baseYear)
 
 		// Calculate distances
 		distToNext := next - baseYear

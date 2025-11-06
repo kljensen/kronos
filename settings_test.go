@@ -133,7 +133,7 @@ func TestApplySettings_Normalization(t *testing.T) {
 	text := "test\u00A0text" // Non-breaking space
 	refDate := time.Now()
 
-	ctx, err := ApplySettings(text, refDate, settings)
+	ctx, err := applySettings(text, refDate, settings)
 	if err != nil {
 		t.Fatalf("ApplySettings failed: %v", err)
 	}
@@ -149,7 +149,7 @@ func TestApplySettings_SkipTokens(t *testing.T) {
 	text := "on March 15 at 3pm"
 	refDate := time.Now()
 
-	ctx, err := ApplySettings(text, refDate, settings)
+	ctx, err := applySettings(text, refDate, settings)
 	if err != nil {
 		t.Fatalf("ApplySettings failed: %v", err)
 	}
@@ -166,7 +166,7 @@ func TestApplySettings_RelativeBase(t *testing.T) {
 	text := "test"
 	refDate := time.Now()
 
-	ctx, err := ApplySettings(text, refDate, settings)
+	ctx, err := applySettings(text, refDate, settings)
 	if err != nil {
 		t.Fatalf("ApplySettings failed: %v", err)
 	}
@@ -184,7 +184,7 @@ func TestApplySettings_InvalidSettings(t *testing.T) {
 	text := "test"
 	refDate := time.Now()
 
-	_, err := ApplySettings(text, refDate, settings)
+	_, err := applySettings(text, refDate, settings)
 	if err == nil {
 		t.Error("Expected error for invalid settings")
 	}
@@ -307,7 +307,7 @@ func TestNewParsingContextWithSettings(t *testing.T) {
 	text := "March 15"
 	refDate := time.Now()
 
-	ctx := NewParsingContextWithSettings(text, refDate, settings)
+	ctx := newParsingContextWithSettings(text, refDate, settings)
 
 	if ctx == nil {
 		t.Fatal("Expected non-nil context")

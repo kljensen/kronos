@@ -3,42 +3,42 @@ package kronos
 import "time"
 
 // MergeDateTimeResult merges a date-only result with a time-only result.
-func MergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
+func mergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
 	result := dateResult.Clone()
-	beginDate, okDate := AsParsingComponents(dateResult.Start())
-	beginTime, okTime := AsParsingComponents(timeResult.Start())
+	beginDate, okDate := asParsingComponents(dateResult.Start())
+	beginTime, okTime := asParsingComponents(timeResult.Start())
 	if !okDate || !okTime {
 		return result
 	}
 
-	result.start = MergeDateTimeComponent(beginDate, beginTime)
+	result.start = mergeDateTimeComponent(beginDate, beginTime)
 
 	if dateResult.End() != nil || timeResult.End() != nil {
 		var endDate, endTime *ParsingComponents
 		if dateResult.End() == nil {
-			endDate, okDate = AsParsingComponents(dateResult.Start())
+			endDate, okDate = asParsingComponents(dateResult.Start())
 		} else {
-			endDate, okDate = AsParsingComponents(dateResult.End())
+			endDate, okDate = asParsingComponents(dateResult.End())
 		}
 		if timeResult.End() == nil {
-			endTime, okTime = AsParsingComponents(timeResult.Start())
+			endTime, okTime = asParsingComponents(timeResult.Start())
 		} else {
-			endTime, okTime = AsParsingComponents(timeResult.End())
+			endTime, okTime = asParsingComponents(timeResult.End())
 		}
 		if !okDate || !okTime {
 			return result
 		}
 
-		endDateTime := MergeDateTimeComponent(endDate, endTime)
+		endDateTime := mergeDateTimeComponent(endDate, endTime)
 
 		// If date has no end and the merged end time is before start time,
 		// the end should be on the next day
 		if dateResult.End() == nil && endDateTime.Date().Before(result.Start().Date()) {
 			nextDay := endDateTime.Date().Add(24 * time.Hour)
 			if endDateTime.IsCertain(ComponentDay) {
-				AssignSimilarDate(endDateTime, nextDay)
+				assignSimilarDate(endDateTime, nextDay)
 			} else {
-				ImplySimilarDate(endDateTime, nextDay)
+				implySimilarDate(endDateTime, nextDay)
 			}
 		}
 
@@ -49,7 +49,7 @@ func MergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
 }
 
 // MergeDateTimeComponent merges date and time components.
-func MergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingComponents {
+func mergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingComponents {
 	result := dateComp.Clone()
 
 	// Merge time components

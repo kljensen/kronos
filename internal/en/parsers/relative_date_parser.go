@@ -50,7 +50,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 
 			// Check if approximation words were used by examining the full match
 			fullMatch := match[0]
-			_, isApproximate := kronos.StripApproximationWords(fullMatch)
+			_, isApproximate := kronos.XStripApproximationWords(fullMatch)
 
 			modifier := strings.ToLower(match[1])
 			unitWord := strings.ToLower(match[2])
@@ -62,7 +62,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "next" and "after this"
 			if modifier == "next" || strings.HasPrefix(modifier, "after") {
 				duration := kronos.Duration{timeunit: 1}
-				components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+				components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "next month" means "the next month period" starting on the 1st
@@ -83,7 +83,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "last" and "past"
 			if modifier == "last" || modifier == "past" {
 				duration := kronos.Duration{timeunit: -1}
-				components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+				components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "last month" means "the previous month period" starting on the 1st

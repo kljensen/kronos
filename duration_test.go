@@ -167,7 +167,7 @@ func TestAddDuration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := AddDuration(tt.ref, tt.duration)
+			result, err := addDuration(tt.ref, tt.duration)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
@@ -228,7 +228,7 @@ func TestReverseDuration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ReverseDuration(tt.duration)
+			result := reverseDuration(tt.duration)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -248,7 +248,7 @@ func TestAddDurationDoesNotMutateInput(t *testing.T) {
 	}
 
 	// Add duration
-	_, err := AddDuration(ref, duration)
+	_, err := addDuration(ref, duration)
 	assert.NoError(t, err)
 
 	// Verify original duration is unchanged
@@ -460,7 +460,7 @@ func TestAddDuration_BoundsChecking(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := AddDuration(tt.ref, tt.duration)
+			_, err := addDuration(tt.ref, tt.duration)
 			if tt.expectError {
 				assert.Error(t, err)
 				if tt.errorMsg != "" {

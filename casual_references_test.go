@@ -9,9 +9,9 @@ import (
 
 func TestNow(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 45, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Now(reference)
+	component := now(reference)
 
 	// All date and time components should be certain
 	assert.True(t, component.IsCertain(ComponentYear))
@@ -35,9 +35,9 @@ func TestNow(t *testing.T) {
 
 func TestToday(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 45, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Today(reference)
+	component := today(reference)
 
 	// Date components should be certain
 	assert.True(t, component.IsCertain(ComponentYear))
@@ -63,9 +63,9 @@ func TestToday(t *testing.T) {
 
 func TestYesterday(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Yesterday(reference)
+	component := yesterday(reference)
 
 	assert.True(t, component.IsCertain(ComponentYear))
 	assert.True(t, component.IsCertain(ComponentMonth))
@@ -82,9 +82,9 @@ func TestYesterday(t *testing.T) {
 
 func TestTomorrow(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Tomorrow(reference)
+	component := tomorrow(reference)
 
 	assert.True(t, component.IsCertain(ComponentYear))
 	assert.True(t, component.IsCertain(ComponentMonth))
@@ -101,10 +101,10 @@ func TestTomorrow(t *testing.T) {
 
 func TestTheDayAfter(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	// 3 days after
-	component := TheDayAfter(reference, 3)
+	component := theDayAfter(reference, 3)
 
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
 	assert.Equal(t, 6, *component.Get(ComponentMonth))
@@ -113,10 +113,10 @@ func TestTheDayAfter(t *testing.T) {
 
 func TestTheDayBefore(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
 	// 3 days before
-	component := TheDayBefore(reference, 3)
+	component := theDayBefore(reference, 3)
 
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
 	assert.Equal(t, 6, *component.Get(ComponentMonth))
@@ -125,9 +125,9 @@ func TestTheDayBefore(t *testing.T) {
 
 func TestTonight(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Tonight(reference)
+	component := tonight(reference)
 
 	// Date should be certain
 	assert.True(t, component.IsCertain(ComponentYear))
@@ -146,9 +146,9 @@ func TestTonight(t *testing.T) {
 
 func TestTonightWithHour(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := TonightWithHour(reference, 20)
+	component := tonightWithHour(reference, 20)
 
 	assert.Equal(t, 20, *component.Get(ComponentHour))
 }
@@ -156,9 +156,9 @@ func TestTonightWithHour(t *testing.T) {
 func TestLastNight_EarlyMorning(t *testing.T) {
 	// Before 6 AM - should refer to previous day's night
 	refDate := time.Date(2020, 6, 15, 3, 0, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := LastNight(reference)
+	component := lastNight(reference)
 
 	// Should be June 14
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
@@ -173,9 +173,9 @@ func TestLastNight_EarlyMorning(t *testing.T) {
 func TestLastNight_AfterMorning(t *testing.T) {
 	// After 6 AM - should refer to same day's night
 	refDate := time.Date(2020, 6, 15, 14, 0, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := LastNight(reference)
+	component := lastNight(reference)
 
 	// Should be June 15
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
@@ -185,9 +185,9 @@ func TestLastNight_AfterMorning(t *testing.T) {
 
 func TestEvening(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Evening(reference)
+	component := evening(reference)
 
 	// Time should be implied (20:00 / 8 PM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
@@ -201,9 +201,9 @@ func TestEvening(t *testing.T) {
 
 func TestYesterdayEvening(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := YesterdayEvening(reference)
+	component := yesterdayEvening(reference)
 
 	// Date should be yesterday
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
@@ -223,9 +223,9 @@ func TestYesterdayEvening(t *testing.T) {
 func TestMidnight_EarlyMorning(t *testing.T) {
 	// Before 2 AM - refers to current midnight
 	refDate := time.Date(2020, 6, 15, 1, 0, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Midnight(reference)
+	component := midnight(reference)
 
 	// Should be same day (June 15)
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
@@ -241,9 +241,9 @@ func TestMidnight_EarlyMorning(t *testing.T) {
 func TestMidnight_AfterMorning(t *testing.T) {
 	// After 2 AM - refers to coming midnight (next day)
 	refDate := time.Date(2020, 6, 15, 14, 0, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Midnight(reference)
+	component := midnight(reference)
 
 	// Should be next day (June 16)
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
@@ -254,9 +254,9 @@ func TestMidnight_AfterMorning(t *testing.T) {
 
 func TestMorning(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Morning(reference)
+	component := morning(reference)
 
 	// Time should be implied (6:00 AM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
@@ -271,9 +271,9 @@ func TestMorning(t *testing.T) {
 
 func TestAfternoon(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Afternoon(reference)
+	component := afternoon(reference)
 
 	// Time should be implied (15:00 / 3 PM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
@@ -288,9 +288,9 @@ func TestAfternoon(t *testing.T) {
 
 func TestNoon(t *testing.T) {
 	refDate := time.Date(2020, 6, 15, 14, 30, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Noon(reference)
+	component := noon(reference)
 
 	// Hour should be certain (12:00)
 	assert.True(t, component.IsCertain(ComponentHour))
@@ -305,9 +305,9 @@ func TestNoon(t *testing.T) {
 func TestMonthBoundaries(t *testing.T) {
 	// Test yesterday crossing month boundary
 	refDate := time.Date(2020, 6, 1, 12, 0, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Yesterday(reference)
+	component := yesterday(reference)
 
 	assert.Equal(t, 2020, *component.Get(ComponentYear))
 	assert.Equal(t, 5, *component.Get(ComponentMonth))
@@ -317,9 +317,9 @@ func TestMonthBoundaries(t *testing.T) {
 func TestYearBoundaries(t *testing.T) {
 	// Test yesterday crossing year boundary
 	refDate := time.Date(2020, 1, 1, 12, 0, 0, 0, time.UTC)
-	reference := NewReferenceWithTimezone(refDate, nil)
+	reference := newReferenceWithTimezone(refDate, nil)
 
-	component := Yesterday(reference)
+	component := yesterday(reference)
 
 	assert.Equal(t, 2019, *component.Get(ComponentYear))
 	assert.Equal(t, 12, *component.Get(ComponentMonth))
@@ -327,9 +327,9 @@ func TestYearBoundaries(t *testing.T) {
 
 	// Test tomorrow crossing year boundary
 	refDate2 := time.Date(2020, 12, 31, 12, 0, 0, 0, time.UTC)
-	reference2 := NewReferenceWithTimezone(refDate2, nil)
+	reference2 := newReferenceWithTimezone(refDate2, nil)
 
-	component2 := Tomorrow(reference2)
+	component2 := tomorrow(reference2)
 
 	assert.Equal(t, 2021, *component2.Get(ComponentYear))
 	assert.Equal(t, 1, *component2.Get(ComponentMonth))

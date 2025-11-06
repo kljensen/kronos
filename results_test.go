@@ -10,7 +10,7 @@ func TestReferenceWithTimezone(t *testing.T) {
 	t.Run("NewReferenceWithTimezone with instant and offset", func(t *testing.T) {
 		instant := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
 		offset := -300 // EST offset
-		ref := NewReferenceWithTimezone(instant, &offset)
+		ref := newReferenceWithTimezone(instant, &offset)
 
 		if !ref.Instant().Equal(instant) {
 			t.Errorf("Expected instant %v, got %v", instant, ref.Instant())
@@ -23,7 +23,7 @@ func TestReferenceWithTimezone(t *testing.T) {
 
 	t.Run("NewReferenceWithTimezone with zero instant uses current time", func(t *testing.T) {
 		before := time.Now()
-		ref := NewReferenceWithTimezone(time.Time{}, nil)
+		ref := newReferenceWithTimezone(time.Time{}, nil)
 		after := time.Now()
 
 		if ref.Instant().Before(before) || ref.Instant().After(after) {
@@ -33,7 +33,7 @@ func TestReferenceWithTimezone(t *testing.T) {
 
 	t.Run("FromDate creates reference without timezone offset", func(t *testing.T) {
 		date := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ref := NewReferenceWithTimezone(time.Time{}, nil).FromDate(date)
+		ref := newReferenceWithTimezone(time.Time{}, nil).FromDate(date)
 
 		if !ref.Instant().Equal(date) {
 			t.Errorf("Expected instant %v, got %v", date, ref.Instant())
@@ -45,10 +45,10 @@ func TestReferenceWithTimezone(t *testing.T) {
 	})
 }
 
-func TestFromInput(t *testing.T) {
+func TestfromInput(t *testing.T) {
 	t.Run("FromInput with time.Time", func(t *testing.T) {
 		instant := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ref := FromInput(instant, nil)
+		ref := fromInput(instant, nil)
 
 		if !ref.Instant().Equal(instant) {
 			t.Errorf("Expected instant %v, got %v", instant, ref.Instant())
@@ -67,7 +67,7 @@ func TestFromInput(t *testing.T) {
 			Timezone: offset,
 		}
 
-		ref := FromInput(parsingRef, nil)
+		ref := fromInput(parsingRef, nil)
 
 		if !ref.Instant().Equal(instant) {
 			t.Errorf("Expected instant %v, got %v", instant, ref.Instant())
@@ -80,7 +80,7 @@ func TestFromInput(t *testing.T) {
 
 	t.Run("FromInput with nil", func(t *testing.T) {
 		before := time.Now()
-		ref := FromInput(nil, nil)
+		ref := fromInput(nil, nil)
 		after := time.Now()
 
 		if ref.Instant().Before(before) || ref.Instant().After(after) {
@@ -92,7 +92,7 @@ func TestFromInput(t *testing.T) {
 func TestGetTimezoneOffset(t *testing.T) {
 	t.Run("GetTimezoneOffset with explicit offset", func(t *testing.T) {
 		offset := -300
-		ref := NewReferenceWithTimezone(time.Now(), &offset)
+		ref := newReferenceWithTimezone(time.Now(), &offset)
 
 		if ref.GetTimezoneOffset() != offset {
 			t.Errorf("Expected offset %d, got %d", offset, ref.GetTimezoneOffset())
@@ -101,7 +101,7 @@ func TestGetTimezoneOffset(t *testing.T) {
 
 	t.Run("GetTimezoneOffset without explicit offset uses system", func(t *testing.T) {
 		instant := time.Now()
-		ref := NewReferenceWithTimezone(instant, nil)
+		ref := newReferenceWithTimezone(instant, nil)
 
 		_, systemOffset := instant.Zone()
 		expectedOffset := systemOffset / 60
@@ -113,10 +113,10 @@ func TestGetTimezoneOffset(t *testing.T) {
 }
 
 func TestParsingComponents(t *testing.T) {
-	ref := NewReferenceWithTimezone(time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC), nil)
+	ref := newReferenceWithTimezone(time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC), nil)
 
 	t.Run("NewParsingComponents sets default implied values", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 
 		// Check implied values from reference
 		if pc.Get(ComponentYear) == nil || *pc.Get(ComponentYear) != 2024 {
@@ -145,7 +145,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("IsCertain returns true only for known values", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 
 		if pc.IsCertain(ComponentYear) {
 			t.Errorf("Year should not be certain initially")
@@ -159,7 +159,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("Assign sets known value and removes implied", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 
 		// Initially implied
 		if pc.IsCertain(ComponentYear) {
@@ -178,7 +178,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("Imply does not override known values", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 
 		pc.Assign(ComponentYear, 2025)
 		pc.Imply(ComponentYear, 2026)
@@ -189,7 +189,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("Delete removes both known and implied values", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 
 		pc.Assign(ComponentYear, 2025)
 		pc.Assign(ComponentMonth, 12)
@@ -206,7 +206,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("Clone creates independent copy", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentYear, 2025)
 		pc.AddTag("test-tag")
 
@@ -232,7 +232,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("IsOnlyDate returns true when no time components are certain", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentYear, 2025)
 		pc.Assign(ComponentMonth, 12)
 		pc.Assign(ComponentDay, 25)
@@ -249,7 +249,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("IsOnlyTime returns true when no date components are certain", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentHour, 14)
 		pc.Assign(ComponentMinute, 30)
 
@@ -265,7 +265,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("IsOnlyWeekdayComponent", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentWeekday, int(WeekdayMonday))
 
 		if !pc.IsOnlyWeekdayComponent() {
@@ -280,7 +280,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("IsDateWithUnknownYear", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentMonth, 12)
 
 		if !pc.IsDateWithUnknownYear() {
@@ -295,7 +295,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("IsValidDate validates component values", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentYear, 2024)
 		pc.Assign(ComponentMonth, 2)
 		pc.Assign(ComponentDay, 29) // Valid in leap year
@@ -312,7 +312,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("Date constructs time.Time from components", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentYear, 2024)
 		pc.Assign(ComponentMonth, 11)
 		pc.Assign(ComponentDay, 2)
@@ -348,7 +348,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("AddTag and Tags", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 
 		pc.AddTag("tag1")
 		pc.AddTag("tag2")
@@ -369,7 +369,7 @@ func TestParsingComponents(t *testing.T) {
 	})
 
 	t.Run("String returns debug representation", func(t *testing.T) {
-		pc := NewParsingComponents(ref, nil)
+		pc := newParsingComponents(ref, nil)
 		pc.Assign(ComponentYear, 2024)
 		pc.AddTag("test")
 
@@ -382,13 +382,13 @@ func TestParsingComponents(t *testing.T) {
 }
 
 func TestParsingResult(t *testing.T) {
-	ref := NewReferenceWithTimezone(time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC), nil)
+	ref := newReferenceWithTimezone(time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC), nil)
 
 	t.Run("NewParsingResult creates result", func(t *testing.T) {
-		start := NewParsingComponents(ref, nil)
+		start := newParsingComponents(ref, nil)
 		start.Assign(ComponentYear, 2024)
 
-		result := NewParsingResult(ref, 0, "Nov 2, 2024", start, nil)
+		result := newParsingResult(ref, 0, "Nov 2, 2024", start, nil)
 
 		if result.Index() != 0 {
 			t.Errorf("Expected index 0, got %d", result.Index())
@@ -408,7 +408,7 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("NewParsingResult with nil start creates default", func(t *testing.T) {
-		result := NewParsingResult(ref, 5, "test", nil, nil)
+		result := newParsingResult(ref, 5, "test", nil, nil)
 
 		if result.Start() == nil {
 			t.Errorf("Expected start to be created by default")
@@ -416,11 +416,11 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("Clone creates independent copy", func(t *testing.T) {
-		start := NewParsingComponents(ref, nil)
+		start := newParsingComponents(ref, nil)
 		start.Assign(ComponentYear, 2024)
 		start.AddTag("start-tag")
 
-		result := NewParsingResult(ref, 0, "test", start, nil)
+		result := newParsingResult(ref, 0, "test", start, nil)
 		result.AddTag("result-tag")
 
 		clone := result.Clone()
@@ -442,12 +442,12 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("Date delegates to start.Date()", func(t *testing.T) {
-		start := NewParsingComponents(ref, nil)
+		start := newParsingComponents(ref, nil)
 		start.Assign(ComponentYear, 2024)
 		start.Assign(ComponentMonth, 11)
 		start.Assign(ComponentDay, 2)
 
-		result := NewParsingResult(ref, 0, "test", start, nil)
+		result := newParsingResult(ref, 0, "test", start, nil)
 		date := result.Date()
 
 		if date.Year() != 2024 || date.Month() != 11 || date.Day() != 2 {
@@ -456,10 +456,10 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("AddTag adds to both start and end", func(t *testing.T) {
-		start := NewParsingComponents(ref, nil)
-		end := NewParsingComponents(ref, nil)
+		start := newParsingComponents(ref, nil)
+		end := newParsingComponents(ref, nil)
 
-		result := NewParsingResult(ref, 0, "test", start, end)
+		result := newParsingResult(ref, 0, "test", start, end)
 		result.AddTag("test-tag")
 
 		if !start.Tags()["test-tag"] {
@@ -472,13 +472,13 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("Tags combines start and end tags", func(t *testing.T) {
-		start := NewParsingComponents(ref, nil)
+		start := newParsingComponents(ref, nil)
 		start.AddTag("start-tag")
 
-		end := NewParsingComponents(ref, nil)
+		end := newParsingComponents(ref, nil)
 		end.AddTag("end-tag")
 
-		result := NewParsingResult(ref, 0, "test", start, end)
+		result := newParsingResult(ref, 0, "test", start, end)
 
 		tags := result.Tags()
 
@@ -496,8 +496,8 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("String returns debug representation", func(t *testing.T) {
-		start := NewParsingComponents(ref, nil)
-		result := NewParsingResult(ref, 5, "Nov 2", start, nil)
+		start := newParsingComponents(ref, nil)
+		result := newParsingResult(ref, 5, "Nov 2", start, nil)
 		result.AddTag("test")
 
 		str := result.String()
@@ -508,7 +508,7 @@ func TestParsingResult(t *testing.T) {
 	})
 
 	t.Run("RefDate returns reference date", func(t *testing.T) {
-		result := NewParsingResult(ref, 0, "test", nil, nil)
+		result := newParsingResult(ref, 0, "test", nil, nil)
 
 		if !result.RefDate().Equal(ref.Instant()) {
 			t.Errorf("Expected RefDate to equal reference instant")

@@ -31,8 +31,8 @@ func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, c
 
 // MergeResults merges two date results into a single date range result.
 func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromResult, toResult *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
-	fromStart, okFrom := kronos.AsParsingComponents(fromResult.Start())
-	toStart, okTo := kronos.AsParsingComponents(toResult.Start())
+	fromStart, okFrom := kronos.XAsParsingComponents(fromResult.Start())
+	toStart, okTo := kronos.XAsParsingComponents(toResult.Start())
 	if !okFrom || !okTo {
 		return fromResult
 	}
@@ -142,7 +142,7 @@ func (r *AbstractMergeDateRangeRefiner) Refine(context *kronos.ParsingContext, r
 		next := results[i]
 		start := current.Index() + len(current.Text())
 		end := next.Index()
-		textBetween, okRange := kronos.SafeSlice(context.Text(), start, end)
+		textBetween, okRange := kronos.XSafeSlice(context.Text(), start, end)
 		if !okRange {
 			merged = append(merged, current)
 			current = next

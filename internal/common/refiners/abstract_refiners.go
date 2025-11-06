@@ -49,7 +49,7 @@ func (m *BaseMergingRefiner) Refine(context *kronos.ParsingContext, results []*k
 		next := results[i]
 		start := current.Index() + len(current.Text())
 		end := next.Index()
-		textBetween, okRange := kronos.SafeSlice(context.Text(), start, end)
+		textBetween, okRange := kronos.XSafeSlice(context.Text(), start, end)
 		if !okRange {
 			merged = append(merged, current)
 			current = next

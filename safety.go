@@ -8,7 +8,7 @@ import (
 // AsParsingComponents attempts to cast the given ParsedComponents interface to
 // a *ParsingComponents. It returns the concrete value and true when the cast
 // succeeds, or nil and false otherwise.
-func AsParsingComponents(pc ParsedComponents) (*ParsingComponents, bool) {
+func asParsingComponents(pc ParsedComponents) (*ParsingComponents, bool) {
 	if pc == nil {
 		return nil, false
 	}
@@ -25,7 +25,7 @@ func AsParsingComponents(pc ParsedComponents) (*ParsingComponents, bool) {
 // (exclusive) while clamping the requested range to valid bounds. The returned
 // boolean is false when start is beyond the end of the string, indicating that
 // the requested slice could not be produced safely.
-func SafeSlice(text string, start, end int) (string, bool) {
+func safeSlice(text string, start, end int) (string, bool) {
 	if start < 0 {
 		start = 0
 	}
@@ -86,7 +86,7 @@ var multiSpaceRegex = regexp.MustCompile(`\s+`)
 // 5. Removes zero-width characters
 // 6. Collapses multiple consecutive whitespace characters to single space
 // 7. Trims leading and trailing whitespace
-func SanitizeInput(input string) string {
+func sanitizeInput(input string) string {
 	// 1. Normalize apostrophes to ASCII '
 	input = normalizeApostrophes(input)
 

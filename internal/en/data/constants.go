@@ -354,7 +354,7 @@ func ParseYear(match string) int {
 	if err != nil {
 		return 0
 	}
-	return kronos.FindMostLikelyADYear(year)
+	return kronos.XFindMostLikelyADYear(year)
 }
 
 // ParseNumberPattern parses number-like patterns including words

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestENCasualDateParser_Now(t *testing.T) {
+func TestENCasualDateParser_now(t *testing.T) {
 	parser := NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 8, 9, 10, 11000000, time.UTC)
 
@@ -28,7 +28,7 @@ func TestENCasualDateParser_Now(t *testing.T) {
 	assert.Equal(t, 10, *result.Start().Get(kronos.ComponentSecond))
 }
 
-func TestENCasualDateParser_Today(t *testing.T) {
+func TestENCasualDateParser_today(t *testing.T) {
 	parser := NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 14, 12, 0, 0, time.UTC)
 
@@ -45,7 +45,7 @@ func TestENCasualDateParser_Today(t *testing.T) {
 	assert.Equal(t, 10, *result.Start().Get(kronos.ComponentDay))
 }
 
-func TestENCasualDateParser_Tomorrow(t *testing.T) {
+func TestENCasualDateParser_tomorrow(t *testing.T) {
 	parser := NewENCasualDateParser()
 
 	tests := []struct {
@@ -96,7 +96,7 @@ func TestENCasualDateParser_Tomorrow(t *testing.T) {
 	}
 }
 
-func TestENCasualDateParser_Yesterday(t *testing.T) {
+func TestENCasualDateParser_yesterday(t *testing.T) {
 	parser := NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
@@ -113,7 +113,7 @@ func TestENCasualDateParser_Yesterday(t *testing.T) {
 	assert.Equal(t, 9, *result.Start().Get(kronos.ComponentDay))
 }
 
-func TestENCasualDateParser_LastNight(t *testing.T) {
+func TestENCasualDateParser_lastNight(t *testing.T) {
 	parser := NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 12, 0, 0, 0, time.UTC)
 
@@ -131,7 +131,7 @@ func TestENCasualDateParser_LastNight(t *testing.T) {
 	assert.Equal(t, 0, *result.Start().Get(kronos.ComponentHour))
 }
 
-func TestENCasualDateParser_Tonight(t *testing.T) {
+func TestENCasualDateParser_tonight(t *testing.T) {
 	parser := NewENCasualDateParser()
 	refDate := time.Date(2012, 8, 10, 18, 0, 0, 0, time.UTC)
 

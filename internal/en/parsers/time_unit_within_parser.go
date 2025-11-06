@@ -73,7 +73,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 			}
 
 			// Create relative result from reference (forward in time)
-			components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+			components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {

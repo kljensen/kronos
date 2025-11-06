@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStripApproximationWords(t *testing.T) {
+func TeststripApproximationWords(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         string
@@ -113,7 +113,7 @@ func TestStripApproximationWords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaned, isApprox := StripApproximationWords(tt.input)
+			cleaned, isApprox := stripApproximationWords(tt.input)
 			assert.Equal(t, tt.expectedClean, cleaned, "Cleaned text mismatch")
 			assert.Equal(t, tt.isApproximate, isApprox, "isApproximate flag mismatch")
 		})

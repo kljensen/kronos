@@ -48,7 +48,7 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 
 			// Check if approximation words were used by examining the full match
 			fullMatch := match[0]
-			_, isApproximate := kronos.StripApproximationWords(fullMatch)
+			_, isApproximate := kronos.XStripApproximationWords(fullMatch)
 
 			prefix := strings.ToLower(match[1])
 			duration := data.ParseDuration(match[2])
@@ -59,11 +59,11 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 			// Reverse duration for "last", "past", and "-"
 			switch prefix {
 			case "last", "past", "-":
-				duration = kronos.ReverseDuration(duration)
+				duration = kronos.XReverseDuration(duration)
 			}
 
 			// Create relative result from reference
-			components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+			components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {

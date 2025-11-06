@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSanitizeInput(t *testing.T) {
+func TestsanitizeInput(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -261,9 +261,9 @@ func TestSanitizeInput(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeInput(tt.input)
+			result := sanitizeInput(tt.input)
 			if result != tt.expected {
-				t.Errorf("SanitizeInput(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("sanitizeInput(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
@@ -346,7 +346,7 @@ func TestRemoveZeroWidthChars(t *testing.T) {
 }
 
 // Benchmark tests for performance
-func BenchmarkSanitizeInput(b *testing.B) {
+func BenchmarksanitizeInput(b *testing.B) {
 	testCases := []struct {
 		name  string
 		input string
@@ -360,7 +360,7 @@ func BenchmarkSanitizeInput(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				SanitizeInput(tc.input)
+				sanitizeInput(tc.input)
 			}
 		})
 	}

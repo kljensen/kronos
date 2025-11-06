@@ -104,7 +104,7 @@ func checkFloatToIntOverflow(value float64, unit Timeunit) error {
 // It handles fractional durations by cascading remainders to smaller units.
 // For example, 1.5 months becomes 1 month + 2 weeks.
 // Returns an error if the duration or resulting date is out of bounds.
-func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
+func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 	// Validate input date
 	if err := validateDate(ref); err != nil {
 		return time.Time{}, err
@@ -321,7 +321,7 @@ func AddDuration(ref time.Time, duration Duration) (time.Time, error) {
 
 // ReverseDuration returns the reversed duration (e.g., back into the past instead of future).
 // All values in the duration are negated.
-func ReverseDuration(duration Duration) Duration {
+func reverseDuration(duration Duration) Duration {
 	reversed := make(Duration)
 	for key, val := range duration {
 		reversed[key] = -val

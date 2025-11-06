@@ -27,7 +27,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 		refInstant := context.Reference().Instant()
 
 		// Handle time-only results
-		resultStart, okStart := kronos.AsParsingComponents(result.Start())
+		resultStart, okStart := kronos.XAsParsingComponents(result.Start())
 		if !okStart {
 			continue
 		}
@@ -35,7 +35,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 			refFollowingDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
 
-			kronos.ImplySimilarDate(resultStart, refFollowingDay)
+			kronos.XImplySimilarDate(resultStart, refFollowingDay)
 			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: ForwardDateRefiner adjusted time from ref date to following day
@@ -43,12 +43,12 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 			}
 
 			if result.End() != nil {
-				if resultEnd, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+				if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 					if resultEnd.IsOnlyTime() {
-						kronos.ImplySimilarDate(resultEnd, refFollowingDay)
+						kronos.XImplySimilarDate(resultEnd, refFollowingDay)
 						if resultStart.Date().After(resultEnd.Date()) {
 							refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
-							kronos.ImplySimilarDate(resultEnd, refFollowingDay)
+							kronos.XImplySimilarDate(resultEnd, refFollowingDay)
 						}
 					}
 				}
@@ -64,12 +64,12 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 					daysToAdd += 7
 				}
 
-				adjustedDate, err := kronos.AddDuration(refDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
+				adjustedDate, err := kronos.XAddDuration(refDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
 				if err != nil {
 					// Duration calculation failed - skip this adjustment
 					continue
 				}
-				kronos.ImplySimilarDate(resultStart, adjustedDate)
+				kronos.XImplySimilarDate(resultStart, adjustedDate)
 
 				if context.Option().Debug != nil {
 					context.Debug(func() {
@@ -78,7 +78,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 				}
 
 				if result.End() != nil {
-					if resultEnd, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+					if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 						if resultEnd.IsOnlyWeekdayComponent() {
 							endWeekdayVal := resultEnd.Get(kronos.ComponentWeekday)
 							if endWeekdayVal != nil {
@@ -86,12 +86,12 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 								if daysToAdd <= 0 {
 									daysToAdd += 7
 								}
-								adjustedDate, err = kronos.AddDuration(adjustedDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
+								adjustedDate, err = kronos.XAddDuration(adjustedDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
 								if err != nil {
 									// Duration calculation failed - skip this adjustment
 									continue
 								}
-								kronos.ImplySimilarDate(resultEnd, adjustedDate)
+								kronos.XImplySimilarDate(resultEnd, adjustedDate)
 
 								if context.Option().Debug != nil {
 									context.Debug(func() {
@@ -118,7 +118,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*k
 					}
 
 					if result.End() != nil {
-						if resultEnd, okEnd := kronos.AsParsingComponents(result.End()); okEnd {
+						if resultEnd, okEnd := kronos.XAsParsingComponents(result.End()); okEnd {
 							if !resultEnd.IsCertain(kronos.ComponentYear) {
 								endYearVal := resultEnd.Get(kronos.ComponentYear)
 								if endYearVal != nil {

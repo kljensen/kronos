@@ -77,7 +77,7 @@ func TestENCasualTimeParser_Night(t *testing.T) {
 	assert.Equal(t, 20, *result.Start().Get(kronos.ComponentHour))
 }
 
-func TestENCasualTimeParser_Noon(t *testing.T) {
+func TestENCasualTimeParser_noon(t *testing.T) {
 	parser := NewENCasualTimeParser()
 	refDate := time.Date(2012, 8, 10, 8, 0, 0, 0, time.UTC)
 
@@ -102,7 +102,7 @@ func TestENCasualTimeParser_Noon(t *testing.T) {
 	}
 }
 
-func TestENCasualTimeParser_Midnight(t *testing.T) {
+func TestENCasualTimeParser_midnight(t *testing.T) {
 	parser := NewENCasualTimeParser()
 
 	tests := []struct {

@@ -51,7 +51,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 
 			// Check if approximation words were used by examining the full match
 			fullMatch := match[0]
-			_, isApproximate := kronos.StripApproximationWords(fullMatch)
+			_, isApproximate := kronos.XStripApproximationWords(fullMatch)
 
 			duration := data.ParseDuration(match[1])
 			if data.IsEmptyDuration(duration) {
@@ -59,7 +59,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 			}
 
 			// Create relative result from reference (forward in time)
-			components := kronos.CreateRelativeFromReference(context.Reference(), duration)
+			components := kronos.XCreateRelativeFromReference(context.Reference(), duration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				// Add tag for relative date and time if time components are present

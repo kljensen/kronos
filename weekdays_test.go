@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetNextWeekday(t *testing.T) {
+func TestgetNextWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -54,13 +54,13 @@ func TestGetNextWeekday(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetNextWeekday(tt.refDate, tt.targetWeekday)
+			result := getNextWeekday(tt.refDate, tt.targetWeekday)
 			assert.Equal(t, tt.expectedDate, result)
 		})
 	}
 }
 
-func TestGetLastWeekday(t *testing.T) {
+func TestgetLastWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -95,13 +95,13 @@ func TestGetLastWeekday(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetLastWeekday(tt.refDate, tt.targetWeekday)
+			result := getLastWeekday(tt.refDate, tt.targetWeekday)
 			assert.Equal(t, tt.expectedDate, result)
 		})
 	}
 }
 
-func TestGetThisWeekday(t *testing.T) {
+func TestgetThisWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -155,13 +155,13 @@ func TestGetThisWeekday(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetThisWeekday(tt.refDate, tt.targetWeekday, tt.forward)
+			result := getThisWeekday(tt.refDate, tt.targetWeekday, tt.forward)
 			assert.Equal(t, tt.expectedDate, result)
 		})
 	}
 }
 
-func TestGetDaysToWeekday(t *testing.T) {
+func TestgetDaysToWeekday(t *testing.T) {
 	tests := []struct {
 		name          string
 		refDate       time.Time
@@ -243,7 +243,7 @@ func TestGetDaysToWeekday(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetDaysToWeekday(tt.refDate, tt.targetWeekday, tt.modifier)
+			result := getDaysToWeekday(tt.refDate, tt.targetWeekday, tt.modifier)
 			assert.Equal(t, tt.expectedDays, result)
 		})
 	}

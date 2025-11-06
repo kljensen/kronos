@@ -41,7 +41,7 @@ func (m *mockRefiner) Refine(context *ParsingContext, results []*ParsingResult) 
 func TestParser(t *testing.T) {
 	t.Run("Parser interface with mock implementation", func(t *testing.T) {
 		refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ctx := NewParsingContext("test tomorrow", refDate, nil)
+		ctx := newParsingContext("test tomorrow", refDate, nil)
 
 		patternCalled := false
 		extractCalled := false
@@ -95,7 +95,7 @@ func TestParser(t *testing.T) {
 	})
 
 	t.Run("Parser can return different result types", func(t *testing.T) {
-		ctx := NewParsingContext("test", time.Now(), nil)
+		ctx := newParsingContext("test", time.Now(), nil)
 
 		// Test returning component map
 		p1 := &mockParser{
@@ -112,7 +112,7 @@ func TestParser(t *testing.T) {
 		// Test returning ParsingComponents
 		p2 := &mockParser{
 			extractFunc: func(context *ParsingContext, match []string) interface{} {
-				return NewParsingComponents(ctx.Reference(), nil)
+				return newParsingComponents(ctx.Reference(), nil)
 			},
 		}
 
@@ -124,7 +124,7 @@ func TestParser(t *testing.T) {
 		// Test returning ParsingResult
 		p3 := &mockParser{
 			extractFunc: func(context *ParsingContext, match []string) interface{} {
-				return NewParsingResult(ctx.Reference(), 0, "test", nil, nil)
+				return newParsingResult(ctx.Reference(), 0, "test", nil, nil)
 			},
 		}
 
@@ -150,7 +150,7 @@ func TestParser(t *testing.T) {
 func TestRefiner(t *testing.T) {
 	t.Run("Refiner interface with mock implementation", func(t *testing.T) {
 		refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ctx := NewParsingContext("test", refDate, nil)
+		ctx := newParsingContext("test", refDate, nil)
 
 		refineCalled := false
 
@@ -170,8 +170,8 @@ func TestRefiner(t *testing.T) {
 
 		// Create test results
 		results := []*ParsingResult{
-			NewParsingResult(ctx.Reference(), 0, "first", nil, nil),
-			NewParsingResult(ctx.Reference(), 5, "second", nil, nil),
+			newParsingResult(ctx.Reference(), 0, "first", nil, nil),
+			newParsingResult(ctx.Reference(), 5, "second", nil, nil),
 		}
 
 		// Test Refine method
@@ -191,7 +191,7 @@ func TestRefiner(t *testing.T) {
 	})
 
 	t.Run("Refiner can modify results", func(t *testing.T) {
-		ctx := NewParsingContext("test", time.Now(), nil)
+		ctx := newParsingContext("test", time.Now(), nil)
 
 		// Refiner that adds tags
 		refiner := &mockRefiner{
@@ -203,7 +203,7 @@ func TestRefiner(t *testing.T) {
 			},
 		}
 
-		result := NewParsingResult(ctx.Reference(), 0, "test", nil, nil)
+		result := newParsingResult(ctx.Reference(), 0, "test", nil, nil)
 		results := []*ParsingResult{result}
 
 		refined := refiner.Refine(ctx, results)
@@ -214,7 +214,7 @@ func TestRefiner(t *testing.T) {
 	})
 
 	t.Run("Refiner can merge or split results", func(t *testing.T) {
-		ctx := NewParsingContext("test", time.Now(), nil)
+		ctx := newParsingContext("test", time.Now(), nil)
 
 		// Refiner that merges adjacent results
 		refiner := &mockRefiner{
@@ -224,7 +224,7 @@ func TestRefiner(t *testing.T) {
 				}
 
 				// Simple merge: create single result from first and last
-				merged := NewParsingResult(
+				merged := newParsingResult(
 					ctx.Reference(),
 					results[0].Index(),
 					results[len(results)-1].Text(),
@@ -237,8 +237,8 @@ func TestRefiner(t *testing.T) {
 		}
 
 		results := []*ParsingResult{
-			NewParsingResult(ctx.Reference(), 0, "first", nil, nil),
-			NewParsingResult(ctx.Reference(), 6, "second", nil, nil),
+			newParsingResult(ctx.Reference(), 0, "first", nil, nil),
+			newParsingResult(ctx.Reference(), 6, "second", nil, nil),
 		}
 
 		refined := refiner.Refine(ctx, results)

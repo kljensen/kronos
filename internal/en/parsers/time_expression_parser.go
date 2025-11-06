@@ -100,7 +100,7 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 		// If the following match has a time clue like "at night", apply it to the start component too
 		// (e.g., "10 - 11 at night" means both 10pm and 11pm)
 		if strings.Contains(match[0], "night") || strings.Contains(match[0], "afternoon") || strings.Contains(match[0], "morning") {
-			if startComponents, ok := kronos.AsParsingComponents(result.Start()); ok {
+			if startComponents, ok := kronos.XAsParsingComponents(result.Start()); ok {
 				processTimeClues(match[0], startComponents)
 			}
 		}

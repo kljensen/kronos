@@ -182,7 +182,7 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 	}
 
 	// Create the parsing components
-	components := kronos.NewParsingComponents(context.Reference(), map[kronos.Component]int{
+	components := kronos.XNewParsingComponents(context.Reference(), map[kronos.Component]int{
 		kronos.ComponentDay:   day,
 		kronos.ComponentMonth: month,
 	})
@@ -196,11 +196,11 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 		if err != nil {
 			return nil
 		}
-		year := kronos.FindMostLikelyADYear(rawYear)
+		year := kronos.XFindMostLikelyADYear(rawYear)
 		components.Assign(kronos.ComponentYear, year)
 	} else {
 		// Use preference-aware year selection, which handles Feb 29 leap years
-		year := kronos.FindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
+		year := kronos.XFindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
 		components.Imply(kronos.ComponentYear, year)
 	}
 
