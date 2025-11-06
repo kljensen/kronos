@@ -30,7 +30,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("MM/DD/YYYY format", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false) // US format
 		text := "8/10/2012"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"8/10/2012", // full match
@@ -52,7 +52,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("DD/MM/YYYY format (little endian)", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(true) // UK/EU format
 		text := "8/10/2012"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"8/10/2012",
@@ -74,7 +74,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("auto-swap invalid month", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false) // US format (MM/DD)
 		text := "15/8/2012"                       // 15 can't be a month
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"15/8/2012",
@@ -96,7 +96,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("reject invalid date", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "35/40/2012" // both invalid
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"35/40/2012",
@@ -113,7 +113,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("MM/DD without year", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "8/10"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"8/10",
@@ -138,7 +138,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("2-digit year", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "12/30/16"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"12/30/16",
@@ -161,7 +161,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("with dash separator", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "12-30-16"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"12-30-16",
@@ -183,7 +183,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("with dot separator and year", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "7.12.2020"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"7.12.2020",
@@ -203,7 +203,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("reject dot separator without year", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "7.12"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		result := parser.Extract(context, []string{
 			"7.12",
@@ -241,7 +241,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 
 		for _, tc := range testCases {
 			t.Run(tc.name, func(t *testing.T) {
-				context := kronos.newParsingContext(tc.text, refDate, nil)
+				context := kronos.XNewParsingContext(tc.text, refDate, nil)
 				result := parser.Extract(context, tc.match)
 				assert.Nil(t, result, "should reject version number pattern")
 			})
@@ -251,7 +251,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 	t.Run("reject if preceded by digit", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
 		text := "Version1.8/10/2012"
-		context := kronos.newParsingContext(text, refDate, nil)
+		context := kronos.XNewParsingContext(text, refDate, nil)
 
 		// This would match "8/10/2012" but should be rejected because it's preceded by a digit
 		result := parser.Extract(context, []string{
@@ -273,7 +273,7 @@ func TestSlashDateFormatParser(t *testing.T) {
 func TestSlashDateFormatParserIntegration(t *testing.T) {
 	t.Run("pattern matching", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
-		context := kronos.newParsingContext("The date is 8/10/2012", time.Now(), nil)
+		context := kronos.XNewParsingContext("The date is 8/10/2012", time.Now(), nil)
 
 		pattern := parser.Pattern(context)
 		assert.NotNil(t, pattern)
@@ -284,7 +284,7 @@ func TestSlashDateFormatParserIntegration(t *testing.T) {
 
 	t.Run("full parse with slash", func(t *testing.T) {
 		parser := NewSlashDateFormatParser(false)
-		context := kronos.newParsingContext("Meeting on 4/15/2016", time.Date(2012, 7, 10, 0, 0, 0, 0, time.Local), nil)
+		context := kronos.XNewParsingContext("Meeting on 4/15/2016", time.Date(2012, 7, 10, 0, 0, 0, 0, time.Local), nil)
 
 		pattern := parser.Pattern(context)
 		match := pattern.FindStringSubmatch("Meeting on 4/15/2016")

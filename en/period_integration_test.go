@@ -72,7 +72,7 @@ func TestPeriodIntegrationWithParser(t *testing.T) {
 			}
 
 			result := results[0]
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			if !ok {
 				t.Fatalf("Could not convert result to ParsingComponents")
 			}
@@ -109,7 +109,7 @@ func TestPeriodWithCombinedExpressions(t *testing.T) {
 			}
 
 			result := results[0]
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			if !ok {
 				t.Fatalf("Could not convert result to ParsingComponents")
 			}
@@ -147,7 +147,7 @@ func TestPeriodConsistencyAcrossParsers(t *testing.T) {
 			}
 
 			result := results[0]
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			if !ok {
 				t.Fatalf("Could not convert result to ParsingComponents")
 			}
@@ -176,7 +176,7 @@ func TestPeriodConsistencyAcrossParsers(t *testing.T) {
 			}
 
 			result := results[0]
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			if !ok {
 				t.Fatalf("Could not convert result to ParsingComponents")
 			}
@@ -213,7 +213,7 @@ func TestPeriodPreservationInMerging(t *testing.T) {
 			}
 
 			result := results[0]
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			if !ok {
 				t.Fatalf("Could not convert result to ParsingComponents")
 			}
@@ -255,7 +255,7 @@ func TestSlashDatePeriodTracking(t *testing.T) {
 			}
 
 			result := results[0]
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			if !ok {
 				t.Fatalf("Could not convert result to ParsingComponents")
 			}

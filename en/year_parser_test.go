@@ -51,7 +51,7 @@ func TestENYearParser(t *testing.T) {
 			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
 
 			// Check period
-			components, ok := kronos.asParsingComponents(result.Start())
+			components, ok := kronos.XAsParsingComponents(result.Start())
 			assert.True(t, ok, "Expected ParsingComponents")
 			period := components.Period()
 			assert.Equal(t, kronos.PeriodYear, period, "Expected PeriodYear")

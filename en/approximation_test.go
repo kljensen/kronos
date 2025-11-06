@@ -521,7 +521,7 @@ func TeststripApproximationWords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cleaned, isApprox := kronos.stripApproximationWords(tt.input)
+			cleaned, isApprox := kronos.XStripApproximationWords(tt.input)
 			assert.Equal(t, tt.expectedClean, cleaned, "Cleaned text mismatch")
 			assert.Equal(t, tt.isApproximate, isApprox, "isApproximate flag mismatch")
 		})
