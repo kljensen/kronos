@@ -60,6 +60,25 @@ func (d DayPreference) String() string {
 // Settings contains all configuration for date parsing.
 // It provides a comprehensive way to customize parsing behavior,
 // similar to Python's dateparser settings system.
+//
+// Deprecated: Direct use of Settings is discouraged in favor of the builder pattern.
+// Use the fluent builder API for common options:
+//
+//	parser := kronos.New(en.Casual).
+//	    WithDateOrder(kronos.DateOrderDMY).
+//	    WithForwardDate(true).
+//	    Strict()
+//
+// For advanced options, use the experimental package:
+//
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	parser := kronos.New(en.Casual).
+//	    WithOption(experimental.WithParserOrder("iso8601")).
+//	    WithOption(experimental.WithMaxParsers(3))
+//
+// The Settings struct will remain available for compatibility but new code should
+// use the builder pattern.
 type Settings struct {
 	// Date interpretation
 	DateOrder        DateOrder      // Order of date components (MDY, DMY, YMD)

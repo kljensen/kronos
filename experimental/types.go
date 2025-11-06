@@ -43,3 +43,19 @@ const (
 // NewParsingContext creates a new parsing context.
 // Re-exported from the main package for the experimental API.
 var NewParsingContext = kronos.NewParsingContext
+
+// Settings contains all configuration for date parsing.
+// Re-exported from the main package for the experimental API.
+type Settings = kronos.Settings
+
+// DateOrder represents the order of date components in ambiguous formats.
+// Re-exported from the main package for the experimental API.
+type DateOrder = kronos.DateOrder
+
+// DayPreference specifies how to interpret day when it's ambiguous.
+// Re-exported from the main package for the experimental API.
+type DayPreference = kronos.DayPreference
+
+// DatePreference specifies whether to prefer past or future dates.
+// Re-exported from the main package for the experimental API.
+type DatePreference = kronos.DatePreference

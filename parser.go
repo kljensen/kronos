@@ -84,6 +84,21 @@ func (p *ParserBuilder) DateOrder(order DateOrder) *ParserBuilder {
 	return p
 }
 
+// WithDateOrder is an alias for DateOrder that follows the With* naming convention.
+func (p *ParserBuilder) WithDateOrder(order DateOrder) *ParserBuilder {
+	return p.DateOrder(order)
+}
+
+// WithForwardDate enables forward date parsing (prefer future dates).
+// This is equivalent to PreferFuture() but uses the legacy ForwardDate setting.
+func (p *ParserBuilder) WithForwardDate(forward bool) *ParserBuilder {
+	p.settings.ForwardDate = forward
+	if forward {
+		p.settings.PreferDatesFrom = PreferFuture
+	}
+	return p
+}
+
 // PreferPast configures the parser to prefer past dates when ambiguous.
 // For example, "March" in November would be interpreted as last March.
 func (p *ParserBuilder) PreferPast() *ParserBuilder {
@@ -129,6 +144,22 @@ func (p *ParserBuilder) ToTimezone(tz string) *ParserBuilder {
 // When enabled, only future dates are parsed.
 func (p *ParserBuilder) ForwardDate() *ParserBuilder {
 	p.settings.ForwardDate = true
+	return p
+}
+
+// WithOption applies an advanced configuration option to the parser.
+// Options are provided by the experimental package and allow fine-grained control
+// over parsing behavior without cluttering the main builder API.
+//
+// Example:
+//
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	parser := kronos.New(en.Casual).
+//	    WithOption(experimental.WithParserOrder("iso8601", "en_casual_date")).
+//	    WithOption(experimental.WithMaxParsers(3))
+func (p *ParserBuilder) WithOption(option func(*Settings)) *ParserBuilder {
+	option(&p.settings)
 	return p
 }
 
