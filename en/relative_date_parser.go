@@ -65,9 +65,10 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "next month" means "the next month period" starting on the 1st
-					if timeunit == kronos.TimeunitMonth {
+					switch timeunit {
+					case kronos.TimeunitMonth:
 						components.Imply(kronos.ComponentDay, 1)
-					} else if timeunit == kronos.TimeunitYear {
+					case kronos.TimeunitYear:
 						components.Imply(kronos.ComponentMonth, 1)
 						components.Imply(kronos.ComponentDay, 1)
 					}
@@ -85,9 +86,10 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "last month" means "the previous month period" starting on the 1st
-					if timeunit == kronos.TimeunitMonth {
+					switch timeunit {
+					case kronos.TimeunitMonth:
 						components.Imply(kronos.ComponentDay, 1)
-					} else if timeunit == kronos.TimeunitYear {
+					case kronos.TimeunitYear:
 						components.Imply(kronos.ComponentMonth, 1)
 						components.Imply(kronos.ComponentDay, 1)
 					}

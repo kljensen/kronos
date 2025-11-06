@@ -1,12 +1,11 @@
+version: "2"
+
 run:
   timeout: 5m
 
 linters:
   enable-all: true
   disable:
-    # Deprecated linters
-    - tenv  # Deprecated, replaced by usetesting
-
     # Impractical linters for this codebase
     - intrange           # Requires Go 1.22+ features, want to support older versions
     - testpackage        # Tests in same package is acceptable for testing internal behavior
