@@ -8,8 +8,8 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/parsing"
 	"github.com/kljensen/kronos/internal/en/data"
+	"github.com/kljensen/kronos/internal/parsing"
 )
 
 // ENYearMonthDayParser parses date formats like YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD

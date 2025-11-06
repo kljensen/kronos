@@ -347,7 +347,7 @@ func TestENMonthNameLittleEndianParser_LowercaseMonth(t *testing.T) {
 
 	t.Run(text, func(t *testing.T) {
 		results, err := New().WithReferenceDate(refDate).Parse(text)
-			assert.NoError(t, err)
+		assert.NoError(t, err)
 		assert.NotEmpty(t, results, "Expected to parse: %s", text)
 		if len(results) == 0 {
 			return

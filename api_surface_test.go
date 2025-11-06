@@ -231,7 +231,7 @@ func TestDeprecatedExports(t *testing.T) {
 
 	// Group by category
 	categories := map[string]int{
-		"Weekday (use time.Weekday)":  0,
+		"Weekday (use time.Weekday)":   0,
 		"Month (use time.Month)":       0,
 		"Meridiem (internal)":          0,
 		"Numeric constants (internal)": 0,
@@ -259,15 +259,15 @@ func TestDeprecatedExports(t *testing.T) {
 func TestPublicAPIStability(t *testing.T) {
 	// Core types that should never be removed without a major version bump
 	essentialTypes := []string{
-		"Component",        // Core enum for accessing parsed components
-		"DateOrder",        // Configuration for date format (MDY/DMY/YMD)
-		"DatePreference",   // Configuration for ambiguous date resolution
-		"Timeunit",         // Required for Duration map keys
-		"Duration",         // Public duration type
-		"Result",           // Primary result interface
-		"Components",       // Component access interface
-		"Parser",           // Parser interface
-		"ParserBuilder",    // Fluent builder API
+		"Component",      // Core enum for accessing parsed components
+		"DateOrder",      // Configuration for date format (MDY/DMY/YMD)
+		"DatePreference", // Configuration for ambiguous date resolution
+		"Timeunit",       // Required for Duration map keys
+		"Duration",       // Public duration type
+		"Result",         // Primary result interface
+		"Components",     // Component access interface
+		"Parser",         // Parser interface
+		"ParserBuilder",  // Fluent builder API
 	}
 
 	cmd := exec.Command("go", "doc", "-short", ".")
