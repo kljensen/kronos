@@ -22,18 +22,23 @@ import (
 // 3. If it must be public, update MAX_EXPORTS with justification
 func TestAPIExports(t *testing.T) {
 	const (
-		// Maximum allowed public exports after Phase 1-4 API minimization.
-		// Current breakdown (~126 exports):
+		// Maximum allowed public exports after Phase 1-7 API minimization.
+		// Current breakdown (92 exports):
 		// - Essential enum types: Component (13), DateOrder (4), DatePreference (4) = 21 consts
 		// - Duration/Time: Timeunit (13), Period (7) = 20 consts + Duration type
-		// - Deprecated (kept for backward compatibility):
-		//   * Weekday (8) + Month (13) + Meridiem (3) = 24 items
-		//   * Numeric helpers (2 items: DayPreferMonday, DayPreferSunday)
 		// - Core API: Builder, Parser, Chrono, Configuration, Result/Components interfaces
 		// - Helper functions: parsing, configuration, component access
-		// Target: ~60-70 exports (after removing deprecated types in major version bump)
-		// Current: 126 (includes ~39 deprecated items marked for removal)
-		MAX_EXPORTS = 150 // Reduced from 200, allows headroom while preventing API bloat
+		// - Advanced parsing: Moved to experimental package
+		// - X-prefixed helpers: Mostly retired (only 4 remain for private field access)
+		//
+		// Phase 7 achievements (Issues #145-#147):
+		// - Moved advanced parsing constructs to experimental
+		// - Retired X-prefixed configuration helpers
+		// - Tightened configuration exposure around builder API
+		//
+		// Current: 92 exports (down from 126 in Phase 4)
+		// Target: Maintain ~80-100 exports for essential API
+		MAX_EXPORTS = 100 // Reduced from 150, enforces lean essential API
 	)
 
 	// Use go doc to list all exports

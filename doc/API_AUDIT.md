@@ -2,23 +2,24 @@
 
 **Date:** 2025-11-06
 **Current Version:** API minimization complete (Phase 1-7)
-**Total Exports:** 127 (limit: 150)
+**Total Exports:** 92 (limit: 100)
 
 ## Executive Summary
 
-This document provides a complete inventory of the kronos public API and categorizes each export according to its intended audience and stability guarantees. After the recent API minimization effort (Phases 1-7), we have 127 public exports with room for 23 more before hitting our guard limit.
+This document provides a complete inventory of the kronos public API after the API minimization effort (Phases 1-7, Issues #145-#148). We have successfully reduced the public API from 127 to 92 exports.
 
-### Current State
-- **Essential API (stable, keep):** 60 exports (47%)
-- **Experimental API (move):** 13 exports (10%)
-- **Deprecated API (phase out):** 4 exports (3%)
-- **Internal API (already prefixed):** 50 exports (39%)
+### Current State (Post Phase 7)
+- **Essential API (stable):** Core types, enums, and builder pattern (~60 exports)
+- **Experimental API:** Moved to `github.com/kljensen/kronos/experimental` package
+- **X-prefixed helpers:** Reduced to 4 (only for private field access)
+- **Total exports:** 92 (down from 127)
+- **Guard limit:** 100 (reduced from 150)
 
-### Recommended Actions
-1. Move 13 experimental exports to `github.com/kljensen/kronos/experimental`
-2. Plan deprecation path for 4 deprecated exports in next major version
-3. Internal API (X-prefixed) can stay as-is - already clearly marked
-4. Reduce MAX_EXPORTS guard from 150 to **80** after moving experimental APIs
+### Phase 7 Achievements (Issues #145-#148)
+1. ✓ Moved advanced parsing constructs to experimental package
+2. ✓ Retired X-prefixed configuration helpers (kept only 4 for private field access)
+3. ✓ Tightened configuration exposure around builder API
+4. ✓ Reduced MAX_EXPORTS guard from 150 to 100
 
 ## Category Definitions
 
@@ -245,79 +246,82 @@ All X-prefixed functions are internal helpers:
 
 ---
 
-## Recommendations
+## Completed Actions (Phase 7)
 
-### 1. Move Experimental APIs (Priority: High)
+### 1. ✓ Moved Experimental APIs to experimental Package (Issue #145)
 
-Create `github.com/kljensen/kronos/experimental` package and move:
-- Types: `Chrono`, `Configuration`, `ParserFactory`, `ParserInfo`, `ParserRegistry`, `Pipeline`, `Refiner`
-- Functions: `NewChrono`, `NewParserRegistry`, `NewPipeline`, `NewPipelineWithSettings`, `Register`
-- Variables: `GlobalRegistry`
+Created `github.com/kljensen/kronos/experimental` package with:
+- Advanced parsing types: `Parser`, `Refiner`, `Configuration`, `Chrono`
+- Parsing internals: `ParsingComponents`, `ParsingResult`, `ParsingContext`
+- Helper functions: `Today()`, `Tomorrow()`, `AddDuration()`, etc.
+- Internal constants: `ApproximationWords`, `DefaultTimezoneAbbrMap`, `EmptyDuration`
 
-**Benefits:**
-- Clearer API boundaries
-- Allows experimental APIs to evolve without breaking main API
-- Reduces cognitive load for new users
-- Enables faster iteration on advanced features
+**Benefits achieved:**
+- Clearer API boundaries between essential and advanced features
+- Experimental APIs can now evolve without breaking main API
+- Reduced cognitive load for new users
+- Enabled faster iteration on advanced features
 
-**Migration strategy:**
-1. Copy types/functions to experimental/ package
-2. Re-export from root package with deprecation notices
-3. Update documentation to reference experimental package
-4. Remove from root in v2.0
+### 2. ✓ Retired X-Prefixed Configuration Helpers (Issue #146)
 
-### 2. Deprecate DayPreference (Priority: Medium)
+Removed most X-prefixed configuration helpers:
+- Kept only 4 helpers needed for private field access
+- Tightened configuration exposure around builder API
+- Improved separation between public and internal APIs
 
-Add deprecation notices:
-```go
-// Deprecated: Use DatePreference instead. Will be removed in v2.0.
-type DayPreference int
-```
+### 3. ✓ Updated API Guard (Issue #148)
 
-Update any internal code to use `DatePreference` instead.
-
-### 3. Update API Guard (Priority: High)
-
-After moving experimental APIs, update MAX_EXPORTS:
+Updated MAX_EXPORTS enforcement:
 ```go
 // Before:
-MAX_EXPORTS = 150 // 127 current + 23 headroom
+MAX_EXPORTS = 150 // 127 current exports
 
-// After moving experimental APIs:
-MAX_EXPORTS = 80  // 60 essential + 4 deprecated + 50 internal - 13 experimental = 114
-                  // Set to 80 to encourage further minimization
+// After Phase 7:
+MAX_EXPORTS = 100 // 92 current exports (down 35 from Phase 4)
 ```
 
-### 4. Documentation Updates (Priority: High)
+### 4. ✓ Documentation Updates (Issue #148)
 
-Update package documentation to clarify:
-1. **Essential API** - Recommended for general use, stability guaranteed
-2. **Experimental API** - Import from `experimental` package, may change
-3. **Internal API** - X-prefixed, not for direct use, no stability guarantees
-4. **Deprecated API** - Migration path documented, removal planned for v2.0
+Updated documentation to reflect new API boundaries:
+1. **Essential API** - Stable, recommended for general use (~60 exports)
+2. **Experimental API** - Available in `experimental` package, may change
+3. **Internal API** - Minimal X-prefixed helpers (only 4 remain)
+4. README includes clear guidance on when to use experimental package
 
-### 5. Future Cleanup for v2.0 (Priority: Low)
+### Future Cleanup for v2.0 (Low Priority)
 
 Consider for v2.0:
-- Remove `DayPreference` completely
-- Remove deprecated re-exports of experimental APIs
-- Consider if any X-prefixed functions can be moved to internal/helpers
+- Remove `DayPreference` completely (currently 1 deprecated type remains)
+- Further reduce X-prefixed helpers if possible
+- Evaluate if any essential API can be simplified
 
 ---
 
-## Target API Surface for v2.0
+## Target API Surface
 
-After implementing all recommendations:
+Current state after Phase 7:
 
 | Category | Count | Notes |
 |----------|-------|-------|
-| Essential | 60 | Stable public API |
+| Essential | ~60 | Stable public API (types, enums, builder pattern) |
 | Experimental | 0 | Moved to experimental package |
-| Deprecated | 0 | Removed in v2.0 |
-| Internal (X-prefixed) | 50 | Keep for internal/ packages |
-| **Total** | **110** | Down from 127 |
+| Deprecated | 1 | DayPreference (remove in v2.0) |
+| Internal (X-prefixed) | 4 | Minimal helpers for private field access |
+| **Total** | **92** | Down from 127 in Phase 4 |
 
-**New MAX_EXPORTS target: 80** (room for ~20 additions to essential API)
+**Current MAX_EXPORTS guard: 100** (room for ~8 additions to essential API)
+
+### Future v2.0 Target
+
+| Category | Count | Notes |
+|----------|-------|-------|
+| Essential | ~60 | Stable public API |
+| Experimental | 0 | In experimental package |
+| Deprecated | 0 | Remove DayPreference |
+| Internal (X-prefixed) | 0-4 | Minimize further if possible |
+| **Total** | **~60-64** | Clean, minimal API |
+
+**Future MAX_EXPORTS target: 80** (room for ~16-20 additions)
 
 ---
 
