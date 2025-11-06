@@ -1,8 +1,5 @@
-version: 2
-
 run:
   timeout: 5m
-  go: '1.21'
 
 linters:
   enable-all: true
@@ -11,6 +8,7 @@ linters:
     - tenv  # Deprecated, replaced by usetesting
 
     # Impractical linters for this codebase
+    - intrange           # Requires Go 1.22+ features, want to support older versions
     - testpackage        # Tests in same package is acceptable for testing internal behavior
     - exhaustruct        # Not practical to initialize all fields, especially for external types
     - varnamelen         # Short variable names in loops/functions are idiomatic Go
@@ -78,7 +76,6 @@ linters-settings:
 issues:
   max-same-issues: 0
   max-issues-per-linter: 0
-  exclude-use-default: false
   exclude-rules:
     # Disable errcheck for test files
     - path: _test\.go
