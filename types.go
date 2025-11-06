@@ -134,9 +134,33 @@ func (p Period) String() string {
 
 // DebugHandler is a function that handles debug events.
 // It receives a debug message for logging or analysis.
+//
+// Deprecated: Direct use of DebugHandler is discouraged. Use the builder pattern
+// with experimental options instead:
+//
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	parser := kronos.New(en.Casual).
+//	    WithOption(experimental.WithDebugHandler(func(msg string) {
+//	        log.Printf("DEBUG: %s", msg)
+//	    }))
 type DebugHandler func(message string)
 
 // ParsingOption contains configuration options for parsing.
+//
+// Deprecated: Direct use of ParsingOption is discouraged. Use the builder pattern
+// for common options and experimental package for advanced options:
+//
+//	// Common usage:
+//	parser := kronos.New(en.Casual).
+//	    WithDateOrder(kronos.DateOrderDMY).
+//	    PreferFuture()
+//
+//	// Advanced usage with experimental options:
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	parser := kronos.New(en.Casual).
+//	    WithOption(experimental.WithTimezoneOverrides(customTimezones))
 type ParsingOption struct {
 	// ForwardDate indicates whether to parse only forward dates
 	// (results should be after the reference date).
@@ -165,6 +189,22 @@ type ParsingOption struct {
 
 // AmbiguousTimezoneMap defines a timezone that has different offsets
 // depending on whether daylight saving time (DST) is in effect.
+//
+// Deprecated: Direct use of AmbiguousTimezoneMap is discouraged. Use the builder pattern
+// with experimental options instead:
+//
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	customTimezones := kronos.TimezoneAbbrMap{
+//	    "ET": &kronos.AmbiguousTimezoneMap{
+//	        TimezoneOffsetDuringDst: -240,
+//	        TimezoneOffsetNonDst: -300,
+//	        DstStart: func(year int) time.Time { ... },
+//	        DstEnd: func(year int) time.Time { ... },
+//	    },
+//	}
+//	parser := kronos.New(en.Casual).
+//	    WithOption(experimental.WithTimezoneOverrides(customTimezones))
 type AmbiguousTimezoneMap struct {
 	// TimezoneOffsetDuringDst is the offset in minutes during DST.
 	TimezoneOffsetDuringDst int
@@ -182,9 +222,29 @@ type AmbiguousTimezoneMap struct {
 // TimezoneAbbrMap maps timezone abbreviations to their offsets.
 // Values can be either a simple offset (in minutes) or an AmbiguousTimezoneMap
 // for timezones that observe DST.
+//
+// Deprecated: Direct use of TimezoneAbbrMap is discouraged. Use the builder pattern
+// with experimental options instead:
+//
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	customTimezones := kronos.TimezoneAbbrMap{
+//	    "CUSTOM": 123,  // UTC+2:03
+//	    "TEST": -456,   // UTC-7:36
+//	}
+//	parser := kronos.New(en.Casual).
+//	    WithOption(experimental.WithTimezoneOverrides(customTimezones))
 type TimezoneAbbrMap map[string]interface{}
 
 // ParsingReference contains reference information for parsing dates/times.
+//
+// Deprecated: Direct use of ParsingReference is discouraged. Use the builder pattern
+// with WithReferenceDate instead:
+//
+//	parser := kronos.New(en.Casual).
+//	    WithReferenceDate(time.Now())
+//
+// For advanced timezone reference configuration, use the experimental package.
 type ParsingReference struct {
 	// Instant is the reference date/time when the input is written or mentioned.
 	// This affects date/time implication (e.g. weekday or time mentioning).

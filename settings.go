@@ -109,17 +109,32 @@ type Settings struct {
 	// Performance
 	MaxParsers int           // Maximum number of parsers to run (0 = unlimited)
 	Timeout    time.Duration // Parsing timeout (0 = no timeout)
+
+	// Advanced configuration
+	TimezoneOverrides TimezoneAbbrMap // Custom timezone abbreviations
+	DebugHandler      DebugHandler    // Debug callback for parsing events
 }
 
 // ToParsingOption converts Settings to ParsingOption for backward compatibility.
 // This method is used internally to bridge Settings and ParsingOption.
 func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
+	// Merge default timezones with overrides
+	mergedTimezones := timezones
+	if s.TimezoneOverrides != nil {
+		if mergedTimezones == nil {
+			mergedTimezones = make(TimezoneAbbrMap)
+		}
+		for k, v := range s.TimezoneOverrides {
+			mergedTimezones[k] = v
+		}
+	}
+
 	return ParsingOption{
 		ForwardDate: s.PreferDatesFrom == PreferFuture,
 		Preference:  s.PreferDatesFrom,
 		DateOrder:   s.DateOrder,
-		Timezones:   timezones,
-		Debug:       nil,
+		Timezones:   mergedTimezones,
+		Debug:       s.DebugHandler,
 	}
 }
 

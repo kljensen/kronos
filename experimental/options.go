@@ -168,3 +168,43 @@ func WithTimeAsPeriod(asPeriod bool) Option {
 		s.ReturnTimeAsPeriod = asPeriod
 	}
 }
+
+// WithTimezoneOverrides sets custom timezone abbreviation mappings.
+// This allows you to override the default timezone abbreviations with custom ones.
+// Values can be either a simple offset in minutes (int) or an AmbiguousTimezoneMap
+// for timezones that observe DST.
+//
+// Example:
+//
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	customTimezones := kronos.TimezoneAbbrMap{
+//	    "CUSTOM": 123,  // Custom timezone at UTC+2:03
+//	    "TEST": -456,   // Custom timezone at UTC-7:36
+//	}
+//	builder := kronos.New().
+//	    WithOption(experimental.WithTimezoneOverrides(customTimezones))
+func WithTimezoneOverrides(timezones kronos.TimezoneAbbrMap) Option {
+	return func(s *kronos.Settings) {
+		s.TimezoneOverrides = timezones
+	}
+}
+
+// WithDebugHandler sets a debug callback for parsing events.
+// This is useful for understanding how the parser works and debugging issues.
+// The handler receives debug messages during parsing.
+//
+// Example:
+//
+//	import "log"
+//	import "github.com/kljensen/kronos/experimental"
+//
+//	builder := kronos.New().
+//	    WithOption(experimental.WithDebugHandler(func(msg string) {
+//	        log.Printf("DEBUG: %s", msg)
+//	    }))
+func WithDebugHandler(handler kronos.DebugHandler) Option {
+	return func(s *kronos.Settings) {
+		s.DebugHandler = handler
+	}
+}

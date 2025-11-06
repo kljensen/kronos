@@ -98,3 +98,37 @@ func TestBuilderChaining(t *testing.T) {
 		Strict().
 		Timezone("UTC")
 }
+
+// TestBuilderAdvancedOptions tests advanced configuration options.
+func TestBuilderAdvancedOptions(t *testing.T) {
+	customTimezones := TimezoneAbbrMap{
+		"CUSTOM": 123,
+	}
+
+	debugCalled := false
+	debugHandler := func(msg string) {
+		debugCalled = true
+	}
+
+	parser := New(nil).
+		WithOption(func(s *Settings) {
+			s.TimezoneOverrides = customTimezones
+		}).
+		WithOption(func(s *Settings) {
+			s.DebugHandler = debugHandler
+		})
+
+	// Verify settings
+	if parser.settings.TimezoneOverrides == nil {
+		t.Error("Expected timezone overrides to be set")
+	}
+	if parser.settings.DebugHandler == nil {
+		t.Error("Expected debug handler to be set")
+	}
+
+	// Call handler
+	parser.settings.DebugHandler("test")
+	if !debugCalled {
+		t.Error("Expected debug handler to be called")
+	}
+}

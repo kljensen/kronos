@@ -127,6 +127,30 @@ func demonstrateExperimentalOptions() {
 		fmt.Printf("With custom base: %v\n", results[0].Date())
 	}
 
+	// Custom timezone overrides
+	customTimezones := kronos.TimezoneAbbrMap{
+		"CUSTOM": 123, // UTC+2:03
+	}
+	parser = en.New().
+		WithOption(experimental.WithTimezoneOverrides(customTimezones))
+
+	results, _ = parser.Parse("3pm CUSTOM")
+	if len(results) > 0 {
+		fmt.Printf("With custom timezone: %v\n", results[0].Date())
+	}
+
+	// Debug handler
+	parser = en.New().
+		WithOption(experimental.WithDebugHandler(func(msg string) {
+			// In real code, you might log this
+			// fmt.Printf("DEBUG: %s\n", msg)
+		}))
+
+	results, _ = parser.Parse("tomorrow")
+	if len(results) > 0 {
+		fmt.Printf("With debug handler: %v\n", results[0].Date())
+	}
+
 	fmt.Println()
 }
 

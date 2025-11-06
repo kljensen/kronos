@@ -198,3 +198,16 @@ func Parse(text string, chrono *Chrono) ([]Result, error) {
 func ParseDate(text string, chrono *Chrono) (*time.Time, error) {
 	return New(chrono).ParseDate(text)
 }
+
+// Settings returns a copy of the current settings for inspection.
+// This is useful for advanced use cases that need to examine or validate settings.
+// Note: Modifying the returned Settings will not affect the builder.
+//
+// Example:
+//
+//	parser := kronos.New(en.Casual).PreferFuture()
+//	settings := parser.Settings()
+//	fmt.Printf("Preference: %v\n", settings.PreferDatesFrom)
+func (p *ParserBuilder) Settings() Settings {
+	return p.settings
+}

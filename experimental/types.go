@@ -248,3 +248,27 @@ const (
 	Friday    = time.Friday
 	Saturday  = time.Saturday
 )
+
+// TimezoneAbbrMap maps timezone abbreviations to their offsets.
+// Re-exported from the main package for the experimental API.
+type TimezoneAbbrMap = kronos.TimezoneAbbrMap
+
+// AmbiguousTimezoneMap defines a timezone with different DST offsets.
+// Re-exported from the main package for the experimental API.
+type AmbiguousTimezoneMap = kronos.AmbiguousTimezoneMap
+
+// DebugHandler is a function that handles debug events.
+// Re-exported from the main package for the experimental API.
+type DebugHandler = kronos.DebugHandler
+
+// ParsingReference contains reference information for parsing.
+// Re-exported from the main package for the experimental API.
+type ParsingReference = kronos.ParsingReference
+
+// DefaultSettings returns sensible default settings.
+// This is re-exported from the main package for backward compatibility.
+var DefaultSettings = kronos.DefaultSettings
+
+// ValidateSettings checks settings for consistency and validity.
+// This is re-exported from the main package for backward compatibility.
+var ValidateSettings = kronos.ValidateSettings
