@@ -111,6 +111,10 @@ func (r *ReferenceWithTimezone) Instant() time.Time {
 
 // ParsingComponents represents a collection of parsed date/time components.
 // Components are stored as either "known" (directly parsed) or "implied" (inferred).
+//
+// Deprecated: This concrete type exposes internal implementation details. New code should
+// use the Components interface instead, which provides a cleaner API that hides implementation.
+// This type will be moved to an internal package in a future version.
 type ParsingComponents struct {
 	knownValues   map[Component]int
 	impliedValues map[Component]int
@@ -563,6 +567,10 @@ func (pc *ParsingComponents) AddDurationAsImplied(duration Duration) *ParsingCom
 }
 
 // ParsingResult represents a parsed result containing date/time information.
+//
+// Deprecated: This concrete type exposes internal implementation details. New code should
+// use the Result interface instead, which provides a cleaner API that hides implementation.
+// This type will be moved to an internal package in a future version.
 type ParsingResult struct {
 	reference *ReferenceWithTimezone
 	refDate   time.Time

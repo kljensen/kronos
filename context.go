@@ -4,6 +4,10 @@ import "time"
 
 // ParsingContext holds the context for parsing operations.
 // It contains the text to parse, options, and reference information.
+//
+// Deprecated: This concrete type exposes internal implementation details. External code should
+// not depend on the internal structure of this type. It will be moved to an internal package
+// in a future version.
 type ParsingContext struct {
 	text      string
 	option    ParsingOption
