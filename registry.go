@@ -7,6 +7,10 @@ import (
 
 // ParserInfo contains metadata about a registered parser.
 // It allows parsers to be dynamically discovered and configured.
+//
+// Deprecated: This type is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 type ParserInfo struct {
 	// Name is the unique identifier for this parser.
 	Name string
@@ -26,10 +30,18 @@ type ParserInfo struct {
 
 // ParserFactory creates a parser instance.
 // This allows parsers to be created with specific settings.
+//
+// Deprecated: This type is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 type ParserFactory func() Parser
 
 // ParserRegistry manages available parsers and their metadata.
 // It provides a central place to register and discover parsers.
+//
+// Deprecated: This type is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 type ParserRegistry struct {
 	mu       sync.RWMutex
 	parsers  map[string]*registeredParser
@@ -43,9 +55,17 @@ type registeredParser struct {
 }
 
 // GlobalRegistry is the global parser registry for all parsers.
+//
+// Deprecated: This variable is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 var GlobalRegistry = NewParserRegistry()
 
 // NewParserRegistry creates a new parser registry.
+//
+// Deprecated: This function is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 func NewParserRegistry() *ParserRegistry {
 	return &ParserRegistry{
 		parsers:  make(map[string]*registeredParser),
@@ -55,6 +75,10 @@ func NewParserRegistry() *ParserRegistry {
 
 // Register registers a parser with the global registry.
 // The parser name must be unique.
+//
+// Deprecated: This function is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 func Register(name string, info ParserInfo, factory ParserFactory) {
 	GlobalRegistry.RegisterParser(name, info, factory)
 }

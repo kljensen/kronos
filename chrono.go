@@ -8,6 +8,10 @@ import (
 // Chrono is the main parsing engine that coordinates multiple parsers and refiners.
 // It maintains a list of parsers (each handling a specific date format) and refiners
 // (each post-processing the results).
+//
+// Deprecated: This type is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 type Chrono struct {
 	parsers  []Parser
 	refiners []Refiner
@@ -15,6 +19,10 @@ type Chrono struct {
 
 // NewChrono creates a new Chrono instance with the given configuration.
 // If config is nil, an empty Chrono is created.
+//
+// Deprecated: This function is part of the advanced API and will be moved to the
+// experimental package in a future version. For new code, import and use
+// github.com/kljensen/kronos/experimental instead.
 func NewChrono(config *Configuration) *Chrono {
 	if config == nil {
 		return &Chrono{

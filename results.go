@@ -661,6 +661,12 @@ func (pr *ParsingResult) SetIndex(index int) {
 	pr.index = index
 }
 
+// SetStart sets the start component of the parsing result.
+// This is used by parsers and refiners to update the parsed components.
+func (pr *ParsingResult) SetStart(start *ParsingComponents) {
+	pr.start = start
+}
+
 // ParsingResultWithBoundary wraps ParsingComponents with boundary information
 // This is used internally to communicate the adjusted text (without boundary) to chrono.go
 // when parsers using AbstractParserWithWordBoundary return ParsingComponents.
