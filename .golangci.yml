@@ -4,7 +4,7 @@ run:
   timeout: 5m
 
 linters:
-  enable-all: true
+  default: all
   disable:
     # Impractical linters for this codebase
     - intrange           # Requires Go 1.22+ features, want to support older versions
@@ -42,53 +42,57 @@ linters:
     - err113             # Dynamic errors are appropriate for detailed validation messages
     - goconst            # Repeated strings in tests don't always need to be constants
 
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
 
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment  # Disable field alignment checks as they're too pedantic and can hurt readability
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment  # Disable field alignment checks as they're too pedantic and can hurt readability
 
-  gofmt:
-    simplify: true
+    goconst:
+      min-len: 3
+      min-occurrences: 3
 
-  gofumpt:
-    extra-rules: true
+    misspell:
+      locale: US
 
-  goconst:
-    min-len: 3
-    min-occurrences: 3
+    revive:
+      rules:
+        - name: exported
+          arguments:
+            - "checkPrivateReceivers"
+            - "disableStutteringCheck"
 
-  misspell:
-    locale: US
-
-  revive:
+  exclusions:
     rules:
-      - name: exported
-        arguments:
-          - "checkPrivateReceivers"
-          - "disableStutteringCheck"
+      # Disable errcheck for test files
+      - path: _test\.go
+        linters:
+          - errcheck
+      # Allow deprecated API usage in test files that test internal/advanced APIs
+      # These tests need to use deprecated types to test the internal implementation
+      - path: _test\.go
+        text: "SA1019"
+      # Allow deprecated API usage in en/en.go which provides the public API
+      # This file uses internal types to construct Chrono instances
+      - path: en/en\.go
+        text: "SA1019"
+      # Allow deprecated API usage in internal/ packages
+      # These are internal implementations that legitimately use deprecated public types
+      - path: internal/
+        text: "SA1019"
+
+formatters:
+  settings:
+    gofmt:
+      simplify: true
+
+    gofumpt:
+      extra-rules: true
 
 issues:
   max-same-issues: 0
   max-issues-per-linter: 0
-  exclude-rules:
-    # Disable errcheck for test files
-    - path: _test\.go
-      linters:
-        - errcheck
-    # Allow deprecated API usage in test files that test internal/advanced APIs
-    # These tests need to use deprecated types to test the internal implementation
-    - path: _test\.go
-      text: "SA1019"
-    # Allow deprecated API usage in en/en.go which provides the public API
-    # This file uses internal types to construct Chrono instances
-    - path: en/en\.go
-      text: "SA1019"
-    # Allow deprecated API usage in internal/ packages
-    # These are internal implementations that legitimately use deprecated public types
-    - path: internal/
-      text: "SA1019"
