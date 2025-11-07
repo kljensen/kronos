@@ -86,7 +86,7 @@ func TestTimeunitConstants(t *testing.T) {
 // from the standard library instead.
 
 // TestparsingOptionDefaults verifies parsingOption struct can be created with defaults.
-func TestparsingOptionDefaults(t *testing.T) {
+func TestParsingOptionDefaults(t *testing.T) {
 	opt := parsingOption{}
 
 	if opt.ForwardDate != false {
@@ -103,7 +103,7 @@ func TestparsingOptionDefaults(t *testing.T) {
 }
 
 // TestparsingOptionWithValues verifies parsingOption can be created with values.
-func TestparsingOptionWithValues(t *testing.T) {
+func TestParsingOptionWithValues(t *testing.T) {
 	debugCalled := false
 	debugHandler := func(message string) {
 		debugCalled = true
@@ -210,7 +210,7 @@ func TestTimezoneAbbrMap(t *testing.T) {
 }
 
 // TestparsingReference verifies parsingReference structure.
-func TestparsingReference(t *testing.T) {
+func TestParsingReference(t *testing.T) {
 	now := time.Now()
 	ref := parsingReference{
 		Instant:  &now,
@@ -231,7 +231,7 @@ func TestparsingReference(t *testing.T) {
 }
 
 // TestparsingReferenceWithOffset verifies parsingReference can use offset.
-func TestparsingReferenceWithOffset(t *testing.T) {
+func TestParsingReferenceWithOffset(t *testing.T) {
 	now := time.Now()
 	ref := parsingReference{
 		Timezone: -300, // EST offset in minutes

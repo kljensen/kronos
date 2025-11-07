@@ -23,7 +23,7 @@ func TestDefaultSettings(t *testing.T) {
 	}
 }
 
-func TestvalidateSettings_ValidTimezone(t *testing.T) {
+func TestValidateSettings_ValidTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.Timezone = "America/New_York"
 
@@ -33,7 +33,7 @@ func TestvalidateSettings_ValidTimezone(t *testing.T) {
 	}
 }
 
-func TestvalidateSettings_InvalidTimezone(t *testing.T) {
+func TestValidateSettings_InvalidTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.Timezone = "Invalid/Timezone"
 
@@ -42,7 +42,6 @@ func TestvalidateSettings_InvalidTimezone(t *testing.T) {
 		t.Error("Expected error for invalid timezone")
 	}
 }
-
 
 func TestDateOrderString(t *testing.T) {
 	tests := []struct {
@@ -100,7 +99,6 @@ func TestApplySettings_InvalidSettings(t *testing.T) {
 	}
 }
 
-
 func TestSettings_StrictParsing(t *testing.T) {
 	settings := DefaultSettings()
 	settings.StrictParsing = true
@@ -109,7 +107,6 @@ func TestSettings_StrictParsing(t *testing.T) {
 		t.Error("Expected StrictParsing to be true")
 	}
 }
-
 
 func TestNewParsingContextWithSettings(t *testing.T) {
 	settings := DefaultSettings()
@@ -177,4 +174,3 @@ func TestSettings_DatePreferences(t *testing.T) {
 		}
 	}
 }
-

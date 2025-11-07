@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func TestnewPipeline(t *testing.T) {
+func TestNewPipeline(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -19,7 +19,7 @@ func TestnewPipeline(t *testing.T) {
 	}
 }
 
-func TestnewPipeline_NilConfig(t *testing.T) {
+func TestNewPipeline_NilConfig(t *testing.T) {
 	settings := DefaultSettings()
 	pipeline := newPipeline(nil, settings)
 
@@ -28,7 +28,7 @@ func TestnewPipeline_NilConfig(t *testing.T) {
 	}
 }
 
-func TestnewPipelineWithSettings(t *testing.T) {
+func TestNewPipelineWithSettings(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -45,7 +45,7 @@ func TestnewPipelineWithSettings(t *testing.T) {
 	}
 }
 
-func TestnewPipelineWithSettings_InvalidSettings(t *testing.T) {
+func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -58,7 +58,6 @@ func TestnewPipelineWithSettings_InvalidSettings(t *testing.T) {
 		t.Error("Expected error for invalid settings")
 	}
 }
-
 
 func TestPipeline_Execute_BasicParsing(t *testing.T) {
 	// This is a simplified test - full integration tests would use real parsers
@@ -106,10 +105,7 @@ func TestPipeline_Execute_StrictParsing(t *testing.T) {
 	_ = results
 }
 
-
-
-
-func TestparseWithSettings_ConvenienceFunction(t *testing.T) {
+func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -130,7 +126,7 @@ func TestparseWithSettings_ConvenienceFunction(t *testing.T) {
 	}
 }
 
-func TestparseWithSettings_InvalidSettings(t *testing.T) {
+func TestParseWithSettings_InvalidSettings(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
