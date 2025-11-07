@@ -166,7 +166,7 @@ func TestAPIExports(t *testing.T) {
 
 	// Report deprecated types (for documentation)
 	deprecatedTypes := []string{
-		"Weekday", "Month", "Meridiem", "DayPreference",
+		"Weekday", "Month", "Meridiem",
 	}
 	var stillPresent []string
 	for _, typeName := range deprecatedTypes {

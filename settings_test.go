@@ -15,9 +15,6 @@ func TestDefaultSettings(t *testing.T) {
 	if settings.PreferDatesFrom != PreferCurrentPeriod {
 		t.Errorf("Expected PreferCurrentPeriod, got %v", settings.PreferDatesFrom)
 	}
-	if settings.PreferDayOfMonth != DayPreferCurrent {
-		t.Errorf("Expected DayPreferCurrent, got %v", settings.PreferDayOfMonth)
-	}
 	if settings.Timezone != "UTC" {
 		t.Errorf("Expected UTC timezone, got %s", settings.Timezone)
 	}
@@ -68,23 +65,6 @@ func TestDateOrderString(t *testing.T) {
 	for _, tc := range tests {
 		if tc.order.String() != tc.expected {
 			t.Errorf("Expected %s, got %s", tc.expected, tc.order.String())
-		}
-	}
-}
-
-func TestDayPreferenceString(t *testing.T) {
-	tests := []struct {
-		pref     DayPreference
-		expected string
-	}{
-		{DayPreferCurrent, "current"},
-		{DayPreferFirst, "first"},
-		{DayPreferLast, "last"},
-	}
-
-	for _, tc := range tests {
-		if tc.pref.String() != tc.expected {
-			t.Errorf("Expected %s, got %s", tc.expected, tc.pref.String())
 		}
 	}
 }
@@ -223,21 +203,3 @@ func TestSettings_DatePreferences(t *testing.T) {
 	}
 }
 
-func TestSettings_DayPreferences(t *testing.T) {
-	// Test all day preferences
-	preferences := []DayPreference{
-		DayPreferCurrent,
-		DayPreferFirst,
-		DayPreferLast,
-	}
-
-	for _, pref := range preferences {
-		settings := DefaultSettings()
-		settings.PreferDayOfMonth = pref
-
-		err := validateSettings(settings)
-		if err != nil {
-			t.Errorf("Valid day preference %v should not error, got: %v", pref, err)
-		}
-	}
-}

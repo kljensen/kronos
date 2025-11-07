@@ -31,32 +31,6 @@ func (d DateOrder) String() string {
 	}
 }
 
-// DayPreference specifies how to interpret day when it's ambiguous.
-type DayPreference int
-
-const (
-	// DayPreferCurrent prefers the current day of month.
-	DayPreferCurrent DayPreference = iota
-	// DayPreferFirst prefers the first day of the period.
-	DayPreferFirst
-	// DayPreferLast prefers the last day of the period.
-	DayPreferLast
-)
-
-// String returns the string representation of DayPreference.
-func (d DayPreference) String() string {
-	switch d {
-	case DayPreferCurrent:
-		return "current"
-	case DayPreferFirst:
-		return "first"
-	case DayPreferLast:
-		return "last"
-	default:
-		return "current"
-	}
-}
-
 // Settings contains all configuration for date parsing.
 // It provides a comprehensive way to customize parsing behavior,
 // similar to Python's dateparser settings system.
@@ -81,9 +55,8 @@ func (d DayPreference) String() string {
 // use the builder pattern.
 type Settings struct {
 	// Date interpretation
-	DateOrder        DateOrder      // Order of date components (MDY, DMY, YMD)
-	PreferDatesFrom  DatePreference // Past, Future, CurrentPeriod
-	PreferDayOfMonth DayPreference  // Current, First, Last
+	DateOrder       DateOrder      // Order of date components (MDY, DMY, YMD)
+	PreferDatesFrom DatePreference // Past, Future, CurrentPeriod
 
 	// Timezone handling
 	Timezone            string // Default timezone name (e.g., "UTC", "America/New_York")
@@ -130,7 +103,6 @@ func DefaultSettings() Settings {
 	return Settings{
 		DateOrder:           DateOrderMDY,
 		PreferDatesFrom:     PreferCurrentPeriod,
-		PreferDayOfMonth:    DayPreferCurrent,
 		Timezone:            "UTC",
 		ToTimezone:          "",
 		ReturnTimezoneAware: false,
@@ -164,11 +136,6 @@ func validateSettings(s Settings) error {
 	// Validate date preference
 	if s.PreferDatesFrom < PreferCurrentPeriod || s.PreferDatesFrom > PreferFuture {
 		return fmt.Errorf("invalid date preference: %d", s.PreferDatesFrom)
-	}
-
-	// Validate day preference
-	if s.PreferDayOfMonth < DayPreferCurrent || s.PreferDayOfMonth > DayPreferLast {
-		return fmt.Errorf("invalid day preference: %d", s.PreferDayOfMonth)
 	}
 
 	return nil
