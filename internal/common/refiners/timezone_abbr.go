@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal"
 	"github.com/kljensen/kronos/internal/helpers"
 )
 
@@ -77,7 +77,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 		}
 
 		// Look up timezone offset
-		extractedTimezoneOffsetPtr := helpers.ToTimezoneOffset(timezoneAbbr, refDate, timezoneOverrides, data.DefaultTimezoneAbbrMap)
+		extractedTimezoneOffsetPtr := helpers.ToTimezoneOffset(timezoneAbbr, refDate, timezoneOverrides, internal.DefaultTimezoneAbbrMap)
 		if extractedTimezoneOffsetPtr == nil {
 			continue
 		}

@@ -1,24 +1,4 @@
-package types
-
-// Timeunit represents a unit of time for calculations and operations.
-// This is an internal type used for duration calculations and parsing.
-type Timeunit string
-
-// Time unit constants for internal use
-const (
-	TimeunitYear        Timeunit = "year"
-	TimeunitMonth       Timeunit = "month"
-	TimeunitWeek        Timeunit = "week"
-	TimeunitDay         Timeunit = "day"
-	TimeunitHour        Timeunit = "hour"
-	TimeunitMinute      Timeunit = "minute"
-	TimeunitSecond      Timeunit = "second"
-	TimeunitMillisecond Timeunit = "millisecond"
-	TimeunitMicrosecond Timeunit = "microsecond"
-	TimeunitNanosecond  Timeunit = "nanosecond"
-	TimeunitQuarter     Timeunit = "quarter"
-	TimeunitDecade      Timeunit = "decade"
-)
+package helpers
 
 // Meridiem represents the AM/PM indicator for internal parsing.
 type Meridiem int

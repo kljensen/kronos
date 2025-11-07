@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal"
 	"github.com/kljensen/kronos/internal/helpers"
 )
 
@@ -167,13 +167,13 @@ var GetNthWeekdayOfMonth = helpers.GetNthWeekdayOfMonth
 // These are commonly used constants for parsing.
 
 // DefaultTimezoneAbbrMap is a map of common timezone abbreviations to their offsets in minutes.
-var DefaultTimezoneAbbrMap = data.DefaultTimezoneAbbrMap
+var DefaultTimezoneAbbrMap = internal.DefaultTimezoneAbbrMap
 
 // ApproximationWords is a list of words that indicate approximate time expressions.
-var ApproximationWords = data.ApproximationWords
+var ApproximationWords = internal.ApproximationWords
 
 // EmptyDuration represents an explicit empty duration.
-var EmptyDuration = data.EmptyDuration
+var EmptyDuration = internal.EmptyDuration
 
 // Duration and Timeunit types
 // These are re-exported from the main package for convenience.

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal"
 	endata "github.com/kljensen/kronos/internal/en/data"
 	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
@@ -65,7 +65,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "next" and "after this"
 			if modifier == "next" || strings.HasPrefix(modifier, "after") {
 				duration := kronos.Duration{timeunit: 1}
-				components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
+				components := helpers.CreateRelativeFromReference(context.Reference(), duration, internal.EmptyDuration)
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "next month" means "the next month period" starting on the 1st
@@ -86,7 +86,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			// Handle "last" and "past"
 			if modifier == "last" || modifier == "past" {
 				duration := kronos.Duration{timeunit: -1}
-				components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
+				components := helpers.CreateRelativeFromReference(context.Reference(), duration, internal.EmptyDuration)
 				if components != nil {
 					// For month/year timeunits, override day to 1st of period
 					// "last month" means "the previous month period" starting on the 1st

@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kljensen/kronos/internal/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -138,7 +137,7 @@ func TestTonight(t *testing.T) {
 	// Time should be implied (22:00 / 10 PM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
 	assert.Equal(t, 22, *component.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemPM), *component.Get(ComponentMeridiem))
+	assert.Equal(t, int(1), *component.Get(ComponentMeridiem))
 
 	// Check tag
 	tags := component.Tags()
@@ -193,7 +192,7 @@ func TestEvening(t *testing.T) {
 	// Time should be implied (20:00 / 8 PM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
 	assert.Equal(t, 20, *component.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemPM), *component.Get(ComponentMeridiem))
+	assert.Equal(t, int(1), *component.Get(ComponentMeridiem))
 
 	// Check tag
 	tags := component.Tags()
@@ -213,7 +212,7 @@ func TestYesterdayEvening(t *testing.T) {
 
 	// Time should be implied evening
 	assert.Equal(t, 20, *component.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemPM), *component.Get(ComponentMeridiem))
+	assert.Equal(t, int(1), *component.Get(ComponentMeridiem))
 
 	// Check tags
 	tags := component.Tags()
@@ -262,7 +261,7 @@ func TestMorning(t *testing.T) {
 	// Time should be implied (6:00 AM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
 	assert.Equal(t, 6, *component.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemAM), *component.Get(ComponentMeridiem))
+	assert.Equal(t, int(0), *component.Get(ComponentMeridiem))
 	assert.Equal(t, 0, *component.Get(ComponentMinute))
 
 	// Check tag
@@ -279,7 +278,7 @@ func TestAfternoon(t *testing.T) {
 	// Time should be implied (15:00 / 3 PM by default)
 	assert.False(t, component.IsCertain(ComponentHour))
 	assert.Equal(t, 15, *component.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemPM), *component.Get(ComponentMeridiem))
+	assert.Equal(t, int(1), *component.Get(ComponentMeridiem))
 	assert.Equal(t, 0, *component.Get(ComponentMinute))
 
 	// Check tag

@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kljensen/kronos/internal/types"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -510,7 +509,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 	components1.Assign(ComponentMonth, 6)
 	components1.Assign(ComponentDay, 15)
 	components1.Assign(ComponentHour, 11)
-	components1.Assign(ComponentMeridiem, int(types.MeridiemAM))
+	components1.Assign(ComponentMeridiem, int(0))
 
 	result1 := newParsingResult(ref, 0, "June 15, 2020 at 11:00 AM", components1, nil)
 	results1 := []*ParsingResult{result1}
@@ -520,7 +519,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 
 	start1 := converted1[0].Start()
 	assert.Equal(t, 7, *start1.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemAM), *start1.Get(ComponentMeridiem))
+	assert.Equal(t, int(0), *start1.Get(ComponentMeridiem))
 
 	// 1:00 PM UTC (13:00) should become 9:00 AM EDT (PM to AM - crosses meridiem)
 	components2 := newParsingComponents(ref, nil)
@@ -528,7 +527,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 	components2.Assign(ComponentMonth, 6)
 	components2.Assign(ComponentDay, 15)
 	components2.Assign(ComponentHour, 13)
-	components2.Assign(ComponentMeridiem, int(types.MeridiemPM))
+	components2.Assign(ComponentMeridiem, int(1))
 
 	result2 := newParsingResult(ref, 0, "June 15, 2020 at 1:00 PM", components2, nil)
 	results2 := []*ParsingResult{result2}
@@ -538,7 +537,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 
 	start2 := converted2[0].Start()
 	assert.Equal(t, 9, *start2.Get(ComponentHour))
-	assert.Equal(t, int(types.MeridiemAM), *start2.Get(ComponentMeridiem), "Meridiem should change from PM to AM")
+	assert.Equal(t, int(0), *start2.Get(ComponentMeridiem), "Meridiem should change from PM to AM")
 }
 
 // TestPipeline_TimezoneConversion_TimezoneOffset tests that timezone offset is updated

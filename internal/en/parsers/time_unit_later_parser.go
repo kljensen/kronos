@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal"
 	endata "github.com/kljensen/kronos/internal/en/data"
 	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
@@ -62,7 +62,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 			}
 
 			// Create relative result from reference (forward in time)
-			components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
+			components := helpers.CreateRelativeFromReference(context.Reference(), duration, internal.EmptyDuration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				// Add tag for relative date and time if time components are present

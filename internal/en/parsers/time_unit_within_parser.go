@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal"
 	endata "github.com/kljensen/kronos/internal/en/data"
 	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
@@ -76,7 +76,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 			}
 
 			// Create relative result from reference (forward in time)
-			components := helpers.CreateRelativeFromReference(context.Reference(), duration, data.EmptyDuration)
+			components := helpers.CreateRelativeFromReference(context.Reference(), duration, internal.EmptyDuration)
 			if components != nil {
 				components.AddTag("result/relativeDate")
 				if duration[kronos.TimeunitHour] != 0 || duration[kronos.TimeunitMinute] != 0 || duration[kronos.TimeunitSecond] != 0 {

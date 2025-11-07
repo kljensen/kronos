@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/data"
+	"github.com/kljensen/kronos/internal"
 	endata "github.com/kljensen/kronos/internal/en/data"
 	"github.com/kljensen/kronos/internal/helpers"
 )
@@ -81,7 +81,7 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.ParsingContext,
 
 		// Create new reference from current result's date
 		newRef := context.Reference().FromDate(current.Start().Date())
-		components := helpers.CreateRelativeFromReference(newRef, duration, data.EmptyDuration)
+		components := helpers.CreateRelativeFromReference(newRef, duration, internal.EmptyDuration)
 
 		// Create merged result
 		resultIndex := current.Index()
