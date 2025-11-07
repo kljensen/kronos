@@ -83,11 +83,11 @@ func TestToTimezoneOffset_AmbiguousTimezone(t *testing.T) {
 		TimezoneOffsetNonDst:    -300, // EST = UTC-5
 		DstStart: func(year int) time.Time {
 			// DST starts 2nd Sunday of March at 2 AM
-			return getNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
+			return GetNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends 1st Sunday of November at 2 AM
-			return getNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
+			return GetNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
 		},
 	}
 
@@ -208,7 +208,7 @@ func TestGetNthWeekdayOfMonth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := getNthWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.n, tt.hour)
+			result := GetNthWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.n, tt.hour)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -267,7 +267,7 @@ func TestGetLastWeekdayOfMonth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := getLastWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.hour)
+			result := GetLastWeekdayOfMonth(tt.year, tt.month, tt.weekday, tt.hour)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
