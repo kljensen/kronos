@@ -59,7 +59,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		floor := int(val)
-		date = addYears(date, floor)
+		date = date.AddDate(floor, 0, 0)
 		if err := validateDate(date); err != nil {
 			return time.Time{}, err
 		}
@@ -75,7 +75,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		floor := int(val)
-		date = addMonths(date, floor*3)
+		date = date.AddDate(0, floor*3, 0)
 		if err := validateDate(date); err != nil {
 			return time.Time{}, err
 		}
@@ -87,7 +87,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		floor := int(val)
-		date = addMonths(date, floor)
+		date = date.AddDate(0, floor, 0)
 		if err := validateDate(date); err != nil {
 			return time.Time{}, err
 		}
@@ -314,12 +314,4 @@ func checkFloatToIntOverflow(value float64, unit kronos.Timeunit) error {
 		return fmt.Errorf("duration %s value %f would overflow int32 conversion", unit, value)
 	}
 	return nil
-}
-
-func addYears(date time.Time, years int) time.Time {
-	return date.AddDate(years, 0, 0)
-}
-
-func addMonths(date time.Time, months int) time.Time {
-	return date.AddDate(0, months, 0)
 }

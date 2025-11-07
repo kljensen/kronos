@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/internal/helpers"
 )
 
 // DefaultTimezoneAbbrMap is a map of common timezone abbreviations to their offsets in minutes.
@@ -27,11 +26,11 @@ var DefaultTimezoneAbbrMap = kronos.TimezoneAbbrMap{
 		TimezoneOffsetNonDst:    -300, // EST = UTC-5
 		DstStart: func(year int) time.Time {
 			// DST starts 2nd Sunday of March at 2 AM
-			return helpers.GetNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
+			return kronos.InternalGetNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends 1st Sunday of November at 2 AM
-			return helpers.GetNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
+			return kronos.InternalGetNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
 		},
 	},
 	"CST":  -360,
@@ -56,11 +55,11 @@ var DefaultTimezoneAbbrMap = kronos.TimezoneAbbrMap{
 		TimezoneOffsetNonDst:    60,  // CET = UTC+1
 		DstStart: func(year int) time.Time {
 			// DST starts last Sunday of March at 2 AM
-			return helpers.GetLastWeekdayOfMonth(year, time.March, time.Sunday, 2)
+			return kronos.InternalGetLastWeekdayOfMonth(year, time.March, time.Sunday, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends last Sunday of October at 3 AM
-			return helpers.GetLastWeekdayOfMonth(year, time.October, time.Sunday, 3)
+			return kronos.InternalGetLastWeekdayOfMonth(year, time.October, time.Sunday, 3)
 		},
 	},
 	"CEST": 120,
