@@ -9,77 +9,25 @@ import (
 // AssignSimilarDate assigns (force updates) the parsing components to the same day as the target.
 // This sets year, month, and day as certain (known) values.
 func AssignSimilarDate(components *kronos.InternalParsingComponents, date time.Time) {
-	components.Assign(kronos.ComponentDay, date.Day())
-	components.Assign(kronos.ComponentMonth, int(date.Month()))
-	components.Assign(kronos.ComponentYear, date.Year())
+	components.AssignSimilarDate(date)
 }
 
 // AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
 func AssignSimilarTime(components *kronos.InternalParsingComponents, date time.Time) {
-	components.Assign(kronos.ComponentHour, date.Hour())
-	components.Assign(kronos.ComponentMinute, date.Minute())
-	components.Assign(kronos.ComponentSecond, date.Second())
-
-	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
-	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
-
-	components.Assign(kronos.ComponentMillisecond, millisecond)
-	if microsecond > 0 {
-		components.Assign(kronos.ComponentMicrosecond, microsecond)
-	}
-	if nanosecond > 0 {
-		components.Assign(kronos.ComponentNanosecond, nanosecond)
-	}
-
-	// Set meridiem based on hour
-	if date.Hour() < 12 {
-		components.Assign(kronos.ComponentMeridiem, 0) // AM
-	} else {
-		components.Assign(kronos.ComponentMeridiem, 1) // PM
-	}
+	components.AssignSimilarTime(date)
 }
 
 // ImplySimilarDate implies (weakly updates) the parsing components to the same day as the target.
 // This sets year, month, and day as implied values (only if not already certain).
 func ImplySimilarDate(components *kronos.InternalParsingComponents, date time.Time) {
-	components.Imply(kronos.ComponentDay, date.Day())
-	components.Imply(kronos.ComponentMonth, int(date.Month()))
-	components.Imply(kronos.ComponentYear, date.Year())
+	components.ImplySimilarDate(date)
 }
 
 // ImplySimilarTime implies (weakly updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
 func ImplySimilarTime(components *kronos.InternalParsingComponents, date time.Time) {
-	components.Imply(kronos.ComponentHour, date.Hour())
-	components.Imply(kronos.ComponentMinute, date.Minute())
-	components.Imply(kronos.ComponentSecond, date.Second())
-
-	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
-	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
-
-	components.Imply(kronos.ComponentMillisecond, millisecond)
-	if microsecond > 0 {
-		components.Imply(kronos.ComponentMicrosecond, microsecond)
-	}
-	if nanosecond > 0 {
-		components.Imply(kronos.ComponentNanosecond, nanosecond)
-	}
-
-	// Set meridiem based on hour
-	if date.Hour() < 12 {
-		components.Imply(kronos.ComponentMeridiem, 0) // AM
-	} else {
-		components.Imply(kronos.ComponentMeridiem, 1) // PM
-	}
+	components.ImplySimilarTime(date)
 }
 
 // MergeDateTimeComponent merges date and time components.

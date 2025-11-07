@@ -7,16 +7,6 @@ import (
 )
 
 // Package helpers contains internal helper functions for the kronos package.
-//
-// NOTE ON APPARENT DUPLICATION:
-// Many functions in this file have similar implementations in internal/helpers.
-// This is intentional and necessary to avoid import cycles:
-//   - internal/helpers provides functions for use by internal parsers/refiners
-//   - This file provides functions for use by main package code
-//   - Go's import cycle restrictions prevent consolidation into a single location
-//
-// The implementations are kept in sync manually. When modifying these functions,
-// ensure corresponding changes are made in internal/helpers if applicable.
 
 // ============================================================================
 // Type casting helpers
@@ -134,78 +124,22 @@ func removeZeroWidthChars(s string) string {
 // Date/time assignment and implication helpers
 // ============================================================================
 
-// assignSimilarDate assigns (force updates) the parsing components to the same day as the target.
-// This sets year, month, and day as certain (known) values.
+// assignSimilarDate is a convenience wrapper around AssignSimilarDate for backwards compatibility.
 func assignSimilarDate(components *parsingComponents, date time.Time) {
-	components.Assign(ComponentDay, date.Day())
-	components.Assign(ComponentMonth, int(date.Month()))
-	components.Assign(ComponentYear, date.Year())
+	components.AssignSimilarDate(date)
 }
 
-// assignSimilarTime assigns (force updates) the parsing components to the same time as the target.
-// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
+// assignSimilarTime is a convenience wrapper around AssignSimilarTime for backwards compatibility.
 func assignSimilarTime(components *parsingComponents, date time.Time) {
-	components.Assign(ComponentHour, date.Hour())
-	components.Assign(ComponentMinute, date.Minute())
-	components.Assign(ComponentSecond, date.Second())
-
-	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
-	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
-
-	components.Assign(ComponentMillisecond, millisecond)
-	if microsecond > 0 {
-		components.Assign(ComponentMicrosecond, microsecond)
-	}
-	if nanosecond > 0 {
-		components.Assign(ComponentNanosecond, nanosecond)
-	}
-
-	// Set meridiem based on hour
-	if date.Hour() < 12 {
-		components.Assign(ComponentMeridiem, 0) // AM
-	} else {
-		components.Assign(ComponentMeridiem, 1) // PM
-	}
+	components.AssignSimilarTime(date)
 }
 
-// implySimilarDate implies (weakly updates) the parsing components to the same day as the target.
-// This sets year, month, and day as implied values (only if not already certain).
+// implySimilarDate is a convenience wrapper around ImplySimilarDate for backwards compatibility.
 func implySimilarDate(components *parsingComponents, date time.Time) {
-	components.Imply(ComponentDay, date.Day())
-	components.Imply(ComponentMonth, int(date.Month()))
-	components.Imply(ComponentYear, date.Year())
+	components.ImplySimilarDate(date)
 }
 
-// implySimilarTime implies (weakly updates) the parsing components to the same time as the target.
-// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
+// implySimilarTime is a convenience wrapper around ImplySimilarTime for backwards compatibility.
 func implySimilarTime(components *parsingComponents, date time.Time) {
-	components.Imply(ComponentHour, date.Hour())
-	components.Imply(ComponentMinute, date.Minute())
-	components.Imply(ComponentSecond, date.Second())
-
-	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
-	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
-
-	components.Imply(ComponentMillisecond, millisecond)
-	if microsecond > 0 {
-		components.Imply(ComponentMicrosecond, microsecond)
-	}
-	if nanosecond > 0 {
-		components.Imply(ComponentNanosecond, nanosecond)
-	}
-
-	// Set meridiem based on hour
-	if date.Hour() < 12 {
-		components.Imply(ComponentMeridiem, 0) // AM
-	} else {
-		components.Imply(ComponentMeridiem, 1) // PM
-	}
+	components.ImplySimilarTime(date)
 }

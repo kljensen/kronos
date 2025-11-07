@@ -358,6 +358,82 @@ func (pc *parsingComponents) SetPeriod(period Period) *parsingComponents {
 	return pc
 }
 
+// AssignSimilarDate assigns (force updates) the parsing components to the same day as the target.
+// This sets year, month, and day as certain (known) values.
+func (pc *parsingComponents) AssignSimilarDate(date time.Time) {
+	pc.Assign(ComponentDay, date.Day())
+	pc.Assign(ComponentMonth, int(date.Month()))
+	pc.Assign(ComponentYear, date.Year())
+}
+
+// AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
+// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
+func (pc *parsingComponents) AssignSimilarTime(date time.Time) {
+	pc.Assign(ComponentHour, date.Hour())
+	pc.Assign(ComponentMinute, date.Minute())
+	pc.Assign(ComponentSecond, date.Second())
+
+	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
+	totalNanos := date.Nanosecond()
+	millisecond := totalNanos / 1000000
+	remainingNanos := totalNanos % 1000000
+	microsecond := remainingNanos / 1000
+	nanosecond := remainingNanos % 1000
+
+	pc.Assign(ComponentMillisecond, millisecond)
+	if microsecond > 0 {
+		pc.Assign(ComponentMicrosecond, microsecond)
+	}
+	if nanosecond > 0 {
+		pc.Assign(ComponentNanosecond, nanosecond)
+	}
+
+	// Set meridiem based on hour
+	if date.Hour() < 12 {
+		pc.Assign(ComponentMeridiem, 0) // AM
+	} else {
+		pc.Assign(ComponentMeridiem, 1) // PM
+	}
+}
+
+// ImplySimilarDate implies (weakly updates) the parsing components to the same day as the target.
+// This sets year, month, and day as implied values (only if not already certain).
+func (pc *parsingComponents) ImplySimilarDate(date time.Time) {
+	pc.Imply(ComponentDay, date.Day())
+	pc.Imply(ComponentMonth, int(date.Month()))
+	pc.Imply(ComponentYear, date.Year())
+}
+
+// ImplySimilarTime implies (weakly updates) the parsing components to the same time as the target.
+// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
+func (pc *parsingComponents) ImplySimilarTime(date time.Time) {
+	pc.Imply(ComponentHour, date.Hour())
+	pc.Imply(ComponentMinute, date.Minute())
+	pc.Imply(ComponentSecond, date.Second())
+
+	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
+	totalNanos := date.Nanosecond()
+	millisecond := totalNanos / 1000000
+	remainingNanos := totalNanos % 1000000
+	microsecond := remainingNanos / 1000
+	nanosecond := remainingNanos % 1000
+
+	pc.Imply(ComponentMillisecond, millisecond)
+	if microsecond > 0 {
+		pc.Imply(ComponentMicrosecond, microsecond)
+	}
+	if nanosecond > 0 {
+		pc.Imply(ComponentNanosecond, nanosecond)
+	}
+
+	// Set meridiem based on hour
+	if date.Hour() < 12 {
+		pc.Imply(ComponentMeridiem, 0) // AM
+	} else {
+		pc.Imply(ComponentMeridiem, 1) // PM
+	}
+}
+
 // DeterminePeriodFromDuration determines the granularity/period based on a duration.
 // The period represents the finest time unit present in the duration.
 // This follows the pattern from Python's dateparser.
@@ -471,12 +547,12 @@ func createRelativeFromReference(reference *referenceWithTimezone, duration Dura
 	if hasTimeComponents {
 		// Duration includes time - assign both date and time as certain
 		components.AddTag("result/relativeDateAndTime")
-		assignSimilarTime(components, date)
-		assignSimilarDate(components, date)
+		components.AssignSimilarTime(date)
+		components.AssignSimilarDate(date)
 		components.Assign(ComponentTimezoneOffset, reference.GetTimezoneOffset())
 	} else {
 		// Duration is date-only - imply time components
-		implySimilarTime(components, date)
+		components.ImplySimilarTime(date)
 		components.Imply(ComponentTimezoneOffset, reference.GetTimezoneOffset())
 
 		// Handle different date granularities
@@ -536,8 +612,8 @@ func (pc *parsingComponents) AddDurationAsImplied(duration Duration) *parsingCom
 	}
 
 	// Imply the new date components
-	implySimilarDate(pc, newDate)
-	implySimilarTime(pc, newDate)
+	pc.ImplySimilarDate(newDate)
+	pc.ImplySimilarTime(newDate)
 
 	return pc
 }
@@ -821,9 +897,9 @@ func mergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 		if dateResult.End() == nil && endDateTime.Date().Before(result.Start().Date()) {
 			nextDay := endDateTime.Date().Add(24 * time.Hour)
 			if endDateTime.IsCertain(ComponentDay) {
-				assignSimilarDate(endDateTime, nextDay)
+				endDateTime.AssignSimilarDate(nextDay)
 			} else {
-				implySimilarDate(endDateTime, nextDay)
+				endDateTime.ImplySimilarDate(nextDay)
 			}
 		}
 
