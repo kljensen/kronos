@@ -64,25 +64,10 @@ func AsParsingComponents(pc kronos.Components) (*kronos.InternalParsingComponent
 	return components, true
 }
 
-// NewParsingContext creates a new ParsingContext for parsing operations.
-func NewParsingContext(text string, refDate interface{}, option *kronos.InternalParsingOption) *kronos.InternalParsingContext {
-	return kronos.InternalNewParsingContext(text, refDate, option)
-}
-
 // NewParsingComponents creates a new ParsingComponents with the given reference.
 // It initializes implied values based on the reference date.
 func NewParsingComponents(reference *kronos.InternalReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.InternalParsingComponents {
 	return kronos.InternalNewParsingComponents(reference, knownComponents)
-}
-
-// NewParsingResult creates a new ParsingResult with the given parameters.
-func NewParsingResult(reference *kronos.InternalReferenceWithTimezone, index int, text string, start, end *kronos.InternalParsingComponents) *kronos.InternalParsingResult {
-	return kronos.InternalNewParsingResult(reference, index, text, start, end)
-}
-
-// MergeDateTimeResultWrapper merges a date-only result with a time-only result.
-func MergeDateTimeResultWrapper(dateResult, timeResult *kronos.InternalParsingResult) *kronos.InternalParsingResult {
-	return kronos.InternalMergeDateTimeResult(dateResult, timeResult)
 }
 
 // ApproximationWords is a list of words that indicate approximate time expressions
