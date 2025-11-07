@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 	"time"
+
+	"github.com/kljensen/kronos/internal/sanitization"
 )
 
 // ============================================================================
@@ -55,7 +57,7 @@ func newParsingContext(text string, refDate interface{}, settings Settings) *par
 	reference := fromInput(refDate, timezones)
 
 	// Sanitize input text to handle Unicode normalization issues
-	text = sanitizeInput(text)
+	text = sanitization.SanitizeInput(text)
 
 	return &parsingContext{
 		text:      text,

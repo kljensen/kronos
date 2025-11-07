@@ -1,15 +1,11 @@
-package kronos
+package sanitization
 
 import (
 	"regexp"
 	"strings"
 )
 
-// Package helpers contains internal helper functions for the kronos package.
-
-// ============================================================================
 // Input sanitization for Unicode normalization
-// ============================================================================
 
 // apostropheLookalikes contains Unicode characters that look like apostrophes
 // but should be normalized to ASCII apostrophe (U+0027) for parsing.
@@ -43,7 +39,7 @@ var zeroWidthChars = []rune{
 // multiSpaceRegex matches one or more whitespace characters.
 var multiSpaceRegex = regexp.MustCompile(`\s+`)
 
-// sanitizeInput performs comprehensive Unicode normalization on input text
+// SanitizeInput performs comprehensive Unicode normalization on input text
 // to handle apostrophe variants, non-breaking spaces, zero-width characters,
 // and other Unicode normalization issues that commonly occur in real-world input.
 //
@@ -55,7 +51,7 @@ var multiSpaceRegex = regexp.MustCompile(`\s+`)
 // 5. Removes zero-width characters
 // 6. Collapses multiple consecutive whitespace characters to single space
 // 7. Trims leading and trailing whitespace
-func sanitizeInput(input string) string {
+func SanitizeInput(input string) string {
 	// 1. Normalize apostrophes to ASCII '
 	input = normalizeApostrophes(input)
 
