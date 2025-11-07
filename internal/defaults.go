@@ -10,6 +10,8 @@ import (
 // Values can be either:
 // - int: a fixed offset in minutes
 // - AmbiguousTimezoneMap: for timezones that observe DST
+//
+//nolint:staticcheck // SA1019 Internal package legitimately uses deprecated types
 var DefaultTimezoneAbbrMap = kronos.TimezoneAbbrMap{
 	// UTC/GMT
 	"UTC": 0,

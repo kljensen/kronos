@@ -1,3 +1,4 @@
+//nolint:staticcheck // SA1019 Test file uses deprecated internal APIs for testing
 package en
 
 // Tests ported from chrono's en_year_month_day.test.ts
