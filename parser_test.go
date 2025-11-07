@@ -134,13 +134,13 @@ func TestPackageLevelParse(t *testing.T) {
 	}
 	chrono := NewChrono(config)
 
-	// Test Parse - should not panic even with no parsers
-	results, err := Parse("test", chrono)
+	// Test Parse via builder - should not panic even with no parsers
+	results, err := New(chrono).Parse("test")
 	assert.NoError(t, err)
 	assert.NotNil(t, results)
 
-	// Test ParseDate - should not panic even with no parsers
-	date, err := ParseDate("test", chrono)
+	// Test ParseDate via builder - should not panic even with no parsers
+	date, err := New(chrono).ParseDate("test")
 	assert.NoError(t, err)
 	assert.Nil(t, date) // No parsers, no results
 }
