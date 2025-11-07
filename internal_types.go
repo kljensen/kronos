@@ -39,19 +39,9 @@ type InternalParsingResultWithBoundary = parsingResultWithBoundary
 
 // Constructor functions for internal packages
 
-// InternalNewParsingContext creates a parsing context (internal use only).
-func InternalNewParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
-	return newParsingContextFromOption(text, refDate, option)
-}
-
 // InternalNewParsingComponents creates parsing components (internal use only).
 func InternalNewParsingComponents(reference *referenceWithTimezone, knownComponents map[Component]int) *parsingComponents {
 	return newParsingComponents(reference, knownComponents)
-}
-
-// InternalNewParsingResult creates a parsing result (internal use only).
-func InternalNewParsingResult(reference *referenceWithTimezone, index int, text string, start, end *parsingComponents) *parsingResult {
-	return newParsingResult(reference, index, text, start, end)
 }
 
 // InternalNewReferenceWithTimezone creates a reference with timezone (internal use only).
@@ -67,16 +57,6 @@ func InternalMergeDateTimeResult(dateResult, timeResult *parsingResult) *parsing
 // InternalMergeDateTimeComponent merges date and time components (internal use only).
 func InternalMergeDateTimeComponent(dateComp, timeComp *parsingComponents) *parsingComponents {
 	return mergeDateTimeComponent(dateComp, timeComp)
-}
-
-// InternalValidateSettings validates parsing settings (internal use only).
-func InternalValidateSettings(s Settings) error {
-	return validateSettings(s)
-}
-
-// InternalParseWithSettings parses text with custom settings (internal use only).
-func InternalParseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*parsingResult, error) {
-	return parseWithSettings(text, refDate, settings, config)
 }
 
 // Weekday calculation helpers for internal packages
