@@ -50,7 +50,7 @@ func demonstrateCommonOptions() {
 	// US format (Month/Day/Year)
 	parser := en.New().
 		WithReferenceDate(refDate).
-		WithDateOrder(kronos.DateOrderMDY).
+		DateOrder(kronos.DateOrderMDY).
 		Casual()
 
 	results, _ := parser.Parse("12/25/2024")
@@ -60,7 +60,7 @@ func demonstrateCommonOptions() {
 
 	// European format (Day/Month/Year)
 	parser = en.New().
-		WithDateOrder(kronos.DateOrderDMY).
+		DateOrder(kronos.DateOrderDMY).
 		PreferFuture() // Prefer future dates
 
 	results, _ = parser.Parse("25/12/2024")
@@ -98,7 +98,7 @@ func demonstrateCombinedOptions() {
 	// Chain multiple configuration methods
 	parser := en.New().
 		WithReferenceDate(refDate).
-		WithDateOrder(kronos.DateOrderDMY).
+		DateOrder(kronos.DateOrderDMY).
 		Strict().
 		PreferFuture()
 

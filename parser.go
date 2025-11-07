@@ -83,11 +83,6 @@ func (p *ParserBuilder) DateOrder(order DateOrder) *ParserBuilder {
 	return p
 }
 
-// WithDateOrder is an alias for DateOrder that follows the With* naming convention.
-func (p *ParserBuilder) WithDateOrder(order DateOrder) *ParserBuilder {
-	return p.DateOrder(order)
-}
-
 // PreferPast configures the parser to prefer past dates when ambiguous.
 // For example, "March" in November would be interpreted as last March.
 func (p *ParserBuilder) PreferPast() *ParserBuilder {
@@ -174,28 +169,6 @@ func (p *ParserBuilder) ParseDate(text string) (*time.Time, error) {
 		return &date, nil
 	}
 	return nil, nil
-}
-
-// Parse is a package-level convenience function for parsing dates.
-// It uses default settings and the current time as reference.
-// For more control, use New() to create a ParserBuilder and configure it.
-//
-// Example:
-//
-//	results, err := kronos.Parse("tomorrow at 3pm", en.Casual)
-func Parse(text string, chrono *Chrono) ([]Result, error) {
-	return New(chrono).Parse(text)
-}
-
-// ParseDate is a package-level convenience function for parsing a single date.
-// It returns the first parsed date or nil if no date is found.
-// For more control, use New() to create a ParserBuilder and configure it.
-//
-// Example:
-//
-//	date, err := kronos.ParseDate("tomorrow at 3pm", en.Casual)
-func ParseDate(text string, chrono *Chrono) (*time.Time, error) {
-	return New(chrono).ParseDate(text)
 }
 
 // Settings returns a copy of the current settings for inspection.

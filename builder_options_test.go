@@ -11,7 +11,7 @@ func TestBuilderWithCommonOptions(t *testing.T) {
 
 	builder := New(nil).
 		WithReferenceDate(refDate).
-		WithDateOrder(DateOrderDMY).
+		DateOrder(DateOrderDMY).
 		PreferFuture().
 		Strict()
 
@@ -93,7 +93,7 @@ func TestBuilderChaining(t *testing.T) {
 	// This should not panic
 	_ = New(nil).
 		WithReferenceDate(refDate).
-		WithDateOrder(DateOrderYMD).
+		DateOrder(DateOrderYMD).
 		PreferPast().
 		Strict().
 		Timezone("UTC")
