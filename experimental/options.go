@@ -7,15 +7,16 @@ import (
 
 // Option is a function that modifies parser settings.
 // This allows advanced configuration without cluttering the main builder API.
+//
+// Deprecated: The experimental options are being removed. Use the main ParserBuilder
+// API methods instead (PreferPast(), PreferFuture(), DateOrder(), etc.).
 type Option func(*kronos.Settings)
 
 // WithDayPreference sets how to interpret day when it's ambiguous.
 // Use DayPreferCurrent (default), DayPreferFirst, or DayPreferLast.
 //
-// Example:
-//
-//	builder := kronos.New().
-//	    WithOption(experimental.WithDayPreference(kronos.DayPreferFirst))
+// Deprecated: This option exposes internal implementation details. If you need
+// this level of control, access Settings directly via ParserBuilder.Settings().
 func WithDayPreference(pref kronos.DayPreference) Option {
 	return func(s *kronos.Settings) {
 		s.PreferDayOfMonth = pref
@@ -25,10 +26,8 @@ func WithDayPreference(pref kronos.DayPreference) Option {
 // WithTimezoneAware enables returning timezone information in results.
 // This is an experimental feature.
 //
-// Example:
-//
-//	builder := kronos.New().
-//	    WithOption(experimental.WithTimezoneAware(true))
+// Deprecated: This option exposes internal implementation details. If you need
+// this level of control, access Settings directly via ParserBuilder.Settings().
 func WithTimezoneAware(aware bool) Option {
 	return func(s *kronos.Settings) {
 		s.ReturnTimezoneAware = aware
@@ -38,10 +37,8 @@ func WithTimezoneAware(aware bool) Option {
 // WithTimeAsPeriod enables tracking parsing granularity.
 // This tracks whether the parser found year, month, day, or time precision.
 //
-// Example:
-//
-//	builder := kronos.New().
-//	    WithOption(experimental.WithTimeAsPeriod(true))
+// Deprecated: This option exposes internal implementation details. If you need
+// this level of control, access Settings directly via ParserBuilder.Settings().
 func WithTimeAsPeriod(asPeriod bool) Option {
 	return func(s *kronos.Settings) {
 		s.ReturnTimeAsPeriod = asPeriod
@@ -53,16 +50,8 @@ func WithTimeAsPeriod(asPeriod bool) Option {
 // Values can be either a simple offset in minutes (int) or an AmbiguousTimezoneMap
 // for timezones that observe DST.
 //
-// Example:
-//
-//	import "github.com/kljensen/kronos/experimental"
-//
-//	customTimezones := kronos.TimezoneAbbrMap{
-//	    "CUSTOM": 123,  // Custom timezone at UTC+2:03
-//	    "TEST": -456,   // Custom timezone at UTC-7:36
-//	}
-//	builder := kronos.New().
-//	    WithOption(experimental.WithTimezoneOverrides(customTimezones))
+// Deprecated: This option exposes internal implementation details. If you need
+// this level of control, access Settings directly via ParserBuilder.Settings().
 func WithTimezoneOverrides(timezones kronos.TimezoneAbbrMap) Option {
 	return func(s *kronos.Settings) {
 		s.TimezoneOverrides = timezones
@@ -73,15 +62,8 @@ func WithTimezoneOverrides(timezones kronos.TimezoneAbbrMap) Option {
 // This is useful for understanding how the parser works and debugging issues.
 // The handler receives debug messages during parsing.
 //
-// Example:
-//
-//	import "log"
-//	import "github.com/kljensen/kronos/experimental"
-//
-//	builder := kronos.New().
-//	    WithOption(experimental.WithDebugHandler(func(msg string) {
-//	        log.Printf("DEBUG: %s", msg)
-//	    }))
+// Deprecated: This option exposes internal implementation details. If you need
+// this level of control, access Settings directly via ParserBuilder.Settings().
 func WithDebugHandler(handler kronos.DebugHandler) Option {
 	return func(s *kronos.Settings) {
 		s.DebugHandler = handler

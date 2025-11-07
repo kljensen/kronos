@@ -6,7 +6,6 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/experimental"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -223,7 +222,7 @@ func TestNoonMidnightKeywords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono()
+			chrono := CasualChrono()
 			results := chrono.Parse(tt.text, tt.refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
@@ -251,7 +250,7 @@ func TestNoonMidnightKeywords(t *testing.T) {
 
 // TestNoonMidnightEdgeCases tests edge cases and potential issues
 func TestNoonMidnightEdgeCases(t *testing.T) {
-	chrono := experimental.EnglishCasualChrono()
+	chrono := CasualChrono()
 
 	t.Run("midnight should be hour 0, not hour 12", func(t *testing.T) {
 		refDate := time.Date(2023, 1, 1, 14, 0, 0, 0, time.UTC)
@@ -305,7 +304,7 @@ func TestNoonMidnightEdgeCases(t *testing.T) {
 
 // TestNoonMidnightWithTimezones tests noon/midnight with timezone expressions
 func TestNoonMidnightWithTimezones(t *testing.T) {
-	chrono := experimental.EnglishCasualChrono()
+	chrono := CasualChrono()
 
 	tests := []struct {
 		name         string

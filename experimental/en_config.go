@@ -94,18 +94,24 @@ func createConfiguration(strictMode, littleEndian bool) *Configuration {
 
 // EnglishCasualChrono creates a Chrono instance configured for parsing casual English.
 // It recognizes informal expressions like "today", "tomorrow", "next week", etc.
+//
+// Deprecated: Use en.CasualChrono() or better yet, en.New() for the builder API.
 func EnglishCasualChrono() *Chrono {
 	return NewChrono(createCasualConfiguration(false))
 }
 
 // EnglishStrictChrono creates a Chrono instance configured for parsing strict English.
 // It only recognizes formal date/time patterns and avoids casual expressions.
+//
+// Deprecated: Use en.StrictChrono() or better yet, en.NewStrict() for the builder API.
 func EnglishStrictChrono() *Chrono {
 	return NewChrono(createConfiguration(true, false))
 }
 
 // EnglishGBChrono creates a Chrono instance configured for parsing UK-style English.
 // It uses little-endian date format (day/month/year) and casual expressions.
+//
+// Deprecated: Use en.GBChrono() or better yet, en.NewGB() for the builder API.
 func EnglishGBChrono() *Chrono {
 	return NewChrono(createCasualConfiguration(true))
 }

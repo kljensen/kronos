@@ -5,7 +5,6 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
-	"github.com/kljensen/kronos/experimental"
 )
 
 // TestPerformanceWhitespaceBacktracking tests that parsing doesn't exhibit
@@ -33,7 +32,7 @@ func TestPerformanceWhitespaceBacktracking(t *testing.T) {
 
 	start := time.Now()
 	refDate := time.Now()
-	chrono := experimental.EnglishCasualChrono()
+	chrono := CasualChrono()
 	results, err := kronos.New(chrono).WithReferenceDate(refDate).Parse(str)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

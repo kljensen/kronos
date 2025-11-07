@@ -410,7 +410,7 @@ func TestENMonthNameLittleEndianParser_ImpossibleDatesStrictMode(t *testing.T) {
 			t.Skip("Strict mode date validation refiners not yet implemented")
 			t.Logf("Text: %s, Reason: %s", tt.text, tt.reason)
 			// TODO: When strict mode refiners are implemented:
-			// strictChrono := experimental.EnglishStrictChrono()
+			// strictChrono := StrictChrono()
 			// results := strictChrono.Parse(tt.text, tt.refDate, nil)
 			// assert.Empty(t, results, "Should not parse in strict mode: %s (%s)", tt.text, tt.reason)
 		})

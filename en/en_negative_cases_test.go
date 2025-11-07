@@ -1,8 +1,5 @@
 //nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
-
-import "github.com/kljensen/kronos/experimental"
-
 // Tests ported from chrono's negative_cases.test.ts
 //
 // Summary of 38 original test cases:
@@ -49,7 +46,7 @@ func TestNegativeRandomNonDatePatterns(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			refDate := time.Now()
@@ -80,7 +77,7 @@ func TestNegativeURLEncoded(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)
@@ -107,7 +104,7 @@ func TestNegativeHyphenatedNumbers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)
@@ -133,7 +130,7 @@ func TestNegativeImpossibleDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)
@@ -154,7 +151,7 @@ func TestNegativeImpossibleDateRanges(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)
@@ -176,7 +173,7 @@ func TestNegativeVersionNumbers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)
@@ -196,7 +193,7 @@ func TestNegativeIncorrectReference(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)
@@ -231,7 +228,7 @@ func TestPositiveDateWithVersionNumber(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := experimental.EnglishCasualChrono() // was CreateCasualConfiguration(false)
+			chrono := CasualChrono() // was CreateCasualConfiguration(false)
 			// chrono created above
 
 			results := chrono.Parse(tt.text, time.Now(), nil)

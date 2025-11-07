@@ -1,6 +1,5 @@
-// Package main demonstrates the new builder API for kronos.
-// This shows how to use the simplified API for common options
-// and the experimental package for advanced options.
+// Package main demonstrates the builder API for kronos.
+// This shows how to use the fluent API for common parsing configurations.
 package main
 
 import (
@@ -9,13 +8,11 @@ import (
 
 	"github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/en"
-	"github.com/kljensen/kronos/experimental"
 )
 
 func main() {
 	demonstrateSimpleAPI()
 	demonstrateCommonOptions()
-	demonstrateExperimentalOptions()
 	demonstrateCombinedOptions()
 }
 
@@ -46,7 +43,7 @@ func demonstrateSimpleAPI() {
 
 // demonstrateCommonOptions shows the builder API for common use cases.
 func demonstrateCommonOptions() {
-	fmt.Println("=== Common Options (Main Package) ===")
+	fmt.Println("=== Common Options ===")
 
 	refDate := time.Date(2024, 3, 15, 12, 0, 0, 0, time.UTC)
 
@@ -81,81 +78,29 @@ func demonstrateCommonOptions() {
 		fmt.Printf("Strict mode: %v\n", results[0].Date())
 	}
 
-	fmt.Println()
-}
+	// British English (DMY order)
+	parser = en.NewGB().WithReferenceDate(refDate)
 
-// demonstrateExperimentalOptions shows advanced options via the experimental package.
-func demonstrateExperimentalOptions() {
-	fmt.Println("=== Advanced Options (Experimental Package) ===")
-
-	// Custom timezone overrides
-	customTimezones := kronos.TimezoneAbbrMap{
-		"CUSTOM": 123, // UTC+2:03
-	}
-	parser := en.New().
-		WithOption(experimental.WithTimezoneOverrides(customTimezones))
-
-	results, _ := parser.Parse("3pm CUSTOM")
+	results, _ = parser.Parse("15/3/2024")
 	if len(results) > 0 {
-		fmt.Printf("With custom timezone: %v\n", results[0].Date())
-	}
-
-	// Debug handler
-	parser = en.New().
-		WithOption(experimental.WithDebugHandler(func(msg string) {
-			// In real code, you might log this
-			// fmt.Printf("DEBUG: %s\n", msg)
-		}))
-
-	results, _ = parser.Parse("tomorrow")
-	if len(results) > 0 {
-		fmt.Printf("With debug handler: %v\n", results[0].Date())
-	}
-
-	// Day preference
-	parser = en.New().
-		WithOption(experimental.WithDayPreference(kronos.DayPreferFirst))
-
-	results, _ = parser.Parse("March")
-	if len(results) > 0 {
-		fmt.Printf("With day preference: %v\n", results[0].Date())
-	}
-
-	// Timezone aware results
-	parser = en.New().
-		WithOption(experimental.WithTimezoneAware(true))
-
-	results, _ = parser.Parse("3pm EST")
-	if len(results) > 0 {
-		fmt.Printf("With timezone aware: %v\n", results[0].Date())
-	}
-
-	// Time as period tracking
-	parser = en.New().
-		WithOption(experimental.WithTimeAsPeriod(true))
-
-	results, _ = parser.Parse("2024")
-	if len(results) > 0 {
-		fmt.Printf("With time as period: %v\n", results[0].Date())
+		fmt.Printf("British format 15/3/2024: %v\n", results[0].Date())
 	}
 
 	fmt.Println()
 }
 
-// demonstrateCombinedOptions shows combining common and advanced options.
+// demonstrateCombinedOptions shows combining multiple configurations.
 func demonstrateCombinedOptions() {
 	fmt.Println("=== Combined Options ===")
 
 	refDate := time.Date(2024, 3, 15, 12, 0, 0, 0, time.UTC)
 
-	// Mix common and experimental options
+	// Chain multiple configuration methods
 	parser := en.New().
 		WithReferenceDate(refDate).
 		WithDateOrder(kronos.DateOrderDMY).
 		Strict().
-		PreferFuture().
-		WithOption(experimental.WithDayPreference(kronos.DayPreferFirst)).
-		WithOption(experimental.WithTimezoneAware(true))
+		PreferFuture()
 
 	results, _ := parser.Parse("15/03/2024")
 	if len(results) > 0 {

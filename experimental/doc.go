@@ -1,70 +1,67 @@
-// Package experimental contains advanced and potentially unstable features
-// for the kronos date parsing library.
+// Package experimental is DEPRECATED and will be removed in a future version.
 //
-// # Purpose
+// # Migration Guide
 //
-// This package provides the "escape hatch" for advanced users who need access
-// to internal parsing APIs. It re-exports types and functions from internal
-// packages that are useful for:
+// The experimental package has been deprecated because it was over-engineered
+// and exposed too many internal APIs. Most users never needed this package.
 //
-//   - Writing custom date/time parsers
-//   - Extending kronos with new parsing patterns
-//   - Building domain-specific date parsing solutions
-//   - Migrating from deprecated public APIs
+// ## Pre-configured Chronos (MOVED)
 //
-// # Stability Warning
+// The pre-configured Chrono instances have been moved to the en package:
 //
-// IMPORTANT: The experimental package APIs may change between minor versions.
-// While we will make efforts to maintain compatibility, breaking changes are
-// possible as the library evolves. Only use this package if you need advanced
-// customization that cannot be achieved through the main kronos package.
+//   - experimental.EnglishCasualChrono() → en.CasualChrono()
+//   - experimental.EnglishStrictChrono() → en.StrictChrono()
+//   - experimental.EnglishGBChrono() → en.GBChrono()
 //
-// # When to Use This Package
+// However, most users should use the builder API instead:
 //
-// Use this package if you need to:
+//   - en.New() for casual English parsing
+//   - en.NewStrict() for strict English parsing
+//   - en.NewGB() for British English parsing
 //
-//   - Create custom parsers that integrate with the kronos parsing system
-//   - Access parsing internals like ParsingContext, ParsingComponents, or ParsingResult
-//   - Use helper functions for date construction (Today, Tomorrow, etc.)
-//   - Perform complex date math with Duration and Timeunit
-//   - Configure advanced parsing behavior with Settings
+// ## Advanced Options (REMOVED)
 //
-// # For Most Users
+// The experimental options (WithDayPreference, WithTimezoneAware, etc.) have been
+// removed. These exposed internal settings that most users never needed. If you were
+// using these options, you have two alternatives:
 //
-// Most users should use the simpler functions in the main kronos package:
+// 1. Use the main ParserBuilder API which covers most use cases:
 //
-//   - kronos.Parse() - Parse natural language dates
-//   - kronos.ParseWithOption() - Parse with custom options
-//   - kronos.ParseMultiple() - Parse multiple dates from text
+//     parser := en.New().
+//         WithReferenceDate(refDate).
+//         PreferPast().
+//         DateOrder(kronos.DateOrderDMY)
 //
-// Only use this experimental package if you need to write custom parsers or
-// extend kronos functionality beyond what the main package provides.
+// 2. If you truly need low-level control, access the Settings directly via
+//    ParserBuilder.Settings() and modify them before calling Parse().
 //
-// # Migration Path
+// ## Low-level APIs (USE INTERNAL PACKAGES)
 //
-// This package provides a migration path for users who were using deprecated
-// public APIs (like the old ParsingContext, ParsingComponents, etc.). These
-// types have been moved to internal packages, and this experimental package
-// re-exports them with the same names for backward compatibility during the
-// transition period.
+// The low-level Chrono/Configuration/Parser/Refiner types are still available
+// in the main kronos package. If you need even lower-level access, you can
+// import the internal packages directly (though this is not recommended and
+// not covered by API stability guarantees).
 //
-// # Available APIs
+// ## Type Re-exports (USE MAIN PACKAGE)
 //
-// The experimental package re-exports:
+// All type re-exports (Component, Duration, Settings, etc.) are available in
+// the main kronos package. Simply import "github.com/kljensen/kronos" instead
+// of "github.com/kljensen/kronos/experimental".
 //
-//   - Type aliases: ParsingContext, ParsingComponents, ParsingResult, ReferenceWithTimezone
-//   - Factory functions: NewParsingContext, NewParsingComponents, NewParsingResult
-//   - Date constructors: Today, Tomorrow, Yesterday, Now, Midnight, Noon, Morning, Afternoon, Evening
-//   - Component helpers: AssignSimilarDate, AssignSimilarTime, MergeDateTimeComponent
-//   - Date math: GetLastWeekday, GetNextWeekday, GetThisWeekday, AddDuration, ReverseDuration
-//   - Year helpers: FindMostLikelyADYear, FindYearClosestToRefWithPreference
-//   - Data constants: DefaultTimezoneAbbrMap, ApproximationWords, EmptyDuration
-//   - Configuration types: Settings, DateOrder, DayPreference, DatePreference
-//   - Duration types: Duration, Timeunit, Period
-//   - Advanced parsing: Chrono, Configuration, Parser, Refiner, Pipeline
-//   - Registry: ParserRegistry, ParserInfo, ParserFactory, GlobalRegistry, Register
-//   - Pipeline functions: NewPipeline, NewPipelineWithSettings, ParseWithSettings
+// # Rationale
 //
-// See the package documentation and type definitions for detailed information
-// about each exported item.
+// The experimental package was originally created to provide an "escape hatch"
+// for advanced users and to help with API migration. However, it caused more
+// confusion than it solved:
+//
+//   - It wasn't clear what was "experimental" vs. stable
+//   - It exposed too many internal implementation details
+//   - It duplicated types from the main package
+//   - Most users never needed any of its features
+//
+// By removing it, we simplify the API surface and make the library easier to
+// understand and maintain.
+//
+// Deprecated: Use the en package for English parsing and the main kronos package
+// for types and configuration.
 package experimental
