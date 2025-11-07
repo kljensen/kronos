@@ -149,12 +149,18 @@ type Settings struct {
 func (s Settings) toparsingOption(timezones TimezoneAbbrMap) parsingOption {
 	// Merge default timezones with overrides
 	mergedTimezones := timezones
-	if s.TimezoneOverrides != nil {
+	if len(s.TimezoneOverrides) > 0 {
 		if mergedTimezones == nil {
-			mergedTimezones = make(TimezoneAbbrMap)
-		}
-		for k, v := range s.TimezoneOverrides {
-			mergedTimezones[k] = v
+			mergedTimezones = s.TimezoneOverrides
+		} else {
+			// Only create new map if we need to merge
+			mergedTimezones = make(TimezoneAbbrMap, len(timezones)+len(s.TimezoneOverrides))
+			for k, v := range timezones {
+				mergedTimezones[k] = v
+			}
+			for k, v := range s.TimezoneOverrides {
+				mergedTimezones[k] = v
+			}
 		}
 	}
 
@@ -209,9 +215,6 @@ func applySettings(text string, refDate time.Time, settings Settings) (*parsingC
 		return nil, err
 	}
 
-	// Apply normalization
-	text = sanitizeInput(text)
-
 	// Create parsing option from settings
 	opt := parsingOption{
 		Preference: settings.PreferDatesFrom,
@@ -220,7 +223,7 @@ func applySettings(text string, refDate time.Time, settings Settings) (*parsingC
 		Debug:      nil,
 	}
 
-	// Create context
+	// Create context (sanitization happens in newParsingContext)
 	ctx := newParsingContext(text, refDate, &opt)
 	ctx.settings = &settings
 

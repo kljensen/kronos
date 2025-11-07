@@ -12,6 +12,8 @@ var emptyDuration = Duration{
 	TimeunitMillisecond: 0,
 }
 
+const secondsPerMinute = 60
+
 // referenceWithTimezone represents a reference date/time with an optional timezone offset.
 // It is used as the reference point for parsing relative dates and times.
 type referenceWithTimezone struct {
@@ -79,8 +81,6 @@ func (r *referenceWithTimezone) GetDateWithAdjustedTimezone() time.Time {
 // GetSystemTimezoneAdjustmentMinute returns the number of minutes difference between
 // the system's timezone and the reference timezone.
 func (r *referenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time, overrideTimezoneOffset *int) int {
-	const secondsPerMinute = 60
-
 	if date.IsZero() || date.Unix() < 0 {
 		// Javascript date timezone calculation got effect when the time epoch < 0
 		date = time.Now()
@@ -102,8 +102,6 @@ func (r *referenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time
 // GetTimezoneOffset returns the timezone offset in minutes.
 // If no timezone offset is set, it returns the system timezone offset.
 func (r *referenceWithTimezone) GetTimezoneOffset() int {
-	const secondsPerMinute = 60
-
 	if r.timezoneOffset != nil {
 		return *r.timezoneOffset
 	}
