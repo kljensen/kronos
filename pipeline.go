@@ -10,23 +10,14 @@ import (
 // Internal parsing types
 // ============================================================================
 
-// parsingOption contains configuration options for parsing.
+// parsingOption contains configuration options for the deprecated Chrono API.
+// Deprecated: Use Settings instead. This type exists only for backward compatibility
+// with the deprecated Chrono.Parse() method.
 type parsingOption struct {
-	// ForwardDate indicates whether to parse only forward dates
-	// (results should be after the reference date).
-	ForwardDate bool
-
-	// Preference specifies how ambiguous dates should be resolved.
 	Preference DatePreference
-
-	// DateOrder specifies the order of date components in ambiguous formats.
-	DateOrder DateOrder
-
-	// Timezones provides additional timezone keywords for parsers to recognize.
-	Timezones TimezoneAbbrMap
-
-	// Debug is an internal debug event handler.
-	Debug DebugHandler
+	DateOrder  DateOrder
+	Timezones  TimezoneAbbrMap
+	Debug      DebugHandler
 }
 
 // parsingReference contains reference information for parsing dates/times.
@@ -50,27 +41,16 @@ type parsingReference struct {
 // in a future version.
 type parsingContext struct {
 	text      string
-	option    parsingOption
+	settings  Settings
 	reference *referenceWithTimezone
 	refDate   time.Time
-	settings  *Settings
 }
 
-// newParsingContext creates a new ParsingContext.
+// newParsingContext creates a new ParsingContext with Settings.
 // If refDate is nil, the current time is used.
-// If option is nil, default options are used.
 // The input text is sanitized to normalize Unicode characters before parsing.
-func newParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
-	var opt parsingOption
-	if option != nil {
-		opt = *option
-	}
-
-	var timezones TimezoneAbbrMap
-	if opt.Timezones != nil {
-		timezones = opt.Timezones
-	}
-
+func newParsingContext(text string, refDate interface{}, settings Settings) *parsingContext {
+	timezones := settings.GetTimezones(nil)
 	reference := fromInput(refDate, timezones)
 
 	// Sanitize input text to handle Unicode normalization issues
@@ -78,11 +58,30 @@ func newParsingContext(text string, refDate interface{}, option *parsingOption) 
 
 	return &parsingContext{
 		text:      text,
-		option:    opt,
+		settings:  settings,
 		reference: reference,
 		refDate:   reference.Instant(),
-		settings:  nil,
 	}
+}
+
+// newParsingContextFromOption creates a parsing context from the deprecated parsingOption.
+// Deprecated: This is for backward compatibility with the deprecated Chrono API.
+func newParsingContextFromOption(text string, refDate interface{}, option *parsingOption) *parsingContext {
+	var settings Settings
+	if option != nil {
+		settings = Settings{
+			DateOrder:         option.DateOrder,
+			PreferDatesFrom:   option.Preference,
+			Timezone:          "",
+			StrictParsing:     false,
+			TimezoneOverrides: option.Timezones,
+			DebugHandler:      option.Debug,
+		}
+	} else {
+		settings = DefaultSettings()
+	}
+
+	return newParsingContext(text, refDate, settings)
 }
 
 // CreateParsingComponents creates ParsingComponents from a component map or existing components.
@@ -162,7 +161,7 @@ func (ctx *parsingContext) CreateParsingResult(index int, textOrEndIndex interfa
 
 // Debug executes the provided function if debugging is enabled.
 func (ctx *parsingContext) Debug(fn func()) {
-	if ctx.option.Debug != nil {
+	if ctx.settings.DebugHandler != nil {
 		fn()
 	}
 }
@@ -172,9 +171,10 @@ func (ctx *parsingContext) Text() string {
 	return ctx.text
 }
 
-// Option returns the parsing options.
-func (ctx *parsingContext) Option() parsingOption {
-	return ctx.option
+// Option returns the parsing settings.
+// Deprecated: Use Settings() instead.
+func (ctx *parsingContext) Option() Settings {
+	return ctx.settings
 }
 
 // Reference returns the reference with timezone.
@@ -187,8 +187,8 @@ func (ctx *parsingContext) RefDate() time.Time {
 	return ctx.refDate
 }
 
-// Settings returns the parsing settings, if any.
-func (ctx *parsingContext) Settings() *Settings {
+// Settings returns the parsing settings.
+func (ctx *parsingContext) Settings() Settings {
 	return ctx.settings
 }
 

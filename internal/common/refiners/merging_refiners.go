@@ -268,7 +268,7 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.InternalParsingCon
 			continue
 		}
 
-		if context.Option().Debug != nil {
+		if context.Option().DebugHandler != nil {
 			context.Debug(func() {
 				// Log: Extracting timezone offset
 			})

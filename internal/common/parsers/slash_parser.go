@@ -202,7 +202,7 @@ func (p *SlashDateFormatParser) Extract(context *kronos.InternalParsingContext, 
 		components.Assign(kronos.ComponentYear, year)
 	} else {
 		// Use preference-aware year selection, which handles Feb 29 leap years
-		year := helpers.FindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().Preference)
+		year := helpers.FindYearClosestToRefWithPreference(context.RefDate(), day, month, context.Option().PreferDatesFrom)
 		components.Imply(kronos.ComponentYear, year)
 	}
 

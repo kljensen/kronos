@@ -10,7 +10,7 @@ func TestNewParsingContext(t *testing.T) {
 		text := "tomorrow at 3pm"
 		refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
 
-		ctx := newParsingContext(text, refDate, nil)
+		ctx := newParsingContext(text, refDate, DefaultSettings())
 
 		if ctx.Text() != text {
 			t.Errorf("Expected text '%s', got '%s'", text, ctx.Text())
@@ -35,7 +35,7 @@ func TestNewParsingContext(t *testing.T) {
 			Timezone: offset,
 		}
 
-		ctx := newParsingContext(text, parsingRef, nil)
+		ctx := newParsingContext(text, parsingRef, DefaultSettings())
 
 		if !ctx.RefDate().Equal(instant) {
 			t.Errorf("Expected refDate %v, got %v", instant, ctx.RefDate())
@@ -49,7 +49,7 @@ func TestNewParsingContext(t *testing.T) {
 	t.Run("NewParsingContext with nil refDate uses current time", func(t *testing.T) {
 		text := "tomorrow"
 		before := time.Now()
-		ctx := newParsingContext(text, nil, nil)
+		ctx := newParsingContext(text, nil, DefaultSettings())
 		after := time.Now()
 
 		if ctx.RefDate().Before(before) || ctx.RefDate().After(after) {
@@ -57,47 +57,50 @@ func TestNewParsingContext(t *testing.T) {
 		}
 	})
 
-	t.Run("NewParsingContext with nil option uses defaults", func(t *testing.T) {
+	t.Run("NewParsingContext with default settings", func(t *testing.T) {
 		text := "tomorrow"
-		ctx := newParsingContext(text, nil, nil)
+		ctx := newParsingContext(text, nil, DefaultSettings())
 
-		opt := ctx.Option()
+		settings := ctx.Settings()
 
-		if opt.ForwardDate {
+		if settings.ForwardDate() {
 			t.Errorf("Expected ForwardDate to be false by default")
 		}
 
-		if opt.Timezones != nil {
-			t.Errorf("Expected Timezones to be nil by default")
+		if settings.TimezoneOverrides != nil {
+			t.Errorf("Expected TimezoneOverrides to be nil by default")
 		}
 
-		if opt.Debug != nil {
-			t.Errorf("Expected Debug to be nil by default")
+		if settings.DebugHandler != nil {
+			t.Errorf("Expected DebugHandler to be nil by default")
 		}
 	})
 
-	t.Run("NewParsingContext with custom option", func(t *testing.T) {
+	t.Run("NewParsingContext with custom settings", func(t *testing.T) {
 		text := "tomorrow"
 		debugCalled := false
 		debugHandler := func(message string) {
 			debugCalled = true
 		}
 
-		option := &parsingOption{
-			ForwardDate: true,
-			Debug:       debugHandler,
+		settings := Settings{
+			DateOrder:       DateOrderMDY,
+			PreferDatesFrom: PreferFuture,
+			Timezone:        "UTC",
+			StrictParsing:   false,
+			DebugHandler:    debugHandler,
 		}
 
-		ctx := newParsingContext(text, nil, option)
+		ctx := newParsingContext(text, nil, settings)
 
-		opt := ctx.Option()
+		s := ctx.Settings()
 
-		if !opt.ForwardDate {
+		if !s.ForwardDate() {
 			t.Errorf("Expected ForwardDate to be true")
 		}
 
-		if opt.Debug == nil {
-			t.Errorf("Expected Debug handler to be set")
+		if s.DebugHandler == nil {
+			t.Errorf("Expected DebugHandler to be set")
 		}
 
 		// Verify debug handler works
@@ -113,7 +116,7 @@ func TestNewParsingContext(t *testing.T) {
 
 func TestCreateParsingComponents(t *testing.T) {
 	refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-	ctx := newParsingContext("test", refDate, nil)
+	ctx := newParsingContext("test", refDate, DefaultSettings())
 
 	t.Run("CreateParsingComponents with nil creates default", func(t *testing.T) {
 		pc := ctx.CreateParsingComponents(nil)
@@ -172,7 +175,7 @@ func TestCreateParsingComponents(t *testing.T) {
 
 func TestCreateParsingResult(t *testing.T) {
 	refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-	ctx := newParsingContext("tomorrow at 3pm", refDate, nil)
+	ctx := newParsingContext("tomorrow at 3pm", refDate, DefaultSettings())
 
 	t.Run("CreateParsingResult with text", func(t *testing.T) {
 		result := ctx.CreateParsingResult(0, "tomorrow")
@@ -297,11 +300,15 @@ func TestDebug(t *testing.T) {
 			called = true
 		}
 
-		option := &parsingOption{
-			Debug: debugHandler,
+		settings := Settings{
+			DateOrder:       DateOrderMDY,
+			PreferDatesFrom: PreferCurrentPeriod,
+			Timezone:        "UTC",
+			StrictParsing:   false,
+			DebugHandler:    debugHandler,
 		}
 
-		ctx := newParsingContext("test", nil, option)
+		ctx := newParsingContext("test", nil, settings)
 
 		ctx.Debug(func() {
 			debugHandler("test message")
@@ -313,7 +320,7 @@ func TestDebug(t *testing.T) {
 	})
 
 	t.Run("Debug does nothing when handler not set", func(t *testing.T) {
-		ctx := newParsingContext("test", nil, nil)
+		ctx := newParsingContext("test", nil, DefaultSettings())
 
 		// Should not panic
 		ctx.Debug(func() {
@@ -326,11 +333,14 @@ func TestDebug(t *testing.T) {
 func TestContextAccessors(t *testing.T) {
 	text := "tomorrow at 3pm"
 	refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-	option := &parsingOption{
-		ForwardDate: true,
+	settings := Settings{
+		DateOrder:       DateOrderMDY,
+		PreferDatesFrom: PreferFuture,
+		Timezone:        "UTC",
+		StrictParsing:   false,
 	}
 
-	ctx := newParsingContext(text, refDate, option)
+	ctx := newParsingContext(text, refDate, settings)
 
 	t.Run("Text returns input text", func(t *testing.T) {
 		if ctx.Text() != text {
@@ -338,10 +348,10 @@ func TestContextAccessors(t *testing.T) {
 		}
 	})
 
-	t.Run("Option returns parsing option", func(t *testing.T) {
-		opt := ctx.Option()
+	t.Run("Settings returns parsing settings", func(t *testing.T) {
+		s := ctx.Settings()
 
-		if !opt.ForwardDate {
+		if !s.ForwardDate() {
 			t.Errorf("Expected ForwardDate to be true")
 		}
 	})

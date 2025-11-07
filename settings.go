@@ -144,33 +144,32 @@ type Settings struct {
 	DebugHandler      DebugHandler    // Debug callback for parsing events
 }
 
-// toparsingOption converts Settings to parsingOption for backward compatibility.
-// This method is used internally to bridge Settings and parsingOption.
-func (s Settings) toparsingOption(timezones TimezoneAbbrMap) parsingOption {
-	// Merge default timezones with overrides
-	mergedTimezones := timezones
-	if len(s.TimezoneOverrides) > 0 {
-		if mergedTimezones == nil {
-			mergedTimezones = s.TimezoneOverrides
-		} else {
-			// Only create new map if we need to merge
-			mergedTimezones = make(TimezoneAbbrMap, len(timezones)+len(s.TimezoneOverrides))
-			for k, v := range timezones {
-				mergedTimezones[k] = v
-			}
-			for k, v := range s.TimezoneOverrides {
-				mergedTimezones[k] = v
-			}
-		}
+// ForwardDate returns whether dates should be interpreted as forward-looking.
+// This is true when PreferDatesFrom is set to PreferFuture.
+func (s Settings) ForwardDate() bool {
+	return s.PreferDatesFrom == PreferFuture
+}
+
+// GetTimezones merges default timezones with overrides.
+// Returns the merged timezone map for parsing.
+func (s Settings) GetTimezones(defaults TimezoneAbbrMap) TimezoneAbbrMap {
+	if len(s.TimezoneOverrides) == 0 {
+		return defaults
 	}
 
-	return parsingOption{
-		ForwardDate: s.PreferDatesFrom == PreferFuture,
-		Preference:  s.PreferDatesFrom,
-		DateOrder:   s.DateOrder,
-		Timezones:   mergedTimezones,
-		Debug:       s.DebugHandler,
+	if defaults == nil {
+		return s.TimezoneOverrides
 	}
+
+	// Merge defaults with overrides
+	merged := make(TimezoneAbbrMap, len(defaults)+len(s.TimezoneOverrides))
+	for k, v := range defaults {
+		merged[k] = v
+	}
+	for k, v := range s.TimezoneOverrides {
+		merged[k] = v
+	}
+	return merged
 }
 
 // DefaultSettings returns sensible default settings that maintain
@@ -207,7 +206,7 @@ func validateSettings(s Settings) error {
 	return nil
 }
 
-// ApplySettings creates a new ParsingContext with settings applied.
+// applySettings creates a new ParsingContext with settings applied.
 // This allows settings to influence the parsing context.
 func applySettings(text string, refDate time.Time, settings Settings) (*parsingContext, error) {
 	// Validate settings first
@@ -215,17 +214,7 @@ func applySettings(text string, refDate time.Time, settings Settings) (*parsingC
 		return nil, err
 	}
 
-	// Create parsing option from settings
-	opt := parsingOption{
-		Preference: settings.PreferDatesFrom,
-		DateOrder:  settings.DateOrder,
-		Timezones:  nil,
-		Debug:      nil,
-	}
-
-	// Create context (sanitization happens in newParsingContext)
-	ctx := newParsingContext(text, refDate, &opt)
-	ctx.settings = &settings
-
+	// Create context directly with settings
+	ctx := newParsingContext(text, refDate, settings)
 	return ctx, nil
 }

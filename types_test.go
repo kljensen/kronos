@@ -85,60 +85,8 @@ func TestTimeunitConstants(t *testing.T) {
 // These types are now internal only. Users should use time.Weekday and time.Month
 // from the standard library instead.
 
-// TestparsingOptionDefaults verifies parsingOption struct can be created with defaults.
-func TestParsingOptionDefaults(t *testing.T) {
-	opt := parsingOption{}
-
-	if opt.ForwardDate != false {
-		t.Errorf("Default ForwardDate should be false, got %v", opt.ForwardDate)
-	}
-
-	if opt.Timezones != nil {
-		t.Errorf("Default Timezones should be nil, got %v", opt.Timezones)
-	}
-
-	if opt.Debug != nil {
-		t.Errorf("Default Debug should be nil, got %v", opt.Debug)
-	}
-}
-
-// TestparsingOptionWithValues verifies parsingOption can be created with values.
-func TestParsingOptionWithValues(t *testing.T) {
-	debugCalled := false
-	debugHandler := func(message string) {
-		debugCalled = true
-	}
-
-	timezones := make(TimezoneAbbrMap)
-	timezones["EST"] = -300
-
-	opt := parsingOption{
-		ForwardDate: true,
-		Timezones:   timezones,
-		Debug:       debugHandler,
-	}
-
-	if !opt.ForwardDate {
-		t.Errorf("ForwardDate should be true, got %v", opt.ForwardDate)
-	}
-
-	if opt.Timezones == nil {
-		t.Fatal("Timezones should not be nil")
-	}
-
-	if offset, ok := opt.Timezones["EST"].(int); !ok || offset != -300 {
-		t.Errorf("Expected EST offset to be -300, got %v", opt.Timezones["EST"])
-	}
-
-	if opt.Debug == nil {
-		t.Fatal("Debug handler should not be nil")
-	}
-
-	opt.Debug("test")
-	if !debugCalled {
-		t.Errorf("Debug handler was not called")
-	}
-}
+// NOTE: parsingOption tests removed as it's an internal implementation detail.
+// Settings tests are in settings_test.go
 
 // TestAmbiguousTimezoneMap verifies AmbiguousTimezoneMap structure.
 func TestAmbiguousTimezoneMap(t *testing.T) {

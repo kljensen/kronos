@@ -41,7 +41,7 @@ func (m *mockRefiner) Refine(context *parsingContext, results []*parsingResult) 
 func TestParser(t *testing.T) {
 	t.Run("Parser interface with mock implementation", func(t *testing.T) {
 		refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ctx := newParsingContext("test tomorrow", refDate, nil)
+		ctx := newParsingContext("test tomorrow", refDate, DefaultSettings())
 
 		patternCalled := false
 		extractCalled := false
@@ -95,7 +95,7 @@ func TestParser(t *testing.T) {
 	})
 
 	t.Run("Parser can return different result types", func(t *testing.T) {
-		ctx := newParsingContext("test", time.Now(), nil)
+		ctx := newParsingContext("test", time.Now(), DefaultSettings())
 
 		// Test returning component map
 		p1 := &mockParser{
@@ -150,7 +150,7 @@ func TestParser(t *testing.T) {
 func TestRefiner(t *testing.T) {
 	t.Run("Refiner interface with mock implementation", func(t *testing.T) {
 		refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ctx := newParsingContext("test", refDate, nil)
+		ctx := newParsingContext("test", refDate, DefaultSettings())
 
 		refineCalled := false
 
@@ -191,7 +191,7 @@ func TestRefiner(t *testing.T) {
 	})
 
 	t.Run("Refiner can modify results", func(t *testing.T) {
-		ctx := newParsingContext("test", time.Now(), nil)
+		ctx := newParsingContext("test", time.Now(), DefaultSettings())
 
 		// Refiner that adds tags
 		refiner := &mockRefiner{
@@ -214,7 +214,7 @@ func TestRefiner(t *testing.T) {
 	})
 
 	t.Run("Refiner can merge or split results", func(t *testing.T) {
-		ctx := newParsingContext("test", time.Now(), nil)
+		ctx := newParsingContext("test", time.Now(), DefaultSettings())
 
 		// Refiner that merges adjacent results
 		refiner := &mockRefiner{

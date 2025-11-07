@@ -262,7 +262,7 @@ func NewChrono(config *Configuration) *Chrono {
 // 4. Apply all refiners sequentially
 // 5. Return final results
 func (c *Chrono) Parse(text string, referenceDate interface{}, option *parsingOption) []*parsingResult {
-	context := newParsingContext(text, referenceDate, option)
+	context := newParsingContextFromOption(text, referenceDate, option)
 
 	results := make([]*parsingResult, 0)
 	for _, parser := range c.parsers {

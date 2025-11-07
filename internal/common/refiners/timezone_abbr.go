@@ -35,8 +35,8 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.InternalParsingConte
 	for k, v := range r.timezoneOverrides {
 		timezoneOverrides[k] = v
 	}
-	if context.Option().Timezones != nil {
-		for k, v := range context.Option().Timezones {
+	if context.Option().TimezoneOverrides != nil {
+		for k, v := range context.Option().TimezoneOverrides {
 			timezoneOverrides[k] = v
 		}
 	}
@@ -53,7 +53,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.InternalParsingConte
 			continue
 		}
 		// DEBUG
-		if context.Option().Debug != nil {
+		if context.Option().DebugHandler != nil {
 			context.Debug(func() {
 				// fmt.Printf("DEBUG TZ: result.Text=%q, suffix=%q, match[0]=%q\n", result.Text(), suffix[:20], match[0])
 			})
@@ -83,7 +83,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.InternalParsingConte
 		}
 		extractedTimezoneOffset := *extractedTimezoneOffsetPtr
 
-		if context.Option().Debug != nil {
+		if context.Option().DebugHandler != nil {
 			context.Debug(func() {
 				// Log: Extracting timezone
 			})
@@ -149,7 +149,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.InternalParsingConte
 		}
 
 		// DEBUG
-		if context.Option().Debug != nil {
+		if context.Option().DebugHandler != nil {
 			context.Debug(func() {
 				// fmt.Printf("DEBUG TZ: match[0]=%q, trimmed matchedText=%q, newText will be=%q\n",
 				// 	match[0], matchedText, result.Text()+matchedText)

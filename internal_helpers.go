@@ -23,7 +23,7 @@ type (
 
 // InternalNewParsingContext creates a parsing context (internal use only).
 func InternalNewParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
-	return newParsingContext(text, refDate, option)
+	return newParsingContextFromOption(text, refDate, option)
 }
 
 // InternalNewParsingComponents creates parsing components (internal use only).
