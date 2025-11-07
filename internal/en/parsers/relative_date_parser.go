@@ -105,65 +105,66 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			}
 
 			// Handle "this" - set to beginning of current period
-			components := context.CreateParsingComponents(nil)
-			refDate := context.Reference().Instant()
-
-			switch timeunit {
-			case kronos.TimeunitHour:
-				// Start of this hour
-				date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), refDate.Hour(), 0, 0, 0, refDate.Location())
-				components.Assign(kronos.ComponentDay, date.Day())
-				components.Assign(kronos.ComponentMonth, int(date.Month()))
-				components.Assign(kronos.ComponentYear, date.Year())
-				components.Assign(kronos.ComponentHour, date.Hour())
-				components.Imply(kronos.ComponentMinute, 0)
-				components.Imply(kronos.ComponentSecond, 0)
-				components.SetPeriod(kronos.PeriodTime)
-
-			case kronos.TimeunitDay:
-				// Start of this day
-				date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
-				components.Assign(kronos.ComponentDay, date.Day())
-				components.Assign(kronos.ComponentMonth, int(date.Month()))
-				components.Assign(kronos.ComponentYear, date.Year())
-				components.Imply(kronos.ComponentHour, 0)
-				components.Imply(kronos.ComponentMinute, 0)
-				components.Imply(kronos.ComponentSecond, 0)
-				components.SetPeriod(kronos.PeriodDay)
-
-			case kronos.TimeunitWeek:
-				// Start of this week (Sunday)
-				date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
-				date = date.AddDate(0, 0, -int(date.Weekday()))
-				components.Imply(kronos.ComponentDay, date.Day())
-				components.Imply(kronos.ComponentMonth, int(date.Month()))
-				components.Imply(kronos.ComponentYear, date.Year())
-				components.SetPeriod(kronos.PeriodWeek)
-
-			case kronos.TimeunitMonth:
-				// Start of this month
-				date := time.Date(refDate.Year(), refDate.Month(), 1, 0, 0, 0, 0, refDate.Location())
-				components.Imply(kronos.ComponentDay, date.Day())
-				components.Assign(kronos.ComponentYear, date.Year())
-				components.Assign(kronos.ComponentMonth, int(date.Month()))
-				components.SetPeriod(kronos.PeriodMonth)
-
-			case kronos.TimeunitYear:
-				// Start of this year
-				date := time.Date(refDate.Year(), 1, 1, 0, 0, 0, 0, refDate.Location())
-				components.Imply(kronos.ComponentDay, date.Day())
-				components.Imply(kronos.ComponentMonth, int(date.Month()))
-				components.Assign(kronos.ComponentYear, date.Year())
-				components.SetPeriod(kronos.PeriodYear)
-			}
-
-			if isApproximate {
-				components.AddTag("result/approximate")
-			}
+			components := handleThisPeriod(context, timeunit, isApproximate)
 			return components
 		},
 		nil,
 	)
 
 	return parser
+}
+
+// handleThisPeriod creates components for "this <timeunit>" expressions
+func handleThisPeriod(context *kronos.ParsingContext, timeunit kronos.Timeunit, isApproximate bool) *kronos.ParsingComponents {
+	components := context.CreateParsingComponents(nil)
+	refDate := context.Reference().Instant()
+
+	switch timeunit {
+	case kronos.TimeunitHour:
+		date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), refDate.Hour(), 0, 0, 0, refDate.Location())
+		components.Assign(kronos.ComponentDay, date.Day())
+		components.Assign(kronos.ComponentMonth, int(date.Month()))
+		components.Assign(kronos.ComponentYear, date.Year())
+		components.Assign(kronos.ComponentHour, date.Hour())
+		components.Imply(kronos.ComponentMinute, 0)
+		components.Imply(kronos.ComponentSecond, 0)
+		components.SetPeriod(kronos.PeriodTime)
+
+	case kronos.TimeunitDay:
+		date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
+		components.Assign(kronos.ComponentDay, date.Day())
+		components.Assign(kronos.ComponentMonth, int(date.Month()))
+		components.Assign(kronos.ComponentYear, date.Year())
+		components.Imply(kronos.ComponentHour, 0)
+		components.Imply(kronos.ComponentMinute, 0)
+		components.Imply(kronos.ComponentSecond, 0)
+		components.SetPeriod(kronos.PeriodDay)
+
+	case kronos.TimeunitWeek:
+		date := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
+		date = date.AddDate(0, 0, -int(date.Weekday()))
+		components.Imply(kronos.ComponentDay, date.Day())
+		components.Imply(kronos.ComponentMonth, int(date.Month()))
+		components.Imply(kronos.ComponentYear, date.Year())
+		components.SetPeriod(kronos.PeriodWeek)
+
+	case kronos.TimeunitMonth:
+		date := time.Date(refDate.Year(), refDate.Month(), 1, 0, 0, 0, 0, refDate.Location())
+		components.Imply(kronos.ComponentDay, date.Day())
+		components.Assign(kronos.ComponentYear, date.Year())
+		components.Assign(kronos.ComponentMonth, int(date.Month()))
+		components.SetPeriod(kronos.PeriodMonth)
+
+	case kronos.TimeunitYear:
+		date := time.Date(refDate.Year(), 1, 1, 0, 0, 0, 0, refDate.Location())
+		components.Imply(kronos.ComponentDay, date.Day())
+		components.Imply(kronos.ComponentMonth, int(date.Month()))
+		components.Assign(kronos.ComponentYear, date.Year())
+		components.SetPeriod(kronos.PeriodYear)
+	}
+
+	if isApproximate {
+		components.AddTag("result/approximate")
+	}
+	return components
 }
