@@ -6,6 +6,18 @@ import (
 	"time"
 )
 
+// Package helpers contains internal helper functions for the kronos package.
+//
+// NOTE ON APPARENT DUPLICATION:
+// Many functions in this file have similar implementations in internal/helpers.
+// This is intentional and necessary to avoid import cycles:
+//   - internal/helpers provides functions for use by internal parsers/refiners
+//   - This file provides functions for use by main package code and tests
+//   - Go's import cycle restrictions prevent consolidation into a single location
+//
+// The implementations are kept in sync manually. When modifying these functions,
+// ensure corresponding changes are made in internal/helpers if applicable.
+
 // ============================================================================
 // String safety and slicing helpers
 // ============================================================================
