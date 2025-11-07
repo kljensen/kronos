@@ -9,16 +9,33 @@ import "time"
 // INTERNAL USE ONLY - These exports are implementation details that may
 // change without notice. External code should not use these types.
 
-// Type aliases for internal packages to use unexported types
-type (
-	InternalParsingContext            = parsingContext
-	InternalParsingComponents         = parsingComponents
-	InternalParsingResult             = parsingResult
-	InternalReferenceWithTimezone     = referenceWithTimezone
-	InternalParsingOption             = parsingOption
-	InternalParsingReference          = parsingReference
-	InternalParsingResultWithBoundary = parsingResultWithBoundary
-)
+// InternalParsingContext is an alias for parsingContext, allowing internal packages
+// to use the unexported type.
+type InternalParsingContext = parsingContext
+
+// InternalParsingComponents is an alias for parsingComponents, allowing internal packages
+// to use the unexported type.
+type InternalParsingComponents = parsingComponents
+
+// InternalParsingResult is an alias for parsingResult, allowing internal packages
+// to use the unexported type.
+type InternalParsingResult = parsingResult
+
+// InternalReferenceWithTimezone is an alias for referenceWithTimezone, allowing internal packages
+// to use the unexported type.
+type InternalReferenceWithTimezone = referenceWithTimezone
+
+// InternalParsingOption is an alias for parsingOption, allowing internal packages
+// to use the unexported type.
+type InternalParsingOption = parsingOption
+
+// InternalParsingReference is an alias for parsingReference, allowing internal packages
+// to use the unexported type.
+type InternalParsingReference = parsingReference
+
+// InternalParsingResultWithBoundary is an alias for parsingResultWithBoundary, allowing internal packages
+// to use the unexported type.
+type InternalParsingResultWithBoundary = parsingResultWithBoundary
 
 // Constructor functions for internal packages
 

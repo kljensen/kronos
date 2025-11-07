@@ -11,6 +11,7 @@ import (
 // ============================================================================
 
 // parsingOption contains configuration options for the deprecated Chrono API.
+//
 // Deprecated: Use Settings instead. This type exists only for backward compatibility
 // with the deprecated Chrono.Parse() method.
 type parsingOption struct {
@@ -65,6 +66,7 @@ func newParsingContext(text string, refDate interface{}, settings Settings) *par
 }
 
 // newParsingContextFromOption creates a parsing context from the deprecated parsingOption.
+//
 // Deprecated: This is for backward compatibility with the deprecated Chrono API.
 func newParsingContextFromOption(text string, refDate interface{}, option *parsingOption) *parsingContext {
 	var settings Settings
@@ -172,6 +174,7 @@ func (ctx *parsingContext) Text() string {
 }
 
 // Option returns the parsing settings.
+//
 // Deprecated: Use Settings() instead.
 func (ctx *parsingContext) Option() Settings {
 	return ctx.settings
