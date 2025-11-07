@@ -1,5 +1,7 @@
 package kronos
 
+import "time"
+
 // Internal helper functions for accessing private fields.
 // These are used by internal/ and experimental packages.
 
@@ -8,19 +10,30 @@ package kronos
 // from internal packages but are prefixed with Internal to indicate they are
 // not intended for external use.
 
-func InternalNewParsingContext(text string, refDate interface{}, option *ParsingOption) *ParsingContext {
+// Type aliases for internal use
+type (
+	InternalParsingContext            = parsingContext
+	InternalParsingComponents         = parsingComponents
+	InternalParsingResult             = parsingResult
+	InternalReferenceWithTimezone     = referenceWithTimezone
+	InternalParsingOption             = parsingOption
+	InternalParsingReference          = parsingReference
+	InternalParsingResultWithBoundary = parsingResultWithBoundary
+)
+
+func InternalNewParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
 	return newParsingContext(text, refDate, option)
 }
 
-func InternalNewParsingComponents(reference *ReferenceWithTimezone, knownComponents map[Component]int) *ParsingComponents {
+func InternalNewParsingComponents(reference *referenceWithTimezone, knownComponents map[Component]int) *parsingComponents {
 	return newParsingComponents(reference, knownComponents)
 }
 
-func InternalNewParsingResult(reference *ReferenceWithTimezone, index int, text string, start, end *ParsingComponents) *ParsingResult {
+func InternalNewParsingResult(reference *referenceWithTimezone, index int, text string, start, end *parsingComponents) *parsingResult {
 	return newParsingResult(reference, index, text, start, end)
 }
 
-func InternalMergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
+func InternalMergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 	return mergeDateTimeResult(dateResult, timeResult)
 }
 
@@ -34,4 +47,12 @@ func InternalGlobalRegistry() *ParserRegistry {
 
 func InternalRegister(name string, info ParserInfo, factory ParserFactory) {
 	internalRegister(name, info, factory)
+}
+
+func InternalValidateSettings(s Settings) error {
+	return validateSettings(s)
+}
+
+func InternalParseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*parsingResult, error) {
+	return parseWithSettings(text, refDate, settings, config)
 }

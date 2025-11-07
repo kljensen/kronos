@@ -20,12 +20,12 @@ func NewOverlapRemovalRefiner() *OverlapRemovalRefiner {
 }
 
 // Refine removes overlapping results
-func (r *OverlapRemovalRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *OverlapRemovalRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if len(results) < 2 {
 		return results
 	}
 
-	filteredResults := make([]*kronos.ParsingResult, 0, len(results))
+	filteredResults := make([]*kronos.InternalParsingResult, 0, len(results))
 	prevResult := results[0]
 
 	for i := 1; i < len(results); i++ {
@@ -40,7 +40,7 @@ func (r *OverlapRemovalRefiner) Refine(context *kronos.ParsingContext, results [
 		}
 
 		// Results overlap - keep the longer one
-		var kept *kronos.ParsingResult
+		var kept *kronos.InternalParsingResult
 		if len(result.Text()) > len(prevResult.Text()) {
 			kept = result
 		} else {
@@ -78,8 +78,8 @@ func NewUnlikelyFormatFilter(strictMode bool) *UnlikelyFormatFilter {
 }
 
 // Refine filters out unlikely results
-func (f *UnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
-	filtered := make([]*kronos.ParsingResult, 0, len(results))
+func (f *UnlikelyFormatFilter) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
+	filtered := make([]*kronos.InternalParsingResult, 0, len(results))
 
 	for _, result := range results {
 		if f.isValid(context, result) {
@@ -90,7 +90,7 @@ func (f *UnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results []
 	return filtered
 }
 
-func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
+func (f *UnlikelyFormatFilter) isValid(context *kronos.InternalParsingContext, result *kronos.InternalParsingResult) bool {
 	// Remove results that are just numbers or dots
 	// Exception: Allow 4-digit years (1000-2999) which are valid year-only expressions
 	textWithoutSpaces := strings.ReplaceAll(result.Text(), " ", "")
@@ -156,7 +156,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *k
 	return true
 }
 
-func (f *UnlikelyFormatFilter) isStrictModeValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
+func (f *UnlikelyFormatFilter) isStrictModeValid(context *kronos.InternalParsingContext, result *kronos.InternalParsingResult) bool {
 	// In strict mode, remove weekday-only components
 	resultStart, okStart := helpers.AsParsingComponents(result.Start())
 	if !okStart {
@@ -191,7 +191,7 @@ func NewDatePreferenceRefiner() *DatePreferenceRefiner {
 }
 
 // Refine adjusts dates based on the preference setting
-func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *DatePreferenceRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	preference := context.Option().Preference
 
 	// PreferCurrentPeriod is the default - no adjustment needed
@@ -240,11 +240,11 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.ParsingContext, results [
 
 // adjustTimeOnlyComponents adjusts time-only components based on preference
 func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
-	components *kronos.ParsingComponents,
+	components *kronos.InternalParsingComponents,
 	refDate time.Time,
 	refInstant time.Time,
 	preference kronos.DatePreference,
-	context *kronos.ParsingContext,
+	context *kronos.InternalParsingContext,
 ) {
 	// Get the constructed date with the current implied date
 	constructedDate := components.Date()

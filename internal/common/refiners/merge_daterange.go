@@ -16,7 +16,7 @@ type AbstractMergeDateRangeRefiner struct {
 }
 
 // ShouldMergeResults determines if two results should be merged into a date range.
-func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) bool {
+func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.InternalParsingResult, context *kronos.InternalParsingContext) bool {
 	// Both results should not already have an end
 	if current.End() != nil || next.End() != nil {
 		return false
@@ -32,7 +32,7 @@ func (r *AbstractMergeDateRangeRefiner) ShouldMergeResults(textBetween string, c
 }
 
 // MergeResults merges two date results into a single date range result.
-func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromResult, toResult *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
+func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromResult, toResult *kronos.InternalParsingResult, context *kronos.InternalParsingContext) *kronos.InternalParsingResult {
 	fromStart, okFrom := helpers.AsParsingComponents(fromResult.Start())
 	toStart, okTo := helpers.AsParsingComponents(toResult.Start())
 	if !okFrom || !okTo {
@@ -132,12 +132,12 @@ func (r *AbstractMergeDateRangeRefiner) MergeResults(textBetween string, fromRes
 }
 
 // Refine processes results to merge date ranges based on the pattern between them.
-func (r *AbstractMergeDateRangeRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *AbstractMergeDateRangeRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if len(results) < 2 {
 		return results
 	}
 
-	merged := make([]*kronos.ParsingResult, 0, len(results))
+	merged := make([]*kronos.InternalParsingResult, 0, len(results))
 	current := results[0]
 
 	for i := 1; i < len(results); i++ {

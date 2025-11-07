@@ -118,19 +118,19 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		setup    func() *ParsingComponents
+		setup    func() *parsingComponents
 		expected Period
 	}{
 		{
 			name: "nil components",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				return nil
 			},
 			expected: PeriodUnknown,
 		},
 		{
 			name: "time components certain",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentHour, 10)
 				pc.Assign(ComponentMinute, 30)
@@ -140,7 +140,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		},
 		{
 			name: "day certain",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentYear, 2020)
 				pc.Assign(ComponentMonth, 3)
@@ -151,7 +151,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		},
 		{
 			name: "weekday certain without day",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentWeekday, int(time.Monday))
 				return pc
@@ -160,7 +160,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		},
 		{
 			name: "month certain without day",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentYear, 2020)
 				pc.Assign(ComponentMonth, 3)
@@ -170,7 +170,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		},
 		{
 			name: "only year certain",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				pc := newParsingComponents(ref, nil)
 				pc.Assign(ComponentYear, 2020)
 				return pc
@@ -179,7 +179,7 @@ func TestDeterminePeriodFromComponents(t *testing.T) {
 		},
 		{
 			name: "nothing certain",
-			setup: func() *ParsingComponents {
+			setup: func() *parsingComponents {
 				pc := newParsingComponents(ref, nil)
 				return pc
 			},
@@ -204,22 +204,22 @@ func TestCasualReferencesPeriod(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		fn       func() *ParsingComponents
+		fn       func() *parsingComponents
 		expected Period
 	}{
-		{"Now", func() *ParsingComponents { return now(ref) }, PeriodTime},
-		{"Today", func() *ParsingComponents { return today(ref) }, PeriodDay},
-		{"Yesterday", func() *ParsingComponents { return yesterday(ref) }, PeriodDay},
-		{"Tomorrow", func() *ParsingComponents { return tomorrow(ref) }, PeriodDay},
-		{"TheDayAfter", func() *ParsingComponents { return theDayAfter(ref, 2) }, PeriodDay},
-		{"TheDayBefore", func() *ParsingComponents { return theDayBefore(ref, 1) }, PeriodDay},
-		{"Tonight", func() *ParsingComponents { return tonight(ref) }, PeriodDay},
-		{"LastNight", func() *ParsingComponents { return lastNight(ref) }, PeriodDay},
-		{"Morning", func() *ParsingComponents { return morning(ref) }, PeriodTime},
-		{"Afternoon", func() *ParsingComponents { return afternoon(ref) }, PeriodTime},
-		{"Evening", func() *ParsingComponents { return evening(ref) }, PeriodTime},
-		{"Midnight", func() *ParsingComponents { return midnight(ref) }, PeriodTime},
-		{"Noon", func() *ParsingComponents { return noon(ref) }, PeriodTime},
+		{"Now", func() *parsingComponents { return now(ref) }, PeriodTime},
+		{"Today", func() *parsingComponents { return today(ref) }, PeriodDay},
+		{"Yesterday", func() *parsingComponents { return yesterday(ref) }, PeriodDay},
+		{"Tomorrow", func() *parsingComponents { return tomorrow(ref) }, PeriodDay},
+		{"TheDayAfter", func() *parsingComponents { return theDayAfter(ref, 2) }, PeriodDay},
+		{"TheDayBefore", func() *parsingComponents { return theDayBefore(ref, 1) }, PeriodDay},
+		{"Tonight", func() *parsingComponents { return tonight(ref) }, PeriodDay},
+		{"LastNight", func() *parsingComponents { return lastNight(ref) }, PeriodDay},
+		{"Morning", func() *parsingComponents { return morning(ref) }, PeriodTime},
+		{"Afternoon", func() *parsingComponents { return afternoon(ref) }, PeriodTime},
+		{"Evening", func() *parsingComponents { return evening(ref) }, PeriodTime},
+		{"Midnight", func() *parsingComponents { return midnight(ref) }, PeriodTime},
+		{"Noon", func() *parsingComponents { return noon(ref) }, PeriodTime},
 	}
 
 	for _, tt := range tests {

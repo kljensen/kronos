@@ -10,7 +10,7 @@ import (
 // It handles date-only durations (implies time) and time durations (assigns both date and time).
 // This is used for parsing relative expressions like "in 3 days", "2 hours ago", etc.
 // Returns nil if the duration calculation fails (e.g., overflow).
-func CreateRelativeFromReference(reference *kronos.ReferenceWithTimezone, duration kronos.Duration, emptyDuration kronos.Duration) *kronos.ParsingComponents {
+func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone, duration kronos.Duration, emptyDuration kronos.Duration) *kronos.InternalParsingComponents {
 	if duration == nil {
 		duration = emptyDuration
 	}
@@ -97,7 +97,7 @@ func CreateRelativeFromReference(reference *kronos.ReferenceWithTimezone, durati
 //
 // This is a placeholder for documentation purposes. The real function will be
 // exposed through the X-prefixed helper in the main kronos package.
-func MergeDateTimeResult(dateResult, timeResult *kronos.ParsingResult) *kronos.ParsingResult {
+func MergeDateTimeResult(dateResult, timeResult *kronos.InternalParsingResult) *kronos.InternalParsingResult {
 	// This implementation is a simplified version that works with public APIs only.
 	// The full implementation with private field access remains in the kronos package.
 	result := dateResult.Clone()
@@ -112,7 +112,7 @@ func MergeDateTimeResult(dateResult, timeResult *kronos.ParsingResult) *kronos.P
 	// For end component merging, we rely on the SetStart approach
 	// The full implementation with direct field access is in the main package
 	if dateResult.End() != nil || timeResult.End() != nil {
-		var endDate, endTime *kronos.ParsingComponents
+		var endDate, endTime *kronos.InternalParsingComponents
 		if dateResult.End() == nil {
 			endDate, okDate = AsParsingComponents(dateResult.Start())
 		} else {

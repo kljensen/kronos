@@ -16,7 +16,7 @@ type AbstractMergeDateTimeRefiner struct {
 }
 
 // ShouldMergeResults determines if a date-only and time-only result should be merged.
-func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) bool {
+func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, current, next *kronos.InternalParsingResult, context *kronos.InternalParsingContext) bool {
 	// Check if one is date-only and the other is time-only
 	currentStart, okCurrent := helpers.AsParsingComponents(current.Start())
 	nextStart, okNext := helpers.AsParsingComponents(next.Start())
@@ -41,7 +41,7 @@ func (r *AbstractMergeDateTimeRefiner) ShouldMergeResults(textBetween string, cu
 }
 
 // MergeResults merges a date-only and time-only result into a single date-time result.
-func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current, next *kronos.ParsingResult, context *kronos.ParsingContext) *kronos.ParsingResult {
+func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current, next *kronos.InternalParsingResult, context *kronos.InternalParsingContext) *kronos.InternalParsingResult {
 	currentStart, okCurrent := helpers.AsParsingComponents(current.Start())
 	if !okCurrent {
 		return current
@@ -54,7 +54,7 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	resultText = current.Text() + textBetween + next.Text()
 
 	// Determine which is date and which is time, then merge
-	var result *kronos.ParsingResult
+	var result *kronos.InternalParsingResult
 	if currentStart.IsOnlyDate() {
 		result = helpers.MergeDateTimeResult(current, next)
 	} else {
@@ -72,12 +72,12 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 }
 
 // Refine processes results to merge date and time components based on the pattern between them.
-func (r *AbstractMergeDateTimeRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *AbstractMergeDateTimeRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if len(results) < 2 {
 		return results
 	}
 
-	merged := make([]*kronos.ParsingResult, 0, len(results))
+	merged := make([]*kronos.InternalParsingResult, 0, len(results))
 	current := results[0]
 
 	for i := 1; i < len(results); i++ {
@@ -118,12 +118,12 @@ func NewMergeWeekdayComponentRefiner() *MergeWeekdayComponentRefiner {
 }
 
 // Refine merges weekday components with adjacent date components
-func (r *MergeWeekdayComponentRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *MergeWeekdayComponentRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if len(results) < 2 {
 		return results
 	}
 
-	merged := make([]*kronos.ParsingResult, 0, len(results))
+	merged := make([]*kronos.InternalParsingResult, 0, len(results))
 	i := 0
 
 	for i < len(results) {
@@ -159,9 +159,9 @@ func (r *MergeWeekdayComponentRefiner) Refine(context *kronos.ParsingContext, re
 
 func (r *MergeWeekdayComponentRefiner) shouldMergeResults(
 	textBetween string,
-	currentResult *kronos.ParsingResult,
-	nextResult *kronos.ParsingResult,
-	context *kronos.ParsingContext,
+	currentResult *kronos.InternalParsingResult,
+	nextResult *kronos.InternalParsingResult,
+	context *kronos.InternalParsingContext,
 ) bool {
 	// Merge when:
 	// 1. Current result is weekday-only
@@ -188,10 +188,10 @@ func (r *MergeWeekdayComponentRefiner) shouldMergeResults(
 
 func (r *MergeWeekdayComponentRefiner) mergeResults(
 	textBetween string,
-	currentResult *kronos.ParsingResult,
-	nextResult *kronos.ParsingResult,
-	context *kronos.ParsingContext,
-) *kronos.ParsingResult {
+	currentResult *kronos.InternalParsingResult,
+	nextResult *kronos.InternalParsingResult,
+	context *kronos.InternalParsingContext,
+) *kronos.InternalParsingResult {
 	// Get start components
 	currentStart, okCurrent := helpers.AsParsingComponents(currentResult.Start())
 	nextStart, okNext := helpers.AsParsingComponents(nextResult.Start())
@@ -209,7 +209,7 @@ func (r *MergeWeekdayComponentRefiner) mergeResults(
 	}
 
 	// Handle end components if present
-	var newEnd *kronos.ParsingComponents
+	var newEnd *kronos.InternalParsingComponents
 	if nextResult.End() != nil {
 		if nextEnd, ok := helpers.AsParsingComponents(nextResult.End()); ok {
 			newEnd = nextEnd.Clone()
@@ -245,7 +245,7 @@ func NewExtractTimezoneOffsetRefiner() *ExtractTimezoneOffsetRefiner {
 }
 
 // Refine extracts timezone offsets and adds them to results
-func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	for i, result := range results {
 		resultStart, ok := helpers.AsParsingComponents(result.Start())
 		if !ok {
@@ -296,7 +296,7 @@ func (r *ExtractTimezoneOffsetRefiner) Refine(context *kronos.ParsingContext, re
 			timezoneOffset = -timezoneOffset
 		}
 
-		var resultEnd *kronos.ParsingComponents
+		var resultEnd *kronos.InternalParsingComponents
 		if result.End() != nil {
 			if endComponents, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents

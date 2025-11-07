@@ -25,7 +25,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 	parser := &ENWeekdayParser{}
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
+		func(context *kronos.InternalParsingContext) *regexp.Regexp {
 			// Unicode parentheses (（ and ）) are literal characters, not escaped
 			pattern := `(?:(?:,|\(|（)\s*)?` +
 				`(?:on\s*?)?` +
@@ -39,7 +39,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) interface{} {
 			if len(match) < 4 {
 				return nil
 			}
@@ -132,7 +132,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 
 // resolveWeekday determines the target weekday based on the word and modifier
 // Returns -1 if the word is not recognized
-func resolveWeekday(weekdayWord, modifier string, context *kronos.ParsingContext) time.Weekday {
+func resolveWeekday(weekdayWord, modifier string, context *kronos.InternalParsingContext) time.Weekday {
 	// Regular weekday from dictionary
 	if wd, ok := data.WeekdayDictionary[weekdayWord]; ok || weekdayWord == "sunday" {
 		return wd
@@ -172,7 +172,7 @@ func resolveWeekday(weekdayWord, modifier string, context *kronos.ParsingContext
 }
 
 // handleWeekendCounting calculates the date for "N weekends ago" or "N weekends from now"
-func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, countStr, direction string) *kronos.ParsingComponents {
+func handleWeekendCounting(context *kronos.InternalParsingContext, refDate time.Time, countStr, direction string) *kronos.InternalParsingComponents {
 	count := 1
 	if countStr != "" {
 		var err error

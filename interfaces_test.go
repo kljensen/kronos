@@ -8,18 +8,18 @@ import (
 
 // Mock parser for testing
 type mockParser struct {
-	patternFunc func(context *ParsingContext) *regexp.Regexp
-	extractFunc func(context *ParsingContext, match []string) interface{}
+	patternFunc func(context *parsingContext) *regexp.Regexp
+	extractFunc func(context *parsingContext, match []string) interface{}
 }
 
-func (m *mockParser) Pattern(context *ParsingContext) *regexp.Regexp {
+func (m *mockParser) Pattern(context *parsingContext) *regexp.Regexp {
 	if m.patternFunc != nil {
 		return m.patternFunc(context)
 	}
 	return regexp.MustCompile(`test`)
 }
 
-func (m *mockParser) Extract(context *ParsingContext, match []string) interface{} {
+func (m *mockParser) Extract(context *parsingContext, match []string) interface{} {
 	if m.extractFunc != nil {
 		return m.extractFunc(context, match)
 	}
@@ -28,10 +28,10 @@ func (m *mockParser) Extract(context *ParsingContext, match []string) interface{
 
 // Mock refiner for testing
 type mockRefiner struct {
-	refineFunc func(context *ParsingContext, results []*ParsingResult) []*ParsingResult
+	refineFunc func(context *parsingContext, results []*parsingResult) []*parsingResult
 }
 
-func (m *mockRefiner) Refine(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
+func (m *mockRefiner) Refine(context *parsingContext, results []*parsingResult) []*parsingResult {
 	if m.refineFunc != nil {
 		return m.refineFunc(context, results)
 	}
@@ -47,11 +47,11 @@ func TestParser(t *testing.T) {
 		extractCalled := false
 
 		parser := &mockParser{
-			patternFunc: func(context *ParsingContext) *regexp.Regexp {
+			patternFunc: func(context *parsingContext) *regexp.Regexp {
 				patternCalled = true
 				return regexp.MustCompile(`tomorrow`)
 			},
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				extractCalled = true
 				components := map[Component]int{
 					ComponentDay: 3,
@@ -99,7 +99,7 @@ func TestParser(t *testing.T) {
 
 		// Test returning component map
 		p1 := &mockParser{
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return map[Component]int{ComponentYear: 2024}
 			},
 		}
@@ -111,31 +111,31 @@ func TestParser(t *testing.T) {
 
 		// Test returning ParsingComponents
 		p2 := &mockParser{
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return newParsingComponents(ctx.Reference(), nil)
 			},
 		}
 
 		result = p2.Extract(ctx, []string{"test"})
-		if _, ok := result.(*ParsingComponents); !ok {
+		if _, ok := result.(*parsingComponents); !ok {
 			t.Errorf("Expected ParsingComponents")
 		}
 
 		// Test returning ParsingResult
 		p3 := &mockParser{
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return newParsingResult(ctx.Reference(), 0, "test", nil, nil)
 			},
 		}
 
 		result = p3.Extract(ctx, []string{"test"})
-		if _, ok := result.(*ParsingResult); !ok {
+		if _, ok := result.(*parsingResult); !ok {
 			t.Errorf("Expected ParsingResult")
 		}
 
 		// Test returning nil
 		p4 := &mockParser{
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return nil
 			},
 		}
@@ -155,10 +155,10 @@ func TestRefiner(t *testing.T) {
 		refineCalled := false
 
 		refiner := &mockRefiner{
-			refineFunc: func(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
+			refineFunc: func(context *parsingContext, results []*parsingResult) []*parsingResult {
 				refineCalled = true
 				// Example: filter out results
-				filtered := make([]*ParsingResult, 0)
+				filtered := make([]*parsingResult, 0)
 				for _, result := range results {
 					if result.Index() > 0 {
 						filtered = append(filtered, result)
@@ -169,7 +169,7 @@ func TestRefiner(t *testing.T) {
 		}
 
 		// Create test results
-		results := []*ParsingResult{
+		results := []*parsingResult{
 			newParsingResult(ctx.Reference(), 0, "first", nil, nil),
 			newParsingResult(ctx.Reference(), 5, "second", nil, nil),
 		}
@@ -195,7 +195,7 @@ func TestRefiner(t *testing.T) {
 
 		// Refiner that adds tags
 		refiner := &mockRefiner{
-			refineFunc: func(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
+			refineFunc: func(context *parsingContext, results []*parsingResult) []*parsingResult {
 				for _, result := range results {
 					result.AddTag("refined")
 				}
@@ -204,7 +204,7 @@ func TestRefiner(t *testing.T) {
 		}
 
 		result := newParsingResult(ctx.Reference(), 0, "test", nil, nil)
-		results := []*ParsingResult{result}
+		results := []*parsingResult{result}
 
 		refined := refiner.Refine(ctx, results)
 
@@ -218,7 +218,7 @@ func TestRefiner(t *testing.T) {
 
 		// Refiner that merges adjacent results
 		refiner := &mockRefiner{
-			refineFunc: func(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
+			refineFunc: func(context *parsingContext, results []*parsingResult) []*parsingResult {
 				if len(results) < 2 {
 					return results
 				}
@@ -232,11 +232,11 @@ func TestRefiner(t *testing.T) {
 					nil,
 				)
 
-				return []*ParsingResult{merged}
+				return []*parsingResult{merged}
 			},
 		}
 
-		results := []*ParsingResult{
+		results := []*parsingResult{
 			newParsingResult(ctx.Reference(), 0, "first", nil, nil),
 			newParsingResult(ctx.Reference(), 6, "second", nil, nil),
 		}

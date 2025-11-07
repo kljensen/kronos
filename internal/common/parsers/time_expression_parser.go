@@ -59,9 +59,9 @@ type AbstractTimeExpressionParser struct {
 	patternFlags               func() string
 
 	// Additional extraction logic
-	extractPrimaryTimeComponentsHook   func(*kronos.ParsingContext, []string, *kronos.ParsingComponents) bool
-	extractFollowingTimeComponentsHook func(*kronos.ParsingContext, []string, *kronos.ParsingResult, *kronos.ParsingComponents) bool
-	checkAndReturnWithoutFollowingHook func(*kronos.ParsingResult) *kronos.ParsingResult
+	extractPrimaryTimeComponentsHook   func(*kronos.InternalParsingContext, []string, *kronos.InternalParsingComponents) bool
+	extractFollowingTimeComponentsHook func(*kronos.InternalParsingContext, []string, *kronos.InternalParsingResult, *kronos.InternalParsingComponents) bool
+	checkAndReturnWithoutFollowingHook func(*kronos.InternalParsingResult) *kronos.InternalParsingResult
 
 	// Cached patterns
 	cachedPrimaryPrefix        string
@@ -113,21 +113,21 @@ func (p *AbstractTimeExpressionParser) SetFollowingSuffix(fn func() string) {
 
 // SetExtractPrimaryTimeComponentsHook allows additional extraction logic
 func (p *AbstractTimeExpressionParser) SetExtractPrimaryTimeComponentsHook(
-	fn func(*kronos.ParsingContext, []string, *kronos.ParsingComponents) bool,
+	fn func(*kronos.InternalParsingContext, []string, *kronos.InternalParsingComponents) bool,
 ) {
 	p.extractPrimaryTimeComponentsHook = fn
 }
 
 // SetExtractFollowingTimeComponentsHook allows additional extraction logic for following time
 func (p *AbstractTimeExpressionParser) SetExtractFollowingTimeComponentsHook(
-	fn func(*kronos.ParsingContext, []string, *kronos.ParsingResult, *kronos.ParsingComponents) bool,
+	fn func(*kronos.InternalParsingContext, []string, *kronos.InternalParsingResult, *kronos.InternalParsingComponents) bool,
 ) {
 	p.extractFollowingTimeComponentsHook = fn
 }
 
 // SetCheckAndReturnWithoutFollowingHook allows customization of validation logic
 func (p *AbstractTimeExpressionParser) SetCheckAndReturnWithoutFollowingHook(
-	fn func(*kronos.ParsingResult) *kronos.ParsingResult,
+	fn func(*kronos.InternalParsingResult) *kronos.InternalParsingResult,
 ) {
 	p.checkAndReturnWithoutFollowingHook = fn
 }
@@ -176,7 +176,7 @@ func buildFollowingTimePattern(followingPhase, followingSuffix string) *regexp.R
 }
 
 // Pattern returns the primary time pattern
-func (p *AbstractTimeExpressionParser) Pattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *AbstractTimeExpressionParser) Pattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	return p.getPrimaryTimePatternThroughCache()
 }
 
@@ -214,7 +214,7 @@ func (p *AbstractTimeExpressionParser) getFollowingTimePatternThroughCache() *re
 }
 
 // Extract parses time expression from the match
-func (p *AbstractTimeExpressionParser) Extract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *AbstractTimeExpressionParser) Extract(context *kronos.InternalParsingContext, match []string) interface{} {
 	startComponents := p.ExtractPrimaryTimeComponents(context, match, false)
 	if startComponents == nil {
 		// If the match seems like a year (e.g., "2013.12:..."),
@@ -291,7 +291,7 @@ func isDigit(b byte) bool {
 
 // looksLikeDecimalRange checks if the match appears to be part of a decimal range
 // rather than a time expression. For example, "10.1 - 10.12" should not parse "10.12" as a time.
-func looksLikeDecimalRange(context *kronos.ParsingContext, match []string) bool {
+func looksLikeDecimalRange(context *kronos.InternalParsingContext, match []string) bool {
 	matchStartIndex := strings.Index(context.Text(), match[0])
 	if matchStartIndex < 0 {
 		return false
@@ -319,7 +319,7 @@ func looksLikeDecimalRange(context *kronos.ParsingContext, match []string) bool 
 
 // isPartOfLargerNumber checks if match is embedded in a larger number sequence.
 // For example, "2012-1400" should not match "12-1400" as a time, and "20" from "2020" should be rejected.
-func isPartOfLargerNumber(context *kronos.ParsingContext, match []string) bool {
+func isPartOfLargerNumber(context *kronos.InternalParsingContext, match []string) bool {
 	matchStartInText := strings.Index(context.Text(), match[0])
 	if matchStartInText < 0 {
 		return false
@@ -383,10 +383,10 @@ func parseMeridiem(ampmStr string, hour int) (int, *helpers.Meridiem, bool) {
 
 // ExtractPrimaryTimeComponents extracts time components from the primary match
 func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
-	context *kronos.ParsingContext,
+	context *kronos.InternalParsingContext,
 	match []string,
 	strict bool,
-) *kronos.ParsingComponents {
+) *kronos.InternalParsingComponents {
 	// Reject decimal ranges and embedded numbers early
 	if looksLikeDecimalRange(context, match) {
 		return nil
@@ -528,10 +528,10 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 
 // ExtractFollowingTimeComponents extracts time components from the following match (for time ranges)
 func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
-	context *kronos.ParsingContext,
+	context *kronos.InternalParsingContext,
 	match []string,
-	result *kronos.ParsingResult,
-) *kronos.ParsingComponents {
+	result *kronos.InternalParsingResult,
+) *kronos.InternalParsingComponents {
 	const noMeridiem = -1
 
 	components := context.CreateParsingComponents(nil)
@@ -731,7 +731,7 @@ var (
 	twoDigitDecimalPattern   = regexp.MustCompile(`\d(\.\d{2})+$`)
 )
 
-func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(result *kronos.ParsingResult) *kronos.ParsingResult {
+func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(result *kronos.InternalParsingResult) *kronos.InternalParsingResult {
 	// Use hook if provided
 	if p.checkAndReturnWithoutFollowingHook != nil {
 		return p.checkAndReturnWithoutFollowingHook(result)
@@ -789,7 +789,7 @@ var (
 	numberRangePattern         = regexp.MustCompile(`[^\d:.]([\d.]+)\s*-\s*([\d.]+)$`)
 )
 
-func (p *AbstractTimeExpressionParser) checkAndReturnWithFollowingPattern(result *kronos.ParsingResult) *kronos.ParsingResult {
+func (p *AbstractTimeExpressionParser) checkAndReturnWithFollowingPattern(result *kronos.InternalParsingResult) *kronos.InternalParsingResult {
 	text := strings.TrimSpace(result.Text())
 
 	// In strict mode, reject simple number ranges (e.g., "7-730", "10 - 20")

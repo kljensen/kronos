@@ -31,7 +31,7 @@ func NewENMonthNameLittleEndianParser() *ENMonthNameLittleEndianParser {
 	return parser
 }
 
-func (p *ENMonthNameLittleEndianParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENMonthNameLittleEndianParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Pattern: (on)? DAY (to|-)? DAY? (-|/|of) MONTH (-|/|,)? YEAR?
 	pattern := `(?i)(?:on\s{0,3})?` +
 		`(` + data.OrdinalNumberPattern + `)` +
@@ -50,7 +50,7 @@ func (p *ENMonthNameLittleEndianParser) innerPattern(context *kronos.ParsingCont
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 4 {
 		return nil
 	}
@@ -119,7 +119,7 @@ func NewENMonthNameMiddleEndianParser(shouldSkipYearLikeDate bool) *ENMonthNameM
 	return parser
 }
 
-func (p *ENMonthNameMiddleEndianParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENMonthNameMiddleEndianParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Pattern: MONTH (-|/|,) DAY (to|-)? (MONTH)? DAY? (-|/|,|space)? YEAR?
 	// Supports:
 	// - "August 10" (month + day)
@@ -144,7 +144,7 @@ func (p *ENMonthNameMiddleEndianParser) innerPattern(context *kronos.ParsingCont
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 3 {
 		return nil
 	}

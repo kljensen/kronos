@@ -34,7 +34,7 @@ func NewENYearMonthDayParser(strictMonthDateOrder bool) *ENYearMonthDayParser {
 	return parser
 }
 
-func (p *ENYearMonthDayParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENYearMonthDayParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Pattern: YYYY[-/./ ]MM[-/./ ]DD or YYYY[-/./ ]MONTH[-/./ ]DD
 	pattern := `(?i)([0-9]{4})[-.\\/\s]` +
 		`(?:(` + data.MonthPattern + `)|([0-9]{1,2}))[-.\\/\s]` +
@@ -44,7 +44,7 @@ func (p *ENYearMonthDayParser) innerPattern(context *kronos.ParsingContext) *reg
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENYearMonthDayParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENYearMonthDayParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 5 {
 		return nil
 	}

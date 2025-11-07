@@ -29,7 +29,7 @@ func NewExtractTimezoneAbbrRefiner(timezoneOverrides map[string]int) *ExtractTim
 }
 
 // Refine extracts timezone abbreviations and adds them to results
-func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	// Merge context timezones with refiner overrides
 	timezoneOverrides := make(kronos.TimezoneAbbrMap)
 	for k, v := range r.timezoneOverrides {
@@ -162,7 +162,7 @@ func (r *ExtractTimezoneAbbrRefiner) Refine(context *kronos.ParsingContext, resu
 			resultStart.Assign(kronos.ComponentTimezoneOffset, extractedTimezoneOffset)
 		}
 
-		var resultEnd *kronos.ParsingComponents
+		var resultEnd *kronos.InternalParsingComponents
 		if result.End() != nil {
 			if endComponents, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents

@@ -11,7 +11,7 @@ import (
 func TestPipeline_TimezoneConversion_BasicUTCToNY(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	// Create a test result with UTC time: 2020-06-15 18:00:00 UTC
 	utc := time.UTC
@@ -26,7 +26,7 @@ func TestPipeline_TimezoneConversion_BasicUTCToNY(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 6:00 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	// Apply timezone conversion
 	converted, err := pipeline.applyTimezoneConversion(results)
@@ -47,7 +47,7 @@ func TestPipeline_TimezoneConversion_BasicUTCToNY(t *testing.T) {
 func TestPipeline_TimezoneConversion_StartDateReflectsTargetTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -60,7 +60,7 @@ func TestPipeline_TimezoneConversion_StartDateReflectsTargetTimezone(t *testing.
 	startComponents.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 6:00 PM", startComponents, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -77,7 +77,7 @@ func TestPipeline_TimezoneConversion_StartDateReflectsTargetTimezone(t *testing.
 func TestPipeline_TimezoneConversion_UTCToTokyo(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Asia/Tokyo"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	// Create a test result with UTC time: 2020-06-15 18:00:00 UTC
 	utc := time.UTC
@@ -92,7 +92,7 @@ func TestPipeline_TimezoneConversion_UTCToTokyo(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 6:00 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	// Apply timezone conversion
 	converted, err := pipeline.applyTimezoneConversion(results)
@@ -114,7 +114,7 @@ func TestPipeline_TimezoneConversion_UTCToTokyo(t *testing.T) {
 func TestPipeline_TimezoneConversion_DateBoundaryChange(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	// Create a test result with UTC time: 2020-06-15 23:00:00 UTC
 	// This should become 2020-06-15 19:00:00 EDT (same day)
@@ -130,7 +130,7 @@ func TestPipeline_TimezoneConversion_DateBoundaryChange(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 11:00 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -151,7 +151,7 @@ func TestPipeline_TimezoneConversion_DateBoundaryChange(t *testing.T) {
 	components2.Assign(ComponentSecond, 0)
 
 	result2 := newParsingResult(ref, 0, "June 16, 2020 at 3:00 AM", components2, nil)
-	results2 := []*ParsingResult{result2}
+	results2 := []*parsingResult{result2}
 
 	converted2, err := pipeline.applyTimezoneConversion(results2)
 	assert.NoError(t, err)
@@ -167,7 +167,7 @@ func TestPipeline_TimezoneConversion_DateBoundaryChange(t *testing.T) {
 func TestPipeline_TimezoneConversion_DSTBoundary(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 3, 8, 12, 0, 0, 0, utc), nil)
@@ -182,7 +182,7 @@ func TestPipeline_TimezoneConversion_DSTBoundary(t *testing.T) {
 	components1.Assign(ComponentSecond, 0)
 
 	result1 := newParsingResult(ref, 0, "March 8, 2020 at 6:00 AM", components1, nil)
-	results1 := []*ParsingResult{result1}
+	results1 := []*parsingResult{result1}
 
 	converted1, err := pipeline.applyTimezoneConversion(results1)
 	assert.NoError(t, err)
@@ -200,7 +200,7 @@ func TestPipeline_TimezoneConversion_DSTBoundary(t *testing.T) {
 	components2.Assign(ComponentSecond, 0)
 
 	result2 := newParsingResult(ref, 0, "March 8, 2020 at 8:00 AM", components2, nil)
-	results2 := []*ParsingResult{result2}
+	results2 := []*parsingResult{result2}
 
 	converted2, err := pipeline.applyTimezoneConversion(results2)
 	assert.NoError(t, err)
@@ -213,7 +213,7 @@ func TestPipeline_TimezoneConversion_DSTBoundary(t *testing.T) {
 func TestPipeline_TimezoneConversion_RangeResults(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -236,7 +236,7 @@ func TestPipeline_TimezoneConversion_RangeResults(t *testing.T) {
 	endComponents.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 from 6:00 PM to 10:00 PM", startComponents, endComponents)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -256,7 +256,7 @@ func TestPipeline_TimezoneConversion_RangeResults(t *testing.T) {
 func TestPipeline_TimezoneConversion_midnight(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/Los_Angeles"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -271,7 +271,7 @@ func TestPipeline_TimezoneConversion_midnight(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 16, 2020 at midnight", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -288,7 +288,7 @@ func TestPipeline_TimezoneConversion_midnight(t *testing.T) {
 func TestPipeline_TimezoneConversion_noon(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Asia/Shanghai"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -303,7 +303,7 @@ func TestPipeline_TimezoneConversion_noon(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at noon", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -320,7 +320,7 @@ func TestPipeline_TimezoneConversion_noon(t *testing.T) {
 func TestPipeline_TimezoneConversion_YearBoundary(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Pacific/Auckland"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2019, 12, 31, 12, 0, 0, 0, utc), nil)
@@ -335,7 +335,7 @@ func TestPipeline_TimezoneConversion_YearBoundary(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "December 31, 2019 at 11:00 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -352,7 +352,7 @@ func TestPipeline_TimezoneConversion_YearBoundary(t *testing.T) {
 func TestPipeline_TimezoneConversion_YearBoundaryBackward(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/Los_Angeles"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 1, 1, 12, 0, 0, 0, utc), nil)
@@ -367,7 +367,7 @@ func TestPipeline_TimezoneConversion_YearBoundaryBackward(t *testing.T) {
 	components.Assign(ComponentSecond, 0)
 
 	result := newParsingResult(ref, 0, "January 1, 2020 at 2:00 AM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -384,7 +384,7 @@ func TestPipeline_TimezoneConversion_YearBoundaryBackward(t *testing.T) {
 func TestPipeline_TimezoneConversion_PreserveCertainty(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -394,7 +394,7 @@ func TestPipeline_TimezoneConversion_PreserveCertainty(t *testing.T) {
 	components.Assign(ComponentHour, 18)
 
 	result := newParsingResult(ref, 0, "6:00 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -412,7 +412,7 @@ func TestPipeline_TimezoneConversion_PreserveCertainty(t *testing.T) {
 func TestPipeline_TimezoneConversion_InvalidTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Invalid/Timezone"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -424,7 +424,7 @@ func TestPipeline_TimezoneConversion_InvalidTimezone(t *testing.T) {
 	components.Assign(ComponentHour, 18)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 6:00 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	_, err := pipeline.applyTimezoneConversion(results)
 	assert.Error(t, err, "Should return error for invalid timezone")
@@ -434,9 +434,9 @@ func TestPipeline_TimezoneConversion_InvalidTimezone(t *testing.T) {
 func TestPipeline_TimezoneConversion_EmptyResults(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
-	results := []*ParsingResult{}
+	results := []*parsingResult{}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -447,13 +447,13 @@ func TestPipeline_TimezoneConversion_EmptyResults(t *testing.T) {
 func TestPipeline_TimezoneConversion_NilStartComponents(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
 
 	result := newParsingResult(ref, 0, "test", nil, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	// Should not panic with nil start components
 	converted, err := pipeline.applyTimezoneConversion(results)
@@ -465,7 +465,7 @@ func TestPipeline_TimezoneConversion_NilStartComponents(t *testing.T) {
 func TestPipeline_TimezoneConversion_WithMilliseconds(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -482,7 +482,7 @@ func TestPipeline_TimezoneConversion_WithMilliseconds(t *testing.T) {
 	components.Assign(ComponentNanosecond, 789)
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 6:30:45.123 PM", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)
@@ -498,7 +498,7 @@ func TestPipeline_TimezoneConversion_WithMilliseconds(t *testing.T) {
 func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -512,7 +512,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 	components1.Assign(ComponentMeridiem, int(0))
 
 	result1 := newParsingResult(ref, 0, "June 15, 2020 at 11:00 AM", components1, nil)
-	results1 := []*ParsingResult{result1}
+	results1 := []*parsingResult{result1}
 
 	converted1, err := pipeline.applyTimezoneConversion(results1)
 	assert.NoError(t, err)
@@ -530,7 +530,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 	components2.Assign(ComponentMeridiem, int(1))
 
 	result2 := newParsingResult(ref, 0, "June 15, 2020 at 1:00 PM", components2, nil)
-	results2 := []*ParsingResult{result2}
+	results2 := []*parsingResult{result2}
 
 	converted2, err := pipeline.applyTimezoneConversion(results2)
 	assert.NoError(t, err)
@@ -544,7 +544,7 @@ func TestPipeline_TimezoneConversion_MeridiemUpdate(t *testing.T) {
 func TestPipeline_TimezoneConversion_TimezoneOffset(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	utc := time.UTC
 	ref := newReferenceWithTimezone(time.Date(2020, 6, 15, 12, 0, 0, 0, utc), nil)
@@ -557,7 +557,7 @@ func TestPipeline_TimezoneConversion_TimezoneOffset(t *testing.T) {
 	components.Assign(ComponentTimezoneOffset, 0) // UTC offset
 
 	result := newParsingResult(ref, 0, "June 15, 2020 at 6:00 PM UTC", components, nil)
-	results := []*ParsingResult{result}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	assert.NoError(t, err)

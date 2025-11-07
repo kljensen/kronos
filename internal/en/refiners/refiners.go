@@ -70,7 +70,7 @@ const (
 var yearSuffixPattern = regexp.MustCompile(`^\s*(` + yearPattern + `)`)
 
 // Refine extracts year suffixes from dates in parsing results
-func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	for i, result := range results {
 		resultStart, okStart := helpers.AsParsingComponents(result.Start())
 		if !okStart {
@@ -96,7 +96,7 @@ func (r *ENExtractYearSuffixRefiner) Refine(context *kronos.ParsingContext, resu
 		}
 
 		year := parseYear(match[1])
-		var resultEnd *kronos.ParsingComponents
+		var resultEnd *kronos.InternalParsingComponents
 		if result.End() != nil {
 			if endComponents, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 				resultEnd = endComponents
@@ -171,21 +171,21 @@ var (
 	patternNegativeFollowing = regexp.MustCompile(`^-`)
 )
 
-func isPositiveFollowingReference(result *kronos.ParsingResult) bool {
+func isPositiveFollowingReference(result *kronos.InternalParsingResult) bool {
 	return patternPositiveFollowing.MatchString(result.Text())
 }
 
-func isNegativeFollowingReference(result *kronos.ParsingResult) bool {
+func isNegativeFollowingReference(result *kronos.InternalParsingResult) bool {
 	return patternNegativeFollowing.MatchString(result.Text())
 }
 
 // Refine merges relative date expressions that come after absolute dates
-func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if len(results) < 2 {
 		return results
 	}
 
-	merged := make([]*kronos.ParsingResult, 0, len(results))
+	merged := make([]*kronos.InternalParsingResult, 0, len(results))
 	current := results[0]
 
 	for i := 1; i < len(results); i++ {
@@ -254,23 +254,23 @@ func NewENMergeRelativeFollowByDateRefiner() *ENMergeRelativeFollowByDateRefiner
 
 var patternFollowBetween = regexp.MustCompile(`^\s*$`)
 
-func hasImpliedEarlierReferenceDate(result *kronos.ParsingResult) bool {
+func hasImpliedEarlierReferenceDate(result *kronos.InternalParsingResult) bool {
 	text := strings.ToLower(result.Text())
 	return strings.HasSuffix(text, " before") || strings.HasSuffix(text, " from")
 }
 
-func hasImpliedLaterReferenceDate(result *kronos.ParsingResult) bool {
+func hasImpliedLaterReferenceDate(result *kronos.InternalParsingResult) bool {
 	text := strings.ToLower(result.Text())
 	return strings.HasSuffix(text, " after") || strings.HasSuffix(text, " since")
 }
 
 // Refine merges relative date expressions that follow absolute dates
-func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if len(results) < 2 {
 		return results
 	}
 
-	merged := make([]*kronos.ParsingResult, 0, len(results))
+	merged := make([]*kronos.InternalParsingResult, 0, len(results))
 	current := results[0]
 
 	for i := 1; i < len(results); i++ {
@@ -347,8 +347,8 @@ func NewENUnlikelyFormatFilter() *ENUnlikelyFormatFilter {
 var mayContextPattern = regexp.MustCompile(`(?i)\b(in)$`)
 
 // Refine filters out unlikely English date formats from parsing results
-func (f *ENUnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
-	filtered := make([]*kronos.ParsingResult, 0, len(results))
+func (f *ENUnlikelyFormatFilter) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
+	filtered := make([]*kronos.InternalParsingResult, 0, len(results))
 
 	for _, result := range results {
 		if !f.isValid(context, result) {
@@ -360,7 +360,7 @@ func (f *ENUnlikelyFormatFilter) Refine(context *kronos.ParsingContext, results 
 	return filtered
 }
 
-func (f *ENUnlikelyFormatFilter) isValid(context *kronos.ParsingContext, result *kronos.ParsingResult) bool {
+func (f *ENUnlikelyFormatFilter) isValid(context *kronos.InternalParsingContext, result *kronos.InternalParsingResult) bool {
 	text := strings.TrimSpace(result.Text())
 
 	// If the result consists of the whole text, it's likely valid

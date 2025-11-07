@@ -57,12 +57,12 @@ func NewSlashDateFormatParser(littleEndian bool) *SlashDateFormatParser {
 }
 
 // Pattern implements Parser.Pattern.
-func (p *SlashDateFormatParser) Pattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *SlashDateFormatParser) Pattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	return slashPattern
 }
 
 // Extract implements Parser.Extract.
-func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *SlashDateFormatParser) Extract(context *kronos.InternalParsingContext, match []string) interface{} {
 	// Get the match boundaries
 	fullMatch := match[0]
 	opening := match[slashOpeningGroup]
@@ -209,7 +209,7 @@ func (p *SlashDateFormatParser) Extract(context *kronos.ParsingContext, match []
 	// If there's a boundary, return ParsingResultWithBoundary
 	// Otherwise, return ParsingComponents for chrono.go to handle
 	if len(opening) > 0 {
-		return &kronos.ParsingResultWithBoundary{
+		return &kronos.InternalParsingResultWithBoundary{
 			Components:         components,
 			AdjustedText:       matchText,
 			BoundaryLen:        len(opening),

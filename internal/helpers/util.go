@@ -51,12 +51,12 @@ const (
 // AsParsingComponents attempts to cast the given ParsedComponents interface to
 // a *ParsingComponents. It returns the concrete value and true when the cast
 // succeeds, or nil and false otherwise.
-func AsParsingComponents(pc kronos.ParsedComponents) (*kronos.ParsingComponents, bool) {
+func AsParsingComponents(pc kronos.ParsedComponents) (*kronos.InternalParsingComponents, bool) {
 	if pc == nil {
 		return nil, false
 	}
 
-	components, ok := pc.(*kronos.ParsingComponents)
+	components, ok := pc.(*kronos.InternalParsingComponents)
 	if !ok || components == nil {
 		return nil, false
 	}
@@ -66,7 +66,7 @@ func AsParsingComponents(pc kronos.ParsedComponents) (*kronos.ParsingComponents,
 
 // NewParsingContext creates a new ParsingContext for parsing operations.
 // This uses the internal helper exported from kronos package for internal use.
-func NewParsingContext(text string, refDate interface{}, option *kronos.ParsingOption) *kronos.ParsingContext {
+func NewParsingContext(text string, refDate interface{}, option *kronos.InternalParsingOption) *kronos.InternalParsingContext {
 	return kronos.InternalNewParsingContext(text, refDate, option)
 }
 
@@ -74,20 +74,20 @@ func NewParsingContext(text string, refDate interface{}, option *kronos.ParsingO
 // It initializes implied values based on the reference date.
 //
 // This uses the internal helper exported from kronos package for internal use.
-func NewParsingComponents(reference *kronos.ReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.ParsingComponents {
+func NewParsingComponents(reference *kronos.InternalReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.InternalParsingComponents {
 	return kronos.InternalNewParsingComponents(reference, knownComponents)
 }
 
 // NewParsingResult creates a new ParsingResult with the given parameters.
 // This uses the internal helper exported from kronos package for internal use.
-func NewParsingResult(reference *kronos.ReferenceWithTimezone, index int, text string, start, end *kronos.ParsingComponents) *kronos.ParsingResult {
+func NewParsingResult(reference *kronos.InternalReferenceWithTimezone, index int, text string, start, end *kronos.InternalParsingComponents) *kronos.InternalParsingResult {
 	return kronos.InternalNewParsingResult(reference, index, text, start, end)
 }
 
 // MergeDateTimeResultWrapper merges a date-only result with a time-only result.
 //
 // This is a wrapper around the internal implementation in the kronos package.
-func MergeDateTimeResultWrapper(dateResult, timeResult *kronos.ParsingResult) *kronos.ParsingResult {
+func MergeDateTimeResultWrapper(dateResult, timeResult *kronos.InternalParsingResult) *kronos.InternalParsingResult {
 	return kronos.InternalMergeDateTimeResult(dateResult, timeResult)
 }
 

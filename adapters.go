@@ -5,11 +5,11 @@ import "time"
 // resultAdapter adapts an internal ParsingResult to implement the public Result interface.
 // This allows us to expose a clean public API while keeping implementation details internal.
 type resultAdapter struct {
-	result *ParsingResult
+	result *parsingResult
 }
 
 // newResultAdapter creates a new resultAdapter wrapping a ParsingResult.
-func newResultAdapter(result *ParsingResult) *resultAdapter {
+func newResultAdapter(result *parsingResult) *resultAdapter {
 	return &resultAdapter{result: result}
 }
 
@@ -33,7 +33,7 @@ func (r *resultAdapter) Start() Components {
 	parsed := r.result.Start()
 	// The ParsedComponents interface is implemented by ParsingComponents,
 	// so we can wrap it in a componentsAdapter
-	if pc, ok := parsed.(*ParsingComponents); ok {
+	if pc, ok := parsed.(*parsingComponents); ok {
 		return newComponentsAdapter(pc)
 	}
 	return nil
@@ -47,7 +47,7 @@ func (r *resultAdapter) End() Components {
 	}
 	// The ParsedComponents interface is implemented by ParsingComponents,
 	// so we can wrap it in a componentsAdapter
-	if pc, ok := parsed.(*ParsingComponents); ok {
+	if pc, ok := parsed.(*parsingComponents); ok {
 		return newComponentsAdapter(pc)
 	}
 	return nil
@@ -61,11 +61,11 @@ func (r *resultAdapter) Tags() map[string]bool {
 
 // componentsAdapter adapts an internal ParsingComponents to implement the public Components interface.
 type componentsAdapter struct {
-	components *ParsingComponents
+	components *parsingComponents
 }
 
 // newComponentsAdapter creates a new componentsAdapter wrapping ParsingComponents.
-func newComponentsAdapter(components *ParsingComponents) *componentsAdapter {
+func newComponentsAdapter(components *parsingComponents) *componentsAdapter {
 	return &componentsAdapter{components: components}
 }
 

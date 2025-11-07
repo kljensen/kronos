@@ -12,14 +12,14 @@ import (
 // MockParser is a simple parser for testing
 type MockParser struct {
 	pattern     string
-	extractFunc func(context *ParsingContext, match []string) interface{}
+	extractFunc func(context *parsingContext, match []string) interface{}
 }
 
-func (p *MockParser) Pattern(context *ParsingContext) *regexp.Regexp {
+func (p *MockParser) Pattern(context *parsingContext) *regexp.Regexp {
 	return regexp.MustCompile(p.pattern)
 }
 
-func (p *MockParser) Extract(context *ParsingContext, match []string) interface{} {
+func (p *MockParser) Extract(context *parsingContext, match []string) interface{} {
 	if p.extractFunc != nil {
 		return p.extractFunc(context, match)
 	}
@@ -28,10 +28,10 @@ func (p *MockParser) Extract(context *ParsingContext, match []string) interface{
 
 // MockRefiner is a simple refiner for testing
 type MockRefiner struct {
-	refineFunc func(context *ParsingContext, results []*ParsingResult) []*ParsingResult
+	refineFunc func(context *parsingContext, results []*parsingResult) []*parsingResult
 }
 
-func (r *MockRefiner) Refine(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
+func (r *MockRefiner) Refine(context *parsingContext, results []*parsingResult) []*parsingResult {
 	if r.refineFunc != nil {
 		return r.refineFunc(context, results)
 	}
@@ -86,7 +86,7 @@ func TestChronoParse(t *testing.T) {
 	t.Run("basic parsing", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\b(\d{4})-(\d{2})-(\d{2})\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return map[Component]int{
 					ComponentYear:  2023,
 					ComponentMonth: 10,
@@ -108,7 +108,7 @@ func TestChronoParse(t *testing.T) {
 	t.Run("multiple matches", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\b(\d{4})\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				year := 0
 				if len(match) > 1 {
 					_, _ = fmt.Sscanf(match[1], "%d", &year)
@@ -129,7 +129,7 @@ func TestChronoParse(t *testing.T) {
 	t.Run("sorted by index", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\b(\d{4})\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return map[Component]int{
 					ComponentYear: 2020,
 				}
@@ -150,7 +150,7 @@ func TestChronoParseDate(t *testing.T) {
 	t.Run("returns first date", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\b(\d{4})-(\d{2})-(\d{2})\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return map[Component]int{
 					ComponentYear:  2023,
 					ComponentMonth: 10,
@@ -172,7 +172,7 @@ func TestChronoParseDate(t *testing.T) {
 	t.Run("returns nil when no matches", func(t *testing.T) {
 		parser := &MockParser{
 			pattern:     `\b(\d{4})-(\d{2})-(\d{2})\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} { return nil },
+			extractFunc: func(context *parsingContext, match []string) interface{} { return nil },
 		}
 
 		config := &Configuration{Parsers: []Parser{parser}}
@@ -187,14 +187,14 @@ func TestChronoRefiner(t *testing.T) {
 	t.Run("refiner processes results", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\b(\d{4})\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return map[Component]int{ComponentYear: 2020}
 			},
 		}
 
 		refinerCalled := false
 		refiner := &MockRefiner{
-			refineFunc: func(context *ParsingContext, results []*ParsingResult) []*ParsingResult {
+			refineFunc: func(context *parsingContext, results []*parsingResult) []*parsingResult {
 				refinerCalled = true
 				// Filter out some results
 				return results[:1]
@@ -217,7 +217,7 @@ func TestExecuteParser(t *testing.T) {
 	t.Run("handles ParsingResult return", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\btest\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				result := context.CreateParsingResult(0, "test")
 				return result
 			},
@@ -233,7 +233,7 @@ func TestExecuteParser(t *testing.T) {
 	t.Run("handles ParsingComponents return", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\btest\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return context.CreateParsingComponents(map[Component]int{
 					ComponentYear: 2023,
 				})
@@ -251,7 +251,7 @@ func TestExecuteParser(t *testing.T) {
 	t.Run("handles map return", func(t *testing.T) {
 		parser := &MockParser{
 			pattern: `\btest\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) interface{} {
 				return map[Component]int{
 					ComponentYear: 2023,
 				}
@@ -269,7 +269,7 @@ func TestExecuteParser(t *testing.T) {
 	t.Run("handles nil return", func(t *testing.T) {
 		parser := &MockParser{
 			pattern:     `\btest\b`,
-			extractFunc: func(context *ParsingContext, match []string) interface{} { return nil },
+			extractFunc: func(context *parsingContext, match []string) interface{} { return nil },
 		}
 
 		config := &Configuration{Parsers: []Parser{parser}}

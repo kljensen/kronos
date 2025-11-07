@@ -101,9 +101,9 @@ type Settings struct {
 	DebugHandler      DebugHandler    // Debug callback for parsing events
 }
 
-// ToParsingOption converts Settings to ParsingOption for backward compatibility.
-// This method is used internally to bridge Settings and ParsingOption.
-func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
+// ToparsingOption converts Settings to parsingOption for backward compatibility.
+// This method is used internally to bridge Settings and parsingOption.
+func (s Settings) ToparsingOption(timezones TimezoneAbbrMap) parsingOption {
 	// Merge default timezones with overrides
 	mergedTimezones := timezones
 	if s.TimezoneOverrides != nil {
@@ -115,7 +115,7 @@ func (s Settings) ToParsingOption(timezones TimezoneAbbrMap) ParsingOption {
 		}
 	}
 
-	return ParsingOption{
+	return parsingOption{
 		ForwardDate: s.PreferDatesFrom == PreferFuture,
 		Preference:  s.PreferDatesFrom,
 		DateOrder:   s.DateOrder,
@@ -139,9 +139,9 @@ func DefaultSettings() Settings {
 	}
 }
 
-// ValidateSettings checks settings for consistency and validity.
+// validateSettings checks settings for consistency and validity.
 // Returns an error if any setting is invalid.
-func ValidateSettings(s Settings) error {
+func validateSettings(s Settings) error {
 	// Validate timezone
 	if s.Timezone != "" {
 		if _, err := time.LoadLocation(s.Timezone); err != nil {
@@ -176,9 +176,9 @@ func ValidateSettings(s Settings) error {
 
 // ApplySettings creates a new ParsingContext with settings applied.
 // This allows settings to influence the parsing context.
-func applySettings(text string, refDate time.Time, settings Settings) (*ParsingContext, error) {
+func applySettings(text string, refDate time.Time, settings Settings) (*parsingContext, error) {
 	// Validate settings first
-	if err := ValidateSettings(settings); err != nil {
+	if err := validateSettings(settings); err != nil {
 		return nil, err
 	}
 
@@ -186,7 +186,7 @@ func applySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 	text = sanitizeInput(text)
 
 	// Create parsing option from settings
-	opt := ParsingOption{
+	opt := parsingOption{
 		Preference: settings.PreferDatesFrom,
 		DateOrder:  settings.DateOrder,
 		Timezones:  nil,

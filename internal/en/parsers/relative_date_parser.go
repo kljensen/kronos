@@ -39,11 +39,11 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 	parser := &ENRelativeDateFormatParser{}
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
+		func(context *kronos.InternalParsingContext) *regexp.Regexp {
 			pattern := approximationPattern + `(this|last|past|next|after\s*this)\s*(` + endata.MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) interface{} {
 			if len(match) < 3 {
 				return nil
 			}
@@ -112,7 +112,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 }
 
 // handleThisPeriod creates components for "this <timeunit>" expressions
-func handleThisPeriod(context *kronos.ParsingContext, timeunit kronos.Timeunit, isApproximate bool) *kronos.ParsingComponents {
+func handleThisPeriod(context *kronos.InternalParsingContext, timeunit kronos.Timeunit, isApproximate bool) *kronos.InternalParsingComponents {
 	components := context.CreateParsingComponents(nil)
 	refDate := context.Reference().Instant()
 

@@ -149,7 +149,7 @@ func (p *ParserBuilder) WithOption(option func(*Settings)) *ParserBuilder {
 // Returns an error if the settings are invalid or parsing fails.
 func (p *ParserBuilder) Parse(text string) ([]Result, error) {
 	// Use pipeline for parsing with settings
-	results, err := ParseWithSettings(text, p.refDate, p.settings, p.config)
+	results, err := parseWithSettings(text, p.refDate, p.settings, p.config)
 	if err != nil {
 		return nil, err
 	}

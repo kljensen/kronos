@@ -19,7 +19,7 @@ func NewForwardDateRefiner() *ForwardDateRefiner {
 }
 
 // Refine adjusts dates to be in the future when forwardDate option is enabled
-func (r *ForwardDateRefiner) Refine(context *kronos.ParsingContext, results []*kronos.ParsingResult) []*kronos.ParsingResult {
+func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
 	if !context.Option().ForwardDate {
 		return results
 	}

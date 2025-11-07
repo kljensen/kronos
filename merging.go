@@ -3,7 +3,7 @@ package kronos
 import "time"
 
 // MergeDateTimeResult merges a date-only result with a time-only result.
-func mergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
+func mergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 	result := dateResult.Clone()
 	beginDate, okDate := asParsingComponents(dateResult.Start())
 	beginTime, okTime := asParsingComponents(timeResult.Start())
@@ -14,7 +14,7 @@ func mergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
 	result.start = mergeDateTimeComponent(beginDate, beginTime)
 
 	if dateResult.End() != nil || timeResult.End() != nil {
-		var endDate, endTime *ParsingComponents
+		var endDate, endTime *parsingComponents
 		if dateResult.End() == nil {
 			endDate, okDate = asParsingComponents(dateResult.Start())
 		} else {
@@ -49,7 +49,7 @@ func mergeDateTimeResult(dateResult, timeResult *ParsingResult) *ParsingResult {
 }
 
 // MergeDateTimeComponent merges date and time components.
-func mergeDateTimeComponent(dateComp, timeComp *ParsingComponents) *ParsingComponents {
+func mergeDateTimeComponent(dateComp, timeComp *parsingComponents) *parsingComponents {
 	result := dateComp.Clone()
 
 	// Merge time components

@@ -5,39 +5,39 @@ import (
 	"time"
 )
 
-func TestNewPipeline(t *testing.T) {
+func TestnewPipeline(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
 	settings := DefaultSettings()
 
-	pipeline := NewPipeline(config, settings)
+	pipeline := newPipeline(config, settings)
 
 	if pipeline == nil {
 		t.Fatal("Expected non-nil pipeline")
 	}
 }
 
-func TestNewPipeline_NilConfig(t *testing.T) {
+func TestnewPipeline_NilConfig(t *testing.T) {
 	settings := DefaultSettings()
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	if pipeline == nil {
 		t.Fatal("Expected non-nil pipeline")
 	}
 }
 
-func TestNewPipelineWithSettings(t *testing.T) {
+func TestnewPipelineWithSettings(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
 	settings := DefaultSettings()
 
-	pipeline, err := NewPipelineWithSettings(config, settings)
+	pipeline, err := newPipelineWithSettings(config, settings)
 	if err != nil {
-		t.Fatalf("NewPipelineWithSettings failed: %v", err)
+		t.Fatalf("newPipelineWithSettings failed: %v", err)
 	}
 
 	if pipeline == nil {
@@ -45,7 +45,7 @@ func TestNewPipelineWithSettings(t *testing.T) {
 	}
 }
 
-func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
+func TestnewPipelineWithSettings_InvalidSettings(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -53,7 +53,7 @@ func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
 	settings := DefaultSettings()
 	settings.Timezone = "Invalid/Timezone"
 
-	_, err := NewPipelineWithSettings(config, settings)
+	_, err := newPipelineWithSettings(config, settings)
 	if err == nil {
 		t.Error("Expected error for invalid settings")
 	}
@@ -68,7 +68,7 @@ func TestPipeline_Execute_BasicParsing(t *testing.T) {
 	}
 	settings := DefaultSettings()
 
-	pipeline := NewPipeline(config, settings)
+	pipeline := newPipeline(config, settings)
 
 	text := "March 15, 2020"
 	refDate := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -92,7 +92,7 @@ func TestPipeline_Execute_StrictParsing(t *testing.T) {
 	settings := DefaultSettings()
 	settings.StrictParsing = true
 
-	pipeline := NewPipeline(config, settings)
+	pipeline := newPipeline(config, settings)
 
 	text := "March 15"
 	refDate := time.Now()
@@ -115,7 +115,7 @@ func TestPipeline_Execute_TimezoneConversion(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
 
-	pipeline := NewPipeline(config, settings)
+	pipeline := newPipeline(config, settings)
 
 	text := "March 15, 2020"
 	refDate := time.Now()
@@ -127,7 +127,7 @@ func TestPipeline_Execute_TimezoneConversion(t *testing.T) {
 }
 
 
-func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
+func TestparseWithSettings_ConvenienceFunction(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -137,9 +137,9 @@ func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 	text := "March 15, 2020"
 	refDate := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	results, err := ParseWithSettings(text, refDate, settings, config)
+	results, err := parseWithSettings(text, refDate, settings, config)
 	if err != nil {
-		t.Fatalf("ParseWithSettings failed: %v", err)
+		t.Fatalf("parseWithSettings failed: %v", err)
 	}
 
 	// With no parsers, we expect no results
@@ -148,7 +148,7 @@ func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 	}
 }
 
-func TestParseWithSettings_InvalidSettings(t *testing.T) {
+func TestparseWithSettings_InvalidSettings(t *testing.T) {
 	config := &Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
@@ -159,7 +159,7 @@ func TestParseWithSettings_InvalidSettings(t *testing.T) {
 	text := "March 15, 2020"
 	refDate := time.Now()
 
-	_, err := ParseWithSettings(text, refDate, settings, config)
+	_, err := parseWithSettings(text, refDate, settings, config)
 	if err == nil {
 		t.Error("Expected error for invalid settings")
 	}
@@ -168,10 +168,10 @@ func TestParseWithSettings_InvalidSettings(t *testing.T) {
 func TestPipeline_ApplyStrictValidation(t *testing.T) {
 	settings := DefaultSettings()
 	settings.StrictParsing = true
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
 	// Create test results
-	ref := &ReferenceWithTimezone{}
+	ref := &referenceWithTimezone{}
 
 	// Result with year and month - should pass strict validation
 	components1 := newParsingComponents(ref, map[Component]int{
@@ -180,16 +180,16 @@ func TestPipeline_ApplyStrictValidation(t *testing.T) {
 	})
 	components1.Assign(ComponentYear, 2020)
 	components1.Assign(ComponentMonth, 3)
-	result1 := &ParsingResult{start: components1}
+	result1 := &parsingResult{start: components1}
 
 	// Result with only month - should fail strict validation
 	components2 := newParsingComponents(ref, map[Component]int{
 		ComponentMonth: 3,
 	})
 	components2.Assign(ComponentMonth, 3)
-	result2 := &ParsingResult{start: components2}
+	result2 := &parsingResult{start: components2}
 
-	results := []*ParsingResult{result1, result2}
+	results := []*parsingResult{result1, result2}
 	filtered := pipeline.applyStrictValidation(results)
 
 	// Only result1 should pass
@@ -202,12 +202,12 @@ func TestPipeline_ApplyStrictValidation(t *testing.T) {
 func TestPipeline_ApplyTimezoneConversion(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "America/New_York"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
-	ref := &ReferenceWithTimezone{}
+	ref := &referenceWithTimezone{}
 	components := newParsingComponents(ref, nil)
-	result := &ParsingResult{start: components}
-	results := []*ParsingResult{result}
+	result := &parsingResult{start: components}
+	results := []*parsingResult{result}
 
 	converted, err := pipeline.applyTimezoneConversion(results)
 	if err != nil {
@@ -222,12 +222,12 @@ func TestPipeline_ApplyTimezoneConversion(t *testing.T) {
 func TestPipeline_ApplyTimezoneConversion_InvalidTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Invalid/Timezone"
-	pipeline := NewPipeline(nil, settings)
+	pipeline := newPipeline(nil, settings)
 
-	ref := &ReferenceWithTimezone{}
+	ref := &referenceWithTimezone{}
 	components := newParsingComponents(ref, nil)
-	result := &ParsingResult{start: components}
-	results := []*ParsingResult{result}
+	result := &parsingResult{start: components}
+	results := []*parsingResult{result}
 
 	_, err := pipeline.applyTimezoneConversion(results)
 	if err == nil {

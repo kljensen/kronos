@@ -125,10 +125,10 @@ type ParsingContext struct {
 // before passing it to the inner extraction logic.
 type AbstractParserWithWordBoundary struct {
 	// innerPattern should return the core regex pattern (without boundary checks)
-	innerPattern func(context *kronos.ParsingContext) *regexp.Regexp
+	innerPattern func(context *kronos.InternalParsingContext) *regexp.Regexp
 
 	// innerExtract should extract components from the match
-	innerExtract func(context *kronos.ParsingContext, match []string) interface{}
+	innerExtract func(context *kronos.InternalParsingContext, match []string) interface{}
 
 	// patternLeftBoundary returns the left boundary pattern
 	patternLeftBoundary func() string
@@ -140,8 +140,8 @@ type AbstractParserWithWordBoundary struct {
 
 // NewAbstractParserWithWordBoundary creates a new AbstractParserWithWordBoundary.
 func NewAbstractParserWithWordBoundary(
-	innerPattern func(context *kronos.ParsingContext) *regexp.Regexp,
-	innerExtract func(context *kronos.ParsingContext, match []string) interface{},
+	innerPattern func(context *kronos.InternalParsingContext) *regexp.Regexp,
+	innerExtract func(context *kronos.InternalParsingContext, match []string) interface{},
 	patternLeftBoundary func() string,
 ) *AbstractParserWithWordBoundary {
 	if patternLeftBoundary == nil {
@@ -159,7 +159,7 @@ func NewAbstractParserWithWordBoundary(
 
 // Pattern implements Parser.Pattern.
 // It wraps the inner pattern with word boundary checks.
-func (p *AbstractParserWithWordBoundary) Pattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *AbstractParserWithWordBoundary) Pattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	currentInnerPattern := p.innerPattern(context)
 
 	// Check if we need to rebuild the pattern
@@ -186,7 +186,7 @@ func (p *AbstractParserWithWordBoundary) Pattern(context *kronos.ParsingContext)
 
 // Extract implements Parser.Extract.
 // It validates word boundaries and adjusts the match before calling innerExtract.
-func (p *AbstractParserWithWordBoundary) Extract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *AbstractParserWithWordBoundary) Extract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 2 {
 		return p.innerExtract(context, match)
 	}
@@ -209,18 +209,18 @@ func (p *AbstractParserWithWordBoundary) Extract(context *kronos.ParsingContext,
 
 	// Wrap the result to communicate boundary information to chrono.go
 	switch v := result.(type) {
-	case *kronos.ParsingResult:
+	case *kronos.InternalParsingResult:
 		// Index should point past the boundary (skip the boundary characters)
 		// headerLen is the length of the boundary to skip
 		v.SetIndex(headerLen)
 		return v
-	case *kronos.ParsingResultWithBoundary:
+	case *kronos.InternalParsingResultWithBoundary:
 		// Parser returned a ParsingResultWithBoundary with custom adjusted text
 		// Update it with the correct boundary length
 		v.BoundaryLen = headerLen
 		v.IncludeBoundaryIdx = true
 		return v
-	case *kronos.ParsingComponents:
+	case *kronos.InternalParsingComponents:
 		// Wrap in a struct that provides both the components and the adjusted text
 		// The text should NOT include the boundary character
 		// Trim trailing whitespace that may have been matched by (?:\s|$|\b)
@@ -233,7 +233,7 @@ func (p *AbstractParserWithWordBoundary) Extract(context *kronos.ParsingContext,
 				break
 			}
 		}
-		return &kronos.ParsingResultWithBoundary{
+		return &kronos.InternalParsingResultWithBoundary{
 			Components:         v,
 			AdjustedText:       adjustedText, // Exclude boundary and trailing space from text
 			BoundaryLen:        headerLen,    // Length of boundary to skip

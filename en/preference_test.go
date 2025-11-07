@@ -75,7 +75,7 @@ func TestDatePreferenceWithMonth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.ParsingOption{
+			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
 			chrono := experimental.EnglishCasualChrono()
@@ -145,7 +145,7 @@ func TestDatePreferenceWithMonthAndDay(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.ParsingOption{
+			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
 			chrono := experimental.EnglishCasualChrono()
@@ -234,7 +234,7 @@ func TestDatePreferenceWithTimeOnly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.ParsingOption{
+			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
 			chrono := experimental.EnglishCasualChrono()
@@ -269,7 +269,7 @@ func TestDatePreferenceWithAbsoluteDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.ParsingOption{
+			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
 			chrono := experimental.EnglishCasualChrono()
@@ -326,7 +326,7 @@ func TestDatePreferenceWithLittleEndianFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.ParsingOption{
+			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
 			chrono := experimental.EnglishGBChrono()
@@ -382,7 +382,7 @@ func TestDatePreferenceDoesNotAffectRelativeDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.ParsingOption{
+			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
 			chrono := experimental.EnglishCasualChrono()

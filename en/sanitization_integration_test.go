@@ -110,7 +110,7 @@ func TestSanitizationPreservesSemantics(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var firstResult *kronos.ParsingResult
+			var firstResult *kronos.InternalParsingResult
 			for i, input := range tc.inputs {
 				results := chrono.Parse(input, refDate, nil)
 				if len(results) == 0 {

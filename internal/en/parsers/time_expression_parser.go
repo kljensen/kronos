@@ -44,7 +44,7 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 	})
 
 	// Helper function to process time clues like "at night", "in the afternoon", "tonight"
-	processTimeClues := func(fullMatch string, components *kronos.ParsingComponents) {
+	processTimeClues := func(fullMatch string, components *kronos.InternalParsingComponents) {
 		// Handle "at night" or "tonight"
 		if strings.Contains(fullMatch, "night") || strings.Contains(fullMatch, "tonight") {
 			hourVal := components.Get(kronos.ComponentHour)
@@ -80,9 +80,9 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 
 	// Set custom extraction hook to handle "at night", "in the afternoon", etc.
 	parser.SetExtractPrimaryTimeComponentsHook(func(
-		context *kronos.ParsingContext,
+		context *kronos.InternalParsingContext,
 		match []string,
-		components *kronos.ParsingComponents,
+		components *kronos.InternalParsingComponents,
 	) bool {
 		processTimeClues(match[0], components)
 		// Add parser tag
@@ -92,10 +92,10 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 
 	// Set hook for following time components to also handle time clues
 	parser.SetExtractFollowingTimeComponentsHook(func(
-		context *kronos.ParsingContext,
+		context *kronos.InternalParsingContext,
 		match []string,
-		result *kronos.ParsingResult,
-		components *kronos.ParsingComponents,
+		result *kronos.InternalParsingResult,
+		components *kronos.InternalParsingComponents,
 	) bool {
 		processTimeClues(match[0], components)
 

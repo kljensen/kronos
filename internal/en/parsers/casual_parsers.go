@@ -30,12 +30,12 @@ func NewENCasualDateParser() *ENCasualDateParser {
 	return parser
 }
 
-func (p *ENCasualDateParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENCasualDateParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	pattern := `(?i)(now|today|tonight|tomorrow|overmorrow|tmr|tmrw|yesterday|last\s*night)`
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENCasualDateParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENCasualDateParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 2 {
 		return nil
 	}
@@ -43,7 +43,7 @@ func (p *ENCasualDateParser) innerExtract(context *kronos.ParsingContext, match 
 	lowerText := strings.ToLower(match[1])
 	lowerText = strings.TrimSpace(lowerText)
 
-	var component *kronos.ParsingComponents
+	var component *kronos.InternalParsingComponents
 
 	switch {
 	case lowerText == "now":
@@ -107,12 +107,12 @@ func NewENCasualTimeParser() *ENCasualTimeParser {
 	return parser
 }
 
-func (p *ENCasualTimeParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENCasualTimeParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	pattern := `(?i)` + approximationPattern + `(?:this)?\s{0,3}(morning|afternoon|evening|night|midnight|midday|noon)`
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENCasualTimeParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENCasualTimeParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 2 {
 		return nil
 	}
@@ -122,7 +122,7 @@ func (p *ENCasualTimeParser) innerExtract(context *kronos.ParsingContext, match 
 	_, isApproximate := helpers.StripApproximationWords(fullMatch)
 
 	timeWord := strings.ToLower(match[1])
-	var component *kronos.ParsingComponents
+	var component *kronos.InternalParsingComponents
 
 	switch timeWord {
 	case "afternoon":

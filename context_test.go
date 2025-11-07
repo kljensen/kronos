@@ -25,12 +25,12 @@ func TestNewParsingContext(t *testing.T) {
 		}
 	})
 
-	t.Run("NewParsingContext with ParsingReference", func(t *testing.T) {
+	t.Run("NewParsingContext with parsingReference", func(t *testing.T) {
 		text := "tomorrow"
 		instant := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
 		offset := -300
 
-		parsingRef := ParsingReference{
+		parsingRef := parsingReference{
 			Instant:  &instant,
 			Timezone: offset,
 		}
@@ -83,7 +83,7 @@ func TestNewParsingContext(t *testing.T) {
 			debugCalled = true
 		}
 
-		option := &ParsingOption{
+		option := &parsingOption{
 			ForwardDate: true,
 			Debug:       debugHandler,
 		}
@@ -211,7 +211,7 @@ func TestCreateParsingResult(t *testing.T) {
 			t.Fatalf("Expected start components to be created")
 		}
 
-		start := result.Start().(*ParsingComponents)
+		start := result.Start().(*parsingComponents)
 		if !start.IsCertain(ComponentYear) {
 			t.Errorf("Expected year to be certain in start components")
 		}
@@ -244,12 +244,12 @@ func TestCreateParsingResult(t *testing.T) {
 			t.Errorf("Expected end components to be created")
 		}
 
-		start := result.Start().(*ParsingComponents)
+		start := result.Start().(*parsingComponents)
 		if val := start.Get(ComponentDay); val == nil || *val != 3 {
 			t.Errorf("Expected start day 3, got %v", val)
 		}
 
-		end := result.End().(*ParsingComponents)
+		end := result.End().(*parsingComponents)
 		if val := end.Get(ComponentDay); val == nil || *val != 5 {
 			t.Errorf("Expected end day 5, got %v", val)
 		}
@@ -297,7 +297,7 @@ func TestDebug(t *testing.T) {
 			called = true
 		}
 
-		option := &ParsingOption{
+		option := &parsingOption{
 			Debug: debugHandler,
 		}
 
@@ -326,7 +326,7 @@ func TestDebug(t *testing.T) {
 func TestContextAccessors(t *testing.T) {
 	text := "tomorrow at 3pm"
 	refDate := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-	option := &ParsingOption{
+	option := &parsingOption{
 		ForwardDate: true,
 	}
 

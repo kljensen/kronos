@@ -132,4 +132,4 @@ var DefaultSettings = kronos.DefaultSettings
 
 // ValidateSettings checks settings for consistency and validity.
 // This is re-exported from the main package for backward compatibility.
-var ValidateSettings = kronos.ValidateSettings
+var ValidateSettings = kronos.InternalValidateSettings

@@ -49,7 +49,7 @@ func NewENCompactFormatParser() *ENCompactFormatParser {
 	return parser
 }
 
-func (p *ENCompactFormatParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENCompactFormatParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Match sequences of 4-14 digits
 	// We want to match compact date/time formats but not:
 	// - Single/double/triple digits
@@ -59,7 +59,7 @@ func (p *ENCompactFormatParser) innerPattern(context *kronos.ParsingContext) *re
 	return regexp.MustCompile(`(\d{4}|\d{6}|\d{8}|\d{10}|\d{12}|\d{14})([^\w-]|$)`)
 }
 
-func (p *ENCompactFormatParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENCompactFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 3 {
 		return nil
 	}
@@ -73,7 +73,7 @@ func (p *ENCompactFormatParser) innerExtract(context *kronos.ParsingContext, mat
 		adjustedText = adjustedText[:len(adjustedText)-len(trailingChar)]
 	}
 
-	var components *kronos.ParsingComponents
+	var components *kronos.InternalParsingComponents
 
 	switch len(digitStr) {
 	case 4:
@@ -104,7 +104,7 @@ func (p *ENCompactFormatParser) innerExtract(context *kronos.ParsingContext, mat
 
 	// Return a ParsingResultWithBoundary with the adjusted text
 	// This excludes the trailing character
-	return &kronos.ParsingResultWithBoundary{
+	return &kronos.InternalParsingResultWithBoundary{
 		Components:         components,
 		AdjustedText:       adjustedText,
 		BoundaryLen:        0,    // Will be set by AbstractParserWithWordBoundary
@@ -116,7 +116,7 @@ func (p *ENCompactFormatParser) innerExtract(context *kronos.ParsingContext, mat
 // Could be: MMDD or HHmm
 // Prioritize time if hours >= 13 (clearly not a month)
 // Otherwise prioritize date if month is valid
-func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	first2, ok := atoiSafe(s[0:2])
 	if !ok {
 		return nil
@@ -164,7 +164,7 @@ func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.ParsingCon
 // Could be: YYMMDD or HHmmss
 // Prioritize date if first 2 digits look like a year (> 23 or starts with 0)
 // Otherwise prioritize time
-func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	first2, ok := atoiSafe(s[0:2])
 	if !ok {
 		return nil
@@ -218,7 +218,7 @@ func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.ParsingCon
 
 // tryParse8Digits attempts to parse 8-digit strings
 // Format: YYYYMMDD
-func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	year, ok := atoiSafe(s[0:4])
 	if !ok {
 		return nil
@@ -245,23 +245,23 @@ func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.ParsingCon
 }
 
 // tryParse10Digits attempts to parse 10-digit strings (YYYYMMDDHHmm)
-func (p *ENCompactFormatParser) tryParse10Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParse10Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	return p.tryParseDateTime(s, 4, 6, 8, 10, -1, -1, ctx)
 }
 
 // tryParse12Digits attempts to parse 12-digit strings (YYYYMMDDHHmmss)
-func (p *ENCompactFormatParser) tryParse12Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParse12Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	return p.tryParseDateTime(s, 4, 6, 8, 10, 12, -1, ctx)
 }
 
 // tryParse14Digits attempts to parse 14-digit strings (YYYYMMDDHHmmss)
-func (p *ENCompactFormatParser) tryParse14Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParse14Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	return p.tryParseDateTime(s, 4, 6, 8, 10, 12, 14, ctx)
 }
 
 // tryParseDateTime is a helper that parses datetime strings with year, month, day, and optional hour, minute, second
 // Pass -1 for minute or second positions to imply 0 values
-func (p *ENCompactFormatParser) tryParseDateTime(s string, yearLen, monthPos, dayPos, hourPos, minutePos, secondPos int, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+func (p *ENCompactFormatParser) tryParseDateTime(s string, yearLen, monthPos, dayPos, hourPos, minutePos, secondPos int, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
 	year, ok := atoiSafe(s[0:yearLen])
 	if !ok {
 		return nil

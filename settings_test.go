@@ -26,31 +26,31 @@ func TestDefaultSettings(t *testing.T) {
 	}
 }
 
-func TestValidateSettings_ValidTimezone(t *testing.T) {
+func TestvalidateSettings_ValidTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.Timezone = "America/New_York"
 
-	err := ValidateSettings(settings)
+	err := validateSettings(settings)
 	if err != nil {
 		t.Errorf("Expected no error for valid timezone, got: %v", err)
 	}
 }
 
-func TestValidateSettings_InvalidTimezone(t *testing.T) {
+func TestvalidateSettings_InvalidTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.Timezone = "Invalid/Timezone"
 
-	err := ValidateSettings(settings)
+	err := validateSettings(settings)
 	if err == nil {
 		t.Error("Expected error for invalid timezone")
 	}
 }
 
-func TestValidateSettings_ValidToTimezone(t *testing.T) {
+func TestvalidateSettings_ValidToTimezone(t *testing.T) {
 	settings := DefaultSettings()
 	settings.ToTimezone = "Europe/London"
 
-	_ = ValidateSettings(settings)
+	_ = validateSettings(settings)
 	// Either way is fine - just testing it doesn't panic
 }
 
@@ -89,11 +89,11 @@ func TestDayPreferenceString(t *testing.T) {
 	}
 }
 
-func TestToParsingOption(t *testing.T) {
+func TestToparsingOption(t *testing.T) {
 	settings := DefaultSettings()
 	settings.PreferDatesFrom = PreferFuture
 
-	opt := settings.ToParsingOption(nil)
+	opt := settings.ToparsingOption(nil)
 
 	if opt.Preference != PreferFuture {
 		t.Errorf("Expected PreferFuture, got %v", opt.Preference)
@@ -216,7 +216,7 @@ func TestSettings_DatePreferences(t *testing.T) {
 		settings := DefaultSettings()
 		settings.PreferDatesFrom = pref
 
-		err := ValidateSettings(settings)
+		err := validateSettings(settings)
 		if err != nil {
 			t.Errorf("Valid preference %v should not error, got: %v", pref, err)
 		}
@@ -235,7 +235,7 @@ func TestSettings_DayPreferences(t *testing.T) {
 		settings := DefaultSettings()
 		settings.PreferDayOfMonth = pref
 
-		err := ValidateSettings(settings)
+		err := validateSettings(settings)
 		if err != nil {
 			t.Errorf("Valid day preference %v should not error, got: %v", pref, err)
 		}

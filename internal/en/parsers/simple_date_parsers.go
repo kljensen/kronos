@@ -31,7 +31,7 @@ func NewENMonthNameParser() *ENMonthNameParser {
 	return parser
 }
 
-func (p *ENMonthNameParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENMonthNameParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Pattern: (in)? MONTH (,|-|of)? YEAR?
 	pattern := `(?i)((?:in)\s*)?` +
 		`(` + data.MonthPattern + `)` +
@@ -42,7 +42,7 @@ func (p *ENMonthNameParser) innerPattern(context *kronos.ParsingContext) *regexp
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENMonthNameParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENMonthNameParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 3 {
 		return nil
 	}
@@ -98,13 +98,13 @@ func NewENSlashMonthFormatParser() *ENSlashMonthFormatParser {
 	return parser
 }
 
-func (p *ENSlashMonthFormatParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENSlashMonthFormatParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Pattern: MM/YYYY (month 1-12, year 4 digits)
 	pattern := `(?i)([0-9]|0[1-9]|1[012])/([0-9]{4})`
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENSlashMonthFormatParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENSlashMonthFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 3 {
 		return nil
 	}
@@ -151,7 +151,7 @@ func NewENYearParser() *ENYearParser {
 	return parser
 }
 
-func (p *ENYearParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ENYearParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	// Match 4-digit years (1000-2999)
 	// This is more restrictive than data.YearPattern to avoid matching other numbers
 	// Note: AbstractParserWithWordBoundary will prepend (^|[\s,;:!?()]) for the left boundary
@@ -162,7 +162,7 @@ func (p *ENYearParser) innerPattern(context *kronos.ParsingContext) *regexp.Rege
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENYearParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ENYearParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	if len(match) < 2 {
 		return nil
 	}
@@ -186,7 +186,7 @@ func (p *ENYearParser) innerExtract(context *kronos.ParsingContext, match []stri
 
 	// Return a ParsingResultWithBoundary with the adjusted text
 	// This excludes the trailing character
-	return &kronos.ParsingResultWithBoundary{
+	return &kronos.InternalParsingResultWithBoundary{
 		Components:         components,
 		AdjustedText:       adjustedText,
 		BoundaryLen:        0,    // Will be set by AbstractParserWithWordBoundary

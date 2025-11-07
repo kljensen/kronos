@@ -8,10 +8,10 @@ import "time"
 // Deprecated: This concrete type exposes internal implementation details. External code should
 // not depend on the internal structure of this type. It will be moved to an internal package
 // in a future version.
-type ParsingContext struct {
+type parsingContext struct {
 	text      string
-	option    ParsingOption
-	reference *ReferenceWithTimezone
+	option    parsingOption
+	reference *referenceWithTimezone
 	refDate   time.Time
 	settings  *Settings
 }
@@ -20,8 +20,8 @@ type ParsingContext struct {
 // If refDate is nil, the current time is used.
 // If option is nil, default options are used.
 // The input text is sanitized to normalize Unicode characters before parsing.
-func newParsingContext(text string, refDate interface{}, option *ParsingOption) *ParsingContext {
-	var opt ParsingOption
+func newParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
+	var opt parsingOption
 	if option != nil {
 		opt = *option
 	}
@@ -36,7 +36,7 @@ func newParsingContext(text string, refDate interface{}, option *ParsingOption) 
 	// Sanitize input text to handle Unicode normalization issues
 	text = sanitizeInput(text)
 
-	return &ParsingContext{
+	return &parsingContext{
 		text:      text,
 		option:    opt,
 		reference: reference,
@@ -48,13 +48,13 @@ func newParsingContext(text string, refDate interface{}, option *ParsingOption) 
 // CreateParsingComponents creates ParsingComponents from a component map or existing components.
 // If components is already a ParsingComponents, it returns it as-is.
 // Otherwise, it creates new ParsingComponents with the provided values.
-func (ctx *ParsingContext) CreateParsingComponents(components interface{}) *ParsingComponents {
+func (ctx *parsingContext) CreateParsingComponents(components interface{}) *parsingComponents {
 	if components == nil {
 		return newParsingComponents(ctx.reference, nil)
 	}
 
 	switch v := components.(type) {
-	case *ParsingComponents:
+	case *parsingComponents:
 		return v
 	case map[Component]int:
 		return newParsingComponents(ctx.reference, v)
@@ -69,10 +69,10 @@ func (ctx *ParsingContext) CreateParsingComponents(components interface{}) *Pars
 // - (index, endIndex) - creates result with substring from text
 // - (index, text, startComponents) - creates result with start components
 // - (index, text, startComponents, endComponents) - creates result with both start and end
-func (ctx *ParsingContext) CreateParsingResult(index int, textOrEndIndex interface{}, args ...interface{}) *ParsingResult {
+func (ctx *parsingContext) CreateParsingResult(index int, textOrEndIndex interface{}, args ...interface{}) *parsingResult {
 	var text string
-	var start *ParsingComponents
-	var end *ParsingComponents
+	var start *parsingComponents
+	var end *parsingComponents
 
 	// Determine if second arg is text or endIndex
 	switch v := textOrEndIndex.(type) {
@@ -102,7 +102,7 @@ func (ctx *ParsingContext) CreateParsingResult(index int, textOrEndIndex interfa
 		}
 
 		switch v := arg.(type) {
-		case *ParsingComponents:
+		case *parsingComponents:
 			if start == nil {
 				start = v
 			} else {
@@ -121,33 +121,33 @@ func (ctx *ParsingContext) CreateParsingResult(index int, textOrEndIndex interfa
 }
 
 // Debug executes the provided function if debugging is enabled.
-func (ctx *ParsingContext) Debug(fn func()) {
+func (ctx *parsingContext) Debug(fn func()) {
 	if ctx.option.Debug != nil {
 		fn()
 	}
 }
 
 // Text returns the input text.
-func (ctx *ParsingContext) Text() string {
+func (ctx *parsingContext) Text() string {
 	return ctx.text
 }
 
 // Option returns the parsing options.
-func (ctx *ParsingContext) Option() ParsingOption {
+func (ctx *parsingContext) Option() parsingOption {
 	return ctx.option
 }
 
 // Reference returns the reference with timezone.
-func (ctx *ParsingContext) Reference() *ReferenceWithTimezone {
+func (ctx *parsingContext) Reference() *referenceWithTimezone {
 	return ctx.reference
 }
 
 // RefDate returns the reference date.
-func (ctx *ParsingContext) RefDate() time.Time {
+func (ctx *parsingContext) RefDate() time.Time {
 	return ctx.refDate
 }
 
 // Settings returns the parsing settings, if any.
-func (ctx *ParsingContext) Settings() *Settings {
+func (ctx *parsingContext) Settings() *Settings {
 	return ctx.settings
 }

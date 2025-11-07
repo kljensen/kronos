@@ -12,11 +12,11 @@ import "regexp"
 type Parser interface {
 	// Pattern returns the regular expression pattern for this parser.
 	// The pattern is used to find potential matches in the input text.
-	Pattern(context *ParsingContext) *regexp.Regexp
+	Pattern(context *parsingContext) *regexp.Regexp
 
 	// Extract is called with the pattern's match.
 	// It should return parsed components, a result, a component map, or nil if extraction fails.
-	Extract(context *ParsingContext, match []string) interface{}
+	Extract(context *parsingContext, match []string) interface{}
 }
 
 // Refiner is an abstraction for Chrono refiners.
@@ -29,7 +29,7 @@ type Parser interface {
 // github.com/kljensen/kronos/experimental instead.
 type Refiner interface {
 	// Refine processes a list of parsing results and returns a refined list.
-	Refine(context *ParsingContext, results []*ParsingResult) []*ParsingResult
+	Refine(context *parsingContext, results []*parsingResult) []*parsingResult
 }
 
 // Configuration holds the parsers and refiners for Chrono.

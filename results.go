@@ -12,34 +12,34 @@ var emptyDuration = Duration{
 	TimeunitMillisecond: 0,
 }
 
-// ReferenceWithTimezone represents a reference date/time with an optional timezone offset.
+// referenceWithTimezone represents a reference date/time with an optional timezone offset.
 // It is used as the reference point for parsing relative dates and times.
-type ReferenceWithTimezone struct {
+type referenceWithTimezone struct {
 	instant        time.Time
 	timezoneOffset *int
 }
 
-// NewReferenceWithTimezone creates a new ReferenceWithTimezone with the given instant and timezone offset.
+// newReferenceWithTimezone creates a new referenceWithTimezone with the given instant and timezone offset.
 // If instant is zero, the current time is used.
 // If timezoneOffset is nil, the system timezone is used.
-func newReferenceWithTimezone(instant time.Time, timezoneOffset *int) *ReferenceWithTimezone {
+func newReferenceWithTimezone(instant time.Time, timezoneOffset *int) *referenceWithTimezone {
 	if instant.IsZero() {
 		instant = time.Now()
 	}
-	return &ReferenceWithTimezone{
+	return &referenceWithTimezone{
 		instant:        instant,
 		timezoneOffset: timezoneOffset,
 	}
 }
 
 // FromDate creates a ReferenceWithTimezone from a Date.
-func (r *ReferenceWithTimezone) FromDate(date time.Time) *ReferenceWithTimezone {
+func (r *referenceWithTimezone) FromDate(date time.Time) *referenceWithTimezone {
 	return newReferenceWithTimezone(date, nil)
 }
 
 // FromInput creates a ReferenceWithTimezone from either a ParsingReference or a time.Time.
 // It also handles timezone conversion using the provided timezoneOverrides.
-func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceWithTimezone {
+func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *referenceWithTimezone {
 	if input == nil {
 		return newReferenceWithTimezone(time.Time{}, nil)
 	}
@@ -47,7 +47,7 @@ func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceW
 	switch v := input.(type) {
 	case time.Time:
 		return newReferenceWithTimezone(v, nil)
-	case ParsingReference:
+	case parsingReference:
 		instant := time.Now()
 		if v.Instant != nil {
 			instant = *v.Instant
@@ -67,7 +67,7 @@ func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *ReferenceW
 // GetDateWithAdjustedTimezone returns a time.Time with the year, month, day, hour, minute, second
 // equal to the reference. The output's instant is NOT the reference's instant when the reference's
 // and system's timezone are different.
-func (r *ReferenceWithTimezone) GetDateWithAdjustedTimezone() time.Time {
+func (r *referenceWithTimezone) GetDateWithAdjustedTimezone() time.Time {
 	date := r.instant
 	if r.timezoneOffset != nil {
 		adjustment := r.GetSystemTimezoneAdjustmentMinute(r.instant, nil)
@@ -78,7 +78,7 @@ func (r *ReferenceWithTimezone) GetDateWithAdjustedTimezone() time.Time {
 
 // GetSystemTimezoneAdjustmentMinute returns the number of minutes difference between
 // the system's timezone and the reference timezone.
-func (r *ReferenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time, overrideTimezoneOffset *int) int {
+func (r *referenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time, overrideTimezoneOffset *int) int {
 	const secondsPerMinute = 60
 
 	if date.IsZero() || date.Unix() < 0 {
@@ -101,7 +101,7 @@ func (r *ReferenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time
 
 // GetTimezoneOffset returns the timezone offset in minutes.
 // If no timezone offset is set, it returns the system timezone offset.
-func (r *ReferenceWithTimezone) GetTimezoneOffset() int {
+func (r *referenceWithTimezone) GetTimezoneOffset() int {
 	const secondsPerMinute = 60
 
 	if r.timezoneOffset != nil {
@@ -112,7 +112,7 @@ func (r *ReferenceWithTimezone) GetTimezoneOffset() int {
 }
 
 // Instant returns the reference instant.
-func (r *ReferenceWithTimezone) Instant() time.Time {
+func (r *referenceWithTimezone) Instant() time.Time {
 	return r.instant
 }
 
@@ -122,18 +122,18 @@ func (r *ReferenceWithTimezone) Instant() time.Time {
 // Deprecated: This concrete type exposes internal implementation details. New code should
 // use the Components interface instead, which provides a cleaner API that hides implementation.
 // This type will be moved to an internal package in a future version.
-type ParsingComponents struct {
+type parsingComponents struct {
 	knownValues   map[Component]int
 	impliedValues map[Component]int
-	reference     *ReferenceWithTimezone
+	reference     *referenceWithTimezone
 	tags          map[string]bool
 	period        Period
 }
 
 // NewParsingComponents creates a new ParsingComponents with the given reference.
 // It initializes implied values based on the reference date.
-func newParsingComponents(reference *ReferenceWithTimezone, knownComponents map[Component]int) *ParsingComponents {
-	pc := &ParsingComponents{
+func newParsingComponents(reference *referenceWithTimezone, knownComponents map[Component]int) *parsingComponents {
+	pc := &parsingComponents{
 		knownValues:   make(map[Component]int),
 		impliedValues: make(map[Component]int),
 		reference:     reference,
@@ -160,14 +160,14 @@ func newParsingComponents(reference *ReferenceWithTimezone, knownComponents map[
 }
 
 // IsCertain returns true if the component is certain (directly mentioned).
-func (pc *ParsingComponents) IsCertain(component Component) bool {
+func (pc *parsingComponents) IsCertain(component Component) bool {
 	_, exists := pc.knownValues[component]
 	return exists
 }
 
 // Get returns the component value for either Certain or Implied values.
 // Returns nil if the component is Unknown.
-func (pc *ParsingComponents) Get(component Component) *int {
+func (pc *parsingComponents) Get(component Component) *int {
 	if val, exists := pc.knownValues[component]; exists {
 		return &val
 	}
@@ -179,7 +179,7 @@ func (pc *ParsingComponents) Get(component Component) *int {
 
 // Assign sets a component value as certain (known).
 // If the component was previously implied, it is removed from implied values.
-func (pc *ParsingComponents) Assign(component Component, value int) *ParsingComponents {
+func (pc *parsingComponents) Assign(component Component, value int) *parsingComponents {
 	pc.knownValues[component] = value
 	delete(pc.impliedValues, component)
 	return pc
@@ -187,7 +187,7 @@ func (pc *ParsingComponents) Assign(component Component, value int) *ParsingComp
 
 // Imply sets a component value as implied.
 // If the component is already known, this does nothing.
-func (pc *ParsingComponents) Imply(component Component, value int) *ParsingComponents {
+func (pc *parsingComponents) Imply(component Component, value int) *parsingComponents {
 	if _, exists := pc.knownValues[component]; exists {
 		return pc
 	}
@@ -196,7 +196,7 @@ func (pc *ParsingComponents) Imply(component Component, value int) *ParsingCompo
 }
 
 // Delete removes components from both known and implied values.
-func (pc *ParsingComponents) Delete(components ...Component) *ParsingComponents {
+func (pc *parsingComponents) Delete(components ...Component) *parsingComponents {
 	for _, component := range components {
 		delete(pc.knownValues, component)
 		delete(pc.impliedValues, component)
@@ -205,8 +205,8 @@ func (pc *ParsingComponents) Delete(components ...Component) *ParsingComponents 
 }
 
 // Clone creates a deep copy of the ParsingComponents.
-func (pc *ParsingComponents) Clone() *ParsingComponents {
-	clone := &ParsingComponents{
+func (pc *parsingComponents) Clone() *parsingComponents {
+	clone := &parsingComponents{
 		knownValues:   make(map[Component]int),
 		impliedValues: make(map[Component]int),
 		reference:     pc.reference,
@@ -228,28 +228,28 @@ func (pc *ParsingComponents) Clone() *ParsingComponents {
 }
 
 // IsOnlyDate returns true if only date components are certain (no time components).
-func (pc *ParsingComponents) IsOnlyDate() bool {
+func (pc *parsingComponents) IsOnlyDate() bool {
 	return !pc.IsCertain(ComponentHour) && !pc.IsCertain(ComponentMinute) && !pc.IsCertain(ComponentSecond)
 }
 
 // IsOnlyTime returns true if only time components are certain (no date components).
-func (pc *ParsingComponents) IsOnlyTime() bool {
+func (pc *parsingComponents) IsOnlyTime() bool {
 	return !pc.IsCertain(ComponentWeekday) && !pc.IsCertain(ComponentDay) &&
 		!pc.IsCertain(ComponentMonth) && !pc.IsCertain(ComponentYear)
 }
 
 // IsOnlyWeekdayComponent returns true if only weekday is certain without day or month.
-func (pc *ParsingComponents) IsOnlyWeekdayComponent() bool {
+func (pc *parsingComponents) IsOnlyWeekdayComponent() bool {
 	return pc.IsCertain(ComponentWeekday) && !pc.IsCertain(ComponentDay) && !pc.IsCertain(ComponentMonth)
 }
 
 // IsDateWithUnknownYear returns true if month is certain but year is not.
-func (pc *ParsingComponents) IsDateWithUnknownYear() bool {
+func (pc *parsingComponents) IsDateWithUnknownYear() bool {
 	return pc.IsCertain(ComponentMonth) && !pc.IsCertain(ComponentYear)
 }
 
 // IsValidDate validates that the components form a valid date.
-func (pc *ParsingComponents) IsValidDate() bool {
+func (pc *parsingComponents) IsValidDate() bool {
 	date := pc.DateWithoutTimezoneAdjustment()
 
 	yearVal := pc.Get(ComponentYear)
@@ -282,7 +282,7 @@ func (pc *ParsingComponents) IsValidDate() bool {
 
 // Date returns a time.Time object constructed from the components.
 // It applies timezone adjustments as needed.
-func (pc *ParsingComponents) Date() time.Time {
+func (pc *parsingComponents) Date() time.Time {
 	date := pc.DateWithoutTimezoneAdjustment()
 
 	timezoneOffsetVal := pc.Get(ComponentTimezoneOffset)
@@ -293,7 +293,7 @@ func (pc *ParsingComponents) Date() time.Time {
 
 // DateWithoutTimezoneAdjustment creates a time.Time from components without timezone adjustment.
 // This is useful for DST calculations where you need the "wall clock" time.
-func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
+func (pc *parsingComponents) DateWithoutTimezoneAdjustment() time.Time {
 	// Use the reference date's location to avoid timezone conversion issues
 	location := time.Local
 	if pc.reference != nil && !pc.reference.instant.IsZero() {
@@ -304,12 +304,12 @@ func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
 
 // DateUTC creates a UTC time.Time from components for DST calculations.
 // This returns a time in UTC with the "wall clock" values from the components.
-func (pc *ParsingComponents) DateUTC() time.Time {
+func (pc *parsingComponents) DateUTC() time.Time {
 	return pc.dateInLocation(time.UTC)
 }
 
 // dateInLocation creates a time.Time from components in the specified location.
-func (pc *ParsingComponents) dateInLocation(location *time.Location) time.Time {
+func (pc *parsingComponents) dateInLocation(location *time.Location) time.Time {
 	const (
 		defaultYear  = 2000
 		defaultMonth = 1
@@ -333,13 +333,13 @@ func (pc *ParsingComponents) dateInLocation(location *time.Location) time.Time {
 }
 
 // AddTag adds a debugging tag to the components.
-func (pc *ParsingComponents) AddTag(tag string) *ParsingComponents {
+func (pc *parsingComponents) AddTag(tag string) *parsingComponents {
 	pc.tags[tag] = true
 	return pc
 }
 
 // Tags returns all debugging tags.
-func (pc *ParsingComponents) Tags() map[string]bool {
+func (pc *parsingComponents) Tags() map[string]bool {
 	tags := make(map[string]bool)
 	for k, v := range pc.tags {
 		tags[k] = v
@@ -348,7 +348,7 @@ func (pc *ParsingComponents) Tags() map[string]bool {
 }
 
 // String returns a string representation for debugging.
-func (pc *ParsingComponents) String() string {
+func (pc *parsingComponents) String() string {
 	tagList := make([]string, 0, len(pc.tags))
 	for tag := range pc.tags {
 		tagList = append(tagList, tag)
@@ -359,17 +359,17 @@ func (pc *ParsingComponents) String() string {
 }
 
 // Reference returns the reference.
-func (pc *ParsingComponents) Reference() *ReferenceWithTimezone {
+func (pc *parsingComponents) Reference() *referenceWithTimezone {
 	return pc.reference
 }
 
 // Period returns the granularity/period of the parsed date.
-func (pc *ParsingComponents) Period() Period {
+func (pc *parsingComponents) Period() Period {
 	return pc.period
 }
 
 // SetPeriod sets the granularity/period of the parsed date.
-func (pc *ParsingComponents) SetPeriod(period Period) *ParsingComponents {
+func (pc *parsingComponents) SetPeriod(period Period) *parsingComponents {
 	pc.period = period
 	return pc
 }
@@ -419,7 +419,7 @@ func determinePeriodFromDuration(duration Duration) Period {
 // DeterminePeriodFromComponents determines the granularity/period based on which
 // components are certain (explicitly mentioned). The period represents the finest
 // granularity of date/time information that was directly parsed.
-func determinePeriodFromComponents(pc *ParsingComponents) Period {
+func determinePeriodFromComponents(pc *parsingComponents) Period {
 	if pc == nil {
 		return PeriodUnknown
 	}
@@ -457,7 +457,7 @@ func determinePeriodFromComponents(pc *ParsingComponents) Period {
 // It handles date-only durations (implies time) and time durations (assigns both date and time).
 // This is used for parsing relative expressions like "in 3 days", "2 hours ago", etc.
 // Returns nil if the duration calculation fails (e.g., overflow).
-func createRelativeFromReference(reference *ReferenceWithTimezone, duration Duration) *ParsingComponents {
+func createRelativeFromReference(reference *referenceWithTimezone, duration Duration) *parsingComponents {
 	if duration == nil {
 		duration = emptyDuration
 	}
@@ -540,7 +540,7 @@ func createRelativeFromReference(reference *ReferenceWithTimezone, duration Dura
 // AddDurationAsImplied adds the duration to the current components and implies the result.
 // This is useful for modifying existing parsing components with a relative offset.
 // Returns nil if the duration calculation fails (e.g., overflow).
-func (pc *ParsingComponents) AddDurationAsImplied(duration Duration) *ParsingComponents {
+func (pc *parsingComponents) AddDurationAsImplied(duration Duration) *parsingComponents {
 	// Get the current date from this component
 	currentDate := pc.Date()
 
@@ -563,22 +563,22 @@ func (pc *ParsingComponents) AddDurationAsImplied(duration Duration) *ParsingCom
 // Deprecated: This concrete type exposes internal implementation details. New code should
 // use the Result interface instead, which provides a cleaner API that hides implementation.
 // This type will be moved to an internal package in a future version.
-type ParsingResult struct {
-	reference *ReferenceWithTimezone
+type parsingResult struct {
+	reference *referenceWithTimezone
 	refDate   time.Time
 	index     int
 	text      string
-	start     *ParsingComponents
-	end       *ParsingComponents
+	start     *parsingComponents
+	end       *parsingComponents
 }
 
 // NewParsingResult creates a new ParsingResult.
-func newParsingResult(reference *ReferenceWithTimezone, index int, text string, start, end *ParsingComponents) *ParsingResult {
+func newParsingResult(reference *referenceWithTimezone, index int, text string, start, end *parsingComponents) *parsingResult {
 	if start == nil {
 		start = newParsingComponents(reference, nil)
 	}
 
-	return &ParsingResult{
+	return &parsingResult{
 		reference: reference,
 		refDate:   reference.Instant(),
 		index:     index,
@@ -589,13 +589,13 @@ func newParsingResult(reference *ReferenceWithTimezone, index int, text string, 
 }
 
 // Clone creates a deep copy of the ParsingResult.
-func (pr *ParsingResult) Clone() *ParsingResult {
-	var startClone *ParsingComponents
+func (pr *parsingResult) Clone() *parsingResult {
+	var startClone *parsingComponents
 	if pr.start != nil {
 		startClone = pr.start.Clone()
 	}
 
-	var endClone *ParsingComponents
+	var endClone *parsingComponents
 	if pr.end != nil {
 		endClone = pr.end.Clone()
 	}
@@ -604,12 +604,12 @@ func (pr *ParsingResult) Clone() *ParsingResult {
 }
 
 // Date returns a time.Time object created from the start components.
-func (pr *ParsingResult) Date() time.Time {
+func (pr *parsingResult) Date() time.Time {
 	return pr.start.Date()
 }
 
 // AddTag adds a debugging tag to both start and end components.
-func (pr *ParsingResult) AddTag(tag string) *ParsingResult {
+func (pr *parsingResult) AddTag(tag string) *parsingResult {
 	pr.start.AddTag(tag)
 	if pr.end != nil {
 		pr.end.AddTag(tag)
@@ -618,7 +618,7 @@ func (pr *ParsingResult) AddTag(tag string) *ParsingResult {
 }
 
 // Tags returns combined debugging tags from start and end components.
-func (pr *ParsingResult) Tags() map[string]bool {
+func (pr *parsingResult) Tags() map[string]bool {
 	combinedTags := make(map[string]bool)
 
 	for tag := range pr.start.Tags() {
@@ -635,7 +635,7 @@ func (pr *ParsingResult) Tags() map[string]bool {
 }
 
 // String returns a string representation for debugging.
-func (pr *ParsingResult) String() string {
+func (pr *parsingResult) String() string {
 	tagList := make([]string, 0, len(pr.Tags()))
 	for tag := range pr.Tags() {
 		tagList = append(tagList, tag)
@@ -646,24 +646,24 @@ func (pr *ParsingResult) String() string {
 }
 
 // RefDate returns the reference date used for parsing.
-func (pr *ParsingResult) RefDate() time.Time {
+func (pr *parsingResult) RefDate() time.Time {
 	return pr.refDate
 }
 
 // Index returns the position in the input text.
-func (pr *ParsingResult) Index() int {
+func (pr *parsingResult) Index() int {
 	return pr.index
 }
 
 // SetIndex sets the position in the input text.
 // This is used internally by parsers and the chrono executor.
-func (pr *ParsingResult) SetIndex(index int) {
+func (pr *parsingResult) SetIndex(index int) {
 	pr.index = index
 }
 
 // SetStart sets the start component of the parsing result.
 // This is used by parsers and refiners to update the parsed components.
-func (pr *ParsingResult) SetStart(start *ParsingComponents) {
+func (pr *parsingResult) SetStart(start *parsingComponents) {
 	pr.start = start
 }
 
@@ -674,25 +674,25 @@ func (pr *ParsingResult) SetStart(start *ParsingComponents) {
 // Deprecated: This is an internal implementation detail that should not be used by external code.
 // It remains exported only for use by internal parser implementations. This type will be moved
 // to an internal package in a future version.
-type ParsingResultWithBoundary struct {
-	Components         *ParsingComponents
+type parsingResultWithBoundary struct {
+	Components         *parsingComponents
 	AdjustedText       string
 	BoundaryLen        int
 	IncludeBoundaryIdx bool // If true, index points past boundary; if false, index points at boundary start
 }
 
 // Text returns the matched text from the input.
-func (pr *ParsingResult) Text() string {
+func (pr *parsingResult) Text() string {
 	return pr.text
 }
 
 // Start returns the starting date/time components.
-func (pr *ParsingResult) Start() ParsedComponents {
+func (pr *parsingResult) Start() ParsedComponents {
 	return pr.start
 }
 
 // End returns the ending date/time components.
-func (pr *ParsingResult) End() ParsedComponents {
+func (pr *parsingResult) End() ParsedComponents {
 	if pr.end == nil {
 		return nil
 	}

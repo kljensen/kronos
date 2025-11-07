@@ -161,7 +161,7 @@ type DebugHandler func(message string)
 //
 //	parser := kronos.New(en.Casual).
 //	    WithOption(experimental.WithTimezoneOverrides(customTimezones))
-type ParsingOption struct {
+type parsingOption struct {
 	// ForwardDate indicates whether to parse only forward dates
 	// (results should be after the reference date).
 	// This affects date/time implication (e.g. weekday or time mentioning).
@@ -245,7 +245,7 @@ type TimezoneAbbrMap map[string]interface{}
 //	    WithReferenceDate(time.Now())
 //
 // For advanced timezone reference configuration, use the experimental package.
-type ParsingReference struct {
+type parsingReference struct {
 	// Instant is the reference date/time when the input is written or mentioned.
 	// This affects date/time implication (e.g. weekday or time mentioning).
 	// If nil, the current time is used.

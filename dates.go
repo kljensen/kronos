@@ -4,7 +4,7 @@ import "time"
 
 // assignSimilarDate assigns (force updates) the parsing components to the same day as the target.
 // This sets year, month, and day as certain (known) values.
-func assignSimilarDate(components *ParsingComponents, date time.Time) {
+func assignSimilarDate(components *parsingComponents, date time.Time) {
 	components.Assign(ComponentDay, date.Day())
 	components.Assign(ComponentMonth, int(date.Month()))
 	components.Assign(ComponentYear, date.Year())
@@ -12,7 +12,7 @@ func assignSimilarDate(components *ParsingComponents, date time.Time) {
 
 // AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
-func assignSimilarTime(components *ParsingComponents, date time.Time) {
+func assignSimilarTime(components *parsingComponents, date time.Time) {
 	components.Assign(ComponentHour, date.Hour())
 	components.Assign(ComponentMinute, date.Minute())
 	components.Assign(ComponentSecond, date.Second())
@@ -42,7 +42,7 @@ func assignSimilarTime(components *ParsingComponents, date time.Time) {
 
 // ImplySimilarDate implies (weakly updates) the parsing components to the same day as the target.
 // This sets year, month, and day as implied values (only if not already certain).
-func implySimilarDate(components *ParsingComponents, date time.Time) {
+func implySimilarDate(components *parsingComponents, date time.Time) {
 	components.Imply(ComponentDay, date.Day())
 	components.Imply(ComponentMonth, int(date.Month()))
 	components.Imply(ComponentYear, date.Year())
@@ -50,7 +50,7 @@ func implySimilarDate(components *ParsingComponents, date time.Time) {
 
 // ImplySimilarTime implies (weakly updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
-func implySimilarTime(components *ParsingComponents, date time.Time) {
+func implySimilarTime(components *parsingComponents, date time.Time) {
 	components.Imply(ComponentHour, date.Hour())
 	components.Imply(ComponentMinute, date.Minute())
 	components.Imply(ComponentSecond, date.Second())

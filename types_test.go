@@ -85,9 +85,9 @@ func TestTimeunitConstants(t *testing.T) {
 // These types are now internal only. Users should use time.Weekday and time.Month
 // from the standard library instead.
 
-// TestParsingOptionDefaults verifies ParsingOption struct can be created with defaults.
-func TestParsingOptionDefaults(t *testing.T) {
-	opt := ParsingOption{}
+// TestparsingOptionDefaults verifies parsingOption struct can be created with defaults.
+func TestparsingOptionDefaults(t *testing.T) {
+	opt := parsingOption{}
 
 	if opt.ForwardDate != false {
 		t.Errorf("Default ForwardDate should be false, got %v", opt.ForwardDate)
@@ -102,8 +102,8 @@ func TestParsingOptionDefaults(t *testing.T) {
 	}
 }
 
-// TestParsingOptionWithValues verifies ParsingOption can be created with values.
-func TestParsingOptionWithValues(t *testing.T) {
+// TestparsingOptionWithValues verifies parsingOption can be created with values.
+func TestparsingOptionWithValues(t *testing.T) {
 	debugCalled := false
 	debugHandler := func(message string) {
 		debugCalled = true
@@ -112,7 +112,7 @@ func TestParsingOptionWithValues(t *testing.T) {
 	timezones := make(TimezoneAbbrMap)
 	timezones["EST"] = -300
 
-	opt := ParsingOption{
+	opt := parsingOption{
 		ForwardDate: true,
 		Timezones:   timezones,
 		Debug:       debugHandler,
@@ -209,10 +209,10 @@ func TestTimezoneAbbrMap(t *testing.T) {
 	}
 }
 
-// TestParsingReference verifies ParsingReference structure.
-func TestParsingReference(t *testing.T) {
+// TestparsingReference verifies parsingReference structure.
+func TestparsingReference(t *testing.T) {
 	now := time.Now()
-	ref := ParsingReference{
+	ref := parsingReference{
 		Instant:  &now,
 		Timezone: "America/New_York",
 	}
@@ -230,10 +230,10 @@ func TestParsingReference(t *testing.T) {
 	}
 }
 
-// TestParsingReferenceWithOffset verifies ParsingReference can use offset.
-func TestParsingReferenceWithOffset(t *testing.T) {
+// TestparsingReferenceWithOffset verifies parsingReference can use offset.
+func TestparsingReferenceWithOffset(t *testing.T) {
 	now := time.Now()
-	ref := ParsingReference{
+	ref := parsingReference{
 		Timezone: -300, // EST offset in minutes
 	}
 	_ = now // Reference time not needed for this test

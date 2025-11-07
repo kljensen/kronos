@@ -59,10 +59,10 @@ func TestFromInput(t *testing.T) {
 		}
 	})
 
-	t.Run("FromInput with ParsingReference", func(t *testing.T) {
+	t.Run("FromInput with parsingReference", func(t *testing.T) {
 		instant := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
 		offset := -300
-		parsingRef := ParsingReference{
+		parsingRef := parsingReference{
 			Instant:  &instant,
 			Timezone: offset,
 		}
@@ -426,11 +426,11 @@ func TestParsingResult(t *testing.T) {
 		clone := result.Clone()
 
 		// Modify original
-		result.Start().(*ParsingComponents).Assign(ComponentYear, 2025)
+		result.Start().(*parsingComponents).Assign(ComponentYear, 2025)
 		result.AddTag("new-tag")
 
 		// Clone should not be affected
-		clonedStart := clone.Start().(*ParsingComponents)
+		clonedStart := clone.Start().(*parsingComponents)
 		if val := clonedStart.Get(ComponentYear); val == nil || *val != 2024 {
 			t.Errorf("Expected cloned year 2024, got %v", val)
 		}

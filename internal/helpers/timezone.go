@@ -51,7 +51,7 @@ func ToTimezoneOffset(tz interface{}, instant time.Time, overrides kronos.Timezo
 
 // FromInput creates a ReferenceWithTimezone from either a ParsingReference or a time.Time.
 // It also handles timezone conversion using the provided timezoneOverrides.
-func FromInput(input interface{}, timezoneOverrides kronos.TimezoneAbbrMap, defaultMap kronos.TimezoneAbbrMap, newRefFn func(time.Time, *int) *kronos.ReferenceWithTimezone) *kronos.ReferenceWithTimezone {
+func FromInput(input interface{}, timezoneOverrides kronos.TimezoneAbbrMap, defaultMap kronos.TimezoneAbbrMap, newRefFn func(time.Time, *int) *kronos.InternalReferenceWithTimezone) *kronos.InternalReferenceWithTimezone {
 	if input == nil {
 		return newRefFn(time.Time{}, nil)
 	}
@@ -59,7 +59,7 @@ func FromInput(input interface{}, timezoneOverrides kronos.TimezoneAbbrMap, defa
 	switch v := input.(type) {
 	case time.Time:
 		return newRefFn(v, nil)
-	case kronos.ParsingReference:
+	case kronos.InternalParsingReference:
 		instant := time.Now()
 		if v.Instant != nil {
 			instant = *v.Instant

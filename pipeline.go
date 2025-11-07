@@ -13,18 +13,18 @@ import (
 // builder pattern instead (kronos.New(chrono).Parse(text)). Direct use of Pipeline
 // exposes internal implementation details and will be moved to the experimental
 // package in a future version.
-type Pipeline struct {
+type pipeline struct {
 	parsers  []Parser
 	refiners []Refiner
 	settings Settings
 }
 
-// NewPipeline creates a new parsing pipeline with the given configuration and settings.
+// newPipeline creates a new parsing pipeline with the given configuration and settings.
 //
 // Deprecated: This function is part of the advanced API. For most use cases, use the
 // builder pattern instead (kronos.New(chrono)). This function will be moved to the
 // experimental package in a future version.
-func NewPipeline(config *Configuration, settings Settings) *Pipeline {
+func newPipeline(config *Configuration, settings Settings) *pipeline {
 	if config == nil {
 		config = &Configuration{
 			Parsers:  []Parser{},
@@ -32,26 +32,26 @@ func NewPipeline(config *Configuration, settings Settings) *Pipeline {
 		}
 	}
 
-	return &Pipeline{
+	return &pipeline{
 		parsers:  append([]Parser{}, config.Parsers...),
 		refiners: append([]Refiner{}, config.Refiners...),
 		settings: settings,
 	}
 }
 
-// NewPipelineWithSettings creates a pipeline using settings to determine parsers.
+// newPipelineWithSettings creates a pipeline using settings to determine parsers.
 //
 // Deprecated: This function is part of the advanced API. For most use cases, use the
 // builder pattern instead (kronos.New(chrono).WithOption(...)). This function will be
 // moved to the experimental package in a future version.
-func NewPipelineWithSettings(config *Configuration, settings Settings) (*Pipeline, error) {
+func newPipelineWithSettings(config *Configuration, settings Settings) (*pipeline, error) {
 	// Validate settings
-	if err := ValidateSettings(settings); err != nil {
+	if err := validateSettings(settings); err != nil {
 		return nil, fmt.Errorf("invalid settings: %w", err)
 	}
 
 	// Start with empty pipeline
-	pipeline := &Pipeline{
+	pipeline := &pipeline{
 		parsers:  []Parser{},
 		refiners: []Refiner{},
 		settings: settings,
@@ -68,7 +68,7 @@ func NewPipelineWithSettings(config *Configuration, settings Settings) (*Pipelin
 
 // Execute runs the pipeline on the given text with a reference date.
 // It returns all parsed results after applying refiners.
-func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, error) {
+func (p *pipeline) Execute(text string, refDate time.Time) ([]*parsingResult, error) {
 	// Create parsing context with settings
 	ctx, err := applySettings(text, refDate, p.settings)
 	if err != nil {
@@ -76,7 +76,7 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 	}
 
 	// Execute parsers
-	results := make([]*ParsingResult, 0)
+	results := make([]*parsingResult, 0)
 	for _, parser := range p.parsers {
 		parsedResults := executeParser(ctx, parser)
 		results = append(results, parsedResults...)
@@ -114,8 +114,8 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 // - Proper index tracking as text is consumed
 // - Multiple return types from Extract: map, ParsingComponents, ParsingResult
 // - Overlapping matches by advancing by 1 on extract failure
-func executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
-	results := make([]*ParsingResult, 0)
+func executeParser(context *parsingContext, parser Parser) []*parsingResult {
+	results := make([]*parsingResult, 0)
 	pattern := parser.Pattern(context)
 
 	originalText := context.Text()
@@ -168,16 +168,16 @@ func executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
 
 // convertToParsingResult converts various result types to ParsingResult.
 // Returns nil if the result cannot be converted.
-func convertToParsingResult(context *ParsingContext, result interface{}, index int, matchedText string, matchedTextLen int) *ParsingResult {
+func convertToParsingResult(context *parsingContext, result interface{}, index int, matchedText string, matchedTextLen int) *parsingResult {
 	switch v := result.(type) {
-	case *ParsingResult:
+	case *parsingResult:
 		if v == nil {
 			return nil
 		}
 		headerOffset := v.Index()
 		v.SetIndex(index + headerOffset)
 		return v
-	case *ParsingResultWithBoundary:
+	case *parsingResultWithBoundary:
 		resultIndex := index
 		if v.IncludeBoundaryIdx {
 			resultIndex = index + v.BoundaryLen
@@ -185,7 +185,7 @@ func convertToParsingResult(context *ParsingContext, result interface{}, index i
 		parsedResult := context.CreateParsingResult(resultIndex, v.AdjustedText)
 		parsedResult.start = v.Components
 		return parsedResult
-	case *ParsingComponents:
+	case *parsingComponents:
 		parsedResult := context.CreateParsingResult(index, matchedText)
 		parsedResult.start = v
 		return parsedResult
@@ -198,8 +198,8 @@ func convertToParsingResult(context *ParsingContext, result interface{}, index i
 
 // applyStrictValidation filters out results that don't meet strict parsing criteria.
 // In strict mode, we reject results that are too ambiguous.
-func (p *Pipeline) applyStrictValidation(results []*ParsingResult) []*ParsingResult {
-	filtered := make([]*ParsingResult, 0, len(results))
+func (p *pipeline) applyStrictValidation(results []*parsingResult) []*parsingResult {
+	filtered := make([]*parsingResult, 0, len(results))
 	for _, result := range results {
 		// In strict mode, require at least year and month
 		start := result.Start()
@@ -218,7 +218,7 @@ func (p *Pipeline) applyStrictValidation(results []*ParsingResult) []*ParsingRes
 // This function converts the parsed date/time to the specified timezone and updates
 // all components (year, month, day, hour, minute, second, timezone offset) to reflect
 // the new timezone. This handles DST transitions and date boundary changes correctly.
-func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*ParsingResult, error) {
+func (p *pipeline) applyTimezoneConversion(results []*parsingResult) ([]*parsingResult, error) {
 	targetLoc, err := time.LoadLocation(p.settings.ToTimezone)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load timezone location: %w", err)
@@ -260,7 +260,7 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 // updateComponentsFromDate updates all date/time components in ParsingComponents
 // to match the values from the given time.Time in the target timezone.
 // This preserves the "certain" vs "implied" status of each component while updating values.
-func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
+func updateComponentsFromDate(components *parsingComponents, date time.Time) {
 	// Helper to update a component preserving its certain/implied status
 	updateComponent := func(comp Component, value int) {
 		if components.IsCertain(comp) {
@@ -298,7 +298,7 @@ func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
 	updateComponent(ComponentTimezoneOffset, offset/60)
 }
 
-// ParseWithSettings is a convenience function that creates a pipeline
+// parseWithSettings is a convenience function that creates a pipeline
 // and executes it with the given settings.
 //
 // Deprecated: This function exposes internal implementation details (ParsingResult).
@@ -308,8 +308,8 @@ func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
 //	results, err := parser.Parse(text)
 //
 // This function will be removed in a future version.
-func ParseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*ParsingResult, error) {
-	pipeline, err := NewPipelineWithSettings(config, settings)
+func parseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*parsingResult, error) {
+	pipeline, err := newPipelineWithSettings(config, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -319,6 +319,6 @@ func ParseWithSettings(text string, refDate time.Time, settings Settings, config
 
 // ParserCount returns the number of parsers in the pipeline.
 // This is useful for testing and validation.
-func (p *Pipeline) ParserCount() int {
+func (p *pipeline) ParserCount() int {
 	return len(p.parsers)
 }

@@ -6,14 +6,14 @@ import (
 )
 
 // AsParsingComponents attempts to cast the given ParsedComponents interface to
-// a *ParsingComponents. It returns the concrete value and true when the cast
+// a *parsingComponents. It returns the concrete value and true when the cast
 // succeeds, or nil and false otherwise.
-func asParsingComponents(pc ParsedComponents) (*ParsingComponents, bool) {
+func asParsingComponents(pc ParsedComponents) (*parsingComponents, bool) {
 	if pc == nil {
 		return nil, false
 	}
 
-	components, ok := pc.(*ParsingComponents)
+	components, ok := pc.(*parsingComponents)
 	if !ok || components == nil {
 		return nil, false
 	}

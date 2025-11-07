@@ -59,11 +59,11 @@ func NewISOFormatParser() *ISOFormatParser {
 	return parser
 }
 
-func (p *ISOFormatParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
+func (p *ISOFormatParser) innerPattern(context *kronos.InternalParsingContext) *regexp.Regexp {
 	return isoPattern
 }
 
-func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []string) interface{} {
+func (p *ISOFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
 	// Parse year, month, day
 	year, err := strconv.Atoi(match[isoYearGroup])
 	if err != nil {
@@ -180,7 +180,7 @@ func (p *ISOFormatParser) innerExtract(context *kronos.ParsingContext, match []s
 	// The parsing.AbstractParserWithWordBoundary will wrap this in ParsingResultWithBoundary
 	// But we need to trim the trailing character from the text
 	// Return a ParsingResultWithBoundary with the adjusted text
-	return &kronos.ParsingResultWithBoundary{
+	return &kronos.InternalParsingResultWithBoundary{
 		Components:         components,
 		AdjustedText:       adjustedText,
 		BoundaryLen:        0,    // Will be set by parsing.AbstractParserWithWordBoundary

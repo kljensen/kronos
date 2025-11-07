@@ -26,7 +26,7 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 	}
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
+		func(context *kronos.InternalParsingContext) *regexp.Regexp {
 			timeUnitPattern := endata.TimeUnitPattern
 			if parser.strictMode {
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
@@ -40,7 +40,7 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) interface{} {
 			if len(match) < 2 {
 				return nil
 			}
@@ -92,7 +92,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 	}
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
+		func(context *kronos.InternalParsingContext) *regexp.Regexp {
 			timeUnitPattern := endata.TimeUnitPattern
 			if parser.strictMode {
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
@@ -106,7 +106,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) interface{} {
 			if len(match) < 2 {
 				return nil
 			}
@@ -156,7 +156,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 	}
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
+		func(context *kronos.InternalParsingContext) *regexp.Regexp {
 			timeUnitPattern := endata.TimeUnitPattern
 			if parser.strictMode {
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
@@ -178,7 +178,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) interface{} {
 			if len(match) < 2 {
 				return nil
 			}
@@ -224,7 +224,7 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 	}
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
-		func(context *kronos.ParsingContext) *regexp.Regexp {
+		func(context *kronos.InternalParsingContext) *regexp.Regexp {
 			timeUnitPattern := endata.TimeUnitPattern
 			if !parser.allowAbbreviations {
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
@@ -239,7 +239,7 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.ParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) interface{} {
 			if len(match) < 3 {
 				return nil
 			}

@@ -48,7 +48,7 @@ func (c *Chrono) Clone() *Chrono {
 
 // ParseDate is a shortcut for calling Parse and returning the first result's date.
 // Returns nil if no results are found.
-func (c *Chrono) ParseDate(text string, referenceDate interface{}, option *ParsingOption) *time.Time {
+func (c *Chrono) ParseDate(text string, referenceDate interface{}, option *parsingOption) *time.Time {
 	results := c.Parse(text, referenceDate, option)
 	if len(results) > 0 {
 		date := results[0].Date()
@@ -57,10 +57,10 @@ func (c *Chrono) ParseDate(text string, referenceDate interface{}, option *Parsi
 	return nil
 }
 
-// ParseWithSettings parses the input text using the provided settings.
+// parseWithSettings parses the input text using the provided settings.
 // Settings provide more comprehensive configuration than ParsingOption.
 // This method creates a pipeline from the current configuration and settings.
-func (c *Chrono) ParseWithSettings(text string, referenceDate time.Time, settings Settings) ([]*ParsingResult, error) {
+func (c *Chrono) parseWithSettings(text string, referenceDate time.Time, settings Settings) ([]*parsingResult, error) {
 	// Create a configuration from this Chrono instance
 	config := &Configuration{
 		Parsers:  append([]Parser{}, c.parsers...),
@@ -68,13 +68,13 @@ func (c *Chrono) ParseWithSettings(text string, referenceDate time.Time, setting
 	}
 
 	// Create and execute pipeline
-	return ParseWithSettings(text, referenceDate, settings, config)
+	return parseWithSettings(text, referenceDate, settings, config)
 }
 
-// ParseDateWithSettings is a shortcut for calling ParseWithSettings and returning the first result's date.
+// ParseDateWithSettings is a shortcut for calling parseWithSettings and returning the first result's date.
 // Returns nil if no results are found or an error occurs.
 func (c *Chrono) ParseDateWithSettings(text string, referenceDate time.Time, settings Settings) (*time.Time, error) {
-	results, err := c.ParseWithSettings(text, referenceDate, settings)
+	results, err := c.parseWithSettings(text, referenceDate, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +92,10 @@ func (c *Chrono) ParseDateWithSettings(text string, referenceDate time.Time, set
 // 3. Sort results by position in text
 // 4. Apply all refiners sequentially
 // 5. Return final results
-func (c *Chrono) Parse(text string, referenceDate interface{}, option *ParsingOption) []*ParsingResult {
+func (c *Chrono) Parse(text string, referenceDate interface{}, option *parsingOption) []*parsingResult {
 	context := newParsingContext(text, referenceDate, option)
 
-	results := make([]*ParsingResult, 0)
+	results := make([]*parsingResult, 0)
 	for _, parser := range c.parsers {
 		parsedResults := executeParser(context, parser)
 		results = append(results, parsedResults...)

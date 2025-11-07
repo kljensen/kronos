@@ -2,7 +2,7 @@ package kronos
 
 // Now returns a ParsingComponents representing the current moment.
 // Both date and time components are certain, and it includes timezone offset.
-func now(reference *ReferenceWithTimezone) *ParsingComponents {
+func now(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -17,7 +17,7 @@ func now(reference *ReferenceWithTimezone) *ParsingComponents {
 
 // Today returns a ParsingComponents representing today's date.
 // Date components are certain, time components are implied.
-func today(reference *ReferenceWithTimezone) *ParsingComponents {
+func today(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -32,7 +32,7 @@ func today(reference *ReferenceWithTimezone) *ParsingComponents {
 
 // Yesterday returns a ParsingComponents representing yesterday's date.
 // Date components are certain, time components are implied.
-func yesterday(reference *ReferenceWithTimezone) *ParsingComponents {
+func yesterday(reference *referenceWithTimezone) *parsingComponents {
 	component := theDayBefore(reference, 1)
 	component.AddTag("casualReference/yesterday")
 	component.SetPeriod(PeriodDay)
@@ -41,7 +41,7 @@ func yesterday(reference *ReferenceWithTimezone) *ParsingComponents {
 
 // Tomorrow returns a ParsingComponents representing tomorrow's date.
 // Date components are certain, time components are implied.
-func tomorrow(reference *ReferenceWithTimezone) *ParsingComponents {
+func tomorrow(reference *referenceWithTimezone) *parsingComponents {
 	component := theDayAfter(reference, 1)
 	component.AddTag("casualReference/tomorrow")
 	component.SetPeriod(PeriodDay)
@@ -50,13 +50,13 @@ func tomorrow(reference *ReferenceWithTimezone) *ParsingComponents {
 
 // TheDayBefore returns a ParsingComponents representing n days before the reference date.
 // Date components are certain, time components are implied.
-func theDayBefore(reference *ReferenceWithTimezone, nDays int) *ParsingComponents {
+func theDayBefore(reference *referenceWithTimezone, nDays int) *parsingComponents {
 	return theDayAfter(reference, -nDays)
 }
 
 // TheDayAfter returns a ParsingComponents representing n days after the reference date.
 // Date components are certain, time components are implied.
-func theDayAfter(reference *ReferenceWithTimezone, nDays int) *ParsingComponents {
+func theDayAfter(reference *referenceWithTimezone, nDays int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -72,12 +72,12 @@ func theDayAfter(reference *ReferenceWithTimezone, nDays int) *ParsingComponents
 
 // Tonight returns a ParsingComponents representing tonight.
 // Date components are certain, time is implied (default: 10 PM / 22:00).
-func tonight(reference *ReferenceWithTimezone) *ParsingComponents {
+func tonight(reference *referenceWithTimezone) *parsingComponents {
 	return tonightWithHour(reference, 22)
 }
 
 // TonightWithHour returns a ParsingComponents representing tonight with a specific implied hour.
-func tonightWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingComponents {
+func tonightWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -93,12 +93,12 @@ func tonightWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingCo
 // LastNight returns a ParsingComponents representing last night.
 // If the reference time is before 6 AM, it refers to the previous night.
 // Otherwise, it refers to the night of the current day.
-func lastNight(reference *ReferenceWithTimezone) *ParsingComponents {
+func lastNight(reference *referenceWithTimezone) *parsingComponents {
 	return lastNightWithHour(reference, 0)
 }
 
 // LastNightWithHour returns a ParsingComponents representing last night with a specific implied hour.
-func lastNightWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingComponents {
+func lastNightWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -117,12 +117,12 @@ func lastNightWithHour(reference *ReferenceWithTimezone, implyHour int) *Parsing
 
 // Evening returns a ParsingComponents representing evening time.
 // Time is implied (default: 8 PM / 20:00).
-func evening(reference *ReferenceWithTimezone) *ParsingComponents {
+func evening(reference *referenceWithTimezone) *parsingComponents {
 	return eveningWithHour(reference, 20)
 }
 
 // EveningWithHour returns a ParsingComponents representing evening with a specific implied hour.
-func eveningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingComponents {
+func eveningWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
 	component.Imply(ComponentMeridiem, 1) // PM
@@ -134,12 +134,12 @@ func eveningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingCo
 }
 
 // YesterdayEvening returns a ParsingComponents representing yesterday evening.
-func yesterdayEvening(reference *ReferenceWithTimezone) *ParsingComponents {
+func yesterdayEvening(reference *referenceWithTimezone) *parsingComponents {
 	return yesterdayEveningWithHour(reference, 20)
 }
 
 // YesterdayEveningWithHour returns a ParsingComponents representing yesterday evening with a specific hour.
-func yesterdayEveningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingComponents {
+func yesterdayEveningWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -158,7 +158,7 @@ func yesterdayEveningWithHour(reference *ReferenceWithTimezone, implyHour int) *
 // Midnight returns a ParsingComponents representing midnight.
 // If the reference time is after 2 AM, it refers to the coming midnight (next day).
 // Otherwise, it refers to the current midnight.
-func midnight(reference *ReferenceWithTimezone) *ParsingComponents {
+func midnight(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
@@ -185,12 +185,12 @@ func midnight(reference *ReferenceWithTimezone) *ParsingComponents {
 
 // Morning returns a ParsingComponents representing morning time.
 // Time is implied (default: 6 AM / 06:00).
-func morning(reference *ReferenceWithTimezone) *ParsingComponents {
+func morning(reference *referenceWithTimezone) *parsingComponents {
 	return morningWithHour(reference, 6)
 }
 
 // MorningWithHour returns a ParsingComponents representing morning with a specific implied hour.
-func morningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingComponents {
+func morningWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
 	component.Imply(ComponentMeridiem, 0) // AM
@@ -206,12 +206,12 @@ func morningWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingCo
 
 // Afternoon returns a ParsingComponents representing afternoon time.
 // Time is implied (default: 3 PM / 15:00).
-func afternoon(reference *ReferenceWithTimezone) *ParsingComponents {
+func afternoon(reference *referenceWithTimezone) *parsingComponents {
 	return afternoonWithHour(reference, 15)
 }
 
 // AfternoonWithHour returns a ParsingComponents representing afternoon with a specific implied hour.
-func afternoonWithHour(reference *ReferenceWithTimezone, implyHour int) *ParsingComponents {
+func afternoonWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
 	component.Imply(ComponentMeridiem, 1) // PM
@@ -226,7 +226,7 @@ func afternoonWithHour(reference *ReferenceWithTimezone, implyHour int) *Parsing
 }
 
 // Noon returns a ParsingComponents representing noon (12:00 PM).
-func noon(reference *ReferenceWithTimezone) *ParsingComponents {
+func noon(reference *referenceWithTimezone) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
 	component.Imply(ComponentMeridiem, 1) // PM

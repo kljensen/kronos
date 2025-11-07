@@ -4,7 +4,7 @@ import "github.com/kljensen/kronos"
 
 // Now returns components representing the current moment.
 // Both date and time components are certain, and it includes timezone offset.
-func Now(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Now(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
@@ -19,7 +19,7 @@ func Now(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
 
 // Today returns components representing today's date.
 // Date components are certain, time components are implied.
-func Today(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Today(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
@@ -34,7 +34,7 @@ func Today(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
 
 // Yesterday returns components representing yesterday's date.
 // Date components are certain, time components are implied.
-func Yesterday(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Yesterday(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	component := TheDayBefore(reference, 1)
 	component.AddTag("casualReference/yesterday")
 	component.SetPeriod(kronos.PeriodDay)
@@ -43,7 +43,7 @@ func Yesterday(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponent
 
 // Tomorrow returns components representing tomorrow's date.
 // Date components are certain, time components are implied.
-func Tomorrow(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Tomorrow(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	component := TheDayAfter(reference, 1)
 	component.AddTag("casualReference/tomorrow")
 	component.SetPeriod(kronos.PeriodDay)
@@ -52,13 +52,13 @@ func Tomorrow(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents
 
 // TheDayBefore returns components representing n days before the reference date.
 // Date components are certain, time components are implied.
-func TheDayBefore(reference *kronos.ReferenceWithTimezone, nDays int) *kronos.ParsingComponents {
+func TheDayBefore(reference *kronos.InternalReferenceWithTimezone, nDays int) *kronos.InternalParsingComponents {
 	return TheDayAfter(reference, -nDays)
 }
 
 // TheDayAfter returns components representing n days after the reference date.
 // Date components are certain, time components are implied.
-func TheDayAfter(reference *kronos.ReferenceWithTimezone, nDays int) *kronos.ParsingComponents {
+func TheDayAfter(reference *kronos.InternalReferenceWithTimezone, nDays int) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
@@ -75,7 +75,7 @@ func TheDayAfter(reference *kronos.ReferenceWithTimezone, nDays int) *kronos.Par
 // Midnight returns components representing midnight.
 // If the reference time is after 2 AM, it refers to the coming midnight (next day).
 // Otherwise, it refers to the current midnight.
-func Midnight(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Midnight(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
@@ -101,7 +101,7 @@ func Midnight(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents
 }
 
 // Noon returns components representing noon (12:00 PM).
-func Noon(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Noon(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	component := NewParsingComponents(reference, nil)
 
 	component.Imply(kronos.ComponentMeridiem, 1) // PM
@@ -117,12 +117,12 @@ func Noon(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
 
 // Morning returns components representing morning time.
 // Time is implied (default: 6 AM / 06:00).
-func Morning(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Morning(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	return MorningWithHour(reference, 6)
 }
 
 // MorningWithHour returns components representing morning with a specific implied hour.
-func MorningWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *kronos.ParsingComponents {
+func MorningWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
 	component := NewParsingComponents(reference, nil)
 
 	component.Imply(kronos.ComponentMeridiem, 0) // AM
@@ -138,12 +138,12 @@ func MorningWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *kr
 
 // Afternoon returns components representing afternoon time.
 // Time is implied (default: 3 PM / 15:00).
-func Afternoon(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Afternoon(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	return AfternoonWithHour(reference, 15)
 }
 
 // AfternoonWithHour returns components representing afternoon with a specific implied hour.
-func AfternoonWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *kronos.ParsingComponents {
+func AfternoonWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
 	component := NewParsingComponents(reference, nil)
 
 	component.Imply(kronos.ComponentMeridiem, 1) // PM
@@ -159,12 +159,12 @@ func AfternoonWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *
 
 // Evening returns components representing evening time.
 // Time is implied (default: 8 PM / 20:00).
-func Evening(reference *kronos.ReferenceWithTimezone) *kronos.ParsingComponents {
+func Evening(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	return EveningWithHour(reference, 20)
 }
 
 // EveningWithHour returns components representing evening with a specific implied hour.
-func EveningWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *kronos.ParsingComponents {
+func EveningWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
 	component := NewParsingComponents(reference, nil)
 
 	component.Imply(kronos.ComponentMeridiem, 1) // PM
@@ -176,7 +176,7 @@ func EveningWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *kr
 }
 
 // TonightWithHour returns components representing tonight with a specific implied hour.
-func TonightWithHour(reference *kronos.ReferenceWithTimezone, implyHour int) *kronos.ParsingComponents {
+func TonightWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
