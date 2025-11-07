@@ -48,10 +48,10 @@ const (
 	YearLookAheadThreshold = 20 // For 2-digit year conversion
 )
 
-// AsParsingComponents attempts to cast the given ParsedComponents interface to
+// AsParsingComponents attempts to cast the given Components interface to
 // a *ParsingComponents. It returns the concrete value and true when the cast
 // succeeds, or nil and false otherwise.
-func AsParsingComponents(pc kronos.ParsedComponents) (*kronos.InternalParsingComponents, bool) {
+func AsParsingComponents(pc kronos.Components) (*kronos.InternalParsingComponents, bool) {
 	if pc == nil {
 		return nil, false
 	}

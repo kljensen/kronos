@@ -687,12 +687,12 @@ func (pr *parsingResult) Text() string {
 }
 
 // Start returns the starting date/time components.
-func (pr *parsingResult) Start() ParsedComponents {
+func (pr *parsingResult) Start() Components {
 	return pr.start
 }
 
 // End returns the ending date/time components.
-func (pr *parsingResult) End() ParsedComponents {
+func (pr *parsingResult) End() Components {
 	if pr.end == nil {
 		return nil
 	}

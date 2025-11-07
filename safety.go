@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 
-// AsParsingComponents attempts to cast the given ParsedComponents interface to
+// asParsingComponents attempts to cast the given Components interface to
 // a *parsingComponents. It returns the concrete value and true when the cast
 // succeeds, or nil and false otherwise.
-func asParsingComponents(pc ParsedComponents) (*parsingComponents, bool) {
+func asParsingComponents(pc Components) (*parsingComponents, bool) {
 	if pc == nil {
 		return nil, false
 	}
