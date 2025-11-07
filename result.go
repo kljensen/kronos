@@ -57,4 +57,11 @@ type Result interface {
 	// Example: For "from Monday to Friday", Start() returns Monday's components
 	// and End() returns Friday's components.
 	End() Components
+
+	// Tags returns metadata tags for this result.
+	// Tags are used internally for debugging and testing to track how a result was parsed.
+	// For example, tags might include "parser/iso", "refiner/merged", "result/relativeDate".
+	//
+	// This method is primarily useful for testing and debugging parser behavior.
+	Tags() map[string]bool
 }

@@ -83,4 +83,11 @@ type Components interface {
 	//	date := comp.Date()
 	//	fmt.Printf("Parsed date: %v\n", date)
 	Date() time.Time
+
+	// Tags returns metadata tags for these components.
+	// Tags are used internally for debugging and testing to track how components were parsed.
+	// For example, tags might include "result/relativeDate", "result/casualTime", "forward".
+	//
+	// This method is primarily useful for testing and debugging parser behavior.
+	Tags() map[string]bool
 }
