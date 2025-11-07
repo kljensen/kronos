@@ -8,13 +8,13 @@ import (
 
 // Bounds constants for date arithmetic.
 const (
-	MinYear            = 1
-	MaxYear            = 9999
-	MaxYearsDuration   = 10000
-	MaxMonthsDuration  = 120000
-	MaxDaysDuration    = 3650000
-	MaxHoursDuration   = 87600000
-	MaxMinutesDuration = 5256000000
+	minYear            = 1
+	maxYear            = 9999
+	maxYearsDuration   = 10000
+	maxMonthsDuration  = 120000
+	maxDaysDuration    = 3650000
+	maxHoursDuration   = 87600000
+	maxMinutesDuration = 5256000000
 )
 
 // Duration represents a directed time duration as a set of values by timeunits.
@@ -25,8 +25,8 @@ type Duration map[Timeunit]float64
 // validateDate checks if a date is within valid bounds.
 func validateDate(t time.Time) error {
 	year := t.Year()
-	if year < MinYear || year > MaxYear {
-		return fmt.Errorf("date year %d is outside valid range [%d, %d]", year, MinYear, MaxYear)
+	if year < minYear || year > maxYear {
+		return fmt.Errorf("date year %d is outside valid range [%d, %d]", year, minYear, maxYear)
 	}
 	return nil
 }
@@ -41,24 +41,24 @@ func validateDuration(d Duration) error {
 		absValue := math.Abs(value)
 		switch unit {
 		case TimeunitYear, TimeunitDecade:
-			if absValue > MaxYearsDuration {
-				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxYearsDuration)
+			if absValue > maxYearsDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, maxYearsDuration)
 			}
 		case TimeunitMonth, TimeunitQuarter:
-			if absValue > MaxMonthsDuration {
-				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxMonthsDuration)
+			if absValue > maxMonthsDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, maxMonthsDuration)
 			}
 		case TimeunitWeek, TimeunitDay:
-			if absValue > MaxDaysDuration {
-				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxDaysDuration)
+			if absValue > maxDaysDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, maxDaysDuration)
 			}
 		case TimeunitHour:
-			if absValue > MaxHoursDuration {
-				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxHoursDuration)
+			if absValue > maxHoursDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, maxHoursDuration)
 			}
 		case TimeunitMinute:
-			if absValue > MaxMinutesDuration {
-				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, MaxMinutesDuration)
+			if absValue > maxMinutesDuration {
+				return fmt.Errorf("duration %s value %f exceeds maximum %d", unit, value, maxMinutesDuration)
 			}
 		}
 	}
@@ -71,14 +71,14 @@ func checkCascadingOverflow(d Duration) error {
 	totalMonths := totalYears*12 + d[TimeunitMonth] + d[TimeunitQuarter]*3
 	totalDays := d[TimeunitDay] + d[TimeunitWeek]*7
 
-	if math.Abs(totalYears) > MaxYearsDuration {
-		return fmt.Errorf("cascading year duration %f exceeds maximum %d", totalYears, MaxYearsDuration)
+	if math.Abs(totalYears) > maxYearsDuration {
+		return fmt.Errorf("cascading year duration %f exceeds maximum %d", totalYears, maxYearsDuration)
 	}
-	if math.Abs(totalMonths) > MaxMonthsDuration {
-		return fmt.Errorf("cascading month duration %f exceeds maximum %d", totalMonths, MaxMonthsDuration)
+	if math.Abs(totalMonths) > maxMonthsDuration {
+		return fmt.Errorf("cascading month duration %f exceeds maximum %d", totalMonths, maxMonthsDuration)
 	}
-	if math.Abs(totalDays) > MaxDaysDuration {
-		return fmt.Errorf("cascading day duration %f exceeds maximum %d", totalDays, MaxDaysDuration)
+	if math.Abs(totalDays) > maxDaysDuration {
+		return fmt.Errorf("cascading day duration %f exceeds maximum %d", totalDays, maxDaysDuration)
 	}
 
 	return nil

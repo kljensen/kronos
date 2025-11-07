@@ -563,21 +563,21 @@ func TestValidateDuration(t *testing.T) {
 		{
 			name: "year exceeds maximum",
 			duration: Duration{
-				TimeunitYear: MaxYearsDuration + 1,
+				TimeunitYear: maxYearsDuration + 1,
 			},
 			expectError: true,
 		},
 		{
 			name: "month exceeds maximum",
 			duration: Duration{
-				TimeunitMonth: MaxMonthsDuration + 1,
+				TimeunitMonth: maxMonthsDuration + 1,
 			},
 			expectError: true,
 		},
 		{
 			name: "day exceeds maximum",
 			duration: Duration{
-				TimeunitDay: MaxDaysDuration + 1,
+				TimeunitDay: maxDaysDuration + 1,
 			},
 			expectError: true,
 		},
