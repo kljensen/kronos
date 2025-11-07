@@ -94,16 +94,6 @@ var DefaultTimezoneAbbrMap = kronos.TimezoneAbbrMap{
 	"GET":  240, // Georgia Eastern Time (UTC+4)
 }
 
-// ApproximationWords is a list of words that indicate approximate time expressions
-var ApproximationWords = []string{
-	"about",
-	"around",
-	"roughly",
-	"approximately",
-	"approx",
-	"circa",
-}
-
 // EmptyDuration represents an explicit empty duration.
 // This is defined as zero day, second, and millisecond.
 var EmptyDuration = kronos.Duration{

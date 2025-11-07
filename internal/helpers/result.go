@@ -19,7 +19,7 @@ func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone
 		return nil
 	}
 
-	components := NewParsingComponents(reference, nil)
+	components := kronos.InternalNewParsingComponents(reference, nil)
 	components.AddTag("result/relativeDate")
 
 	// Determine and set the period based on the duration

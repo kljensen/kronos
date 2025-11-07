@@ -6,7 +6,7 @@ import "github.com/kljensen/kronos"
 // Both date and time components are certain, and it includes timezone offset.
 func Now(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	component.AssignSimilarDate(targetDate)
 	component.AssignSimilarTime(targetDate)
@@ -21,7 +21,7 @@ func Now(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsin
 // Date components are certain, time components are implied.
 func Today(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	component.AssignSimilarDate(targetDate)
 	component.ImplySimilarTime(targetDate)
@@ -60,7 +60,7 @@ func TheDayBefore(reference *kronos.InternalReferenceWithTimezone, nDays int) *k
 // Date components are certain, time components are implied.
 func TheDayAfter(reference *kronos.InternalReferenceWithTimezone, nDays int) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	newDate := targetDate.AddDate(0, 0, nDays)
 
@@ -77,7 +77,7 @@ func TheDayAfter(reference *kronos.InternalReferenceWithTimezone, nDays int) *kr
 // Otherwise, it refers to the current midnight.
 func Midnight(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	// Unless it's very early morning (0-2 AM), assume midnight refers to the coming midnight
 	if targetDate.Hour() > 2 {
@@ -102,7 +102,7 @@ func Midnight(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalP
 
 // Noon returns components representing noon (12:00 PM).
 func Noon(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsingComponents {
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	component.Imply(kronos.ComponentMeridiem, 1) // PM
 	component.Assign(kronos.ComponentHour, 12)
@@ -152,7 +152,7 @@ func EveningWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour 
 // meridiem: 0 for AM, 1 for PM
 // tagSuffix: the specific time-of-day (e.g., "morning", "afternoon", "evening")
 func timeOfDayWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour, meridiem int, tagSuffix string) *kronos.InternalParsingComponents {
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	component.Imply(kronos.ComponentMeridiem, meridiem)
 	component.Imply(kronos.ComponentHour, implyHour)
@@ -168,7 +168,7 @@ func timeOfDayWithHour(reference *kronos.InternalReferenceWithTimezone, implyHou
 // TonightWithHour returns components representing tonight with a specific implied hour.
 func TonightWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
-	component := NewParsingComponents(reference, nil)
+	component := kronos.InternalNewParsingComponents(reference, nil)
 
 	component.AssignSimilarDate(targetDate)
 	component.Imply(kronos.ComponentHour, implyHour)

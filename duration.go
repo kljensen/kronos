@@ -348,4 +348,3 @@ func reverseDuration(duration Duration) Duration {
 	}
 	return reversed
 }
-

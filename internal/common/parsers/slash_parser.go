@@ -184,7 +184,7 @@ func (p *SlashDateFormatParser) Extract(context *kronos.InternalParsingContext, 
 	}
 
 	// Create the parsing components
-	components := helpers.NewParsingComponents(context.Reference(), map[kronos.Component]int{
+	components := kronos.InternalNewParsingComponents(context.Reference(), map[kronos.Component]int{
 		kronos.ComponentDay:   day,
 		kronos.ComponentMonth: month,
 	})

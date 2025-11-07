@@ -64,12 +64,6 @@ func AsParsingComponents(pc kronos.Components) (*kronos.InternalParsingComponent
 	return components, true
 }
 
-// NewParsingComponents creates a new ParsingComponents with the given reference.
-// It initializes implied values based on the reference date.
-func NewParsingComponents(reference *kronos.InternalReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.InternalParsingComponents {
-	return kronos.InternalNewParsingComponents(reference, knownComponents)
-}
-
 // ApproximationWords is a list of words that indicate approximate time expressions
 var ApproximationWords = []string{
 	"about",

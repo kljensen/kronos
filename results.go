@@ -366,6 +366,15 @@ func (pc *parsingComponents) AssignSimilarDate(date time.Time) {
 	pc.Assign(ComponentYear, date.Year())
 }
 
+// breakdownNanoseconds splits nanoseconds into milliseconds, microseconds, and nanoseconds.
+func breakdownNanoseconds(totalNanos int) (millisecond, microsecond, nanosecond int) {
+	millisecond = totalNanos / 1000000
+	remainingNanos := totalNanos % 1000000
+	microsecond = remainingNanos / 1000
+	nanosecond = remainingNanos % 1000
+	return
+}
+
 // AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
 func (pc *parsingComponents) AssignSimilarTime(date time.Time) {
@@ -373,12 +382,7 @@ func (pc *parsingComponents) AssignSimilarTime(date time.Time) {
 	pc.Assign(ComponentMinute, date.Minute())
 	pc.Assign(ComponentSecond, date.Second())
 
-	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
-	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
+	millisecond, microsecond, nanosecond := breakdownNanoseconds(date.Nanosecond())
 
 	pc.Assign(ComponentMillisecond, millisecond)
 	if microsecond > 0 {
@@ -411,12 +415,7 @@ func (pc *parsingComponents) ImplySimilarTime(date time.Time) {
 	pc.Imply(ComponentMinute, date.Minute())
 	pc.Imply(ComponentSecond, date.Second())
 
-	// Break down nanoseconds into milliseconds, microseconds, and nanoseconds
-	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
+	millisecond, microsecond, nanosecond := breakdownNanoseconds(date.Nanosecond())
 
 	pc.Imply(ComponentMillisecond, millisecond)
 	if microsecond > 0 {
@@ -903,82 +902,76 @@ func mergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 	return result
 }
 
+// assignOrImplyComponent assigns or implies a component value based on source certainty.
+func assignOrImplyComponent(result, source *parsingComponents, component Component) {
+	val := source.Get(component)
+	if val == nil {
+		return
+	}
+	if source.IsCertain(component) {
+		result.Assign(component, *val)
+	} else {
+		result.Imply(component, *val)
+	}
+}
+
 // mergeDateTimeComponent merges date and time components.
 func mergeDateTimeComponent(dateComp, timeComp *parsingComponents) *parsingComponents {
 	result := dateComp.Clone()
 
-	// Merge time components
-	hourVal := timeComp.Get(ComponentHour)
-	minuteVal := timeComp.Get(ComponentMinute)
-	secondVal := timeComp.Get(ComponentSecond)
-	millisecondVal := timeComp.Get(ComponentMillisecond)
-	microsecondVal := timeComp.Get(ComponentMicrosecond)
-	nanosecondVal := timeComp.Get(ComponentNanosecond)
-
+	// Merge time components based on certainty
 	if timeComp.IsCertain(ComponentHour) {
-		if hourVal != nil {
+		// Hour is certain - assign hour and minute
+		if hourVal := timeComp.Get(ComponentHour); hourVal != nil {
 			result.Assign(ComponentHour, *hourVal)
 		}
-		if minuteVal != nil {
+		if minuteVal := timeComp.Get(ComponentMinute); minuteVal != nil {
 			result.Assign(ComponentMinute, *minuteVal)
 		}
 
+		// Handle second and subsecond components
 		if timeComp.IsCertain(ComponentSecond) {
-			if secondVal != nil {
+			// Second is certain - assign it
+			if secondVal := timeComp.Get(ComponentSecond); secondVal != nil {
 				result.Assign(ComponentSecond, *secondVal)
 			}
-			if millisecondVal != nil {
-				if timeComp.IsCertain(ComponentMillisecond) {
-					result.Assign(ComponentMillisecond, *millisecondVal)
-				} else {
-					result.Imply(ComponentMillisecond, *millisecondVal)
-				}
-			}
-			if microsecondVal != nil {
-				if timeComp.IsCertain(ComponentMicrosecond) {
-					result.Assign(ComponentMicrosecond, *microsecondVal)
-				} else {
-					result.Imply(ComponentMicrosecond, *microsecondVal)
-				}
-			}
-			if nanosecondVal != nil {
-				if timeComp.IsCertain(ComponentNanosecond) {
-					result.Assign(ComponentNanosecond, *nanosecondVal)
-				} else {
-					result.Imply(ComponentNanosecond, *nanosecondVal)
-				}
-			}
+			// Subsecond components may be certain or implied
+			assignOrImplyComponent(result, timeComp, ComponentMillisecond)
+			assignOrImplyComponent(result, timeComp, ComponentMicrosecond)
+			assignOrImplyComponent(result, timeComp, ComponentNanosecond)
 		} else {
-			if secondVal != nil {
+			// Second is not certain - imply all subsecond components
+			if secondVal := timeComp.Get(ComponentSecond); secondVal != nil {
 				result.Imply(ComponentSecond, *secondVal)
 			}
-			if millisecondVal != nil {
+			if millisecondVal := timeComp.Get(ComponentMillisecond); millisecondVal != nil {
 				result.Imply(ComponentMillisecond, *millisecondVal)
 			}
-			if microsecondVal != nil {
+			if microsecondVal := timeComp.Get(ComponentMicrosecond); microsecondVal != nil {
 				result.Imply(ComponentMicrosecond, *microsecondVal)
 			}
-			if nanosecondVal != nil {
+			if nanosecondVal := timeComp.Get(ComponentNanosecond); nanosecondVal != nil {
 				result.Imply(ComponentNanosecond, *nanosecondVal)
 			}
 		}
 	} else {
-		if hourVal != nil {
+		// Hour is not certain - imply all time components
+		if hourVal := timeComp.Get(ComponentHour); hourVal != nil {
 			result.Imply(ComponentHour, *hourVal)
 		}
-		if minuteVal != nil {
+		if minuteVal := timeComp.Get(ComponentMinute); minuteVal != nil {
 			result.Imply(ComponentMinute, *minuteVal)
 		}
-		if secondVal != nil {
+		if secondVal := timeComp.Get(ComponentSecond); secondVal != nil {
 			result.Imply(ComponentSecond, *secondVal)
 		}
-		if millisecondVal != nil {
+		if millisecondVal := timeComp.Get(ComponentMillisecond); millisecondVal != nil {
 			result.Imply(ComponentMillisecond, *millisecondVal)
 		}
-		if microsecondVal != nil {
+		if microsecondVal := timeComp.Get(ComponentMicrosecond); microsecondVal != nil {
 			result.Imply(ComponentMicrosecond, *microsecondVal)
 		}
-		if nanosecondVal != nil {
+		if nanosecondVal := timeComp.Get(ComponentNanosecond); nanosecondVal != nil {
 			result.Imply(ComponentNanosecond, *nanosecondVal)
 		}
 	}
