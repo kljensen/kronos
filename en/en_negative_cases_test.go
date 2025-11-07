@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 // Tests ported from chrono's negative_cases.test.ts
 //
@@ -21,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/kljensen/kronos/experimental"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,22 +1,21 @@
 # Kronos API Audit - Issue #144
 
 **Date:** 2025-11-06
-**Current Version:** API minimization complete (Phase 1-7)
+**Current Version:** API minimization complete
 **Total Exports:** 92 (limit: 100)
 
 ## Executive Summary
 
-This document provides a complete inventory of the kronos public API after the API minimization effort (Phases 1-7, Issues #145-#148). We have successfully reduced the public API from 127 to 92 exports.
+This document provides a complete inventory of the kronos public API after the API minimization effort. We have successfully reduced the public API from 127 to 92 exports.
 
-### Current State (Post Phase 7)
+### Current State
 - **Essential API (stable):** Core types, enums, and builder pattern (~60 exports)
-- **Experimental API:** Moved to `github.com/kljensen/kronos/experimental` package
 - **X-prefixed helpers:** Reduced to 4 (only for private field access)
 - **Total exports:** 92 (down from 127)
 - **Guard limit:** 100 (reduced from 150)
 
-### Phase 7 Achievements (Issues #145-#148)
-1. ✓ Moved advanced parsing constructs to experimental package
+### Achievements
+1. ✓ Removed experimental package entirely (was over-engineered)
 2. ✓ Retired X-prefixed configuration helpers (kept only 4 for private field access)
 3. ✓ Tightened configuration exposure around builder API
 4. ✓ Reduced MAX_EXPORTS guard from 150 to 100
@@ -25,9 +24,6 @@ This document provides a complete inventory of the kronos public API after the A
 
 ### Essential (Keep Public)
 Stable, user-facing API that forms the core of kronos. These are guaranteed to remain stable and are documented for general use. Breaking changes require a major version bump.
-
-### Experimental (Move to experimental package)
-Advanced/unstable APIs that power kronos internally but are not recommended for general use. These should be moved to `github.com/kljensen/kronos/experimental` where they can evolve without breaking the main API contract.
 
 ### Deprecated (Phase Out)
 Legacy exports kept for backward compatibility but marked for removal in the next major version. Users should migrate away from these.
@@ -119,54 +115,14 @@ comp := results[0].Start()
 if comp.IsCertain(kronos.ComponentHour) {
     hour := comp.Get(kronos.ComponentHour)
 }
+
+// Advanced: Direct settings modification
+parser := en.New().
+    WithOption(func(s *kronos.Settings) {
+        s.TimezoneOverrides = customTimezones
+        s.DebugHandler = debugFunc
+    })
 ```
-
----
-
-### Experimental API (13 exports)
-
-These advanced APIs should be moved to `github.com/kljensen/kronos/experimental`.
-
-#### Types (7)
-- `Chrono` - Advanced parsing engine with custom parser/refiner lists
-- `Configuration` - Advanced configuration struct (Parsers, Refiners)
-- `ParserFactory` - Factory function type for creating parsers
-- `ParserInfo` - Parser metadata (Name, Description, Priority, Tags)
-- `ParserRegistry` - Registry for managing available parsers
-- `Pipeline` - Internal pipeline executor
-- `Refiner` - Refiner interface for post-processing results
-
-**Rationale:** These are used for:
-1. **Custom parser development** - Most users don't write custom parsers
-2. **Advanced configuration** - Direct Chrono/Configuration access is rarely needed
-3. **Parser registration** - Plugin-style architecture, not needed by 95% of users
-
-**Migration path:**
-```go
-// Before (current):
-import "github.com/kljensen/kronos"
-chrono := kronos.NewChrono(&kronos.Configuration{...})
-
-// After (future):
-import "github.com/kljensen/kronos/experimental"
-chrono := experimental.NewChrono(&experimental.Configuration{...})
-```
-
-#### Functions (5)
-- `NewChrono(config *Configuration) *Chrono` - Create custom Chrono
-- `NewParserRegistry() *ParserRegistry` - Create parser registry
-- `NewPipeline(config, settings) *Pipeline` - Create pipeline
-- `NewPipelineWithSettings(config, settings) (*Pipeline, error)` - Create pipeline with validation
-- `Register(name, info, factory)` - Register parser globally
-
-**Rationale:** These are advanced APIs used when building custom parsers or registries. The average user never calls these - they use the builder pattern via `en.New()` or `kronos.New()`.
-
-#### Variables (1)
-- `GlobalRegistry` - Global parser registry
-
-**Rationale:** Global mutable state is an anti-pattern. This should be in experimental package where advanced users can access it, but it's not part of the recommended API.
-
-**Impact assessment:** Low. Based on the examples and typical usage, very few users interact directly with Chrono, Configuration, or the parser registry. Most use the builder pattern via language-specific packages (en, etc.).
 
 ---
 
@@ -246,47 +202,45 @@ All X-prefixed functions are internal helpers:
 
 ---
 
-## Completed Actions (Phase 7)
+## Completed Actions
 
-### 1. ✓ Moved Experimental APIs to experimental Package (Issue #145)
+### 1. ✓ Removed Experimental Package Entirely
 
-Created `github.com/kljensen/kronos/experimental` package with:
-- Advanced parsing types: `Parser`, `Refiner`, `Configuration`, `Chrono`
-- Parsing internals: `ParsingComponents`, `ParsingResult`, `ParsingContext`
-- Helper functions: `Today()`, `Tomorrow()`, `AddDuration()`, etc.
-- Internal constants: `ApproximationWords`, `DefaultTimezoneAbbrMap`, `EmptyDuration`
+The experimental package was over-engineered and caused confusion:
+- It wasn't clear what was "experimental" vs. stable
+- It exposed too many internal implementation details
+- It duplicated types from the main package
+- Most users never needed any of its features
 
-**Benefits achieved:**
-- Clearer API boundaries between essential and advanced features
-- Experimental APIs can now evolve without breaking main API
-- Reduced cognitive load for new users
-- Enabled faster iteration on advanced features
+**Migration:**
+- Pre-configured chronos moved to `en` package: `en.CasualChrono()`, `en.StrictChrono()`, `en.GBChrono()`
+- Most users should use builder API instead: `en.New()`, `en.NewStrict()`, `en.NewGB()`
+- Advanced options now use `WithOption(func(*Settings))` instead of experimental option functions
 
-### 2. ✓ Retired X-Prefixed Configuration Helpers (Issue #146)
+### 2. ✓ Retired X-Prefixed Configuration Helpers
 
 Removed most X-prefixed configuration helpers:
 - Kept only 4 helpers needed for private field access
 - Tightened configuration exposure around builder API
 - Improved separation between public and internal APIs
 
-### 3. ✓ Updated API Guard (Issue #148)
+### 3. ✓ Updated API Guard
 
 Updated MAX_EXPORTS enforcement:
 ```go
 // Before:
 MAX_EXPORTS = 150 // 127 current exports
 
-// After Phase 7:
-MAX_EXPORTS = 100 // 92 current exports (down 35 from Phase 4)
+// After:
+MAX_EXPORTS = 100 // 92 current exports (down 35)
 ```
 
-### 4. ✓ Documentation Updates (Issue #148)
+### 4. ✓ Documentation Updates
 
 Updated documentation to reflect new API boundaries:
 1. **Essential API** - Stable, recommended for general use (~60 exports)
-2. **Experimental API** - Available in `experimental` package, may change
-3. **Internal API** - Minimal X-prefixed helpers (only 4 remain)
-4. README includes clear guidance on when to use experimental package
+2. **Internal API** - Minimal X-prefixed helpers (only 4 remain)
+3. README simplified to focus on builder pattern
 
 ### Future Cleanup for v2.0 (Low Priority)
 
@@ -299,15 +253,14 @@ Consider for v2.0:
 
 ## Target API Surface
 
-Current state after Phase 7:
+Current state:
 
 | Category | Count | Notes |
 |----------|-------|-------|
 | Essential | ~60 | Stable public API (types, enums, builder pattern) |
-| Experimental | 0 | Moved to experimental package |
 | Deprecated | 1 | DayPreference (remove in v2.0) |
 | Internal (X-prefixed) | 4 | Minimal helpers for private field access |
-| **Total** | **92** | Down from 127 in Phase 4 |
+| **Total** | **92** | Down from 127 originally |
 
 **Current MAX_EXPORTS guard: 100** (room for ~8 additions to essential API)
 
@@ -316,7 +269,6 @@ Current state after Phase 7:
 | Category | Count | Notes |
 |----------|-------|-------|
 | Essential | ~60 | Stable public API |
-| Experimental | 0 | In experimental package |
 | Deprecated | 0 | Remove DayPreference |
 | Internal (X-prefixed) | 0-4 | Minimize further if possible |
 | **Total** | **~60-64** | Clean, minimal API |
@@ -345,61 +297,26 @@ Current state after Phase 7:
 
 3. **Settings-based configuration** (advanced)
    ```go
-   settings := kronos.DefaultSettings()
-   settings.DateOrder = kronos.DateOrderDMY
-   results, _ := kronos.ParseWithSettings(text, refDate, settings, config)
+   parser := en.New().
+       WithOption(func(s *kronos.Settings) {
+           s.TimezoneOverrides = customTimezones
+           s.DebugHandler = debugFunc
+       })
    ```
 
-### Rarely Used (Candidates for Experimental)
-
-- Direct `Chrono` construction
-- `Configuration` structs
-- Parser/refiner registration
-- `Pipeline` creation
-
-**Conclusion:** The essential API (60 exports) covers 95%+ of use cases. The experimental APIs (13 exports) are genuinely advanced and should be isolated.
-
----
-
-## Follow-up Issues
-
-Based on this audit, the following follow-up issues should be created:
-
-### Issue: Move Advanced APIs to Experimental Package
-**Priority:** High
-**Description:** Move 13 exports (Chrono, Configuration, etc.) to `github.com/kljensen/kronos/experimental` package with deprecation notices in root package.
-**Exports to move:** Chrono, Configuration, ParserFactory, ParserInfo, ParserRegistry, Pipeline, Refiner, NewChrono, NewParserRegistry, NewPipeline, NewPipelineWithSettings, Register, GlobalRegistry
-
-### Issue: Deprecate DayPreference Type
-**Priority:** Medium
-**Description:** Add deprecation notices to DayPreference and related constants. Document migration path to DatePreference.
-**Exports to deprecate:** DayPreference, DayPreferCurrent, DayPreferFirst, DayPreferLast
-
-### Issue: Update API Guard Target
-**Priority:** High
-**Description:** After moving experimental APIs, update MAX_EXPORTS from 150 to 80 to prevent API bloat.
-**New target:** 80 (60 essential + 50 internal = 110, with ~30 room for growth)
-
-### Issue: Improve API Documentation
-**Priority:** High
-**Description:** Update package docs to clearly distinguish essential, experimental, and internal APIs. Add examples for common patterns.
+**Conclusion:** The essential API (60 exports) covers 95%+ of use cases. The builder pattern via `en.New()` is the primary interface.
 
 ---
 
 ## Appendix: Export Counts by Category
 
 ```
-Total: 127 exports
+Total: 92 exports
 
 Essential (60):
   - Types: 11
   - Constants: 43
   - Functions: 6
-
-Experimental (13):
-  - Types: 7
-  - Functions: 5
-  - Variables: 1
 
 Deprecated (4):
   - Types: 1
@@ -414,14 +331,14 @@ Internal (50):
 
 ## Appendix: Complete Export List
 
-For reference, the complete list of all 127 exports is documented in the inventory above. Each export includes:
+For reference, the complete list of all 92 exports is documented in the inventory above. Each export includes:
 - Name
 - Type (type, const, func, var)
-- Category (essential, experimental, deprecated, internal)
+- Category (essential, deprecated, internal)
 - Rationale for categorization
 
-This audit was generated using `go doc -all .` and automated categorization based on:
+This audit was generated using `go doc -all .` and categorization based on:
 1. Usage patterns in examples/
 2. Naming conventions (X-prefix for internal)
 3. API design principles (builder pattern as primary interface)
-4. Previous API minimization decisions (Phases 1-7)
+4. API minimization decisions

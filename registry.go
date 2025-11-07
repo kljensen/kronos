@@ -55,8 +55,7 @@ type registeredParser struct {
 }
 
 // newParserRegistry creates a new parser registry.
-// This is unexported and only used internally. External code should use
-// experimental.NewParserRegistry() instead.
+// This is unexported and only used internally.
 func newParserRegistry() *ParserRegistry {
 	return &ParserRegistry{
 		parsers:  make(map[string]*registeredParser),
@@ -65,12 +64,10 @@ func newParserRegistry() *ParserRegistry {
 }
 
 // globalRegistry is the internal global parser registry.
-// External code should use experimental.GlobalRegistry instead.
 var globalRegistry = newParserRegistry()
 
 // internalRegister registers a parser with the global registry.
-// This is unexported and only used by experimental package.
-// External code should use experimental.Register() instead.
+// This is unexported and only used internally.
 func internalRegister(name string, info ParserInfo, factory ParserFactory) {
 	globalRegistry.RegisterParser(name, info, factory)
 }

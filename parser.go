@@ -130,16 +130,16 @@ func (p *ParserBuilder) ToTimezone(tz string) *ParserBuilder {
 }
 
 // WithOption applies an advanced configuration option to the parser.
-// Options are provided by the experimental package and allow fine-grained control
-// over parsing behavior without cluttering the main builder API.
+// This allows fine-grained control over parsing behavior by directly modifying
+// the Settings struct.
 //
 // Example:
 //
-//	import "github.com/kljensen/kronos/experimental"
-//
 //	parser := kronos.New(en.Casual).
-//	    WithOption(experimental.WithParserOrder("iso8601", "en_casual_date")).
-//	    WithOption(experimental.WithMaxParsers(3))
+//	    WithOption(func(s *kronos.Settings) {
+//	        s.TimezoneOverrides = customTimezones
+//	        s.DebugHandler = debugFunc
+//	    })
 func (p *ParserBuilder) WithOption(option func(*Settings)) *ParserBuilder {
 	option(&p.settings)
 	return p

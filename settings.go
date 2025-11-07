@@ -69,13 +69,13 @@ func (d DayPreference) String() string {
 //	    WithForwardDate(true).
 //	    Strict()
 //
-// For advanced options, use the experimental package:
-//
-//	import "github.com/kljensen/kronos/experimental"
+// For advanced options, use WithOption to modify settings directly:
 //
 //	parser := kronos.New(en.Casual).
-//	    WithOption(experimental.WithTimezoneOverrides(customTimezones)).
-//	    WithOption(experimental.WithDebugHandler(debugFunc))
+//	    WithOption(func(s *kronos.Settings) {
+//	        s.TimezoneOverrides = customTimezones
+//	        s.DebugHandler = debugFunc
+//	    })
 //
 // The Settings struct will remain available for compatibility but new code should
 // use the builder pattern.

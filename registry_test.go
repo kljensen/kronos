@@ -342,7 +342,6 @@ func TestParserRegistry_ReplaceParser(t *testing.T) {
 
 func TestGlobalRegistry(t *testing.T) {
 	// Test that globalRegistry exists internally
-	// External users should use experimental.GlobalRegistry
 	if globalRegistry == nil {
 		t.Fatal("Expected internal globalRegistry to exist")
 	}
