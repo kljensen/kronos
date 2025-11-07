@@ -123,17 +123,7 @@ func Morning(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalPa
 
 // MorningWithHour returns components representing morning with a specific implied hour.
 func MorningWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
-	component := NewParsingComponents(reference, nil)
-
-	component.Imply(kronos.ComponentMeridiem, 0) // AM
-	component.Imply(kronos.ComponentHour, implyHour)
-	component.Imply(kronos.ComponentMinute, 0)
-	component.Imply(kronos.ComponentSecond, 0)
-	component.Imply(kronos.ComponentMillisecond, 0)
-	component.AddTag("casualReference/morning")
-	component.SetPeriod(kronos.PeriodTime)
-
-	return component
+	return timeOfDayWithHour(reference, implyHour, 0, "morning")
 }
 
 // Afternoon returns components representing afternoon time.
@@ -144,17 +134,7 @@ func Afternoon(reference *kronos.InternalReferenceWithTimezone) *kronos.Internal
 
 // AfternoonWithHour returns components representing afternoon with a specific implied hour.
 func AfternoonWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
-	component := NewParsingComponents(reference, nil)
-
-	component.Imply(kronos.ComponentMeridiem, 1) // PM
-	component.Imply(kronos.ComponentHour, implyHour)
-	component.Imply(kronos.ComponentMinute, 0)
-	component.Imply(kronos.ComponentSecond, 0)
-	component.Imply(kronos.ComponentMillisecond, 0)
-	component.AddTag("casualReference/afternoon")
-	component.SetPeriod(kronos.PeriodTime)
-
-	return component
+	return timeOfDayWithHour(reference, implyHour, 1, "afternoon")
 }
 
 // Evening returns components representing evening time.
@@ -165,11 +145,21 @@ func Evening(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalPa
 
 // EveningWithHour returns components representing evening with a specific implied hour.
 func EveningWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour int) *kronos.InternalParsingComponents {
+	return timeOfDayWithHour(reference, implyHour, 1, "evening")
+}
+
+// timeOfDayWithHour creates components for a time-of-day reference (morning/afternoon/evening).
+// meridiem: 0 for AM, 1 for PM
+// tagSuffix: the specific time-of-day (e.g., "morning", "afternoon", "evening")
+func timeOfDayWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour, meridiem int, tagSuffix string) *kronos.InternalParsingComponents {
 	component := NewParsingComponents(reference, nil)
 
-	component.Imply(kronos.ComponentMeridiem, 1) // PM
+	component.Imply(kronos.ComponentMeridiem, meridiem)
 	component.Imply(kronos.ComponentHour, implyHour)
-	component.AddTag("casualReference/evening")
+	component.Imply(kronos.ComponentMinute, 0)
+	component.Imply(kronos.ComponentSecond, 0)
+	component.Imply(kronos.ComponentMillisecond, 0)
+	component.AddTag("casualReference/" + tagSuffix)
 	component.SetPeriod(kronos.PeriodTime)
 
 	return component
