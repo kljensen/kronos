@@ -15,6 +15,7 @@ package helpers
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/kljensen/kronos"
@@ -62,6 +63,16 @@ func AsParsingComponents(pc kronos.Components) (*kronos.InternalParsingComponent
 	}
 
 	return components, true
+}
+
+// AtoiSafe safely converts a string to an integer.
+// Returns the integer value and true on success, or 0 and false on failure.
+func AtoiSafe(s string) (int, bool) {
+	val, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, false
+	}
+	return val, true
 }
 
 // ApproximationWords is a list of words that indicate approximate time expressions

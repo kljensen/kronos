@@ -3,22 +3,12 @@ package parsers
 
 import (
 	"regexp"
-	"strconv"
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/helpers"
 	"github.com/kljensen/kronos/internal/parsing"
 )
-
-// atoiSafe converts a string to an integer, returning 0 and false on error.
-// Returns the value and true on success.
-func atoiSafe(s string) (int, bool) {
-	val, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, false
-	}
-	return val, true
-}
 
 // ENCompactFormatParser handles dates/times without separators
 // Supports formats like:
@@ -117,11 +107,11 @@ func (p *ENCompactFormatParser) innerExtract(context *kronos.InternalParsingCont
 // Prioritize time if hours >= 13 (clearly not a month)
 // Otherwise prioritize date if month is valid
 func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
-	first2, ok := atoiSafe(s[0:2])
+	first2, ok := helpers.AtoiSafe(s[0:2])
 	if !ok {
 		return nil
 	}
-	last2, ok := atoiSafe(s[2:4])
+	last2, ok := helpers.AtoiSafe(s[2:4])
 	if !ok {
 		return nil
 	}
@@ -165,15 +155,15 @@ func (p *ENCompactFormatParser) tryParse4Digits(s string, ctx *kronos.InternalPa
 // Prioritize date if first 2 digits look like a year (> 23 or starts with 0)
 // Otherwise prioritize time
 func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
-	first2, ok := atoiSafe(s[0:2])
+	first2, ok := helpers.AtoiSafe(s[0:2])
 	if !ok {
 		return nil
 	}
-	middle2, ok := atoiSafe(s[2:4])
+	middle2, ok := helpers.AtoiSafe(s[2:4])
 	if !ok {
 		return nil
 	}
-	last2, ok := atoiSafe(s[4:6])
+	last2, ok := helpers.AtoiSafe(s[4:6])
 	if !ok {
 		return nil
 	}
@@ -219,15 +209,15 @@ func (p *ENCompactFormatParser) tryParse6Digits(s string, ctx *kronos.InternalPa
 // tryParse8Digits attempts to parse 8-digit strings
 // Format: YYYYMMDD
 func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
-	year, ok := atoiSafe(s[0:4])
+	year, ok := helpers.AtoiSafe(s[0:4])
 	if !ok {
 		return nil
 	}
-	month, ok := atoiSafe(s[4:6])
+	month, ok := helpers.AtoiSafe(s[4:6])
 	if !ok {
 		return nil
 	}
-	day, ok := atoiSafe(s[6:8])
+	day, ok := helpers.AtoiSafe(s[6:8])
 	if !ok {
 		return nil
 	}
@@ -262,32 +252,32 @@ func (p *ENCompactFormatParser) tryParse14Digits(s string, ctx *kronos.InternalP
 // tryParseDateTime is a helper that parses datetime strings with year, month, day, and optional hour, minute, second
 // Pass -1 for minute or second positions to imply 0 values
 func (p *ENCompactFormatParser) tryParseDateTime(s string, yearLen, monthPos, dayPos, hourPos, minutePos, secondPos int, ctx *kronos.InternalParsingContext) *kronos.InternalParsingComponents {
-	year, ok := atoiSafe(s[0:yearLen])
+	year, ok := helpers.AtoiSafe(s[0:yearLen])
 	if !ok {
 		return nil
 	}
-	month, ok := atoiSafe(s[yearLen:monthPos])
+	month, ok := helpers.AtoiSafe(s[yearLen:monthPos])
 	if !ok {
 		return nil
 	}
-	day, ok := atoiSafe(s[monthPos:dayPos])
+	day, ok := helpers.AtoiSafe(s[monthPos:dayPos])
 	if !ok {
 		return nil
 	}
-	hour, ok := atoiSafe(s[dayPos:hourPos])
+	hour, ok := helpers.AtoiSafe(s[dayPos:hourPos])
 	if !ok {
 		return nil
 	}
 
 	var minute, second int
 	if minutePos > 0 {
-		minute, ok = atoiSafe(s[hourPos:minutePos])
+		minute, ok = helpers.AtoiSafe(s[hourPos:minutePos])
 		if !ok {
 			return nil
 		}
 	}
 	if secondPos > 0 {
-		second, ok = atoiSafe(s[minutePos:secondPos])
+		second, ok = helpers.AtoiSafe(s[minutePos:secondPos])
 		if !ok {
 			return nil
 		}

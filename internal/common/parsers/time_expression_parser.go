@@ -5,22 +5,11 @@ package parsers
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 
 	kronos "github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/internal/helpers"
 )
-
-// atoiSafe converts a string to an integer, returning 0 and false on error.
-// Returns the value and true on success.
-func atoiSafe(s string) (int, bool) {
-	val, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, false
-	}
-	return val, true
-}
 
 // Time parsing capture group constants
 const (
@@ -401,7 +390,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	var meridiem *helpers.Meridiem
 
 	// Parse hour
-	hour, ok := atoiSafe(match[TimeHourGroup])
+	hour, ok := helpers.AtoiSafe(match[TimeHourGroup])
 	if !ok {
 		return nil
 	}
@@ -431,7 +420,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 			// Skip single digit minute e.g., "at 1.1 xx"
 			return nil
 		}
-		minute, ok = atoiSafe(match[TimeMinuteGroup])
+		minute, ok = helpers.AtoiSafe(match[TimeMinuteGroup])
 		if !ok {
 			return nil
 		}
@@ -471,7 +460,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {
-		second, ok := atoiSafe(match[TimeSecondGroup])
+		second, ok := helpers.AtoiSafe(match[TimeSecondGroup])
 		if !ok {
 			return nil
 		}
@@ -491,7 +480,7 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 		if len(fracStr) > maxNanoDigits {
 			fracStr = fracStr[:maxNanoDigits]
 		}
-		nanos, ok := atoiSafe(fracStr)
+		nanos, ok := helpers.AtoiSafe(fracStr)
 		if !ok {
 			return nil
 		}
@@ -539,7 +528,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 
 	// Parse seconds
 	if match[TimeSecondGroup] != "" {
-		second, ok := atoiSafe(match[TimeSecondGroup])
+		second, ok := helpers.AtoiSafe(match[TimeSecondGroup])
 		if !ok {
 			return nil
 		}
@@ -559,7 +548,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		if len(fracStr) > maxNanoDigits {
 			fracStr = fracStr[:maxNanoDigits]
 		}
-		nanos, ok := atoiSafe(fracStr)
+		nanos, ok := helpers.AtoiSafe(fracStr)
 		if !ok {
 			return nil
 		}
@@ -590,7 +579,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 		}
 	}
 
-	hour, ok := atoiSafe(match[TimeHourGroup])
+	hour, ok := helpers.AtoiSafe(match[TimeHourGroup])
 	if !ok {
 		return nil
 	}
@@ -603,7 +592,7 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 			// Skip single digit minute in following time e.g., "10 - 10.1"
 			return nil
 		}
-		minute, ok = atoiSafe(match[TimeMinuteGroup])
+		minute, ok = helpers.AtoiSafe(match[TimeMinuteGroup])
 		if !ok {
 			return nil
 		}
@@ -774,7 +763,7 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithoutFollowingPattern(res
 			}
 
 			// Reject hours above 24
-			if val, ok := atoiSafe(nums); ok && val > maxHour24Format {
+			if val, ok := helpers.AtoiSafe(nums); ok && val > maxHour24Format {
 				return nil
 			}
 		}
@@ -819,10 +808,10 @@ func (p *AbstractTimeExpressionParser) checkAndReturnWithFollowingPattern(result
 		}
 
 		// Reject hours above 24
-		if startVal, ok := atoiSafe(startNum); ok && startVal > maxHour24Format {
+		if startVal, ok := helpers.AtoiSafe(startNum); ok && startVal > maxHour24Format {
 			return nil
 		}
-		if endVal, ok := atoiSafe(endNum); ok && endVal > maxHour24Format {
+		if endVal, ok := helpers.AtoiSafe(endNum); ok && endVal > maxHour24Format {
 			return nil
 		}
 	}
