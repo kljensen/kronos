@@ -8,26 +8,6 @@ import (
 // Package helpers contains internal helper functions for the kronos package.
 
 // ============================================================================
-// Type casting helpers
-// ============================================================================
-
-// asParsingComponents attempts to cast the given Components interface to
-// a *parsingComponents. It returns the concrete value and true when the cast
-// succeeds, or nil and false otherwise.
-func asParsingComponents(pc Components) (*parsingComponents, bool) {
-	if pc == nil {
-		return nil, false
-	}
-
-	components, ok := pc.(*parsingComponents)
-	if !ok || components == nil {
-		return nil, false
-	}
-
-	return components, true
-}
-
-// ============================================================================
 // Input sanitization for Unicode normalization
 // ============================================================================
 
@@ -118,4 +98,3 @@ func removeZeroWidthChars(s string) string {
 	}
 	return s
 }
-

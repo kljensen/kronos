@@ -866,28 +866,22 @@ func (c *componentsAdapter) Tags() map[string]bool {
 // mergeDateTimeResult merges a date-only result with a time-only result.
 func mergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 	result := dateResult.Clone()
-	beginDate, okDate := asParsingComponents(dateResult.Start())
-	beginTime, okTime := asParsingComponents(timeResult.Start())
-	if !okDate || !okTime {
-		return result
-	}
+	beginDate := dateResult.start
+	beginTime := timeResult.start
 
 	result.start = mergeDateTimeComponent(beginDate, beginTime)
 
-	if dateResult.End() != nil || timeResult.End() != nil {
+	if dateResult.end != nil || timeResult.end != nil {
 		var endDate, endTime *parsingComponents
-		if dateResult.End() == nil {
-			endDate, okDate = asParsingComponents(dateResult.Start())
+		if dateResult.end == nil {
+			endDate = dateResult.start
 		} else {
-			endDate, okDate = asParsingComponents(dateResult.End())
+			endDate = dateResult.end
 		}
-		if timeResult.End() == nil {
-			endTime, okTime = asParsingComponents(timeResult.Start())
+		if timeResult.end == nil {
+			endTime = timeResult.start
 		} else {
-			endTime, okTime = asParsingComponents(timeResult.End())
-		}
-		if !okDate || !okTime {
-			return result
+			endTime = timeResult.end
 		}
 
 		endDateTime := mergeDateTimeComponent(endDate, endTime)
