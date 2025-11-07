@@ -54,33 +54,25 @@ type registeredParser struct {
 	factory ParserFactory
 }
 
-// GlobalRegistry is the global parser registry for all parsers.
-//
-// Deprecated: This variable is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
-var GlobalRegistry = NewParserRegistry()
-
-// NewParserRegistry creates a new parser registry.
-//
-// Deprecated: This function is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
-func NewParserRegistry() *ParserRegistry {
+// newParserRegistry creates a new parser registry.
+// This is unexported and only used internally. External code should use
+// experimental.NewParserRegistry() instead.
+func newParserRegistry() *ParserRegistry {
 	return &ParserRegistry{
 		parsers:  make(map[string]*registeredParser),
 		defaults: []string{},
 	}
 }
 
-// Register registers a parser with the global registry.
-// The parser name must be unique.
-//
-// Deprecated: This function is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
-func Register(name string, info ParserInfo, factory ParserFactory) {
-	GlobalRegistry.RegisterParser(name, info, factory)
+// globalRegistry is the internal global parser registry.
+// External code should use experimental.GlobalRegistry instead.
+var globalRegistry = newParserRegistry()
+
+// internalRegister registers a parser with the global registry.
+// This is unexported and only used by experimental package.
+// External code should use experimental.Register() instead.
+func internalRegister(name string, info ParserInfo, factory ParserFactory) {
+	globalRegistry.RegisterParser(name, info, factory)
 }
 
 // RegisterParser registers a parser with this registry.

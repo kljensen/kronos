@@ -24,19 +24,3 @@ type Parser = kronos.Parser
 // Refiner is an abstraction for Chrono refiners.
 // Re-exported from the main package for the experimental API.
 type Refiner = kronos.Refiner
-
-// Pipeline manages the parsing process with configurable parsers and settings.
-// Re-exported from the main package for the experimental API.
-type Pipeline = kronos.Pipeline
-
-// NewPipeline creates a new parsing pipeline with the given configuration and settings.
-// Re-exported from the main package for the experimental API.
-var NewPipeline = kronos.NewPipeline
-
-// NewPipelineWithSettings creates a pipeline using settings to determine parsers.
-// Re-exported from the main package for the experimental API.
-var NewPipelineWithSettings = kronos.NewPipelineWithSettings
-
-// ParseWithSettings is a convenience function that creates a pipeline and executes it.
-// Re-exported from the main package for the experimental API.
-var ParseWithSettings = kronos.ParseWithSettings

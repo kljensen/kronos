@@ -64,21 +64,31 @@ func AsParsingComponents(pc kronos.ParsedComponents) (*kronos.ParsingComponents,
 	return components, true
 }
 
+// NewParsingContext creates a new ParsingContext for parsing operations.
+// This uses the internal helper exported from kronos package for internal use.
+func NewParsingContext(text string, refDate interface{}, option *kronos.ParsingOption) *kronos.ParsingContext {
+	return kronos.InternalNewParsingContext(text, refDate, option)
+}
+
 // NewParsingComponents creates a new ParsingComponents with the given reference.
 // It initializes implied values based on the reference date.
 //
-// This is a wrapper around the internal implementation in the kronos package.
-// We must use the X function because it needs access to private fields.
+// This uses the internal helper exported from kronos package for internal use.
 func NewParsingComponents(reference *kronos.ReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.ParsingComponents {
-	return kronos.XNewParsingComponents(reference, knownComponents)
+	return kronos.InternalNewParsingComponents(reference, knownComponents)
+}
+
+// NewParsingResult creates a new ParsingResult with the given parameters.
+// This uses the internal helper exported from kronos package for internal use.
+func NewParsingResult(reference *kronos.ReferenceWithTimezone, index int, text string, start, end *kronos.ParsingComponents) *kronos.ParsingResult {
+	return kronos.InternalNewParsingResult(reference, index, text, start, end)
 }
 
 // MergeDateTimeResultWrapper merges a date-only result with a time-only result.
 //
 // This is a wrapper around the internal implementation in the kronos package.
-// We must use the X function because it needs access to private fields.
 func MergeDateTimeResultWrapper(dateResult, timeResult *kronos.ParsingResult) *kronos.ParsingResult {
-	return kronos.XMergeDateTimeResult(dateResult, timeResult)
+	return kronos.InternalMergeDateTimeResult(dateResult, timeResult)
 }
 
 // ApproximationWords is a list of words that indicate approximate time expressions

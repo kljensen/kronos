@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewParserRegistry(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	if registry == nil {
 		t.Fatal("Expected non-nil registry")
@@ -13,7 +13,7 @@ func TestNewParserRegistry(t *testing.T) {
 }
 
 func TestParserRegistry_RegisterParser(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info := ParserInfo{
 		Description: "Test parser",
@@ -31,7 +31,7 @@ func TestParserRegistry_RegisterParser(t *testing.T) {
 }
 
 func TestParserRegistry_GetParser(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info := ParserInfo{
 		Description: "Test parser",
@@ -50,7 +50,7 @@ func TestParserRegistry_GetParser(t *testing.T) {
 }
 
 func TestParserRegistry_GetParser_NotFound(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	parser := registry.GetParser("nonexistent")
 	if parser != nil {
@@ -59,7 +59,7 @@ func TestParserRegistry_GetParser_NotFound(t *testing.T) {
 }
 
 func TestParserRegistry_GetParsers(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info1 := ParserInfo{
 		Description: "Test parser 1",
@@ -84,7 +84,7 @@ func TestParserRegistry_GetParsers(t *testing.T) {
 }
 
 func TestParserRegistry_GetParsers_SkipsUnknown(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info := ParserInfo{
 		Description: "Test parser",
@@ -102,7 +102,7 @@ func TestParserRegistry_GetParsers_SkipsUnknown(t *testing.T) {
 }
 
 func TestParserRegistry_GetAllParsers(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info1 := ParserInfo{
 		Description: "Test parser 1",
@@ -127,7 +127,7 @@ func TestParserRegistry_GetAllParsers(t *testing.T) {
 }
 
 func TestParserRegistry_GetAllParsers_SortedByPriority(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	// Register parsers with different priorities
 	info1 := ParserInfo{
@@ -164,7 +164,7 @@ func TestParserRegistry_GetAllParsers_SortedByPriority(t *testing.T) {
 }
 
 func TestParserRegistry_GetParsersByTag(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info1 := ParserInfo{
 		Description: "Casual parser",
@@ -196,7 +196,7 @@ func TestParserRegistry_GetParsersByTag(t *testing.T) {
 }
 
 func TestParserRegistry_ListParsers(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info1 := ParserInfo{
 		Description: "Test parser 1",
@@ -237,7 +237,7 @@ func TestParserRegistry_ListParsers(t *testing.T) {
 }
 
 func TestParserRegistry_HasParser(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info := ParserInfo{
 		Description: "Test parser",
@@ -258,7 +258,7 @@ func TestParserRegistry_HasParser(t *testing.T) {
 }
 
 func TestParserRegistry_SetDefaultOrder(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	order := []string{"parser1", "parser2", "parser3"}
 	registry.SetDefaultOrder(order)
@@ -276,7 +276,7 @@ func TestParserRegistry_SetDefaultOrder(t *testing.T) {
 }
 
 func TestParserRegistry_GetDefaultOrder(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	// Initially should be empty
 	order := registry.GetDefaultOrder()
@@ -286,7 +286,7 @@ func TestParserRegistry_GetDefaultOrder(t *testing.T) {
 }
 
 func TestParserRegistry_Clear(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info := ParserInfo{
 		Description: "Test parser",
@@ -309,7 +309,7 @@ func TestParserRegistry_Clear(t *testing.T) {
 }
 
 func TestParserRegistry_ReplaceParser(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info1 := ParserInfo{
 		Description: "Original parser",
@@ -341,31 +341,33 @@ func TestParserRegistry_ReplaceParser(t *testing.T) {
 }
 
 func TestGlobalRegistry(t *testing.T) {
-	// Test that GlobalRegistry exists
-	if GlobalRegistry == nil {
-		t.Fatal("Expected GlobalRegistry to exist")
+	// Test that globalRegistry exists internally
+	// External users should use experimental.GlobalRegistry
+	if globalRegistry == nil {
+		t.Fatal("Expected internal globalRegistry to exist")
 	}
 }
 
 func TestRegister_GlobalFunction(t *testing.T) {
+	// Test internal register function
 	// Clear global registry to avoid conflicts
-	GlobalRegistry.Clear()
+	globalRegistry.Clear()
 
 	info := ParserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
 
-	Register("global_test", info, func() Parser {
+	internalRegister("global_test", info, func() Parser {
 		return nil
 	})
 
-	if !GlobalRegistry.HasParser("global_test") {
+	if !globalRegistry.HasParser("global_test") {
 		t.Error("Expected parser to be registered in global registry")
 	}
 
 	// Clean up
-	GlobalRegistry.Clear()
+	globalRegistry.Clear()
 }
 
 func TestParserInfo(t *testing.T) {
@@ -391,7 +393,7 @@ func TestParserInfo(t *testing.T) {
 }
 
 func TestParserRegistry_ConcurrentAccess(t *testing.T) {
-	registry := NewParserRegistry()
+	registry := newParserRegistry()
 
 	info := ParserInfo{
 		Description: "Test parser",
