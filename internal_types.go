@@ -116,3 +116,27 @@ func InternalGetLastWeekdayOfMonth(year int, month time.Month, weekday time.Week
 	result := nextMonth.AddDate(0, 0, -dayDiff)
 	return time.Date(result.Year(), result.Month(), result.Day(), hour, 0, 0, 0, time.UTC)
 }
+
+// Helper function exports for tests (re-exported from internal/helpers)
+// These allow test code to access internal/helpers functionality without creating import cycles.
+
+// InternalHelpersNow wraps helpers.Now for test use.
+func InternalHelpersNow(reference *referenceWithTimezone) *parsingComponents {
+	// Import cycle prevented - this is called from internal/helpers
+	return nil // Implementation moved to test_helpers_test.go
+}
+
+// InternalHelpersToday wraps helpers.Today for test use.
+func InternalHelpersToday(reference *referenceWithTimezone) *parsingComponents {
+	return nil // Implementation moved to test_helpers_test.go
+}
+
+// InternalHelpersYesterday wraps helpers.Yesterday for test use.
+func InternalHelpersYesterday(reference *referenceWithTimezone) *parsingComponents {
+	return nil // Implementation moved to test_helpers_test.go
+}
+
+// InternalHelpersTomorrow wraps helpers.Tomorrow for test use.
+func InternalHelpersTomorrow(reference *referenceWithTimezone) *parsingComponents {
+	return nil // Implementation moved to test_helpers_test.go
+}

@@ -6,12 +6,18 @@ import (
 	"time"
 )
 
-// Test helper functions for creating casual reference components.
-// These functions are only used by tests to verify parsing behavior.
-// They are kept in the main package to avoid export/import complexity.
+// Test helper functions are only used by tests to verify parsing behavior.
+// These cannot import internal/helpers due to import cycles (internal/helpers imports kronos).
+// Therefore we keep implementations here that are test-only.
+//
+// NOTE: The real implementations are in internal/helpers/*.go and are used by the actual parsers.
+// This duplication is necessary due to Go's import cycle restrictions. Tests in package kronos
+// cannot import internal/helpers because internal/helpers imports kronos.
 
-// now returns a ParsingComponents representing the current moment.
-// Both date and time components are certain, and it includes timezone offset.
+// ============================================================================
+// Casual reference helpers (test-only versions)
+// ============================================================================
+
 func now(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -25,8 +31,6 @@ func now(reference *referenceWithTimezone) *parsingComponents {
 	return component
 }
 
-// today returns a ParsingComponents representing today's date.
-// Date components are certain, time components are implied.
 func today(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -40,8 +44,6 @@ func today(reference *referenceWithTimezone) *parsingComponents {
 	return component
 }
 
-// yesterday returns a ParsingComponents representing yesterday's date.
-// Date components are certain, time components are implied.
 func yesterday(reference *referenceWithTimezone) *parsingComponents {
 	component := theDayBefore(reference, 1)
 	component.AddTag("casualReference/yesterday")
@@ -49,8 +51,6 @@ func yesterday(reference *referenceWithTimezone) *parsingComponents {
 	return component
 }
 
-// tomorrow returns a ParsingComponents representing tomorrow's date.
-// Date components are certain, time components are implied.
 func tomorrow(reference *referenceWithTimezone) *parsingComponents {
 	component := theDayAfter(reference, 1)
 	component.AddTag("casualReference/tomorrow")
@@ -58,14 +58,10 @@ func tomorrow(reference *referenceWithTimezone) *parsingComponents {
 	return component
 }
 
-// theDayBefore returns a ParsingComponents representing n days before the reference date.
-// Date components are certain, time components are implied.
 func theDayBefore(reference *referenceWithTimezone, nDays int) *parsingComponents {
 	return theDayAfter(reference, -nDays)
 }
 
-// theDayAfter returns a ParsingComponents representing n days after the reference date.
-// Date components are certain, time components are implied.
 func theDayAfter(reference *referenceWithTimezone, nDays int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -80,13 +76,10 @@ func theDayAfter(reference *referenceWithTimezone, nDays int) *parsingComponents
 	return component
 }
 
-// tonight returns a ParsingComponents representing tonight.
-// Date components are certain, time is implied (default: 10 PM / 22:00).
 func tonight(reference *referenceWithTimezone) *parsingComponents {
 	return tonightWithHour(reference, 22)
 }
 
-// tonightWithHour returns a ParsingComponents representing tonight with a specific implied hour.
 func tonightWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -100,14 +93,10 @@ func tonightWithHour(reference *referenceWithTimezone, implyHour int) *parsingCo
 	return component
 }
 
-// lastNight returns a ParsingComponents representing last night.
-// If the reference time is before 6 AM, it refers to the previous night.
-// Otherwise, it refers to the night of the current day.
 func lastNight(reference *referenceWithTimezone) *parsingComponents {
 	return lastNightWithHour(reference, 0)
 }
 
-// lastNightWithHour returns a ParsingComponents representing last night with a specific implied hour.
 func lastNightWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -125,13 +114,10 @@ func lastNightWithHour(reference *referenceWithTimezone, implyHour int) *parsing
 	return component
 }
 
-// evening returns a ParsingComponents representing evening time.
-// Time is implied (default: 8 PM / 20:00).
 func evening(reference *referenceWithTimezone) *parsingComponents {
 	return eveningWithHour(reference, 20)
 }
 
-// eveningWithHour returns a ParsingComponents representing evening with a specific implied hour.
 func eveningWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
@@ -143,12 +129,10 @@ func eveningWithHour(reference *referenceWithTimezone, implyHour int) *parsingCo
 	return component
 }
 
-// yesterdayEvening returns a ParsingComponents representing yesterday evening.
 func yesterdayEvening(reference *referenceWithTimezone) *parsingComponents {
 	return yesterdayEveningWithHour(reference, 20)
 }
 
-// yesterdayEveningWithHour returns a ParsingComponents representing yesterday evening with a specific hour.
 func yesterdayEveningWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -165,9 +149,6 @@ func yesterdayEveningWithHour(reference *referenceWithTimezone, implyHour int) *
 	return component
 }
 
-// midnight returns a ParsingComponents representing midnight.
-// If the reference time is after 2 AM, it refers to the coming midnight (next day).
-// Otherwise, it refers to the current midnight.
 func midnight(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
@@ -177,7 +158,6 @@ func midnight(reference *referenceWithTimezone) *parsingComponents {
 		duration := Duration{TimeunitDay: 1}
 		newDate, err := addDuration(targetDate, duration)
 		if err != nil {
-			// Duration calculation failed - return nil
 			return nil
 		}
 		component.ImplySimilarDate(newDate)
@@ -193,13 +173,10 @@ func midnight(reference *referenceWithTimezone) *parsingComponents {
 	return component
 }
 
-// morning returns a ParsingComponents representing morning time.
-// Time is implied (default: 6 AM / 06:00).
 func morning(reference *referenceWithTimezone) *parsingComponents {
 	return morningWithHour(reference, 6)
 }
 
-// morningWithHour returns a ParsingComponents representing morning with a specific implied hour.
 func morningWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
@@ -214,13 +191,10 @@ func morningWithHour(reference *referenceWithTimezone, implyHour int) *parsingCo
 	return component
 }
 
-// afternoon returns a ParsingComponents representing afternoon time.
-// Time is implied (default: 3 PM / 15:00).
 func afternoon(reference *referenceWithTimezone) *parsingComponents {
 	return afternoonWithHour(reference, 15)
 }
 
-// afternoonWithHour returns a ParsingComponents representing afternoon with a specific implied hour.
 func afternoonWithHour(reference *referenceWithTimezone, implyHour int) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
@@ -235,7 +209,6 @@ func afternoonWithHour(reference *referenceWithTimezone, implyHour int) *parsing
 	return component
 }
 
-// noon returns a ParsingComponents representing noon (12:00 PM).
 func noon(reference *referenceWithTimezone) *parsingComponents {
 	component := newParsingComponents(reference, nil)
 
@@ -251,19 +224,13 @@ func noon(reference *referenceWithTimezone) *parsingComponents {
 }
 
 // ============================================================================
-// Weekday calculation helpers (test-only)
+// Weekday calculation helpers (test-only versions)
 // ============================================================================
 
-// getNextWeekday returns the date of the next occurrence of the target weekday
-// after the reference date (not including the reference date itself).
-//
-// For example, if refDate is Monday and targetWeekday is Monday, it returns
-// the following Monday (7 days later).
 func getNextWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
-	// Calculate days forward to next occurrence
 	daysForward := target - refWeekday
 	if daysForward <= 0 {
 		daysForward += 7
@@ -272,16 +239,10 @@ func getNextWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	return refDate.AddDate(0, 0, daysForward)
 }
 
-// getLastWeekday returns the date of the last occurrence of the target weekday
-// before the reference date (not including the reference date itself).
-//
-// For example, if refDate is Monday and targetWeekday is Monday, it returns
-// the previous Monday (7 days earlier).
 func getLastWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
-	// Calculate days backward to last occurrence
 	daysBackward := target - refWeekday
 	if daysBackward >= 0 {
 		daysBackward -= 7
@@ -290,35 +251,21 @@ func getLastWeekday(refDate time.Time, targetWeekday time.Weekday) time.Time {
 	return refDate.AddDate(0, 0, daysBackward)
 }
 
-// getThisWeekday returns the date of the target weekday in "this" week.
-//
-// The forward parameter controls the direction:
-// - If forward=true: looks forward from refDate (inclusive)
-// - If forward=false: looks backward from refDate (inclusive)
-//
-// Examples with refDate = Wednesday:
-// - getThisWeekday(Wednesday, Monday, forward=true) -> next Monday (5 days forward)
-// - getThisWeekday(Wednesday, Monday, forward=false) -> previous Monday (2 days back)
-// - getThisWeekday(Wednesday, Wednesday, forward=true) -> same Wednesday (0 days)
-// - getThisWeekday(Wednesday, Wednesday, forward=false) -> same Wednesday (0 days)
 func getThisWeekday(refDate time.Time, targetWeekday time.Weekday, forward bool) time.Time {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
 
 	if refWeekday == target {
-		// Same weekday - return the reference date
 		return refDate
 	}
 
 	if forward {
-		// Look forward
 		daysForward := target - refWeekday
 		if daysForward < 0 {
 			daysForward += 7
 		}
 		return refDate.AddDate(0, 0, daysForward)
 	} else {
-		// Look backward
 		daysBackward := target - refWeekday
 		if daysBackward > 0 {
 			daysBackward -= 7
@@ -327,14 +274,6 @@ func getThisWeekday(refDate time.Time, targetWeekday time.Weekday, forward bool)
 	}
 }
 
-// getDaysToWeekday returns the number of days from refDate to the target weekday
-// based on the modifier.
-//
-// Modifiers:
-// - "this": Returns the target weekday in the current week (looking forward)
-// - "next": Returns the target weekday in the next occurrence
-// - "last": Returns the target weekday in the last occurrence (negative value)
-// - nil/empty: Returns the closest weekday (forward or backward)
 func getDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *string) int {
 	refWeekday := time.Weekday(refDate.Weekday())
 
@@ -348,7 +287,6 @@ func getDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *s
 	case "last":
 		return getBackwardDaysToWeekday(refDate, targetWeekday)
 	case "next":
-		// Special handling for "next" based on the current weekday
 		if refWeekday == time.Sunday {
 			if targetWeekday == time.Sunday {
 				return 7
@@ -366,7 +304,6 @@ func getDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *s
 			return 1 + int(targetWeekday)
 		}
 
-		// For weekdays (Mon-Fri)
 		if targetWeekday < refWeekday && targetWeekday != time.Sunday {
 			return getDaysForwardToWeekday(refDate, targetWeekday)
 		}
@@ -376,8 +313,6 @@ func getDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *s
 	return getDaysToWeekdayClosest(refDate, targetWeekday)
 }
 
-// getDaysForwardToWeekday returns the number of days forward to reach the target weekday.
-// Returns 0 if already on the target weekday.
 func getDaysForwardToWeekday(refDate time.Time, targetWeekday time.Weekday) int {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
@@ -390,8 +325,6 @@ func getDaysForwardToWeekday(refDate time.Time, targetWeekday time.Weekday) int 
 	return forwardCount
 }
 
-// getBackwardDaysToWeekday returns the number of days backward to reach the target weekday.
-// Returns a negative number (or 0 if already on the target weekday).
 func getBackwardDaysToWeekday(refDate time.Time, targetWeekday time.Weekday) int {
 	refWeekday := int(refDate.Weekday())
 	target := int(targetWeekday)
@@ -404,13 +337,10 @@ func getBackwardDaysToWeekday(refDate time.Time, targetWeekday time.Weekday) int
 	return backwardCount
 }
 
-// getDaysToWeekdayClosest returns the number of days to the closest occurrence
-// of the target weekday (either forward or backward).
 func getDaysToWeekdayClosest(refDate time.Time, targetWeekday time.Weekday) int {
 	backward := getBackwardDaysToWeekday(refDate, targetWeekday)
 	forward := getDaysForwardToWeekday(refDate, targetWeekday)
 
-	// Choose the direction with fewer days
 	if forward < -backward {
 		return forward
 	}
@@ -418,167 +348,66 @@ func getDaysToWeekdayClosest(refDate time.Time, targetWeekday time.Weekday) int 
 }
 
 // ============================================================================
-// Approximation helpers (test-only)
+// Year calculation helpers (test-only versions)
 // ============================================================================
 
-// approximationWords is a list of words that indicate approximate time expressions
-var approximationWords = []string{
-	"about",
-	"around",
-	"roughly",
-	"approximately",
-	"approx",
-	"circa",
-}
-
-// stripApproximationWords removes approximation modifiers from the input text
-// and returns the cleaned text along with a flag indicating if approximation was present.
-// The approximation words are matched case-insensitively and removed with their trailing whitespace.
-func stripApproximationWords(input string) (cleaned string, isApproximate bool) {
-	cleaned = input
-	isApproximate = false
-
-	// Check for tilde (~) symbol as approximation marker
-	tildePattern := regexp.MustCompile(`(?i)~\s*`)
-	if tildePattern.MatchString(cleaned) {
-		isApproximate = true
-		cleaned = tildePattern.ReplaceAllString(cleaned, "")
-	}
-
-	// Check for approximation words
-	for _, word := range approximationWords {
-		// Use word boundaries to avoid matching words like "about" in "roundabout"
-		pattern := regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
-		if pattern.MatchString(cleaned) {
-			isApproximate = true
-			cleaned = pattern.ReplaceAllString(cleaned, "")
-		}
-	}
-
-	return strings.TrimSpace(cleaned), isApproximate
-}
-
-// ============================================================================
-// Year calculation helpers (test-only)
-// ============================================================================
-
-// findMostLikelyADYear converts a 2-digit year to a 4-digit year.
-// Years 0-99 are mapped to 1900-2099 range.
-//
-// Logic:
-// - 0-99 maps to 2000-2099 if the year would be <= current year + YearLookAheadThreshold
-// - Otherwise maps to 1900-1999
-//
-// Examples (assuming current year is 2020):
-//   - 20 -> 2020
-//   - 40 -> 2040 (within 20 years of current)
-//   - 50 -> 1950 (would be 2050, which is > 2040, so use 1900s)
-//   - 99 -> 1999
 func findMostLikelyADYear(rawYear int) int {
 	const twoDigitThreshold = 100
 
-	// If it's already a 4-digit year, return as-is
 	if rawYear >= twoDigitThreshold {
 		return rawYear
 	}
 
-	// Get current year for comparison
 	currentYear := time.Now().Year()
-
-	// Calculate the 2000s version
 	const year2000Base = 2000
 	year2000s := year2000Base + rawYear
 
-	// If the year in 2000s would be within threshold of current year, use it
 	if year2000s <= currentYear+20 {
 		return year2000s
 	}
 
-	// Otherwise, use 1900s
 	const year1900Base = 1900
 	return year1900Base + rawYear
 }
 
-// findYearClosestToRef finds the year (past or future) that is closest to the reference date
-// for a given day and month.
-//
-// This is useful when parsing dates without a year (e.g., "March 15").
-// The function finds which year makes the date closest to the reference.
-//
-// Examples:
-// - Reference: 2020-01-15, Day: 20, Month: 3 (March 20)
-//   - Could be 2019-03-20 (about 10 months ago)
-//   - Could be 2020-03-20 (about 2 months ahead)
-//   - Could be 2021-03-20 (about 14 months ahead)
-//   - Returns 2020 (closest match)
 func findYearClosestToRef(refDate time.Time, day, month int) int {
 	return findYearClosestToRefWithPreference(refDate, day, month, PreferCurrentPeriod)
 }
 
-// findYearClosestToRefWithPreference finds the year based on date preference settings.
-// This allows control over whether ambiguous dates should be resolved to past, future, or current period.
-//
-// Special handling for February 29:
-// When month is 2 and day is 29, this function ensures we select a leap year.
-// It adjusts the candidate years to be valid leap years according to the preference.
-//
-// Parameters:
-//   - refDate: The reference date/time for comparison
-//   - day: The day of month (1-31)
-//   - month: The month (1-12)
-//   - preference: How to resolve ambiguous dates (PreferPast, PreferFuture, PreferCurrentPeriod)
-//
-// Examples with reference date Feb 15, 2015 15:30:
-//   - PreferCurrentPeriod: "March 15" → March 15, 2015 (current year)
-//   - PreferPast: "March 15" → March 15, 2014 (last year, since March 15, 2015 is in future)
-//   - PreferFuture: "March 15" → March 15, 2015 (this year, since it's in future)
-//
-// Examples with February 29 and reference date March 1, 2023:
-//   - PreferPast: "February 29" → February 29, 2020 (previous leap year)
-//   - PreferFuture: "February 29" → February 29, 2024 (next leap year)
-//   - PreferCurrentPeriod: "February 29" → February 29, 2024 (nearest leap year)
 func findYearClosestToRefWithPreference(refDate time.Time, day, month int, preference DatePreference) int {
-	const defaultImpliedHour = 12 // Use noon for comparison
+	const defaultImpliedHour = 12
 
 	refYear := refDate.Year()
 	location := refDate.Location()
 
-	// Special case: February 29 requires leap year selection
 	if month == 2 && day == 29 {
 		return findNearestLeapYear(refYear, preference)
 	}
 
-	// Create candidate dates for the reference year and adjacent years
 	candidates := []time.Time{
 		time.Date(refYear-1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, location),
 		time.Date(refYear, time.Month(month), day, defaultImpliedHour, 0, 0, 0, location),
 		time.Date(refYear+1, time.Month(month), day, defaultImpliedHour, 0, 0, 0, location),
 	}
 
-	// Handle different preference modes
 	switch preference {
 	case PreferPast:
-		// Choose the most recent date that is in the past
 		for i := len(candidates) - 1; i >= 0; i-- {
 			if candidates[i].Before(refDate) || candidates[i].Equal(refDate) {
 				return candidates[i].Year()
 			}
 		}
-		// If all candidates are in the future, return the earliest one
 		return candidates[0].Year()
 
 	case PreferFuture:
-		// Choose the nearest date that is in the future
 		for i := 0; i < len(candidates); i++ {
 			if candidates[i].After(refDate) || candidates[i].Equal(refDate) {
 				return candidates[i].Year()
 			}
 		}
-		// If all candidates are in the past, return the latest one
 		return candidates[len(candidates)-1].Year()
 
 	default: // PreferCurrentPeriod
-		// Find the candidate with the smallest absolute difference from refDate
 		var minDiff int64
 		closestYear := refYear
 
@@ -598,18 +427,6 @@ func findYearClosestToRefWithPreference(refDate time.Time, day, month int, prefe
 	}
 }
 
-// isLeapYear checks if a year is a leap year according to the Gregorian calendar rules.
-//
-// Leap year rules:
-// 1. Divisible by 4, AND
-// 2. NOT divisible by 100, OR
-// 3. Divisible by 400
-//
-// Examples:
-//   - 2000: Leap year (divisible by 400)
-//   - 1900: NOT leap year (divisible by 100 but not 400)
-//   - 2004: Leap year (divisible by 4, not by 100)
-//   - 2001: NOT leap year (not divisible by 4)
 func isLeapYear(year int) bool {
 	if year%400 == 0 {
 		return true
@@ -620,14 +437,6 @@ func isLeapYear(year int) bool {
 	return year%4 == 0
 }
 
-// findPreviousLeapYear finds the most recent leap year before or at baseYear.
-// It searches backward from baseYear until it finds a leap year.
-// The search is bounded at year 1900 to avoid excessive searching.
-//
-// Examples:
-//   - findPreviousLeapYear(2023) → 2020
-//   - findPreviousLeapYear(2024) → 2024
-//   - findPreviousLeapYear(1901) → 1900 (bounded)
 func findPreviousLeapYear(baseYear int) int {
 	const lowerBound = 1900
 	for year := baseYear; year >= lowerBound; year-- {
@@ -635,18 +444,9 @@ func findPreviousLeapYear(baseYear int) int {
 			return year
 		}
 	}
-	// Fallback: if no leap year found, return base year
 	return baseYear
 }
 
-// findNextLeapYear finds the next leap year after or at baseYear.
-// It searches forward from baseYear until it finds a leap year.
-// The search is bounded at year 9999 to avoid excessive searching.
-//
-// Examples:
-//   - findNextLeapYear(2023) → 2024
-//   - findNextLeapYear(2024) → 2024
-//   - findNextLeapYear(9997) → 9998 (bounded)
 func findNextLeapYear(baseYear int) int {
 	const upperBound = 9999
 	for year := baseYear; year <= upperBound; year++ {
@@ -654,24 +454,10 @@ func findNextLeapYear(baseYear int) int {
 			return year
 		}
 	}
-	// Fallback: if no leap year found, return base year
 	return baseYear
 }
 
-// findNearestLeapYear finds the nearest leap year based on date preference.
-// This is used when parsing February 29 without a year, ensuring we select
-// a valid leap year according to the preference setting.
-//
-// Parameters:
-//   - baseYear: The starting year (typically the reference year)
-//   - preference: How to resolve ambiguous dates (PreferPast, PreferFuture, PreferCurrentPeriod)
-//
-// Examples with baseYear 2023 (not a leap year):
-//   - PreferPast → 2020 (previous leap year)
-//   - PreferFuture → 2024 (next leap year)
-//   - PreferCurrentPeriod → 2024 (prefer future when current isn't leap)
 func findNearestLeapYear(baseYear int, preference DatePreference) int {
-	// If the base year is already a leap year, use it for all preferences
 	if isLeapYear(baseYear) {
 		return baseYear
 	}
@@ -684,19 +470,49 @@ func findNearestLeapYear(baseYear int, preference DatePreference) int {
 		return findNextLeapYear(baseYear)
 
 	default: // PreferCurrentPeriod
-		// When current year is not a leap year, prefer the nearest one
-		// Break ties by preferring the future
 		next := findNextLeapYear(baseYear)
 		prev := findPreviousLeapYear(baseYear)
 
-		// Calculate distances
 		distToNext := next - baseYear
 		distToPrev := baseYear - prev
 
-		// Prefer future if equal distance
 		if distToNext <= distToPrev {
 			return next
 		}
 		return prev
 	}
+}
+
+// ============================================================================
+// Approximation helpers (test-only)
+// ============================================================================
+
+var approximationWords = []string{
+	"about",
+	"around",
+	"roughly",
+	"approximately",
+	"approx",
+	"circa",
+}
+
+func stripApproximationWords(input string) (cleaned string, isApproximate bool) {
+	cleaned = input
+	isApproximate = false
+
+	tildePattern := regexp.MustCompile(`(?i)~\s*`)
+	if tildePattern.MatchString(cleaned) {
+		isApproximate = true
+		cleaned = tildePattern.ReplaceAllString(cleaned, "")
+	}
+
+	for _, word := range approximationWords {
+		pattern := regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
+		if pattern.MatchString(cleaned) {
+			isApproximate = true
+			cleaned = pattern.ReplaceAllString(cleaned, "")
+		}
+	}
+
+	return strings.TrimSpace(cleaned), isApproximate
 }
