@@ -45,7 +45,7 @@ func (p *ENYearMonthDayParser) innerPattern(context *kronos.InternalParsingConte
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENYearMonthDayParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENYearMonthDayParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 5 {
 		return nil
 	}

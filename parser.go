@@ -195,7 +195,7 @@ type Parser interface {
 
 	// Extract is called with the pattern's match.
 	// It should return parsed components, a result, a component map, or nil if extraction fails.
-	Extract(context *parsingContext, match []string) interface{}
+	Extract(context *parsingContext, match []string) any
 }
 
 // Refiner is an abstraction for Chrono refiners.
@@ -261,8 +261,8 @@ func NewChrono(config *Configuration) *Chrono {
 // 3. Sort results by position in text
 // 4. Apply all refiners sequentially
 // 5. Return final results
-func (c *Chrono) Parse(text string, referenceDate interface{}, option *parsingOption) []*parsingResult {
-	context := newParsingContextFromOption(text, referenceDate, option)
+func (c *Chrono) Parse(text string, referenceDate any, option *parsingOption) []*parsingResult {
+	context := newParsingContext(text, referenceDate, option)
 
 	results := make([]*parsingResult, 0)
 	for _, parser := range c.parsers {

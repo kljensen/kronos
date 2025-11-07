@@ -22,7 +22,7 @@ func (f *BaseFilter) Refine(context *kronos.InternalParsingContext, results []*k
 	filtered := make([]*kronos.InternalParsingResult, 0, len(results))
 	for _, result := range results {
 		// Each concrete filter must implement IsValid
-		if filter, ok := interface{}(f).(Filter); ok {
+		if filter, ok := any(f).(Filter); ok {
 			if filter.IsValid(context, result) {
 				filtered = append(filtered, result)
 			}
@@ -62,7 +62,7 @@ func (m *BaseMergingRefiner) Refine(context *kronos.InternalParsingContext, resu
 		}
 
 		// Get the concrete implementation
-		merger, ok := interface{}(m).(MergingRefiner)
+		merger, ok := any(m).(MergingRefiner)
 		if !ok || !merger.ShouldMergeResults(textBetween, current, next, context) {
 			merged = append(merged, current)
 			current = next

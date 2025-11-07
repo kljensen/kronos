@@ -97,7 +97,7 @@ func FindYearClosestToRefWithPreference(refDate time.Time, day, month int, prefe
 
 	case kronos.PreferFuture:
 		// Choose the nearest date that is in the future
-		for i := 0; i < len(candidates); i++ {
+		for i := range len(candidates) {
 			if candidates[i].After(refDate) || candidates[i].Equal(refDate) {
 				return candidates[i].Year()
 			}

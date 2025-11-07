@@ -41,7 +41,7 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.InternalParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) any {
 			if len(match) < 2 {
 				return nil
 			}
@@ -108,7 +108,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.InternalParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) any {
 			if len(match) < 2 {
 				return nil
 			}
@@ -181,7 +181,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.InternalParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) any {
 			if len(match) < 2 {
 				return nil
 			}
@@ -243,7 +243,7 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.InternalParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) any {
 			if len(match) < 3 {
 				return nil
 			}

@@ -42,7 +42,7 @@ func (p *ENMonthNameParser) innerPattern(context *kronos.InternalParsingContext)
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENMonthNameParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENMonthNameParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 3 {
 		return nil
 	}
@@ -104,7 +104,7 @@ func (p *ENSlashMonthFormatParser) innerPattern(context *kronos.InternalParsingC
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENSlashMonthFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENSlashMonthFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 3 {
 		return nil
 	}
@@ -162,7 +162,7 @@ func (p *ENYearParser) innerPattern(context *kronos.InternalParsingContext) *reg
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENYearParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENYearParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 2 {
 		return nil
 	}

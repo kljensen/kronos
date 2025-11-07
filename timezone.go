@@ -49,7 +49,7 @@ type AmbiguousTimezoneMap struct {
 //	    WithOption(func(s *kronos.Settings) {
 //	        s.TimezoneOverrides = customTimezones
 //	    })
-type TimezoneAbbrMap map[string]interface{}
+type TimezoneAbbrMap map[string]any
 
 // DebugHandler is a function that handles debug events.
 // It receives a debug message for logging or analysis.
@@ -156,7 +156,7 @@ var defaultTimezoneAbbrMap = TimezoneAbbrMap{
 // - Ambiguous timezones with DST - determined based on the instant time
 //
 // Returns nil if the timezone cannot be resolved.
-func toTimezoneOffset(tz interface{}, instant time.Time, overrides TimezoneAbbrMap) *int {
+func toTimezoneOffset(tz any, instant time.Time, overrides TimezoneAbbrMap) *int {
 	if tz == nil {
 		return nil
 	}
@@ -194,7 +194,7 @@ func toTimezoneOffset(tz interface{}, instant time.Time, overrides TimezoneAbbrM
 
 // resolveTimezoneValue resolves a timezone value from the map to an offset.
 // Handles both simple integer offsets and AmbiguousTimezoneMap entries.
-func resolveTimezoneValue(val interface{}, instant time.Time) *int {
+func resolveTimezoneValue(val any, instant time.Time) *int {
 	// Simple integer offset
 	if offset, ok := val.(int); ok {
 		return &offset

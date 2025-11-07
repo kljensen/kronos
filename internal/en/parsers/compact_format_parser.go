@@ -49,7 +49,7 @@ func (p *ENCompactFormatParser) innerPattern(context *kronos.InternalParsingCont
 	return regexp.MustCompile(`(\d{4}|\d{6}|\d{8}|\d{10}|\d{12}|\d{14})([^\w-]|$)`)
 }
 
-func (p *ENCompactFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENCompactFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 3 {
 		return nil
 	}

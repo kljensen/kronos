@@ -1,4 +1,4 @@
-// Package common provides shared utilities and parsers for date/time parsing.
+// Package parsers provides shared utilities and parsers for date/time parsing.
 //
 //nolint:staticcheck // SA1019: Must use deprecated types during transition
 package parsers
@@ -169,41 +169,8 @@ func (p *AbstractTimeExpressionParser) Pattern(context *kronos.InternalParsingCo
 	return p.getPrimaryTimePatternThroughCache()
 }
 
-func (p *AbstractTimeExpressionParser) getPrimaryTimePatternThroughCache() *regexp.Regexp {
-	primaryPrefix := p.primaryPrefix()
-	primarySuffix := p.primarySuffix()
-
-	if p.cachedPrimaryPrefix == primaryPrefix && p.cachedPrimarySuffix == primarySuffix && p.cachedPrimaryTimePattern != nil {
-		return p.cachedPrimaryTimePattern
-	}
-
-	p.cachedPrimaryTimePattern = buildPrimaryTimePattern(
-		p.primaryPatternLeftBoundary(),
-		primaryPrefix,
-		primarySuffix,
-		p.patternFlags(),
-	)
-	p.cachedPrimaryPrefix = primaryPrefix
-	p.cachedPrimarySuffix = primarySuffix
-	return p.cachedPrimaryTimePattern
-}
-
-func (p *AbstractTimeExpressionParser) getFollowingTimePatternThroughCache() *regexp.Regexp {
-	followingPhase := p.followingPhase()
-	followingSuffix := p.followingSuffix()
-
-	if p.cachedFollowingPhase == followingPhase && p.cachedFollowingSuffix == followingSuffix && p.cachedFollowingTimePattern != nil {
-		return p.cachedFollowingTimePattern
-	}
-
-	p.cachedFollowingTimePattern = buildFollowingTimePattern(followingPhase, followingSuffix)
-	p.cachedFollowingPhase = followingPhase
-	p.cachedFollowingSuffix = followingSuffix
-	return p.cachedFollowingTimePattern
-}
-
 // Extract parses time expression from the match
-func (p *AbstractTimeExpressionParser) Extract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *AbstractTimeExpressionParser) Extract(context *kronos.InternalParsingContext, match []string) any {
 	startComponents := p.ExtractPrimaryTimeComponents(context, match, false)
 	if startComponents == nil {
 		// If the match seems like a year (e.g., "2013.12:..."),
@@ -707,6 +674,39 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	components.SetPeriod(kronos.PeriodTime)
 
 	return components
+}
+
+func (p *AbstractTimeExpressionParser) getPrimaryTimePatternThroughCache() *regexp.Regexp {
+	primaryPrefix := p.primaryPrefix()
+	primarySuffix := p.primarySuffix()
+
+	if p.cachedPrimaryPrefix == primaryPrefix && p.cachedPrimarySuffix == primarySuffix && p.cachedPrimaryTimePattern != nil {
+		return p.cachedPrimaryTimePattern
+	}
+
+	p.cachedPrimaryTimePattern = buildPrimaryTimePattern(
+		p.primaryPatternLeftBoundary(),
+		primaryPrefix,
+		primarySuffix,
+		p.patternFlags(),
+	)
+	p.cachedPrimaryPrefix = primaryPrefix
+	p.cachedPrimarySuffix = primarySuffix
+	return p.cachedPrimaryTimePattern
+}
+
+func (p *AbstractTimeExpressionParser) getFollowingTimePatternThroughCache() *regexp.Regexp {
+	followingPhase := p.followingPhase()
+	followingSuffix := p.followingSuffix()
+
+	if p.cachedFollowingPhase == followingPhase && p.cachedFollowingSuffix == followingSuffix && p.cachedFollowingTimePattern != nil {
+		return p.cachedFollowingTimePattern
+	}
+
+	p.cachedFollowingTimePattern = buildFollowingTimePattern(followingPhase, followingSuffix)
+	p.cachedFollowingPhase = followingPhase
+	p.cachedFollowingSuffix = followingSuffix
+	return p.cachedFollowingTimePattern
 }
 
 // Validation patterns (compiled once for efficiency)

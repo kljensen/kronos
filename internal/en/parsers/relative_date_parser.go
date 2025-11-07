@@ -43,7 +43,7 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 			pattern := approximationPattern + `(this|last|past|next|after\s*this)\s*(` + endata.MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.InternalParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) any {
 			if len(match) < 3 {
 				return nil
 			}

@@ -2,8 +2,6 @@ package kronos
 
 import (
 	"testing"
-
-	"github.com/kljensen/kronos/internal/sanitization"
 )
 
 func TestSanitizeInput(t *testing.T) {
@@ -263,17 +261,89 @@ func TestSanitizeInput(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := sanitization.SanitizeInput(tt.input)
+			result := sanitizeInput(tt.input)
 			if result != tt.expected {
-				t.Errorf("SanitizeInput(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("sanitizeInput(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
 }
 
-// Note: Internal helper function tests (normalizeApostrophes, removeZeroWidthChars)
-// have been removed as these are now internal implementation details.
-// The functionality is still tested via TestSanitizeInput which calls the public API.
+func TestNormalizeApostrophes(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "no apostrophes",
+			input:    "hello world",
+			expected: "hello world",
+		},
+		{
+			name:     "ASCII apostrophe",
+			input:    "it's",
+			expected: "it's",
+		},
+		{
+			name:     "right single quotation mark",
+			input:    "it's",
+			expected: "it's",
+		},
+		{
+			name:     "multiple different apostrophes",
+			input:    "it's don't can't",
+			expected: "it's don't can't",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := normalizeApostrophes(tt.input)
+			if result != tt.expected {
+				t.Errorf("normalizeApostrophes(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestRemoveZeroWidthChars(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "no special characters",
+			input:    "hello world",
+			expected: "hello world",
+		},
+		{
+			name:     "zero width space",
+			input:    "hello\u200bworld",
+			expected: "helloworld",
+		},
+		{
+			name:     "multiple zero width characters",
+			input:    "hello\u200b\u200c\u200dworld",
+			expected: "helloworld",
+		},
+		{
+			name:     "BOM",
+			input:    "hello\ufeffworld",
+			expected: "helloworld",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := removeZeroWidthChars(tt.input)
+			if result != tt.expected {
+				t.Errorf("removeZeroWidthChars(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
 
 // Benchmark tests for performance
 func BenchmarkSanitizeInput(b *testing.B) {
@@ -289,8 +359,8 @@ func BenchmarkSanitizeInput(b *testing.B) {
 
 	for _, tc := range testCases {
 		b.Run(tc.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				sanitization.SanitizeInput(tc.input)
+			for range b.N {
+				sanitizeInput(tc.input)
 			}
 		})
 	}

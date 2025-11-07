@@ -35,7 +35,7 @@ func (p *ENCasualDateParser) innerPattern(context *kronos.InternalParsingContext
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENCasualDateParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENCasualDateParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 2 {
 		return nil
 	}
@@ -112,7 +112,7 @@ func (p *ENCasualTimeParser) innerPattern(context *kronos.InternalParsingContext
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENCasualTimeParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENCasualTimeParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 2 {
 		return nil
 	}

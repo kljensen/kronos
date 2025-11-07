@@ -2,8 +2,10 @@ package kronos
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os/exec"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -52,7 +54,7 @@ func TestAPIExports(t *testing.T) {
 	)
 
 	// Use go doc to list all exports
-	cmd := exec.Command("go", "doc", "-all", ".")
+	cmd := exec.CommandContext(context.Background(), "go", "doc", "-all", ".")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -285,7 +287,7 @@ func TestPublicAPIStability(t *testing.T) {
 		"ParserBuilder",  // Fluent builder API
 	}
 
-	cmd := exec.Command("go", "doc", "-short", ".")
+	cmd := exec.CommandContext(context.Background(), "go", "doc", "-short", ".")
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 
@@ -322,12 +324,7 @@ func isExported(name string) bool {
 }
 
 func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 func uniqueStrings(slice []string) []string {
@@ -342,12 +339,6 @@ func uniqueStrings(slice []string) []string {
 	return result
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
 
 // Example output format for the API surface report
 func ExampleTestAPIExports() {

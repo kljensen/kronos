@@ -4,23 +4,29 @@ import (
 	"fmt"
 	"sort"
 	"time"
-
-	"github.com/kljensen/kronos/internal/sanitization"
 )
 
 // ============================================================================
 // Internal parsing types
 // ============================================================================
 
-// parsingOption contains configuration options for the deprecated Chrono API.
-//
-// Deprecated: Use Settings instead. This type exists only for backward compatibility
-// with the deprecated Chrono.Parse() method.
+// parsingOption contains configuration options for parsing.
 type parsingOption struct {
+	// ForwardDate indicates whether to parse only forward dates
+	// (results should be after the reference date).
+	ForwardDate bool
+
+	// Preference specifies how ambiguous dates should be resolved.
 	Preference DatePreference
-	DateOrder  DateOrder
-	Timezones  TimezoneAbbrMap
-	Debug      DebugHandler
+
+	// DateOrder specifies the order of date components in ambiguous formats.
+	DateOrder DateOrder
+
+	// Timezones provides additional timezone keywords for parsers to recognize.
+	Timezones TimezoneAbbrMap
+
+	// Debug is an internal debug event handler.
+	Debug DebugHandler
 }
 
 // parsingReference contains reference information for parsing dates/times.
@@ -29,7 +35,7 @@ type parsingReference struct {
 	Instant *time.Time
 
 	// Timezone is the reference timezone where the input is written or mentioned.
-	Timezone interface{}
+	Timezone any
 }
 
 // ============================================================================
@@ -44,54 +50,45 @@ type parsingReference struct {
 // in a future version.
 type parsingContext struct {
 	text      string
-	settings  Settings
+	option    parsingOption
 	reference *referenceWithTimezone
 	refDate   time.Time
+	settings  *Settings
 }
 
-// newParsingContext creates a new ParsingContext with Settings.
+// newParsingContext creates a new ParsingContext.
 // If refDate is nil, the current time is used.
+// If option is nil, default options are used.
 // The input text is sanitized to normalize Unicode characters before parsing.
-func newParsingContext(text string, refDate interface{}, settings Settings) *parsingContext {
-	timezones := settings.GetTimezones(nil)
+func newParsingContext(text string, refDate any, option *parsingOption) *parsingContext {
+	var opt parsingOption
+	if option != nil {
+		opt = *option
+	}
+
+	var timezones TimezoneAbbrMap
+	if opt.Timezones != nil {
+		timezones = opt.Timezones
+	}
+
 	reference := fromInput(refDate, timezones)
 
 	// Sanitize input text to handle Unicode normalization issues
-	text = sanitization.SanitizeInput(text)
+	text = sanitizeInput(text)
 
 	return &parsingContext{
 		text:      text,
-		settings:  settings,
+		option:    opt,
 		reference: reference,
 		refDate:   reference.Instant(),
+		settings:  nil,
 	}
-}
-
-// newParsingContextFromOption creates a parsing context from the deprecated parsingOption.
-//
-// Deprecated: This is for backward compatibility with the deprecated Chrono API.
-func newParsingContextFromOption(text string, refDate interface{}, option *parsingOption) *parsingContext {
-	var settings Settings
-	if option != nil {
-		settings = Settings{
-			DateOrder:         option.DateOrder,
-			PreferDatesFrom:   option.Preference,
-			Timezone:          "",
-			StrictParsing:     false,
-			TimezoneOverrides: option.Timezones,
-			DebugHandler:      option.Debug,
-		}
-	} else {
-		settings = DefaultSettings()
-	}
-
-	return newParsingContext(text, refDate, settings)
 }
 
 // CreateParsingComponents creates ParsingComponents from a component map or existing components.
 // If components is already a ParsingComponents, it returns it as-is.
 // Otherwise, it creates new ParsingComponents with the provided values.
-func (ctx *parsingContext) CreateParsingComponents(components interface{}) *parsingComponents {
+func (ctx *parsingContext) CreateParsingComponents(components any) *parsingComponents {
 	if components == nil {
 		return newParsingComponents(ctx.reference, nil)
 	}
@@ -112,7 +109,7 @@ func (ctx *parsingContext) CreateParsingComponents(components interface{}) *pars
 // - (index, endIndex) - creates result with substring from text
 // - (index, text, startComponents) - creates result with start components
 // - (index, text, startComponents, endComponents) - creates result with both start and end
-func (ctx *parsingContext) CreateParsingResult(index int, textOrEndIndex interface{}, args ...interface{}) *parsingResult {
+func (ctx *parsingContext) CreateParsingResult(index int, textOrEndIndex any, args ...any) *parsingResult {
 	var text string
 	var start *parsingComponents
 	var end *parsingComponents
@@ -165,7 +162,7 @@ func (ctx *parsingContext) CreateParsingResult(index int, textOrEndIndex interfa
 
 // Debug executes the provided function if debugging is enabled.
 func (ctx *parsingContext) Debug(fn func()) {
-	if ctx.settings.DebugHandler != nil {
+	if ctx.option.Debug != nil {
 		fn()
 	}
 }
@@ -175,11 +172,9 @@ func (ctx *parsingContext) Text() string {
 	return ctx.text
 }
 
-// Option returns the parsing settings.
-//
-// Deprecated: Use Settings() instead.
-func (ctx *parsingContext) Option() Settings {
-	return ctx.settings
+// Option returns the parsing options.
+func (ctx *parsingContext) Option() parsingOption {
+	return ctx.option
 }
 
 // Reference returns the reference with timezone.
@@ -192,8 +187,8 @@ func (ctx *parsingContext) RefDate() time.Time {
 	return ctx.refDate
 }
 
-// Settings returns the parsing settings.
-func (ctx *parsingContext) Settings() Settings {
+// Settings returns the parsing settings, if any.
+func (ctx *parsingContext) Settings() *Settings {
 	return ctx.settings
 }
 
@@ -325,7 +320,7 @@ func executeParser(context *parsingContext, parser Parser) []*parsingResult {
 		// Build the match array
 		numGroups := len(match) / 2
 		matchArray := make([]string, numGroups)
-		for i := 0; i < numGroups; i++ {
+		for i := range numGroups {
 			start, end := match[2*i], match[2*i+1]
 			if start >= 0 {
 				matchArray[i] = remainingText[start:end]
@@ -355,7 +350,7 @@ func executeParser(context *parsingContext, parser Parser) []*parsingResult {
 
 // convertToParsingResult converts various result types to ParsingResult.
 // Returns nil if the result cannot be converted.
-func convertToParsingResult(context *parsingContext, result interface{}, index int, matchedText string, matchedTextLen int) *parsingResult {
+func convertToParsingResult(context *parsingContext, result any, index int, matchedText string, matchedTextLen int) *parsingResult {
 	switch v := result.(type) {
 	case *parsingResult:
 		if v == nil {
@@ -383,24 +378,6 @@ func convertToParsingResult(context *parsingContext, result interface{}, index i
 	}
 }
 
-// applyStrictValidation filters out results that don't meet strict parsing criteria.
-// In strict mode, we reject results that are too ambiguous.
-func (p *pipeline) applyStrictValidation(results []*parsingResult) []*parsingResult {
-	filtered := make([]*parsingResult, 0, len(results))
-	for _, result := range results {
-		// In strict mode, require at least year and month
-		start := result.Start()
-		hasYear := start.IsCertain(ComponentYear)
-		hasMonth := start.IsCertain(ComponentMonth)
-
-		// Accept if it has year and month
-		if hasYear && hasMonth {
-			filtered = append(filtered, result)
-		}
-	}
-	return filtered
-}
-
 // parseWithSettings is a convenience function that creates a pipeline
 // and executes it with the given settings.
 //
@@ -424,4 +401,20 @@ func parseWithSettings(text string, refDate time.Time, settings Settings, config
 // This is useful for testing and validation.
 func (p *pipeline) ParserCount() int {
 	return len(p.parsers)
+}
+
+func (p *pipeline) applyStrictValidation(results []*parsingResult) []*parsingResult {
+	filtered := make([]*parsingResult, 0, len(results))
+	for _, result := range results {
+		// In strict mode, require at least year and month
+		start := result.Start()
+		hasYear := start.IsCertain(ComponentYear)
+		hasMonth := start.IsCertain(ComponentMonth)
+
+		// Accept if it has year and month
+		if hasYear && hasMonth {
+			filtered = append(filtered, result)
+		}
+	}
+	return filtered
 }

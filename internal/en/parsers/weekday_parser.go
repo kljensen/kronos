@@ -39,7 +39,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
-		func(context *kronos.InternalParsingContext, match []string) interface{} {
+		func(context *kronos.InternalParsingContext, match []string) any {
 			if len(match) < 4 {
 				return nil
 			}

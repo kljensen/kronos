@@ -44,10 +44,6 @@ linters:
     - goconst            # Repeated strings in tests don't always need to be constants
     - noinlineerr        # Inline error handling is idiomatic Go
     - unconvert          # Unnecessary conversions are harmless and sometimes aid clarity
-    - modernize          # Modernization suggestions require newer Go versions or are too opinionated
-    - noctx              # Context usage in exec commands is too strict, especially for tests
-    - funcorder          # Method ordering is too opinionated and doesn't affect correctness
-    - godoclint          # Package doc formatting is too strict
 
   settings:
     errcheck:

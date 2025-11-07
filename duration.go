@@ -1,6 +1,7 @@
 package kronos
 
 import (
+	"maps"
 	"fmt"
 	"math"
 	"time"
@@ -151,9 +152,7 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 
 	// Create a working copy to handle fractional cascading
 	working := make(Duration)
-	for k, v := range duration {
-		working[k] = v
-	}
+	maps.Copy(working, duration)
 
 	// Process decades (convert to years)
 	if val, exists := working[TimeunitDecade]; exists {

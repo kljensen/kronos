@@ -264,7 +264,7 @@ var TimeUnitDictionary = map[string]kronos.Timeunit{
 // Pattern builders
 
 // MatchAnyPattern creates a pattern that matches any key from a map
-func MatchAnyPattern(dict interface{}) string {
+func MatchAnyPattern(dict any) string {
 	var keys []string
 	switch d := dict.(type) {
 	case map[string]int:

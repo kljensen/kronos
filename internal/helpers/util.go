@@ -15,7 +15,6 @@ package helpers
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/kljensen/kronos"
@@ -65,14 +64,31 @@ func AsParsingComponents(pc kronos.Components) (*kronos.InternalParsingComponent
 	return components, true
 }
 
-// AtoiSafe safely converts a string to an integer.
-// Returns the integer value and true on success, or 0 and false on failure.
-func AtoiSafe(s string) (int, bool) {
-	val, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, false
-	}
-	return val, true
+// NewParsingContext creates a new ParsingContext for parsing operations.
+// This uses the internal helper exported from kronos package for internal use.
+func NewParsingContext(text string, refDate any, option *kronos.InternalParsingOption) *kronos.InternalParsingContext {
+	return kronos.InternalNewParsingContext(text, refDate, option)
+}
+
+// NewParsingComponents creates a new ParsingComponents with the given reference.
+// It initializes implied values based on the reference date.
+//
+// This uses the internal helper exported from kronos package for internal use.
+func NewParsingComponents(reference *kronos.InternalReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.InternalParsingComponents {
+	return kronos.InternalNewParsingComponents(reference, knownComponents)
+}
+
+// NewParsingResult creates a new ParsingResult with the given parameters.
+// This uses the internal helper exported from kronos package for internal use.
+func NewParsingResult(reference *kronos.InternalReferenceWithTimezone, index int, text string, start, end *kronos.InternalParsingComponents) *kronos.InternalParsingResult {
+	return kronos.InternalNewParsingResult(reference, index, text, start, end)
+}
+
+// MergeDateTimeResultWrapper merges a date-only result with a time-only result.
+//
+// This is a wrapper around the internal implementation in the kronos package.
+func MergeDateTimeResultWrapper(dateResult, timeResult *kronos.InternalParsingResult) *kronos.InternalParsingResult {
+	return kronos.InternalMergeDateTimeResult(dateResult, timeResult)
 }
 
 // ApproximationWords is a list of words that indicate approximate time expressions
@@ -83,23 +99,6 @@ var ApproximationWords = []string{
 	"approximately",
 	"approx",
 	"circa",
-}
-
-// Compiled regex patterns for approximation word detection (cached for performance)
-var (
-	tildePattern          = regexp.MustCompile(`(?i)~\s*`)
-	approximationPatterns = compileApproximationPatterns()
-)
-
-// compileApproximationPatterns pre-compiles regex patterns for each approximation word.
-// This is called once at package initialization to avoid repeated compilation.
-func compileApproximationPatterns() []*regexp.Regexp {
-	patterns := make([]*regexp.Regexp, len(ApproximationWords))
-	for i, word := range ApproximationWords {
-		// Use word boundaries to avoid matching words like "about" in "roundabout"
-		patterns[i] = regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
-	}
-	return patterns
 }
 
 // SafeSlice returns the substring of text between start (inclusive) and end
@@ -131,13 +130,16 @@ func StripApproximationWords(input string) (cleaned string, isApproximate bool) 
 	isApproximate = false
 
 	// Check for tilde (~) symbol as approximation marker
+	tildePattern := regexp.MustCompile(`(?i)~\s*`)
 	if tildePattern.MatchString(cleaned) {
 		isApproximate = true
 		cleaned = tildePattern.ReplaceAllString(cleaned, "")
 	}
 
-	// Check for approximation words using pre-compiled patterns
-	for _, pattern := range approximationPatterns {
+	// Check for approximation words
+	for _, word := range ApproximationWords {
+		// Use word boundaries to avoid matching words like "about" in "roundabout"
+		pattern := regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
 		if pattern.MatchString(cleaned) {
 			isApproximate = true
 			cleaned = pattern.ReplaceAllString(cleaned, "")

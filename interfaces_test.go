@@ -9,7 +9,7 @@ import (
 // Mock parser for testing
 type mockParser struct {
 	patternFunc func(context *parsingContext) *regexp.Regexp
-	extractFunc func(context *parsingContext, match []string) interface{}
+	extractFunc func(context *parsingContext, match []string) any
 }
 
 func (m *mockParser) Pattern(context *parsingContext) *regexp.Regexp {
@@ -19,7 +19,7 @@ func (m *mockParser) Pattern(context *parsingContext) *regexp.Regexp {
 	return regexp.MustCompile(`test`)
 }
 
-func (m *mockParser) Extract(context *parsingContext, match []string) interface{} {
+func (m *mockParser) Extract(context *parsingContext, match []string) any {
 	if m.extractFunc != nil {
 		return m.extractFunc(context, match)
 	}
@@ -51,7 +51,7 @@ func TestParser(t *testing.T) {
 				patternCalled = true
 				return regexp.MustCompile(`tomorrow`)
 			},
-			extractFunc: func(context *parsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) any {
 				extractCalled = true
 				components := map[Component]int{
 					ComponentDay: 3,
@@ -99,7 +99,7 @@ func TestParser(t *testing.T) {
 
 		// Test returning component map
 		p1 := &mockParser{
-			extractFunc: func(context *parsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) any {
 				return map[Component]int{ComponentYear: 2024}
 			},
 		}
@@ -111,7 +111,7 @@ func TestParser(t *testing.T) {
 
 		// Test returning ParsingComponents
 		p2 := &mockParser{
-			extractFunc: func(context *parsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) any {
 				return newParsingComponents(ctx.Reference(), nil)
 			},
 		}
@@ -123,7 +123,7 @@ func TestParser(t *testing.T) {
 
 		// Test returning ParsingResult
 		p3 := &mockParser{
-			extractFunc: func(context *parsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) any {
 				return newParsingResult(ctx.Reference(), 0, "test", nil, nil)
 			},
 		}
@@ -135,7 +135,7 @@ func TestParser(t *testing.T) {
 
 		// Test returning nil
 		p4 := &mockParser{
-			extractFunc: func(context *parsingContext, match []string) interface{} {
+			extractFunc: func(context *parsingContext, match []string) any {
 				return nil
 			},
 		}

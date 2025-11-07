@@ -62,7 +62,7 @@ func (p *SlashDateFormatParser) Pattern(context *kronos.InternalParsingContext) 
 }
 
 // Extract implements Parser.Extract.
-func (p *SlashDateFormatParser) Extract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *SlashDateFormatParser) Extract(context *kronos.InternalParsingContext, match []string) any {
 	// Get the match boundaries
 	fullMatch := match[0]
 	opening := match[slashOpeningGroup]

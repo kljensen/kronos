@@ -63,7 +63,7 @@ func (p *ISOFormatParser) innerPattern(context *kronos.InternalParsingContext) *
 	return isoPattern
 }
 
-func (p *ISOFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ISOFormatParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	// Parse year, month, day
 	year, err := strconv.Atoi(match[isoYearGroup])
 	if err != nil {

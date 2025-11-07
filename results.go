@@ -1,6 +1,7 @@
 package kronos
 
 import (
+	"maps"
 	"fmt"
 	"time"
 )
@@ -27,7 +28,7 @@ func newReferenceWithTimezone(instant time.Time, timezoneOffset *int) *reference
 
 // fromInput creates a ReferenceWithTimezone from either a ParsingReference or a time.Time.
 // It also handles timezone conversion using the provided timezoneOverrides.
-func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *referenceWithTimezone {
+func fromInput(input any, timezoneOverrides TimezoneAbbrMap) *referenceWithTimezone {
 	if input == nil {
 		return newReferenceWithTimezone(time.Time{}, nil)
 	}
@@ -124,9 +125,7 @@ func newParsingComponents(reference *referenceWithTimezone, knownComponents map[
 		tags:          make(map[string]bool),
 	}
 
-	for k, v := range knownComponents {
-		pc.knownValues[k] = v
-	}
+	maps.Copy(pc.knownValues, knownComponents)
 
 	// Set default implied values from reference
 	const defaultImpliedHour = 12 // Noon as default
@@ -198,15 +197,9 @@ func (pc *parsingComponents) Clone() *parsingComponents {
 		period:        pc.period,
 	}
 
-	for k, v := range pc.knownValues {
-		clone.knownValues[k] = v
-	}
-	for k, v := range pc.impliedValues {
-		clone.impliedValues[k] = v
-	}
-	for k, v := range pc.tags {
-		clone.tags[k] = v
-	}
+	maps.Copy(clone.knownValues, pc.knownValues)
+	maps.Copy(clone.impliedValues, pc.impliedValues)
+	maps.Copy(clone.tags, pc.tags)
 
 	return clone
 }
@@ -292,30 +285,6 @@ func (pc *parsingComponents) DateUTC() time.Time {
 	return pc.dateInLocation(time.UTC)
 }
 
-// dateInLocation creates a time.Time from components in the specified location.
-func (pc *parsingComponents) dateInLocation(location *time.Location) time.Time {
-	const (
-		defaultYear  = 2000
-		defaultMonth = 1
-		defaultDay   = 1
-	)
-
-	year := getValueOrDefault(pc.Get(ComponentYear), defaultYear)
-	month := getValueOrDefault(pc.Get(ComponentMonth), defaultMonth)
-	day := getValueOrDefault(pc.Get(ComponentDay), defaultDay)
-	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
-	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
-	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
-	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
-	microsecond := getValueOrDefault(pc.Get(ComponentMicrosecond), 0)
-	nanosecond := getValueOrDefault(pc.Get(ComponentNanosecond), 0)
-
-	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
-	totalNanos := (millisecond * 1000000) + (microsecond * 1000) + nanosecond
-
-	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, location)
-}
-
 // AddTag adds a debugging tag to the components.
 func (pc *parsingComponents) AddTag(tag string) *parsingComponents {
 	pc.tags[tag] = true
@@ -325,9 +294,7 @@ func (pc *parsingComponents) AddTag(tag string) *parsingComponents {
 // Tags returns all debugging tags.
 func (pc *parsingComponents) Tags() map[string]bool {
 	tags := make(map[string]bool)
-	for k, v := range pc.tags {
-		tags[k] = v
-	}
+	maps.Copy(tags, pc.tags)
 	return tags
 }
 
@@ -605,6 +572,30 @@ func (pc *parsingComponents) AddDurationAsImplied(duration Duration) *parsingCom
 	pc.ImplySimilarTime(newDate)
 
 	return pc
+}
+
+// dateInLocation creates a time.Time from components in the specified location.
+func (pc *parsingComponents) dateInLocation(location *time.Location) time.Time {
+	const (
+		defaultYear  = 2000
+		defaultMonth = 1
+		defaultDay   = 1
+	)
+
+	year := getValueOrDefault(pc.Get(ComponentYear), defaultYear)
+	month := getValueOrDefault(pc.Get(ComponentMonth), defaultMonth)
+	day := getValueOrDefault(pc.Get(ComponentDay), defaultDay)
+	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
+	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
+	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
+	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
+	microsecond := getValueOrDefault(pc.Get(ComponentMicrosecond), 0)
+	nanosecond := getValueOrDefault(pc.Get(ComponentNanosecond), 0)
+
+	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
+	totalNanos := (millisecond * 1000000) + (microsecond * 1000) + nanosecond
+
+	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, location)
 }
 
 // ParsingResult represents a parsed result containing date/time information.

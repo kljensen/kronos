@@ -50,7 +50,7 @@ func (p *ENMonthNameLittleEndianParser) innerPattern(context *kronos.InternalPar
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 4 {
 		return nil
 	}
@@ -145,7 +145,7 @@ func (p *ENMonthNameMiddleEndianParser) innerPattern(context *kronos.InternalPar
 	return regexp.MustCompile(pattern)
 }
 
-func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.InternalParsingContext, match []string) interface{} {
+func (p *ENMonthNameMiddleEndianParser) innerExtract(context *kronos.InternalParsingContext, match []string) any {
 	if len(match) < 3 {
 		return nil
 	}

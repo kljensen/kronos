@@ -15,7 +15,7 @@ import (
 // Returns nil if the timezone cannot be resolved.
 //
 //nolint:staticcheck // SA1019 Internal package legitimately uses deprecated types
-func ToTimezoneOffset(tz interface{}, instant time.Time, overrides kronos.TimezoneAbbrMap, defaultMap kronos.TimezoneAbbrMap) *int {
+func ToTimezoneOffset(tz any, instant time.Time, overrides kronos.TimezoneAbbrMap, defaultMap kronos.TimezoneAbbrMap) *int {
 	if tz == nil {
 		return nil
 	}
@@ -55,7 +55,7 @@ func ToTimezoneOffset(tz interface{}, instant time.Time, overrides kronos.Timezo
 // It also handles timezone conversion using the provided timezoneOverrides.
 //
 //nolint:staticcheck // SA1019 Internal package legitimately uses deprecated types
-func FromInput(input interface{}, timezoneOverrides kronos.TimezoneAbbrMap, defaultMap kronos.TimezoneAbbrMap, newRefFn func(time.Time, *int) *kronos.InternalReferenceWithTimezone) *kronos.InternalReferenceWithTimezone {
+func FromInput(input any, timezoneOverrides kronos.TimezoneAbbrMap, defaultMap kronos.TimezoneAbbrMap, newRefFn func(time.Time, *int) *kronos.InternalReferenceWithTimezone) *kronos.InternalReferenceWithTimezone {
 	if input == nil {
 		return newRefFn(time.Time{}, nil)
 	}
@@ -86,7 +86,7 @@ func FromInput(input interface{}, timezoneOverrides kronos.TimezoneAbbrMap, defa
 // Handles both simple integer offsets and AmbiguousTimezoneMap entries.
 //
 //nolint:staticcheck // SA1019 Internal package legitimately uses deprecated types
-func resolveTimezoneValue(val interface{}, instant time.Time) *int {
+func resolveTimezoneValue(val any, instant time.Time) *int {
 	// Simple integer offset
 	if offset, ok := val.(int); ok {
 		return &offset
