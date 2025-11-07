@@ -65,28 +65,22 @@ func AsParsingComponents(pc kronos.Components) (*kronos.InternalParsingComponent
 }
 
 // NewParsingContext creates a new ParsingContext for parsing operations.
-// This uses the internal helper exported from kronos package for internal use.
 func NewParsingContext(text string, refDate interface{}, option *kronos.InternalParsingOption) *kronos.InternalParsingContext {
 	return kronos.InternalNewParsingContext(text, refDate, option)
 }
 
 // NewParsingComponents creates a new ParsingComponents with the given reference.
 // It initializes implied values based on the reference date.
-//
-// This uses the internal helper exported from kronos package for internal use.
 func NewParsingComponents(reference *kronos.InternalReferenceWithTimezone, knownComponents map[kronos.Component]int) *kronos.InternalParsingComponents {
 	return kronos.InternalNewParsingComponents(reference, knownComponents)
 }
 
 // NewParsingResult creates a new ParsingResult with the given parameters.
-// This uses the internal helper exported from kronos package for internal use.
 func NewParsingResult(reference *kronos.InternalReferenceWithTimezone, index int, text string, start, end *kronos.InternalParsingComponents) *kronos.InternalParsingResult {
 	return kronos.InternalNewParsingResult(reference, index, text, start, end)
 }
 
 // MergeDateTimeResultWrapper merges a date-only result with a time-only result.
-//
-// This is a wrapper around the internal implementation in the kronos package.
 func MergeDateTimeResultWrapper(dateResult, timeResult *kronos.InternalParsingResult) *kronos.InternalParsingResult {
 	return kronos.InternalMergeDateTimeResult(dateResult, timeResult)
 }

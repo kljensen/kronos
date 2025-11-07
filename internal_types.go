@@ -2,15 +2,14 @@ package kronos
 
 import "time"
 
-// Internal helper functions and type aliases for accessing internal types.
-// These are used by internal/ packages only.
+// This file provides access to internal types for the internal/ packages.
+// These types are intentionally unexported to external users but needed by
+// internal implementation packages.
 //
-// WARNING: These are NOT part of the public API. External users should NOT
-// use these - they expose implementation details that may change without notice.
+// INTERNAL USE ONLY - These exports are implementation details that may
+// change without notice. External code should not use these types.
 
-// Type aliases to expose internal types to internal/ packages.
-// These types are exported to allow internal packages to use them,
-// but external code should use the public interfaces instead (Result, Components, etc.)
+// Type aliases for internal packages to use unexported types
 type (
 	InternalParsingContext            = parsingContext
 	InternalParsingComponents         = parsingComponents
@@ -20,6 +19,8 @@ type (
 	InternalParsingReference          = parsingReference
 	InternalParsingResultWithBoundary = parsingResultWithBoundary
 )
+
+// Constructor functions for internal packages
 
 // InternalNewParsingContext creates a parsing context (internal use only).
 func InternalNewParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
