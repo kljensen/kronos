@@ -26,27 +26,6 @@ func asParsingComponents(pc Components) (*parsingComponents, bool) {
 	return components, true
 }
 
-// safeSlice returns the substring of text between start (inclusive) and end
-// (exclusive) while clamping the requested range to valid bounds. The returned
-// boolean is false when start is beyond the end of the string, indicating that
-// the requested slice could not be produced safely.
-func safeSlice(text string, start, end int) (string, bool) {
-	if start < 0 {
-		start = 0
-	}
-	if end < start {
-		end = start
-	}
-	if start > len(text) {
-		return "", false
-	}
-	if end > len(text) {
-		end = len(text)
-	}
-
-	return text[start:end], true
-}
-
 // ============================================================================
 // Input sanitization for Unicode normalization
 // ============================================================================
