@@ -244,122 +244,79 @@ func (p *ENCompactFormatParser) tryParse8Digits(s string, ctx *kronos.ParsingCon
 	return nil
 }
 
-// tryParse10Digits attempts to parse 10-digit strings
-// Format: YYYYMMDDHHmm
+// tryParse10Digits attempts to parse 10-digit strings (YYYYMMDDHHmm)
 func (p *ENCompactFormatParser) tryParse10Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, ok := atoiSafe(s[0:4])
-	if !ok {
-		return nil
-	}
-	month, ok := atoiSafe(s[4:6])
-	if !ok {
-		return nil
-	}
-	day, ok := atoiSafe(s[6:8])
-	if !ok {
-		return nil
-	}
-	hour, ok := atoiSafe(s[8:10])
-	if !ok {
-		return nil
-	}
-	minute := 0
-
-	if isValidDate(year, month, day) && isValidTime(hour, minute, 0) {
-		components := ctx.CreateParsingComponents(nil)
-		components.Assign(kronos.ComponentYear, year)
-		components.Assign(kronos.ComponentMonth, month)
-		components.Assign(kronos.ComponentDay, day)
-		components.Assign(kronos.ComponentHour, hour)
-		components.Imply(kronos.ComponentMinute, minute)
-		components.AddTag("parser/ENCompactFormatParser/datetime")
-		return components
-	}
-
-	return nil
+	return p.tryParseDateTime(s, 4, 6, 8, 10, -1, -1, ctx)
 }
 
-// tryParse12Digits attempts to parse 12-digit strings
-// Format: YYYYMMDDHHmmss
+// tryParse12Digits attempts to parse 12-digit strings (YYYYMMDDHHmmss)
 func (p *ENCompactFormatParser) tryParse12Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, ok := atoiSafe(s[0:4])
-	if !ok {
-		return nil
-	}
-	month, ok := atoiSafe(s[4:6])
-	if !ok {
-		return nil
-	}
-	day, ok := atoiSafe(s[6:8])
-	if !ok {
-		return nil
-	}
-	hour, ok := atoiSafe(s[8:10])
-	if !ok {
-		return nil
-	}
-	minute, ok := atoiSafe(s[10:12])
-	if !ok {
-		return nil
-	}
-	second := 0
-
-	if isValidDate(year, month, day) && isValidTime(hour, minute, second) {
-		components := ctx.CreateParsingComponents(nil)
-		components.Assign(kronos.ComponentYear, year)
-		components.Assign(kronos.ComponentMonth, month)
-		components.Assign(kronos.ComponentDay, day)
-		components.Assign(kronos.ComponentHour, hour)
-		components.Assign(kronos.ComponentMinute, minute)
-		components.Imply(kronos.ComponentSecond, second)
-		components.AddTag("parser/ENCompactFormatParser/datetime")
-		return components
-	}
-
-	return nil
+	return p.tryParseDateTime(s, 4, 6, 8, 10, 12, -1, ctx)
 }
 
-// tryParse14Digits attempts to parse 14-digit strings
-// Format: YYYYMMDDHHmmss
+// tryParse14Digits attempts to parse 14-digit strings (YYYYMMDDHHmmss)
 func (p *ENCompactFormatParser) tryParse14Digits(s string, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
-	year, ok := atoiSafe(s[0:4])
+	return p.tryParseDateTime(s, 4, 6, 8, 10, 12, 14, ctx)
+}
+
+// tryParseDateTime is a helper that parses datetime strings with year, month, day, and optional hour, minute, second
+// Pass -1 for minute or second positions to imply 0 values
+func (p *ENCompactFormatParser) tryParseDateTime(s string, yearLen, monthPos, dayPos, hourPos, minutePos, secondPos int, ctx *kronos.ParsingContext) *kronos.ParsingComponents {
+	year, ok := atoiSafe(s[0:yearLen])
 	if !ok {
 		return nil
 	}
-	month, ok := atoiSafe(s[4:6])
+	month, ok := atoiSafe(s[yearLen:monthPos])
 	if !ok {
 		return nil
 	}
-	day, ok := atoiSafe(s[6:8])
+	day, ok := atoiSafe(s[monthPos:dayPos])
 	if !ok {
 		return nil
 	}
-	hour, ok := atoiSafe(s[8:10])
-	if !ok {
-		return nil
-	}
-	minute, ok := atoiSafe(s[10:12])
-	if !ok {
-		return nil
-	}
-	second, ok := atoiSafe(s[12:14])
+	hour, ok := atoiSafe(s[dayPos:hourPos])
 	if !ok {
 		return nil
 	}
 
-	if isValidDate(year, month, day) && isValidTime(hour, minute, second) {
-		components := ctx.CreateParsingComponents(nil)
-		components.Assign(kronos.ComponentYear, year)
-		components.Assign(kronos.ComponentMonth, month)
-		components.Assign(kronos.ComponentDay, day)
-		components.Assign(kronos.ComponentHour, hour)
+	var minute, second int
+	if minutePos > 0 {
+		minute, ok = atoiSafe(s[hourPos:minutePos])
+		if !ok {
+			return nil
+		}
+	}
+	if secondPos > 0 {
+		second, ok = atoiSafe(s[minutePos:secondPos])
+		if !ok {
+			return nil
+		}
+	}
+
+	if !isValidDate(year, month, day) || !isValidTime(hour, minute, second) {
+		return nil
+	}
+
+	components := ctx.CreateParsingComponents(nil)
+	components.Assign(kronos.ComponentYear, year)
+	components.Assign(kronos.ComponentMonth, month)
+	components.Assign(kronos.ComponentDay, day)
+	components.Assign(kronos.ComponentHour, hour)
+
+	if minutePos > 0 {
 		components.Assign(kronos.ComponentMinute, minute)
-		components.Assign(kronos.ComponentSecond, second)
-		components.AddTag("parser/ENCompactFormatParser/datetime")
-		return components
+	} else {
+		components.Imply(kronos.ComponentMinute, 0)
 	}
 
-	return nil
+	if secondPos > 0 {
+		components.Assign(kronos.ComponentSecond, second)
+	} else {
+		components.Imply(kronos.ComponentSecond, 0)
+	}
+
+	components.AddTag("parser/ENCompactFormatParser/datetime")
+	return components
 }
 
 // isValidDate checks if year, month, day form a valid date
