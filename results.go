@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-
 // referenceWithTimezone represents a reference date/time with an optional timezone offset.
 // It is used as the reference point for parsing relative dates and times.
 type referenceWithTimezone struct {
