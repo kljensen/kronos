@@ -31,9 +31,9 @@ func TestReferenceWithTimezone(t *testing.T) {
 		}
 	})
 
-	t.Run("FromDate creates reference without timezone offset", func(t *testing.T) {
+	t.Run("newReferenceWithTimezone creates reference without timezone offset", func(t *testing.T) {
 		date := time.Date(2024, 11, 2, 14, 30, 0, 0, time.UTC)
-		ref := newReferenceWithTimezone(time.Time{}, nil).FromDate(date)
+		ref := newReferenceWithTimezone(date, nil)
 
 		if !ref.Instant().Equal(date) {
 			t.Errorf("Expected instant %v, got %v", date, ref.Instant())

@@ -34,6 +34,10 @@ func InternalNewParsingResult(reference *referenceWithTimezone, index int, text 
 	return newParsingResult(reference, index, text, start, end)
 }
 
+func InternalNewReferenceWithTimezone(instant time.Time, timezoneOffset *int) *referenceWithTimezone {
+	return newReferenceWithTimezone(instant, timezoneOffset)
+}
+
 func InternalMergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 	return mergeDateTimeResult(dateResult, timeResult)
 }

@@ -223,7 +223,7 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.InternalParsing
 		}
 
 		// Create new reference from current result's date
-		newRef := context.Reference().FromDate(current.Start().Date())
+		newRef := kronos.InternalNewReferenceWithTimezone(current.Start().Date(), nil)
 		components := helpers.CreateRelativeFromReference(newRef, duration, internal.EmptyDuration)
 
 		// Create merged result
@@ -318,7 +318,7 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.InternalPars
 		}
 
 		// Create new reference from next result's date
-		newRef := context.Reference().FromDate(next.Start().Date())
+		newRef := kronos.InternalNewReferenceWithTimezone(next.Start().Date(), nil)
 		components := helpers.CreateRelativeFromReference(newRef, duration, internal.EmptyDuration)
 
 		// Create merged result

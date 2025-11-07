@@ -12,8 +12,6 @@ var emptyDuration = Duration{
 	TimeunitMillisecond: 0,
 }
 
-const secondsPerMinute = 60
-
 // referenceWithTimezone represents a reference date/time with an optional timezone offset.
 // It is used as the reference point for parsing relative dates and times.
 type referenceWithTimezone struct {
@@ -34,12 +32,7 @@ func newReferenceWithTimezone(instant time.Time, timezoneOffset *int) *reference
 	}
 }
 
-// FromDate creates a ReferenceWithTimezone from a Date.
-func (r *referenceWithTimezone) FromDate(date time.Time) *referenceWithTimezone {
-	return newReferenceWithTimezone(date, nil)
-}
-
-// FromInput creates a ReferenceWithTimezone from either a ParsingReference or a time.Time.
+// fromInput creates a ReferenceWithTimezone from either a ParsingReference or a time.Time.
 // It also handles timezone conversion using the provided timezoneOverrides.
 func fromInput(input interface{}, timezoneOverrides TimezoneAbbrMap) *referenceWithTimezone {
 	if input == nil {
@@ -87,7 +80,7 @@ func (r *referenceWithTimezone) GetSystemTimezoneAdjustmentMinute(date time.Time
 	}
 
 	_, currentOffset := date.Zone()
-	currentTimezoneOffset := currentOffset / secondsPerMinute
+	currentTimezoneOffset := currentOffset / 60
 
 	targetTimezoneOffset := currentTimezoneOffset
 	if overrideTimezoneOffset != nil {
@@ -106,7 +99,7 @@ func (r *referenceWithTimezone) GetTimezoneOffset() int {
 		return *r.timezoneOffset
 	}
 	_, offset := r.instant.Zone()
-	return offset / secondsPerMinute
+	return offset / 60
 }
 
 // Instant returns the reference instant.
