@@ -195,6 +195,7 @@ func applySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 
 	// Create context
 	ctx := newParsingContext(text, refDate, &opt)
+	ctx.settings = &settings
 
 	return ctx, nil
 }

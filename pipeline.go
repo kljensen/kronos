@@ -65,8 +65,7 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 	// Execute parsers
 	results := make([]*ParsingResult, 0)
 	for _, parser := range p.parsers {
-		// Execute parser
-		parsedResults := p.executeParser(ctx, parser)
+		parsedResults := executeParser(ctx, parser)
 		results = append(results, parsedResults...)
 	}
 
@@ -94,12 +93,6 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 	}
 
 	return results, nil
-}
-
-// executeParser executes a single parser on the context.
-// This delegates to the shared executeParser implementation.
-func (p *Pipeline) executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
-	return executeParser(context, parser)
 }
 
 // executeParser is the shared implementation for executing a single parser.
@@ -147,45 +140,47 @@ func executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
 		}
 
 		// Convert result to ParsingResult
-		var parsedResult *ParsingResult
-		var matchEndPos int
-		switch v := result.(type) {
-		case *ParsingResult:
-			parsedResult = v
-			if parsedResult == nil {
-				remainingText = originalText[index+1:]
-				continue
-			}
-			headerOffset := parsedResult.Index()
-			parsedResult.SetIndex(index + headerOffset)
-			matchEndPos = index + matchedTextLen
-		case *ParsingResultWithBoundary:
-			var resultIndex int
-			if v.IncludeBoundaryIdx {
-				resultIndex = index + v.BoundaryLen
-			} else {
-				resultIndex = index
-			}
-			parsedResult = context.CreateParsingResult(resultIndex, v.AdjustedText)
-			parsedResult.start = v.Components
-			matchEndPos = index + matchedTextLen
-		case *ParsingComponents:
-			parsedResult = context.CreateParsingResult(index, matchedText)
-			parsedResult.start = v
-			matchEndPos = index + matchedTextLen
-		case map[Component]int:
-			parsedResult = context.CreateParsingResult(index, matchedText, v)
-			matchEndPos = index + matchedTextLen
-		default:
+		parsedResult := convertToParsingResult(context, result, index, matchedText, matchedTextLen)
+		if parsedResult == nil {
 			remainingText = originalText[index+1:]
 			continue
 		}
 
 		results = append(results, parsedResult)
-		remainingText = originalText[matchEndPos:]
+		remainingText = originalText[index+matchedTextLen:]
 	}
 
 	return results
+}
+
+// convertToParsingResult converts various result types to ParsingResult.
+// Returns nil if the result cannot be converted.
+func convertToParsingResult(context *ParsingContext, result interface{}, index int, matchedText string, matchedTextLen int) *ParsingResult {
+	switch v := result.(type) {
+	case *ParsingResult:
+		if v == nil {
+			return nil
+		}
+		headerOffset := v.Index()
+		v.SetIndex(index + headerOffset)
+		return v
+	case *ParsingResultWithBoundary:
+		resultIndex := index
+		if v.IncludeBoundaryIdx {
+			resultIndex = index + v.BoundaryLen
+		}
+		parsedResult := context.CreateParsingResult(resultIndex, v.AdjustedText)
+		parsedResult.start = v.Components
+		return parsedResult
+	case *ParsingComponents:
+		parsedResult := context.CreateParsingResult(index, matchedText)
+		parsedResult.start = v
+		return parsedResult
+	case map[Component]int:
+		return context.CreateParsingResult(index, matchedText, v)
+	default:
+		return nil
+	}
 }
 
 // applyStrictValidation filters out results that don't meet strict parsing criteria.
@@ -253,90 +248,41 @@ func (p *Pipeline) applyTimezoneConversion(results []*ParsingResult) ([]*Parsing
 // to match the values from the given time.Time in the target timezone.
 // This preserves the "certain" vs "implied" status of each component while updating values.
 func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
-	// Update date components (year, month, day) - preserve certain/implied status
-	if components.IsCertain(ComponentYear) {
-		components.Assign(ComponentYear, date.Year())
-	} else if components.Get(ComponentYear) != nil {
-		components.Imply(ComponentYear, date.Year())
+	// Helper to update a component preserving its certain/implied status
+	updateComponent := func(comp Component, value int) {
+		if components.IsCertain(comp) {
+			components.Assign(comp, value)
+		} else if components.Get(comp) != nil {
+			components.Imply(comp, value)
+		}
 	}
 
-	if components.IsCertain(ComponentMonth) {
-		components.Assign(ComponentMonth, int(date.Month()))
-	} else if components.Get(ComponentMonth) != nil {
-		components.Imply(ComponentMonth, int(date.Month()))
-	}
+	// Update date components
+	updateComponent(ComponentYear, date.Year())
+	updateComponent(ComponentMonth, int(date.Month()))
+	updateComponent(ComponentDay, date.Day())
 
-	if components.IsCertain(ComponentDay) {
-		components.Assign(ComponentDay, date.Day())
-	} else if components.Get(ComponentDay) != nil {
-		components.Imply(ComponentDay, date.Day())
-	}
+	// Update time components
+	updateComponent(ComponentHour, date.Hour())
+	updateComponent(ComponentMinute, date.Minute())
+	updateComponent(ComponentSecond, date.Second())
 
-	// Update time components (hour, minute, second, subseconds)
-	if components.IsCertain(ComponentHour) {
-		components.Assign(ComponentHour, date.Hour())
-	} else if components.Get(ComponentHour) != nil {
-		components.Imply(ComponentHour, date.Hour())
-	}
-
-	if components.IsCertain(ComponentMinute) {
-		components.Assign(ComponentMinute, date.Minute())
-	} else if components.Get(ComponentMinute) != nil {
-		components.Imply(ComponentMinute, date.Minute())
-	}
-
-	if components.IsCertain(ComponentSecond) {
-		components.Assign(ComponentSecond, date.Second())
-	} else if components.Get(ComponentSecond) != nil {
-		components.Imply(ComponentSecond, date.Second())
-	}
-
-	// Update subsecond components (millisecond, microsecond, nanosecond)
+	// Update subsecond components
 	totalNanos := date.Nanosecond()
-	millisecond := totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond := remainingNanos / 1000
-	nanosecond := remainingNanos % 1000
+	updateComponent(ComponentMillisecond, totalNanos/1000000)
+	updateComponent(ComponentMicrosecond, (totalNanos%1000000)/1000)
+	updateComponent(ComponentNanosecond, totalNanos%1000)
 
-	if components.IsCertain(ComponentMillisecond) {
-		components.Assign(ComponentMillisecond, millisecond)
-	} else if components.Get(ComponentMillisecond) != nil {
-		components.Imply(ComponentMillisecond, millisecond)
-	}
-
-	if components.IsCertain(ComponentMicrosecond) {
-		components.Assign(ComponentMicrosecond, microsecond)
-	} else if components.Get(ComponentMicrosecond) != nil {
-		components.Imply(ComponentMicrosecond, microsecond)
-	}
-
-	if components.IsCertain(ComponentNanosecond) {
-		components.Assign(ComponentNanosecond, nanosecond)
-	} else if components.Get(ComponentNanosecond) != nil {
-		components.Imply(ComponentNanosecond, nanosecond)
-	}
-
-	// Update meridiem based on new hour
-	newMeridiem := 0 // AM
+	// Update meridiem
+	meridiem := 0 // AM
 	if date.Hour() >= 12 {
-		newMeridiem = 1 // PM
+		meridiem = 1 // PM
 	}
+	updateComponent(ComponentMeridiem, meridiem)
 
-	if components.IsCertain(ComponentMeridiem) {
-		components.Assign(ComponentMeridiem, newMeridiem)
-	} else if components.Get(ComponentMeridiem) != nil {
-		components.Imply(ComponentMeridiem, newMeridiem)
-	}
-
-	// Update timezone offset to match the target location
+	// Update timezone offset
 	_, offset := date.Zone()
-	timezoneOffsetMinutes := offset / 60
-
-	if components.IsCertain(ComponentTimezoneOffset) {
-		components.Assign(ComponentTimezoneOffset, timezoneOffsetMinutes)
-	} else if components.Get(ComponentTimezoneOffset) != nil {
-		components.Imply(ComponentTimezoneOffset, timezoneOffsetMinutes)
-	}
+	updateComponent(ComponentTimezoneOffset, offset/60)
 }
 
 // ParseWithSettings is a convenience function that creates a pipeline

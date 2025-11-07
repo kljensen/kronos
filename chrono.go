@@ -97,7 +97,7 @@ func (c *Chrono) Parse(text string, referenceDate interface{}, option *ParsingOp
 
 	results := make([]*ParsingResult, 0)
 	for _, parser := range c.parsers {
-		parsedResults := c.executeParser(context, parser)
+		parsedResults := executeParser(context, parser)
 		results = append(results, parsedResults...)
 	}
 
@@ -112,10 +112,4 @@ func (c *Chrono) Parse(text string, referenceDate interface{}, option *ParsingOp
 	}
 
 	return results
-}
-
-// executeParser executes a single parser on the text.
-// This delegates to the shared executeParser implementation.
-func (c *Chrono) executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
-	return executeParser(context, parser)
 }

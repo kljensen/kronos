@@ -294,37 +294,22 @@ func (pc *ParsingComponents) Date() time.Time {
 // DateWithoutTimezoneAdjustment creates a time.Time from components without timezone adjustment.
 // This is useful for DST calculations where you need the "wall clock" time.
 func (pc *ParsingComponents) DateWithoutTimezoneAdjustment() time.Time {
-	const (
-		defaultYear  = 2000
-		defaultMonth = 1
-		defaultDay   = 1
-	)
-
-	year := getValueOrDefault(pc.Get(ComponentYear), defaultYear)
-	month := getValueOrDefault(pc.Get(ComponentMonth), defaultMonth)
-	day := getValueOrDefault(pc.Get(ComponentDay), defaultDay)
-	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
-	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
-	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
-	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
-	microsecond := getValueOrDefault(pc.Get(ComponentMicrosecond), 0)
-	nanosecond := getValueOrDefault(pc.Get(ComponentNanosecond), 0)
-
-	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
-	totalNanos := (millisecond * 1000000) + (microsecond * 1000) + nanosecond
-
 	// Use the reference date's location to avoid timezone conversion issues
 	location := time.Local
 	if pc.reference != nil && !pc.reference.instant.IsZero() {
 		location = pc.reference.instant.Location()
 	}
-
-	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, location)
+	return pc.dateInLocation(location)
 }
 
 // DateUTC creates a UTC time.Time from components for DST calculations.
 // This returns a time in UTC with the "wall clock" values from the components.
 func (pc *ParsingComponents) DateUTC() time.Time {
+	return pc.dateInLocation(time.UTC)
+}
+
+// dateInLocation creates a time.Time from components in the specified location.
+func (pc *ParsingComponents) dateInLocation(location *time.Location) time.Time {
 	const (
 		defaultYear  = 2000
 		defaultMonth = 1
@@ -344,7 +329,7 @@ func (pc *ParsingComponents) DateUTC() time.Time {
 	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
 	totalNanos := (millisecond * 1000000) + (microsecond * 1000) + nanosecond
 
-	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, time.UTC)
+	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, location)
 }
 
 // AddTag adds a debugging tag to the components.

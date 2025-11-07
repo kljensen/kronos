@@ -163,7 +163,10 @@ func TestNewParsingContextWithSettings(t *testing.T) {
 	text := "March 15"
 	refDate := time.Now()
 
-	ctx := newParsingContextWithSettings(text, refDate, settings)
+	ctx, err := applySettings(text, refDate, settings)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
 
 	if ctx == nil {
 		t.Fatal("Expected non-nil context")

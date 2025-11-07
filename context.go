@@ -45,28 +45,6 @@ func newParsingContext(text string, refDate interface{}, option *ParsingOption) 
 	}
 }
 
-// NewParsingContextWithSettings creates a new ParsingContext with settings.
-// Settings provide more comprehensive configuration than ParsingOption.
-func newParsingContextWithSettings(text string, refDate interface{}, settings Settings) *ParsingContext {
-	// Convert settings to ParsingOption for backward compatibility
-	opt := settings.ToParsingOption(nil)
-
-	reference := fromInput(refDate, nil)
-
-	// Apply normalization
-	text = sanitizeInput(text)
-
-	ctx := &ParsingContext{
-		text:      text,
-		option:    opt,
-		reference: reference,
-		refDate:   reference.Instant(),
-		settings:  &settings,
-	}
-
-	return ctx
-}
-
 // CreateParsingComponents creates ParsingComponents from a component map or existing components.
 // If components is already a ParsingComponents, it returns it as-is.
 // Otherwise, it creates new ParsingComponents with the provided values.
