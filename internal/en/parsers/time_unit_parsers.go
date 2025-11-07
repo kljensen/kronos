@@ -12,6 +12,12 @@ import (
 	"github.com/kljensen/kronos/internal/parsing"
 )
 
+const (
+	approximationPattern = `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
+	wordNumbers          = `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
+	unitSeparator        = `(?:\s*,\s*|\s+and\s+|\s+)`
+)
+
 // ENTimeUnitAgoFormatParser parses expressions like:
 // "3 days ago", "2 hours ago", "5 minutes before", "15 minutes earlier"
 type ENTimeUnitAgoFormatParser struct {
@@ -32,14 +38,6 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
-			// Add optional approximation words at the beginning
-			// Tilde is handled separately because it's a symbol, not a word
-			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
-			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
-			// Separator between units: space, comma+space, or " and "
-			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
-			// Word numbers pattern includes 1-19 and tens (20, 30, ..., 90)
-			wordNumbers := `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
 			pattern := approximationPattern +
 				`((?:(?:[0-9]+(?:[.,][0-9]+)?|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
@@ -106,14 +104,6 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
-			// Add optional approximation words at the beginning
-			// Tilde is handled separately because it's a symbol, not a word
-			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
-			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
-			// Separator between units: space, comma+space, or " and "
-			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
-			// Word numbers pattern includes 1-19 and tens (20, 30, ..., 90)
-			wordNumbers := `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
 			pattern := approximationPattern +
 				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
 				timeUnitPattern +
@@ -178,29 +168,19 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
-			// With optional prefix if forwardDate is enabled, required prefix otherwise
-			// Pattern supports: "1 year 2 months", "1 year, 2 months", "1 year and 2 months", "1 year, 2 months and 3 days"
-			// Separator between units: space, comma+space, or " and "
-			unitSeparator := `(?:\s*,\s*|\s+and\s+|\s+)`
-			// Word numbers pattern includes 1-19 and tens (20, 30, ..., 90)
-			wordNumbers := `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
 			var pattern string
 			option := context.Option()
 			if option.ForwardDate {
-				pattern = `(?:(?:within|in|for)\s*)?` +
-					`(?:(?:about|around|roughly|approximately|just)\s*(?:~\s*)?)?` +
-					`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
-					timeUnitPattern +
-					`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
-					timeUnitPattern + `)*)(?:\s|$|\b)`
+				pattern = `(?:(?:within|in|for)\s*)?`
 			} else {
-				pattern = `(?:within|in|for)\s*` +
-					`(?:(?:about|around|roughly|approximately|just)\s*(?:~\s*)?)?` +
-					`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
-					timeUnitPattern +
-					`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
-					timeUnitPattern + `)*)(?:\s|$|\b)`
+				pattern = `(?:within|in|for)\s*`
 			}
+
+			pattern += `(?:(?:about|around|roughly|approximately|just)\s*(?:~\s*)?)?` +
+				`((?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
+				timeUnitPattern +
+				`(?:` + unitSeparator + `(?:(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+|` + wordNumbers + `)\s*(?:an?\s+)?)?` +
+				timeUnitPattern + `)*)(?:\s|$|\b)`
 
 			return regexp.MustCompile("(?i)" + pattern)
 		},
@@ -256,9 +236,6 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 				timeUnitPattern = endata.TimeUnitNoAbbrPattern
 			}
 
-			// Add optional approximation words at the beginning
-			// Tilde is handled separately because it's a symbol, not a word
-			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
 			pattern := approximationPattern +
 				`(this|last|past|next|after|\+|-)\s*` +
 				`((?:(?:an?\s+)?(?:half|dozen|several|couple|few|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|an|a|the|[0-9]+(?:[.,][0-9]+)?)\s*(?:an?\s+)?(?:of\s+)?)?` +
