@@ -7,6 +7,38 @@ import (
 )
 
 // ============================================================================
+// Internal parsing types
+// ============================================================================
+
+// parsingOption contains configuration options for parsing.
+type parsingOption struct {
+	// ForwardDate indicates whether to parse only forward dates
+	// (results should be after the reference date).
+	ForwardDate bool
+
+	// Preference specifies how ambiguous dates should be resolved.
+	Preference DatePreference
+
+	// DateOrder specifies the order of date components in ambiguous formats.
+	DateOrder DateOrder
+
+	// Timezones provides additional timezone keywords for parsers to recognize.
+	Timezones TimezoneAbbrMap
+
+	// Debug is an internal debug event handler.
+	Debug DebugHandler
+}
+
+// parsingReference contains reference information for parsing dates/times.
+type parsingReference struct {
+	// Instant is the reference date/time when the input is written or mentioned.
+	Instant *time.Time
+
+	// Timezone is the reference timezone where the input is written or mentioned.
+	Timezone interface{}
+}
+
+// ============================================================================
 // Parsing context
 // ============================================================================
 

@@ -2,6 +2,69 @@ package kronos
 
 import "time"
 
+// AmbiguousTimezoneMap defines a timezone that has different offsets
+// depending on whether daylight saving time (DST) is in effect.
+//
+// Deprecated: Direct use of AmbiguousTimezoneMap is discouraged. Use the builder pattern
+// with WithOption instead:
+//
+//	customTimezones := kronos.TimezoneAbbrMap{
+//	    "ET": &kronos.AmbiguousTimezoneMap{
+//	        TimezoneOffsetDuringDst: -240,
+//	        TimezoneOffsetNonDst: -300,
+//	        DstStart: func(year int) time.Time { ... },
+//	        DstEnd: func(year int) time.Time { ... },
+//	    },
+//	}
+//	parser := kronos.New(en.Casual).
+//	    WithOption(func(s *kronos.Settings) {
+//	        s.TimezoneOverrides = customTimezones
+//	    })
+type AmbiguousTimezoneMap struct {
+	// TimezoneOffsetDuringDst is the offset in minutes during DST.
+	TimezoneOffsetDuringDst int
+
+	// TimezoneOffsetNonDst is the offset in minutes when DST is not in effect.
+	TimezoneOffsetNonDst int
+
+	// DstStart returns the start date of DST for the given year.
+	DstStart func(year int) time.Time
+
+	// DstEnd returns the end date of DST for the given year.
+	DstEnd func(year int) time.Time
+}
+
+// TimezoneAbbrMap maps timezone abbreviations to their offsets.
+// Values can be either a simple offset (in minutes) or an AmbiguousTimezoneMap
+// for timezones that observe DST.
+//
+// Deprecated: Direct use of TimezoneAbbrMap is discouraged. Use the builder pattern
+// with WithOption instead:
+//
+//	customTimezones := kronos.TimezoneAbbrMap{
+//	    "CUSTOM": 123,  // UTC+2:03
+//	    "TEST": -456,   // UTC-7:36
+//	}
+//	parser := kronos.New(en.Casual).
+//	    WithOption(func(s *kronos.Settings) {
+//	        s.TimezoneOverrides = customTimezones
+//	    })
+type TimezoneAbbrMap map[string]interface{}
+
+// DebugHandler is a function that handles debug events.
+// It receives a debug message for logging or analysis.
+//
+// Deprecated: Direct use of DebugHandler is discouraged. Use the builder pattern
+// with WithOption instead:
+//
+//	parser := kronos.New(en.Casual).
+//	    WithOption(func(s *kronos.Settings) {
+//	        s.DebugHandler = func(msg string) {
+//	            log.Printf("DEBUG: %s", msg)
+//	        }
+//	    })
+type DebugHandler func(message string)
+
 // defaultTimezoneAbbrMap is an internal copy of timezone abbreviations for use within the root package.
 // External code should use the types and functions provided by the public API.
 var defaultTimezoneAbbrMap = TimezoneAbbrMap{

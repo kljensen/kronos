@@ -5,6 +5,81 @@ import (
 	"time"
 )
 
+// DatePreference specifies how ambiguous dates (with missing components) should be resolved.
+// This controls whether dates like "March 15" (without year) or "10:00" (without date)
+// should be interpreted as being in the past, future, or current period relative to the reference time.
+type DatePreference int
+
+const (
+	// PreferCurrentPeriod (default) chooses the date in the current period.
+	// For dates with missing year: chooses the current year.
+	// For times with missing date: chooses the current day.
+	// Example: If reference is Feb 15, 2015 15:30
+	//   - "March" → March 2015 (current year)
+	//   - "10:00" → Feb 15, 2015 10:00 (current day, even if past)
+	PreferCurrentPeriod DatePreference = iota
+
+	// PreferPast chooses dates in the past.
+	// For dates with missing year: if the date would be in the future, use previous year.
+	// For times with missing date: if the time would be in the future, use previous day.
+	// Example: If reference is Feb 15, 2015 15:30
+	//   - "March" → March 2014 (last March, in the past)
+	//   - "10:00" → Feb 15, 2015 10:00 (earlier today)
+	//   - "18:00" → Feb 14, 2015 18:00 (yesterday, since 18:00 today hasn't happened yet)
+	PreferPast
+
+	// PreferFuture chooses dates in the future.
+	// For dates with missing year: if the date would be in the past, use next year.
+	// For times with missing date: if the time would be in the past, use next day.
+	// Example: If reference is Feb 15, 2015 15:30
+	//   - "March" → March 2015 (next March, in the future)
+	//   - "10:00" → Feb 16, 2015 10:00 (tomorrow morning, since 10:00 already passed today)
+	//   - "18:00" → Feb 15, 2015 18:00 (later today)
+	PreferFuture
+)
+
+// Period represents the granularity of a parsed date/time expression.
+// It indicates the finest level of precision explicitly mentioned in the input.
+// For example:
+//   - "2020" has year-level precision
+//   - "March 2020" has month-level precision
+//   - "yesterday" has day-level precision
+//   - "10:30" has time-level precision
+type Period int
+
+const (
+	// PeriodUnknown indicates the period could not be determined.
+	PeriodUnknown Period = iota
+	// PeriodYear represents year-level precision (e.g., "2020", "last year").
+	PeriodYear
+	// PeriodMonth represents month-level precision (e.g., "March", "3 months ago").
+	PeriodMonth
+	// PeriodWeek represents week-level precision (e.g., "last week", "2 weeks ago").
+	PeriodWeek
+	// PeriodDay represents day-level precision (e.g., "yesterday", "March 15").
+	PeriodDay
+	// PeriodTime represents time-level precision (e.g., "10:30", "2 hours ago").
+	PeriodTime
+)
+
+// String returns the string representation of the Period.
+func (p Period) String() string {
+	switch p {
+	case PeriodYear:
+		return "year"
+	case PeriodMonth:
+		return "month"
+	case PeriodWeek:
+		return "week"
+	case PeriodDay:
+		return "day"
+	case PeriodTime:
+		return "time"
+	default:
+		return "unknown"
+	}
+}
+
 // DateOrder represents the order of date components in ambiguous formats.
 type DateOrder int
 

@@ -2,6 +2,27 @@ package kronos
 
 import "time"
 
+// Component represents a date/time component that can be parsed.
+// Components are used as keys in maps, so they are string constants.
+type Component string
+
+// Date/time component constants
+const (
+	// ComponentYear represents the year component
+	ComponentYear           Component = "year"
+	ComponentMonth          Component = "month"
+	ComponentDay            Component = "day"
+	ComponentWeekday        Component = "weekday"
+	ComponentHour           Component = "hour"
+	ComponentMinute         Component = "minute"
+	ComponentSecond         Component = "second"
+	ComponentMillisecond    Component = "millisecond"
+	ComponentMicrosecond    Component = "microsecond"
+	ComponentNanosecond     Component = "nanosecond"
+	ComponentMeridiem       Component = "meridiem"
+	ComponentTimezoneOffset Component = "timezoneOffset"
+)
+
 // Components represents the individual date/time parts of a parsed expression.
 // It provides access to components like year, month, day, hour, minute, etc.,
 // and distinguishes between components that were explicitly mentioned (certain)

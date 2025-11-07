@@ -6,6 +6,38 @@ import (
 	"time"
 )
 
+// Timeunit represents a unit of time for calculations and operations.
+// This type is used as a key in the Duration map type for specifying time durations.
+//
+// Note: While Timeunit is part of the public API (used by Duration), it is primarily
+// an implementation detail. Future versions may move this to a more restricted scope
+// while maintaining backward compatibility for Duration operations.
+type Timeunit string
+
+// Time unit constants for use with Duration type.
+// These constants are required for working with Duration maps.
+//
+// Example:
+//
+//	duration := kronos.Duration{
+//	    kronos.TimeunitDay: 5,
+//	    kronos.TimeunitHour: 3,
+//	}
+const (
+	TimeunitYear        Timeunit = "year"
+	TimeunitMonth       Timeunit = "month"
+	TimeunitWeek        Timeunit = "week"
+	TimeunitDay         Timeunit = "day"
+	TimeunitHour        Timeunit = "hour"
+	TimeunitMinute      Timeunit = "minute"
+	TimeunitSecond      Timeunit = "second"
+	TimeunitMillisecond Timeunit = "millisecond"
+	TimeunitMicrosecond Timeunit = "microsecond"
+	TimeunitNanosecond  Timeunit = "nanosecond"
+	TimeunitQuarter     Timeunit = "quarter"
+	TimeunitDecade      Timeunit = "decade"
+)
+
 // Bounds constants for date arithmetic.
 const (
 	minYear            = 1
