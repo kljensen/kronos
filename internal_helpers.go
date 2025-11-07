@@ -37,15 +37,15 @@ func InternalMergeDateTimeResult(dateResult, timeResult *parsingResult) *parsing
 	return mergeDateTimeResult(dateResult, timeResult)
 }
 
-func InternalNewParserRegistry() *ParserRegistry {
+func InternalNewParserRegistry() *parserRegistry {
 	return newParserRegistry()
 }
 
-func InternalGlobalRegistry() *ParserRegistry {
+func InternalGlobalRegistry() *parserRegistry {
 	return globalRegistry
 }
 
-func InternalRegister(name string, info ParserInfo, factory ParserFactory) {
+func InternalRegister(name string, info parserInfo, factory parserFactory) {
 	internalRegister(name, info, factory)
 }
 

@@ -5,13 +5,11 @@ import (
 	"sync"
 )
 
-// ParserInfo contains metadata about a registered parser.
+// parserInfo contains metadata about a registered parser.
 // It allows parsers to be dynamically discovered and configured.
 //
-// Deprecated: This type is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
-type ParserInfo struct {
+// This type is internal and not part of the public API.
+type parserInfo struct {
 	// Name is the unique identifier for this parser.
 	Name string
 
@@ -28,21 +26,17 @@ type ParserInfo struct {
 	Tags []string
 }
 
-// ParserFactory creates a parser instance.
+// parserFactory creates a parser instance.
 // This allows parsers to be created with specific settings.
 //
-// Deprecated: This type is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
-type ParserFactory func() Parser
+// This type is internal and not part of the public API.
+type parserFactory func() Parser
 
-// ParserRegistry manages available parsers and their metadata.
+// parserRegistry manages available parsers and their metadata.
 // It provides a central place to register and discover parsers.
 //
-// Deprecated: This type is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
-type ParserRegistry struct {
+// This type is internal and not part of the public API.
+type parserRegistry struct {
 	mu       sync.RWMutex
 	parsers  map[string]*registeredParser
 	defaults []string // Default parser order
@@ -50,14 +44,14 @@ type ParserRegistry struct {
 
 // registeredParser holds the parser factory and metadata.
 type registeredParser struct {
-	info    ParserInfo
-	factory ParserFactory
+	info    parserInfo
+	factory parserFactory
 }
 
 // newParserRegistry creates a new parser registry.
 // This is unexported and only used internally.
-func newParserRegistry() *ParserRegistry {
-	return &ParserRegistry{
+func newParserRegistry() *parserRegistry {
+	return &parserRegistry{
 		parsers:  make(map[string]*registeredParser),
 		defaults: []string{},
 	}
@@ -68,13 +62,13 @@ var globalRegistry = newParserRegistry()
 
 // internalRegister registers a parser with the global registry.
 // This is unexported and only used internally.
-func internalRegister(name string, info ParserInfo, factory ParserFactory) {
+func internalRegister(name string, info parserInfo, factory parserFactory) {
 	globalRegistry.RegisterParser(name, info, factory)
 }
 
 // RegisterParser registers a parser with this registry.
 // If a parser with the same name already exists, it is replaced.
-func (r *ParserRegistry) RegisterParser(name string, info ParserInfo, factory ParserFactory) {
+func (r *parserRegistry) RegisterParser(name string, info parserInfo, factory parserFactory) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -87,7 +81,7 @@ func (r *ParserRegistry) RegisterParser(name string, info ParserInfo, factory Pa
 
 // GetParser retrieves a parser by name and creates an instance.
 // Returns nil if the parser is not found.
-func (r *ParserRegistry) GetParser(name string) Parser {
+func (r *parserRegistry) GetParser(name string) Parser {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -99,7 +93,7 @@ func (r *ParserRegistry) GetParser(name string) Parser {
 
 // GetParsers retrieves multiple parsers by name.
 // Unknown parser names are silently skipped.
-func (r *ParserRegistry) GetParsers(names []string) []Parser {
+func (r *parserRegistry) GetParsers(names []string) []Parser {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -114,7 +108,7 @@ func (r *ParserRegistry) GetParsers(names []string) []Parser {
 
 // GetAllParsers returns all registered parsers in priority order.
 // Higher priority parsers come first.
-func (r *ParserRegistry) GetAllParsers() []Parser {
+func (r *parserRegistry) GetAllParsers() []Parser {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -139,7 +133,7 @@ func (r *ParserRegistry) GetAllParsers() []Parser {
 }
 
 // GetParsersByTag returns all parsers with the specified tag.
-func (r *ParserRegistry) GetParsersByTag(tag string) []Parser {
+func (r *parserRegistry) GetParsersByTag(tag string) []Parser {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -156,11 +150,11 @@ func (r *ParserRegistry) GetParsersByTag(tag string) []Parser {
 }
 
 // ListParsers returns information about all registered parsers.
-func (r *ParserRegistry) ListParsers() []ParserInfo {
+func (r *parserRegistry) ListParsers() []parserInfo {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	infos := make([]ParserInfo, 0, len(r.parsers))
+	infos := make([]parserInfo, 0, len(r.parsers))
 	for _, p := range r.parsers {
 		infos = append(infos, p.info)
 	}
@@ -174,7 +168,7 @@ func (r *ParserRegistry) ListParsers() []ParserInfo {
 }
 
 // HasParser checks if a parser with the given name is registered.
-func (r *ParserRegistry) HasParser(name string) bool {
+func (r *parserRegistry) HasParser(name string) bool {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	_, ok := r.parsers[name]
@@ -183,14 +177,14 @@ func (r *ParserRegistry) HasParser(name string) bool {
 
 // SetDefaultOrder sets the default parser order for this registry.
 // This order is used when no custom order is specified.
-func (r *ParserRegistry) SetDefaultOrder(names []string) {
+func (r *parserRegistry) SetDefaultOrder(names []string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.defaults = append([]string{}, names...)
 }
 
 // GetDefaultOrder returns the default parser order.
-func (r *ParserRegistry) GetDefaultOrder() []string {
+func (r *parserRegistry) GetDefaultOrder() []string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return append([]string{}, r.defaults...)
@@ -198,7 +192,7 @@ func (r *ParserRegistry) GetDefaultOrder() []string {
 
 // Clear removes all registered parsers.
 // This is mainly useful for testing.
-func (r *ParserRegistry) Clear() {
+func (r *parserRegistry) Clear() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.parsers = make(map[string]*registeredParser)

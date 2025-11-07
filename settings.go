@@ -101,9 +101,9 @@ type Settings struct {
 	DebugHandler      DebugHandler    // Debug callback for parsing events
 }
 
-// ToparsingOption converts Settings to parsingOption for backward compatibility.
+// toparsingOption converts Settings to parsingOption for backward compatibility.
 // This method is used internally to bridge Settings and parsingOption.
-func (s Settings) ToparsingOption(timezones TimezoneAbbrMap) parsingOption {
+func (s Settings) toparsingOption(timezones TimezoneAbbrMap) parsingOption {
 	// Merge default timezones with overrides
 	mergedTimezones := timezones
 	if s.TimezoneOverrides != nil {

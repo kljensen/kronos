@@ -93,7 +93,7 @@ func TestToparsingOption(t *testing.T) {
 	settings := DefaultSettings()
 	settings.PreferDatesFrom = PreferFuture
 
-	opt := settings.ToparsingOption(nil)
+	opt := settings.toparsingOption(nil)
 
 	if opt.Preference != PreferFuture {
 		t.Errorf("Expected PreferFuture, got %v", opt.Preference)

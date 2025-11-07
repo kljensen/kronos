@@ -15,7 +15,7 @@ func TestNewParserRegistry(t *testing.T) {
 func TestParserRegistry_RegisterParser(t *testing.T) {
 	registry := newParserRegistry()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 		Tags:        []string{"test"},
@@ -33,7 +33,7 @@ func TestParserRegistry_RegisterParser(t *testing.T) {
 func TestParserRegistry_GetParser(t *testing.T) {
 	registry := newParserRegistry()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
@@ -61,11 +61,11 @@ func TestParserRegistry_GetParser_NotFound(t *testing.T) {
 func TestParserRegistry_GetParsers(t *testing.T) {
 	registry := newParserRegistry()
 
-	info1 := ParserInfo{
+	info1 := parserInfo{
 		Description: "Test parser 1",
 		Priority:    50,
 	}
-	info2 := ParserInfo{
+	info2 := parserInfo{
 		Description: "Test parser 2",
 		Priority:    60,
 	}
@@ -86,7 +86,7 @@ func TestParserRegistry_GetParsers(t *testing.T) {
 func TestParserRegistry_GetParsers_SkipsUnknown(t *testing.T) {
 	registry := newParserRegistry()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
@@ -104,11 +104,11 @@ func TestParserRegistry_GetParsers_SkipsUnknown(t *testing.T) {
 func TestParserRegistry_GetAllParsers(t *testing.T) {
 	registry := newParserRegistry()
 
-	info1 := ParserInfo{
+	info1 := parserInfo{
 		Description: "Test parser 1",
 		Priority:    50,
 	}
-	info2 := ParserInfo{
+	info2 := parserInfo{
 		Description: "Test parser 2",
 		Priority:    60,
 	}
@@ -130,15 +130,15 @@ func TestParserRegistry_GetAllParsers_SortedByPriority(t *testing.T) {
 	registry := newParserRegistry()
 
 	// Register parsers with different priorities
-	info1 := ParserInfo{
+	info1 := parserInfo{
 		Description: "Low priority",
 		Priority:    10,
 	}
-	info2 := ParserInfo{
+	info2 := parserInfo{
 		Description: "High priority",
 		Priority:    100,
 	}
-	info3 := ParserInfo{
+	info3 := parserInfo{
 		Description: "Medium priority",
 		Priority:    50,
 	}
@@ -166,12 +166,12 @@ func TestParserRegistry_GetAllParsers_SortedByPriority(t *testing.T) {
 func TestParserRegistry_GetParsersByTag(t *testing.T) {
 	registry := newParserRegistry()
 
-	info1 := ParserInfo{
+	info1 := parserInfo{
 		Description: "Casual parser",
 		Priority:    50,
 		Tags:        []string{"casual", "english"},
 	}
-	info2 := ParserInfo{
+	info2 := parserInfo{
 		Description: "Formal parser",
 		Priority:    60,
 		Tags:        []string{"formal", "english"},
@@ -198,11 +198,11 @@ func TestParserRegistry_GetParsersByTag(t *testing.T) {
 func TestParserRegistry_ListParsers(t *testing.T) {
 	registry := newParserRegistry()
 
-	info1 := ParserInfo{
+	info1 := parserInfo{
 		Description: "Test parser 1",
 		Priority:    50,
 	}
-	info2 := ParserInfo{
+	info2 := parserInfo{
 		Description: "Test parser 2",
 		Priority:    60,
 	}
@@ -239,7 +239,7 @@ func TestParserRegistry_ListParsers(t *testing.T) {
 func TestParserRegistry_HasParser(t *testing.T) {
 	registry := newParserRegistry()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
@@ -288,7 +288,7 @@ func TestParserRegistry_GetDefaultOrder(t *testing.T) {
 func TestParserRegistry_Clear(t *testing.T) {
 	registry := newParserRegistry()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
@@ -311,12 +311,12 @@ func TestParserRegistry_Clear(t *testing.T) {
 func TestParserRegistry_ReplaceParser(t *testing.T) {
 	registry := newParserRegistry()
 
-	info1 := ParserInfo{
+	info1 := parserInfo{
 		Description: "Original parser",
 		Priority:    50,
 	}
 
-	info2 := ParserInfo{
+	info2 := parserInfo{
 		Description: "Replacement parser",
 		Priority:    60,
 	}
@@ -352,7 +352,7 @@ func TestRegister_GlobalFunction(t *testing.T) {
 	// Clear global registry to avoid conflicts
 	globalRegistry.Clear()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
@@ -370,7 +370,7 @@ func TestRegister_GlobalFunction(t *testing.T) {
 }
 
 func TestParserInfo(t *testing.T) {
-	info := ParserInfo{
+	info := parserInfo{
 		Name:        "test",
 		Description: "Test parser",
 		Priority:    50,
@@ -394,7 +394,7 @@ func TestParserInfo(t *testing.T) {
 func TestParserRegistry_ConcurrentAccess(t *testing.T) {
 	registry := newParserRegistry()
 
-	info := ParserInfo{
+	info := parserInfo{
 		Description: "Test parser",
 		Priority:    50,
 	}
