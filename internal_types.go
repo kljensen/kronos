@@ -39,9 +39,19 @@ type InternalParsingResultWithBoundary = parsingResultWithBoundary
 
 // Constructor functions for internal packages
 
+// InternalNewParsingContext creates a parsing context (internal use only).
+func InternalNewParsingContext(text string, refDate any, option *parsingOption) *parsingContext {
+	return newParsingContext(text, refDate, option)
+}
+
 // InternalNewParsingComponents creates parsing components (internal use only).
 func InternalNewParsingComponents(reference *referenceWithTimezone, knownComponents map[Component]int) *parsingComponents {
 	return newParsingComponents(reference, knownComponents)
+}
+
+// InternalNewParsingResult creates a parsing result (internal use only).
+func InternalNewParsingResult(reference *referenceWithTimezone, index int, text string, start, end *parsingComponents) *parsingResult {
+	return newParsingResult(reference, index, text, start, end)
 }
 
 // InternalNewReferenceWithTimezone creates a reference with timezone (internal use only).
