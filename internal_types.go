@@ -59,7 +59,21 @@ func InternalMergeDateTimeComponent(dateComp, timeComp *parsingComponents) *pars
 	return mergeDateTimeComponent(dateComp, timeComp)
 }
 
+// InternalDeterminePeriodFromDuration determines period from duration (internal use only).
+func InternalDeterminePeriodFromDuration(duration Duration) Period {
+	return determinePeriodFromDuration(duration)
+}
+
 // Weekday calculation helpers for internal packages
+
+// weekdayTo1Indexed converts time.Weekday (0=Sunday) to 1-indexed (1=Monday, 7=Sunday).
+func weekdayTo1Indexed(weekday time.Weekday) int {
+	w := int(weekday)
+	if w == 0 {
+		return 7
+	}
+	return w
+}
 
 // InternalGetNthWeekdayOfMonth returns the date of the nth occurrence of a given weekday
 // in a given month and year (internal use only).
@@ -88,15 +102,8 @@ func InternalGetLastWeekdayOfMonth(year int, month time.Month, weekday time.Week
 	nextMonth := time.Date(year, time.Month(month)+1, 1, 12, 0, 0, 0, time.UTC)
 
 	// Convert weekdays to 1-indexed (Monday=1, Sunday=7)
-	targetWeekday := int(weekday)
-	if targetWeekday == 0 {
-		targetWeekday = 7
-	}
-
-	firstWeekdayNextMonth := int(nextMonth.Weekday())
-	if firstWeekdayNextMonth == 0 {
-		firstWeekdayNextMonth = 7
-	}
+	targetWeekday := weekdayTo1Indexed(weekday)
+	firstWeekdayNextMonth := weekdayTo1Indexed(nextMonth.Weekday())
 
 	// Calculate how many days to go back
 	dayDiff := firstWeekdayNextMonth - targetWeekday

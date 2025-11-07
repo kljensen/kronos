@@ -23,7 +23,7 @@ func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone
 	components.AddTag("result/relativeDate")
 
 	// Determine and set the period based on the duration
-	period := determinePeriodFromDuration(duration)
+	period := kronos.InternalDeterminePeriodFromDuration(duration)
 	components.SetPeriod(period)
 
 	// Check if duration contains time components
@@ -86,48 +86,4 @@ func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone
 	}
 
 	return components
-}
-
-// Helper functions
-
-// determinePeriodFromDuration determines the granularity/period based on a duration.
-// The period represents the finest time unit present in the duration.
-// This follows the pattern from Python's dateparser.
-func determinePeriodFromDuration(duration kronos.Duration) kronos.Period {
-	if duration == nil {
-		return kronos.PeriodDay // Default
-	}
-
-	// Check from finest to coarsest granularity
-	// Time components (hour, minute, second) indicate time-level precision
-	for _, timeunit := range []kronos.Timeunit{kronos.TimeunitSecond, kronos.TimeunitMinute, kronos.TimeunitHour} {
-		if _, exists := duration[timeunit]; exists {
-			return kronos.PeriodTime
-		}
-	}
-
-	// Day indicates day-level precision
-	if _, exists := duration[kronos.TimeunitDay]; exists {
-		return kronos.PeriodDay
-	}
-
-	// Week indicates week-level precision
-	if _, exists := duration[kronos.TimeunitWeek]; exists {
-		return kronos.PeriodWeek
-	}
-
-	// Month indicates month-level precision
-	if _, exists := duration[kronos.TimeunitMonth]; exists {
-		return kronos.PeriodMonth
-	}
-
-	// Year, decade, or quarter indicate year-level precision
-	for _, timeunit := range []kronos.Timeunit{kronos.TimeunitYear, kronos.TimeunitDecade, kronos.TimeunitQuarter} {
-		if _, exists := duration[timeunit]; exists {
-			return kronos.PeriodYear
-		}
-	}
-
-	// Default to day if no specific duration is found
-	return kronos.PeriodDay
 }
