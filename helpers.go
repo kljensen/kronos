@@ -3,7 +3,6 @@ package kronos
 import (
 	"regexp"
 	"strings"
-	"time"
 )
 
 // Package helpers contains internal helper functions for the kronos package.
@@ -120,26 +119,3 @@ func removeZeroWidthChars(s string) string {
 	return s
 }
 
-// ============================================================================
-// Date/time assignment and implication helpers
-// ============================================================================
-
-// assignSimilarDate is a convenience wrapper around AssignSimilarDate for backwards compatibility.
-func assignSimilarDate(components *parsingComponents, date time.Time) {
-	components.AssignSimilarDate(date)
-}
-
-// assignSimilarTime is a convenience wrapper around AssignSimilarTime for backwards compatibility.
-func assignSimilarTime(components *parsingComponents, date time.Time) {
-	components.AssignSimilarTime(date)
-}
-
-// implySimilarDate is a convenience wrapper around ImplySimilarDate for backwards compatibility.
-func implySimilarDate(components *parsingComponents, date time.Time) {
-	components.ImplySimilarDate(date)
-}
-
-// implySimilarTime is a convenience wrapper around ImplySimilarTime for backwards compatibility.
-func implySimilarTime(components *parsingComponents, date time.Time) {
-	components.ImplySimilarTime(date)
-}

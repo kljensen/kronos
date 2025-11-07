@@ -16,8 +16,8 @@ func now(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
-	assignSimilarDate(component, targetDate)
-	assignSimilarTime(component, targetDate)
+	component.AssignSimilarDate(targetDate)
+	component.AssignSimilarTime(targetDate)
 	component.Assign(ComponentTimezoneOffset, reference.GetTimezoneOffset())
 	component.AddTag("casualReference/now")
 	component.SetPeriod(PeriodTime)
@@ -31,8 +31,8 @@ func today(reference *referenceWithTimezone) *parsingComponents {
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
-	assignSimilarDate(component, targetDate)
-	implySimilarTime(component, targetDate)
+	component.AssignSimilarDate(targetDate)
+	component.ImplySimilarTime(targetDate)
 	component.Delete(ComponentMeridiem)
 	component.AddTag("casualReference/today")
 	component.SetPeriod(PeriodDay)
@@ -72,8 +72,8 @@ func theDayAfter(reference *referenceWithTimezone, nDays int) *parsingComponents
 
 	newDate := targetDate.AddDate(0, 0, nDays)
 
-	assignSimilarDate(component, newDate)
-	implySimilarTime(component, newDate)
+	component.AssignSimilarDate(newDate)
+	component.ImplySimilarTime(newDate)
 	component.Delete(ComponentMeridiem)
 	component.SetPeriod(PeriodDay)
 
@@ -91,7 +91,7 @@ func tonightWithHour(reference *referenceWithTimezone, implyHour int) *parsingCo
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := newParsingComponents(reference, nil)
 
-	assignSimilarDate(component, targetDate)
+	component.AssignSimilarDate(targetDate)
 	component.Imply(ComponentHour, implyHour)
 	component.Imply(ComponentMeridiem, 1) // PM
 	component.AddTag("casualReference/tonight")
@@ -117,7 +117,7 @@ func lastNightWithHour(reference *referenceWithTimezone, implyHour int) *parsing
 		targetDate = targetDate.AddDate(0, 0, -1)
 	}
 
-	assignSimilarDate(component, targetDate)
+	component.AssignSimilarDate(targetDate)
 	component.Imply(ComponentHour, implyHour)
 	component.AddTag("casualReference/lastNight")
 	component.SetPeriod(PeriodDay)
@@ -155,7 +155,7 @@ func yesterdayEveningWithHour(reference *referenceWithTimezone, implyHour int) *
 
 	targetDate = targetDate.AddDate(0, 0, -1)
 
-	assignSimilarDate(component, targetDate)
+	component.AssignSimilarDate(targetDate)
 	component.Imply(ComponentHour, implyHour)
 	component.Imply(ComponentMeridiem, 1) // PM
 	component.AddTag("casualReference/yesterday")
@@ -180,7 +180,7 @@ func midnight(reference *referenceWithTimezone) *parsingComponents {
 			// Duration calculation failed - return nil
 			return nil
 		}
-		implySimilarDate(component, newDate)
+		component.ImplySimilarDate(newDate)
 	}
 
 	component.Assign(ComponentHour, 0)

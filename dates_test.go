@@ -12,7 +12,7 @@ func TestAssignSimilarDate(t *testing.T) {
 	components := newParsingComponents(reference, nil)
 
 	targetDate := time.Date(2021, 6, 15, 0, 0, 0, 0, time.UTC)
-	assignSimilarDate(components, targetDate)
+	components.AssignSimilarDate(targetDate)
 
 	assert.True(t, components.IsCertain(ComponentYear))
 	assert.True(t, components.IsCertain(ComponentMonth))
@@ -29,7 +29,7 @@ func TestAssignSimilarTime(t *testing.T) {
 
 	// Test AM time
 	targetDate := time.Date(2021, 6, 15, 8, 30, 45, 123000000, time.UTC)
-	assignSimilarTime(components, targetDate)
+	components.AssignSimilarTime(targetDate)
 
 	assert.True(t, components.IsCertain(ComponentHour))
 	assert.True(t, components.IsCertain(ComponentMinute))
@@ -50,7 +50,7 @@ func TestAssignSimilarTime_PM(t *testing.T) {
 
 	// Test PM time
 	targetDate := time.Date(2021, 6, 15, 14, 30, 0, 0, time.UTC)
-	assignSimilarTime(components, targetDate)
+	components.AssignSimilarTime(targetDate)
 
 	assert.Equal(t, 14, *components.Get(ComponentHour))
 	assert.Equal(t, int(1), *components.Get(ComponentMeridiem))
@@ -64,7 +64,7 @@ func TestImplySimilarDate(t *testing.T) {
 	components.Assign(ComponentYear, 2025)
 
 	targetDate := time.Date(2021, 6, 15, 0, 0, 0, 0, time.UTC)
-	implySimilarDate(components, targetDate)
+	components.ImplySimilarDate(targetDate)
 
 	// Year should remain 2025 (certain value not overridden by imply)
 	assert.True(t, components.IsCertain(ComponentYear))
@@ -85,7 +85,7 @@ func TestImplySimilarTime(t *testing.T) {
 	components.Assign(ComponentHour, 18)
 
 	targetDate := time.Date(2021, 6, 15, 10, 30, 45, 0, time.UTC)
-	implySimilarTime(components, targetDate)
+	components.ImplySimilarTime(targetDate)
 
 	// Hour should remain 18 (certain value not overridden by imply)
 	assert.True(t, components.IsCertain(ComponentHour))
@@ -228,13 +228,13 @@ func TestAssignOverridesImply(t *testing.T) {
 	targetDate := time.Date(2021, 6, 15, 14, 30, 0, 0, time.UTC)
 
 	// First imply a date
-	implySimilarDate(components, targetDate)
+	components.ImplySimilarDate(targetDate)
 	assert.False(t, components.IsCertain(ComponentDay))
 	assert.Equal(t, 15, *components.Get(ComponentDay))
 
 	// Now assign a different date
 	targetDate2 := time.Date(2022, 8, 20, 0, 0, 0, 0, time.UTC)
-	assignSimilarDate(components, targetDate2)
+	components.AssignSimilarDate(targetDate2)
 
 	// Day should now be certain and have the new value
 	assert.True(t, components.IsCertain(ComponentDay))
