@@ -1,8 +1,6 @@
 package helpers
 
 import (
-	"time"
-
 	"github.com/kljensen/kronos"
 )
 
@@ -40,12 +38,12 @@ func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone
 	if hasTimeComponents {
 		// Duration includes time - assign both date and time as certain
 		components.AddTag("result/relativeDateAndTime")
-		AssignSimilarTime(components, date)
-		AssignSimilarDate(components, date)
+		components.AssignSimilarTime(date)
+		components.AssignSimilarDate(date)
 		components.Assign(kronos.ComponentTimezoneOffset, reference.GetTimezoneOffset())
 	} else {
 		// Duration is date-only - imply time components
-		ImplySimilarTime(components, date)
+		components.ImplySimilarTime(date)
 		components.Imply(kronos.ComponentTimezoneOffset, reference.GetTimezoneOffset())
 
 		// Handle different date granularities
@@ -88,63 +86,6 @@ func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone
 	}
 
 	return components
-}
-
-// MergeDateTimeResult merges a date-only result with a time-only result.
-// NOTE: This function cannot be fully implemented in this package because it requires
-// direct field access to ParsingResult.end which is private. The actual implementation
-// remains in the kronos package via kronos.XMergeDateTimeResult.
-//
-// This is a placeholder for documentation purposes. The real function will be
-// exposed through the X-prefixed helper in the main kronos package.
-func MergeDateTimeResult(dateResult, timeResult *kronos.InternalParsingResult) *kronos.InternalParsingResult {
-	// This implementation is a simplified version that works with public APIs only.
-	// The full implementation with private field access remains in the kronos package.
-	result := dateResult.Clone()
-	beginDate, okDate := AsParsingComponents(dateResult.Start())
-	beginTime, okTime := AsParsingComponents(timeResult.Start())
-	if !okDate || !okTime {
-		return result
-	}
-
-	result.SetStart(MergeDateTimeComponent(beginDate, beginTime))
-
-	// For end component merging, we rely on the SetStart approach
-	// The full implementation with direct field access is in the main package
-	if dateResult.End() != nil || timeResult.End() != nil {
-		var endDate, endTime *kronos.InternalParsingComponents
-		if dateResult.End() == nil {
-			endDate, okDate = AsParsingComponents(dateResult.Start())
-		} else {
-			endDate, okDate = AsParsingComponents(dateResult.End())
-		}
-		if timeResult.End() == nil {
-			endTime, okTime = AsParsingComponents(timeResult.Start())
-		} else {
-			endTime, okTime = AsParsingComponents(timeResult.End())
-		}
-		if !okDate || !okTime {
-			return result
-		}
-
-		endDateTime := MergeDateTimeComponent(endDate, endTime)
-
-		// If date has no end and the merged end time is before start time,
-		// the end should be on the next day
-		if dateResult.End() == nil && endDateTime.Date().Before(result.Start().Date()) {
-			nextDay := endDateTime.Date().Add(24 * time.Hour)
-			if endDateTime.IsCertain(kronos.ComponentDay) {
-				AssignSimilarDate(endDateTime, nextDay)
-			} else {
-				ImplySimilarDate(endDateTime, nextDay)
-			}
-		}
-
-		// Note: Setting end requires creating a new result since there's no public setter
-		// The main package implementation uses direct field access
-	}
-
-	return result
 }
 
 // Helper functions

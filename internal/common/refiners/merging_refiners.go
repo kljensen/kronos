@@ -57,9 +57,9 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	// Determine which is date and which is time, then merge
 	var result *kronos.InternalParsingResult
 	if currentStart.IsOnlyDate() {
-		result = helpers.MergeDateTimeResult(current, next)
+		result = kronos.InternalMergeDateTimeResult(current, next)
 	} else {
-		result = helpers.MergeDateTimeResult(next, current)
+		result = kronos.InternalMergeDateTimeResult(next, current)
 	}
 
 	// Create new result with correct index and text
