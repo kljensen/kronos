@@ -73,7 +73,7 @@ func (p *ENCasualDateParser) innerExtract(context *kronos.InternalParsingContext
 		}
 
 		component = context.CreateParsingComponents(nil)
-		helpers.AssignSimilarDate(component, targetDate)
+		component.AssignSimilarDate(targetDate)
 		component.Imply(kronos.ComponentHour, 0)
 		component.SetPeriod(kronos.PeriodDay)
 

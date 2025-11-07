@@ -37,7 +37,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 			refFollowingDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
 
-			helpers.ImplySimilarDate(resultStart, refFollowingDay)
+			resultStart.ImplySimilarDate(refFollowingDay)
 			if context.Option().DebugHandler != nil {
 				context.Debug(func() {
 					// Log: ForwardDateRefiner adjusted time from ref date to following day
@@ -47,10 +47,10 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 			if result.End() != nil {
 				if resultEnd, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 					if resultEnd.IsOnlyTime() {
-						helpers.ImplySimilarDate(resultEnd, refFollowingDay)
+						resultEnd.ImplySimilarDate(refFollowingDay)
 						if resultStart.Date().After(resultEnd.Date()) {
 							refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
-							helpers.ImplySimilarDate(resultEnd, refFollowingDay)
+							resultEnd.ImplySimilarDate(refFollowingDay)
 						}
 					}
 				}
@@ -71,7 +71,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 					// Duration calculation failed - skip this adjustment
 					continue
 				}
-				helpers.ImplySimilarDate(resultStart, adjustedDate)
+				resultStart.ImplySimilarDate(adjustedDate)
 
 				if context.Option().DebugHandler != nil {
 					context.Debug(func() {
@@ -93,7 +93,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 									// Duration calculation failed - skip this adjustment
 									continue
 								}
-								helpers.ImplySimilarDate(resultEnd, adjustedDate)
+								resultEnd.ImplySimilarDate(adjustedDate)
 
 								if context.Option().DebugHandler != nil {
 									context.Debug(func() {

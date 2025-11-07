@@ -224,7 +224,7 @@ func (r *DatePreferenceRefiner) Refine(context *kronos.InternalParsingContext, r
 						if resultStart.Date().After(resultEnd.Date()) {
 							// Move end time to next day
 							nextDay := resultEnd.Date().AddDate(0, 0, 1)
-							helpers.ImplySimilarDate(resultEnd, nextDay)
+							resultEnd.ImplySimilarDate(nextDay)
 						}
 					}
 				}
@@ -256,7 +256,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 		if constructedDate.After(refInstant) {
 			refPreviousDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refPreviousDay = refPreviousDay.AddDate(0, 0, -1)
-			helpers.ImplySimilarDate(components, refPreviousDay)
+			components.ImplySimilarDate(refPreviousDay)
 
 			if context.Option().DebugHandler != nil {
 				context.Debug(func() {
@@ -271,7 +271,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 		if constructedDate.Before(refInstant) || constructedDate.Equal(refInstant) {
 			refFollowingDay := time.Date(refDate.Year(), refDate.Month(), refDate.Day(), 0, 0, 0, 0, refDate.Location())
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
-			helpers.ImplySimilarDate(components, refFollowingDay)
+			components.ImplySimilarDate(refFollowingDay)
 
 			if context.Option().DebugHandler != nil {
 				context.Debug(func() {

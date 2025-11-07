@@ -116,7 +116,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 			targetDate := refDate.AddDate(0, 0, daysOffset)
 
 			// Day/month/year are implied (uncertain) - they're calculated from the weekday
-			helpers.ImplySimilarDate(components, targetDate)
+			components.ImplySimilarDate(targetDate)
 			// Only weekday is certain
 			components.Assign(kronos.ComponentWeekday, int(weekday))
 			// Set period to week-level since we're parsing weekday
@@ -206,7 +206,7 @@ func handleWeekendCounting(context *kronos.InternalParsingContext, refDate time.
 
 	targetDate := refDate.AddDate(0, 0, daysOffset)
 	components := context.CreateParsingComponents(nil)
-	helpers.ImplySimilarDate(components, targetDate)
+	components.ImplySimilarDate(targetDate)
 	components.Assign(kronos.ComponentWeekday, int(targetWeekday))
 	components.SetPeriod(kronos.PeriodWeek)
 

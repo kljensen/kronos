@@ -8,8 +8,8 @@ func Now(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalParsin
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
-	AssignSimilarDate(component, targetDate)
-	AssignSimilarTime(component, targetDate)
+	component.AssignSimilarDate(targetDate)
+	component.AssignSimilarTime(targetDate)
 	component.Assign(kronos.ComponentTimezoneOffset, reference.GetTimezoneOffset())
 	component.AddTag("casualReference/now")
 	component.SetPeriod(kronos.PeriodTime)
@@ -23,8 +23,8 @@ func Today(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalPars
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
-	AssignSimilarDate(component, targetDate)
-	ImplySimilarTime(component, targetDate)
+	component.AssignSimilarDate(targetDate)
+	component.ImplySimilarTime(targetDate)
 	component.Delete(kronos.ComponentMeridiem)
 	component.AddTag("casualReference/today")
 	component.SetPeriod(kronos.PeriodDay)
@@ -64,8 +64,8 @@ func TheDayAfter(reference *kronos.InternalReferenceWithTimezone, nDays int) *kr
 
 	newDate := targetDate.AddDate(0, 0, nDays)
 
-	AssignSimilarDate(component, newDate)
-	ImplySimilarTime(component, newDate)
+	component.AssignSimilarDate(newDate)
+	component.ImplySimilarTime(newDate)
 	component.Delete(kronos.ComponentMeridiem)
 	component.SetPeriod(kronos.PeriodDay)
 
@@ -87,7 +87,7 @@ func Midnight(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalP
 			// Duration calculation failed - return nil
 			return nil
 		}
-		ImplySimilarDate(component, newDate)
+		component.ImplySimilarDate(newDate)
 	}
 
 	component.Assign(kronos.ComponentHour, 0)
@@ -180,7 +180,7 @@ func TonightWithHour(reference *kronos.InternalReferenceWithTimezone, implyHour 
 	targetDate := reference.GetDateWithAdjustedTimezone()
 	component := NewParsingComponents(reference, nil)
 
-	AssignSimilarDate(component, targetDate)
+	component.AssignSimilarDate(targetDate)
 	component.Imply(kronos.ComponentHour, implyHour)
 	component.Imply(kronos.ComponentMeridiem, 1) // PM
 	component.AddTag("casualReference/tonight")
