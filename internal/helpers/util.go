@@ -80,6 +80,23 @@ var ApproximationWords = []string{
 	"circa",
 }
 
+// Compiled regex patterns for approximation word detection (cached for performance)
+var (
+	tildePattern          = regexp.MustCompile(`(?i)~\s*`)
+	approximationPatterns = compileApproximationPatterns()
+)
+
+// compileApproximationPatterns pre-compiles regex patterns for each approximation word.
+// This is called once at package initialization to avoid repeated compilation.
+func compileApproximationPatterns() []*regexp.Regexp {
+	patterns := make([]*regexp.Regexp, len(ApproximationWords))
+	for i, word := range ApproximationWords {
+		// Use word boundaries to avoid matching words like "about" in "roundabout"
+		patterns[i] = regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
+	}
+	return patterns
+}
+
 // SafeSlice returns the substring of text between start (inclusive) and end
 // (exclusive) while clamping the requested range to valid bounds. The returned
 // boolean is false when start is beyond the end of the string, indicating that
@@ -109,16 +126,13 @@ func StripApproximationWords(input string) (cleaned string, isApproximate bool) 
 	isApproximate = false
 
 	// Check for tilde (~) symbol as approximation marker
-	tildePattern := regexp.MustCompile(`(?i)~\s*`)
 	if tildePattern.MatchString(cleaned) {
 		isApproximate = true
 		cleaned = tildePattern.ReplaceAllString(cleaned, "")
 	}
 
-	// Check for approximation words
-	for _, word := range ApproximationWords {
-		// Use word boundaries to avoid matching words like "about" in "roundabout"
-		pattern := regexp.MustCompile(`(?i)\b` + regexp.QuoteMeta(word) + `\s+`)
+	// Check for approximation words using pre-compiled patterns
+	for _, pattern := range approximationPatterns {
 		if pattern.MatchString(cleaned) {
 			isApproximate = true
 			cleaned = pattern.ReplaceAllString(cleaned, "")
