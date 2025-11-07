@@ -375,29 +375,38 @@ func breakdownNanoseconds(totalNanos int) (millisecond, microsecond, nanosecond 
 	return
 }
 
-// AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
-// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
-func (pc *parsingComponents) AssignSimilarTime(date time.Time) {
-	pc.Assign(ComponentHour, date.Hour())
-	pc.Assign(ComponentMinute, date.Minute())
-	pc.Assign(ComponentSecond, date.Second())
+// hourToMeridiem converts an hour (0-23) to meridiem value (0=AM, 1=PM).
+func hourToMeridiem(hour int) int {
+	if hour < 12 {
+		return 0 // AM
+	}
+	return 1 // PM
+}
+
+// setSimilarTimeComponents sets time components using the provided setter function.
+// This is used by both AssignSimilarTime and ImplySimilarTime to avoid duplication.
+func setSimilarTimeComponents(date time.Time, setter func(Component, int) *parsingComponents) {
+	setter(ComponentHour, date.Hour())
+	setter(ComponentMinute, date.Minute())
+	setter(ComponentSecond, date.Second())
 
 	millisecond, microsecond, nanosecond := breakdownNanoseconds(date.Nanosecond())
 
-	pc.Assign(ComponentMillisecond, millisecond)
+	setter(ComponentMillisecond, millisecond)
 	if microsecond > 0 {
-		pc.Assign(ComponentMicrosecond, microsecond)
+		setter(ComponentMicrosecond, microsecond)
 	}
 	if nanosecond > 0 {
-		pc.Assign(ComponentNanosecond, nanosecond)
+		setter(ComponentNanosecond, nanosecond)
 	}
 
-	// Set meridiem based on hour
-	if date.Hour() < 12 {
-		pc.Assign(ComponentMeridiem, 0) // AM
-	} else {
-		pc.Assign(ComponentMeridiem, 1) // PM
-	}
+	setter(ComponentMeridiem, hourToMeridiem(date.Hour()))
+}
+
+// AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
+// This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as certain (known) values.
+func (pc *parsingComponents) AssignSimilarTime(date time.Time) {
+	setSimilarTimeComponents(date, pc.Assign)
 }
 
 // ImplySimilarDate implies (weakly updates) the parsing components to the same day as the target.
@@ -411,26 +420,7 @@ func (pc *parsingComponents) ImplySimilarDate(date time.Time) {
 // ImplySimilarTime implies (weakly updates) the parsing components to the same time as the target.
 // This sets hour, minute, second, millisecond, microsecond, nanosecond, and meridiem as implied values (only if not already certain).
 func (pc *parsingComponents) ImplySimilarTime(date time.Time) {
-	pc.Imply(ComponentHour, date.Hour())
-	pc.Imply(ComponentMinute, date.Minute())
-	pc.Imply(ComponentSecond, date.Second())
-
-	millisecond, microsecond, nanosecond := breakdownNanoseconds(date.Nanosecond())
-
-	pc.Imply(ComponentMillisecond, millisecond)
-	if microsecond > 0 {
-		pc.Imply(ComponentMicrosecond, microsecond)
-	}
-	if nanosecond > 0 {
-		pc.Imply(ComponentNanosecond, nanosecond)
-	}
-
-	// Set meridiem based on hour
-	if date.Hour() < 12 {
-		pc.Imply(ComponentMeridiem, 0) // AM
-	} else {
-		pc.Imply(ComponentMeridiem, 1) // PM
-	}
+	setSimilarTimeComponents(date, pc.Imply)
 }
 
 // DeterminePeriodFromDuration determines the granularity/period based on a duration.
