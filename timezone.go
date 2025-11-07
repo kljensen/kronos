@@ -225,13 +225,12 @@ func resolveAmbiguousTimezone(ambiguous AmbiguousTimezoneMap, instant time.Time)
 	dstEnd := ambiguous.DstEnd(year)
 
 	// Check if instant is during DST period
+	var offset int
 	if instant.After(dstStart) && !instant.After(dstEnd) {
-		offset := ambiguous.TimezoneOffsetDuringDst
-		return &offset
+		offset = ambiguous.TimezoneOffsetDuringDst
+	} else {
+		offset = ambiguous.TimezoneOffsetNonDst
 	}
-
-	// Not during DST
-	offset := ambiguous.TimezoneOffsetNonDst
 	return &offset
 }
 

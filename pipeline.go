@@ -318,12 +318,12 @@ func executeParser(context *parsingContext, parser Parser) []*parsingResult {
 		matchedTextLen := len(matchedText)
 
 		// Build the match array
-		matchArray := make([]string, len(match)/2)
-		for i := 0; i < len(match); i += 2 {
-			if match[i] >= 0 {
-				matchArray[i/2] = remainingText[match[i]:match[i+1]]
-			} else {
-				matchArray[i/2] = ""
+		numGroups := len(match) / 2
+		matchArray := make([]string, numGroups)
+		for i := 0; i < numGroups; i++ {
+			start, end := match[2*i], match[2*i+1]
+			if start >= 0 {
+				matchArray[i] = remainingText[start:end]
 			}
 		}
 

@@ -23,25 +23,30 @@ import (
 func TestAPIExports(t *testing.T) {
 	const (
 		// Maximum allowed public exports after API minimization.
-		// Current breakdown (74 exports):
+		// Current breakdown (71 exports):
 		// - Essential enum types: Component (13), DateOrder (4), DatePreference (4) = 21 consts
 		// - Duration/Time: Timeunit (13), Period (7) = 20 consts + Duration type
 		// - Core API: Builder, Parser, Chrono, Configuration, Result/Components interfaces
 		// - Helper functions: parsing, configuration, component access
-		// - Internal helpers: 9 Internal* exports for internal package access
+		// - Internal helpers: 13 Internal* exports for internal package access
+		//
+		// Recent changes (Iteration 5):
+		// - Removed code duplication (sanitizeInput, secondsPerMinute constant)
+		// - Optimized Settings.toparsingOption to reduce allocations
+		// - No API surface changes (internal refactoring only)
 		//
 		// Recent changes (Iteration 4):
 		// - Moved Duration bounds constants to internal (8 constants)
 		// - Removed Chrono.Clone, Chrono.ParseDate, Chrono.ParseDateWithSettings (3 methods)
 		// - Added Tags() to Result and Components interfaces for testing (2 methods, net +2)
-		// - Net reduction: 9 exports (from 83 to 74)
+		// - Net reduction: 9 exports (from 83 to 74, then 71 after cleanup)
 		//
 		// Past achievements:
 		// - Removed experimental package entirely
 		// - Removed unused DayPreference feature
 		// - Removed redundant builders & convenience functions
 		//
-		// Current: 74 exports (down from 90 in iteration 1)
+		// Current: 71 exports (down from 90 in iteration 1)
 		// Target: Maintain ~70-80 exports for essential API
 		MAX_EXPORTS = 100 // Enforces lean essential API
 	)
