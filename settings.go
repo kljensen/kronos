@@ -134,15 +134,10 @@ type Settings struct {
 	PreferDatesFrom DatePreference // Past, Future, CurrentPeriod
 
 	// Timezone handling
-	Timezone            string // Default timezone name (e.g., "UTC", "America/New_York")
-	ToTimezone          string // Convert results to this timezone
-	ReturnTimezoneAware bool   // Include timezone information in results
+	Timezone string // Default timezone name (e.g., "UTC", "America/New_York")
 
 	// Parsing behavior
 	StrictParsing bool // Validate strictly - reject ambiguous dates
-
-	// Period tracking
-	ReturnTimeAsPeriod bool // Track parsing granularity (year, month, day, time)
 
 	// Advanced configuration
 	TimezoneOverrides TimezoneAbbrMap // Custom timezone abbreviations
@@ -176,13 +171,10 @@ func (s Settings) toparsingOption(timezones TimezoneAbbrMap) parsingOption {
 // backward compatibility with existing behavior.
 func DefaultSettings() Settings {
 	return Settings{
-		DateOrder:           DateOrderMDY,
-		PreferDatesFrom:     PreferCurrentPeriod,
-		Timezone:            "UTC",
-		ToTimezone:          "",
-		ReturnTimezoneAware: false,
-		StrictParsing:       false,
-		ReturnTimeAsPeriod:  false,
+		DateOrder:       DateOrderMDY,
+		PreferDatesFrom: PreferCurrentPeriod,
+		Timezone:        "UTC",
+		StrictParsing:   false,
 	}
 }
 
@@ -193,13 +185,6 @@ func validateSettings(s Settings) error {
 	if s.Timezone != "" {
 		if _, err := time.LoadLocation(s.Timezone); err != nil {
 			return fmt.Errorf("invalid timezone: %s - %w", s.Timezone, err)
-		}
-	}
-
-	// Validate ToTimezone
-	if s.ToTimezone != "" {
-		if _, err := time.LoadLocation(s.ToTimezone); err != nil {
-			return fmt.Errorf("invalid to_timezone: %s - %w", s.ToTimezone, err)
 		}
 	}
 

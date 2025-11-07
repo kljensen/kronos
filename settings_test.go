@@ -43,14 +43,6 @@ func TestvalidateSettings_InvalidTimezone(t *testing.T) {
 	}
 }
 
-func TestvalidateSettings_ValidToTimezone(t *testing.T) {
-	settings := DefaultSettings()
-	settings.ToTimezone = "Europe/London"
-
-	_ = validateSettings(settings)
-	// Either way is fine - just testing it doesn't panic
-}
-
 
 func TestDateOrderString(t *testing.T) {
 	tests := []struct {
@@ -118,23 +110,6 @@ func TestSettings_StrictParsing(t *testing.T) {
 	}
 }
 
-func TestSettings_ReturnTimeAsPeriod(t *testing.T) {
-	settings := DefaultSettings()
-	settings.ReturnTimeAsPeriod = true
-
-	if !settings.ReturnTimeAsPeriod {
-		t.Error("Expected ReturnTimeAsPeriod to be true")
-	}
-}
-
-func TestSettings_ReturnTimezoneAware(t *testing.T) {
-	settings := DefaultSettings()
-	settings.ReturnTimezoneAware = true
-
-	if !settings.ReturnTimezoneAware {
-		t.Error("Expected ReturnTimezoneAware to be true")
-	}
-}
 
 func TestNewParsingContextWithSettings(t *testing.T) {
 	settings := DefaultSettings()

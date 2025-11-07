@@ -89,11 +89,9 @@ func TestParserBuilder_Timezone(t *testing.T) {
 	chrono := NewChrono(config)
 
 	builder := New(chrono).
-		Timezone("America/New_York").
-		ToTimezone("Europe/London")
+		Timezone("America/New_York")
 
 	assert.Equal(t, "America/New_York", builder.settings.Timezone)
-	assert.Equal(t, "Europe/London", builder.settings.ToTimezone)
 }
 
 func TestParserBuilder_StrictCasual(t *testing.T) {

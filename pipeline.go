@@ -287,14 +287,6 @@ func (p *pipeline) Execute(text string, refDate time.Time) ([]*parsingResult, er
 		results = p.applyStrictValidation(results)
 	}
 
-	// Apply timezone conversion if needed
-	if p.settings.ToTimezone != "" {
-		results, err = p.applyTimezoneConversion(results)
-		if err != nil {
-			return nil, fmt.Errorf("failed to apply timezone conversion: %w", err)
-		}
-	}
-
 	return results, nil
 }
 
@@ -402,90 +394,6 @@ func (p *pipeline) applyStrictValidation(results []*parsingResult) []*parsingRes
 		}
 	}
 	return filtered
-}
-
-// applyTimezoneConversion converts results to the target timezone.
-// This function converts the parsed date/time to the specified timezone and updates
-// all components (year, month, day, hour, minute, second, timezone offset) to reflect
-// the new timezone. This handles DST transitions and date boundary changes correctly.
-func (p *pipeline) applyTimezoneConversion(results []*parsingResult) ([]*parsingResult, error) {
-	targetLoc, err := time.LoadLocation(p.settings.ToTimezone)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load timezone location: %w", err)
-	}
-
-	// Convert each result's date to the target timezone
-	for _, result := range results {
-		if result.start != nil {
-			// Convert the start date to the target timezone and update components
-			startDate := result.start.Date()
-			convertedStart := startDate.In(targetLoc)
-			updateComponentsFromDate(result.start, convertedStart)
-
-			_, startOffsetSeconds := convertedStart.Zone()
-			startOffsetMinutes := startOffsetSeconds / 60
-			startReference := newReferenceWithTimezone(convertedStart, &startOffsetMinutes)
-			result.start.reference = startReference
-			result.reference = startReference
-			result.refDate = convertedStart
-		}
-
-		// Handle end components for range results
-		if result.end != nil {
-			endComponents := result.end
-			endDate := endComponents.Date()
-			convertedEnd := endDate.In(targetLoc)
-
-			updateComponentsFromDate(endComponents, convertedEnd)
-
-			_, endOffsetSeconds := convertedEnd.Zone()
-			endOffsetMinutes := endOffsetSeconds / 60
-			endComponents.reference = newReferenceWithTimezone(convertedEnd, &endOffsetMinutes)
-		}
-	}
-
-	return results, nil
-}
-
-// updateComponentsFromDate updates all date/time components in ParsingComponents
-// to match the values from the given time.Time in the target timezone.
-// This preserves the "certain" vs "implied" status of each component while updating values.
-func updateComponentsFromDate(components *parsingComponents, date time.Time) {
-	// Helper to update a component preserving its certain/implied status
-	updateComponent := func(comp Component, value int) {
-		if components.IsCertain(comp) {
-			components.Assign(comp, value)
-		} else if components.Get(comp) != nil {
-			components.Imply(comp, value)
-		}
-	}
-
-	// Update date components
-	updateComponent(ComponentYear, date.Year())
-	updateComponent(ComponentMonth, int(date.Month()))
-	updateComponent(ComponentDay, date.Day())
-
-	// Update time components
-	updateComponent(ComponentHour, date.Hour())
-	updateComponent(ComponentMinute, date.Minute())
-	updateComponent(ComponentSecond, date.Second())
-
-	// Update subsecond components
-	totalNanos := date.Nanosecond()
-	updateComponent(ComponentMillisecond, totalNanos/1000000)
-	updateComponent(ComponentMicrosecond, (totalNanos%1000000)/1000)
-	updateComponent(ComponentNanosecond, totalNanos%1000)
-
-	// Update meridiem
-	meridiem := 0 // AM
-	if date.Hour() >= 12 {
-		meridiem = 1 // PM
-	}
-	updateComponent(ComponentMeridiem, meridiem)
-
-	// Update timezone offset
-	_, offset := date.Zone()
-	updateComponent(ComponentTimezoneOffset, offset/60)
 }
 
 // parseWithSettings is a convenience function that creates a pipeline

@@ -75,14 +75,10 @@ func TestBuilderPreferences(t *testing.T) {
 // TestBuilderTimezone tests timezone settings.
 func TestBuilderTimezone(t *testing.T) {
 	builder := New(nil).
-		Timezone("America/New_York").
-		ToTimezone("Europe/London")
+		Timezone("America/New_York")
 
 	if builder.settings.Timezone != "America/New_York" {
 		t.Errorf("Expected America/New_York, got %s", builder.settings.Timezone)
-	}
-	if builder.settings.ToTimezone != "Europe/London" {
-		t.Errorf("Expected Europe/London, got %s", builder.settings.ToTimezone)
 	}
 }
 

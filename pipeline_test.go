@@ -107,24 +107,6 @@ func TestPipeline_Execute_StrictParsing(t *testing.T) {
 }
 
 
-func TestPipeline_Execute_TimezoneConversion(t *testing.T) {
-	config := &Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
-	}
-	settings := DefaultSettings()
-	settings.ToTimezone = "America/New_York"
-
-	pipeline := newPipeline(config, settings)
-
-	text := "March 15, 2020"
-	refDate := time.Now()
-
-	_, err := pipeline.Execute(text, refDate)
-	if err != nil {
-		t.Fatalf("Execute failed: %v", err)
-	}
-}
 
 
 func TestparseWithSettings_ConvenienceFunction(t *testing.T) {
@@ -196,41 +178,7 @@ func TestPipeline_ApplyStrictValidation(t *testing.T) {
 	if len(filtered) != 1 {
 		t.Errorf("Expected 1 result after strict validation, got %d", len(filtered))
 	}
-}
-
-
-func TestPipeline_ApplyTimezoneConversion(t *testing.T) {
-	settings := DefaultSettings()
-	settings.ToTimezone = "America/New_York"
-	pipeline := newPipeline(nil, settings)
-
-	ref := &referenceWithTimezone{}
-	components := newParsingComponents(ref, nil)
-	result := &parsingResult{start: components}
-	results := []*parsingResult{result}
-
-	converted, err := pipeline.applyTimezoneConversion(results)
-	if err != nil {
-		t.Fatalf("applyTimezoneConversion failed: %v", err)
-	}
-
-	if len(converted) != 1 {
-		t.Errorf("Expected 1 result after timezone conversion, got %d", len(converted))
-	}
-}
-
-func TestPipeline_ApplyTimezoneConversion_InvalidTimezone(t *testing.T) {
-	settings := DefaultSettings()
-	settings.ToTimezone = "Invalid/Timezone"
-	pipeline := newPipeline(nil, settings)
-
-	ref := &referenceWithTimezone{}
-	components := newParsingComponents(ref, nil)
-	result := &parsingResult{start: components}
-	results := []*parsingResult{result}
-
-	_, err := pipeline.applyTimezoneConversion(results)
-	if err == nil {
-		t.Error("Expected error for invalid timezone")
+	if len(filtered) > 0 && filtered[0] != result1 {
+		t.Error("Expected result1 to pass strict validation")
 	}
 }

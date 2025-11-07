@@ -117,19 +117,6 @@ func (p *ParserBuilder) Timezone(tz string) *ParserBuilder {
 	return p
 }
 
-// ToTimezone sets the target timezone for converting results.
-// All parsed dates will be converted to this timezone.
-//
-// EXPERIMENTAL: This feature is currently experimental and not fully implemented.
-// The timezone conversion logic is stubbed out in the pipeline and does not yet
-// modify the parsed results. Use with caution.
-//
-// TODO: Complete the timezone conversion implementation in pipeline.go:applyTimezoneConversion
-func (p *ParserBuilder) ToTimezone(tz string) *ParserBuilder {
-	p.settings.ToTimezone = tz
-	return p
-}
-
 // WithOption applies an advanced configuration option to the parser.
 // This allows fine-grained control over parsing behavior by directly modifying
 // the Settings struct.

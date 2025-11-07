@@ -2,15 +2,15 @@ package kronos
 
 import "time"
 
-// Internal helper functions for accessing private fields.
-// These are used by internal/ and experimental packages.
+// Internal helper functions and type aliases for accessing internal types.
+// These are used by internal/ packages only.
+//
+// WARNING: These are NOT part of the public API. External users should NOT
+// use these - they expose implementation details that may change without notice.
 
-// These functions are NOT part of the public API and should only be used by
-// internal/ and experimental/ packages. They are capitalized to be accessible
-// from internal packages but are prefixed with Internal to indicate they are
-// not intended for external use.
-
-// Type aliases for internal use
+// Type aliases to expose internal types to internal/ packages.
+// These types are exported to allow internal packages to use them,
+// but external code should use the public interfaces instead (Result, Components, etc.)
 type (
 	InternalParsingContext            = parsingContext
 	InternalParsingComponents         = parsingComponents
@@ -21,6 +21,7 @@ type (
 	InternalParsingResultWithBoundary = parsingResultWithBoundary
 )
 
+// Constructor helpers for internal/ packages
 func InternalNewParsingContext(text string, refDate interface{}, option *parsingOption) *parsingContext {
 	return newParsingContext(text, refDate, option)
 }
