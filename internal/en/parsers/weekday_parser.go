@@ -85,57 +85,16 @@ func NewENWeekdayParser() *ENWeekdayParser {
 				modifier = "this"
 			}
 
-			weekdayWord := strings.ToLower(match[3])
-			// Remove plural 's' if present
-			weekdayWord = strings.TrimSuffix(weekdayWord, "s")
+			weekdayWord := strings.ToLower(strings.TrimSuffix(match[3], "s"))
 
-			var weekday time.Weekday
-
-			switch {
-			case data.WeekdayDictionary[weekdayWord] != 0 || weekdayWord == "sunday":
-				// Regular weekday from dictionary
-				weekday = data.WeekdayDictionary[weekdayWord]
-			case weekdayWord == "weekend":
-				// Handle weekend counting (e.g., "2 weekends ago", "1 weekend from now")
-				if countStr != "" || direction != "" {
-					refDate := context.Reference().GetDateWithAdjustedTimezone()
-					components := handleWeekendCounting(context, refDate, countStr, direction)
-					if components != nil {
-						return components
-					}
-					return nil
-				}
-
-				// "This/next weekend" means the coming Saturday,
-				// "last weekend" means last Sunday
-				if modifier == "last" {
-					weekday = time.Sunday
-				} else {
-					weekday = time.Saturday
-				}
-			case weekdayWord == "weekday":
-				// Weekday means any day of the week except weekend
+			// Handle special cases that may return early
+			if weekdayWord == "weekend" && (countStr != "" || direction != "") {
 				refDate := context.Reference().GetDateWithAdjustedTimezone()
-				refWeekday := time.Weekday(refDate.Weekday())
+				return handleWeekendCounting(context, refDate, countStr, direction)
+			}
 
-				if refWeekday == time.Sunday || refWeekday == time.Saturday {
-					if modifier == "last" {
-						weekday = time.Friday
-					} else {
-						weekday = time.Monday
-					}
-				} else {
-					// On a weekday, find the next/last weekday
-					wd := int(refWeekday) - 1
-					if modifier == "last" {
-						wd--
-					} else {
-						wd++
-					}
-					wd = (wd % 5) + 1
-					weekday = time.Weekday(wd)
-				}
-			default:
+			weekday := resolveWeekday(weekdayWord, modifier, context)
+			if weekday < 0 {
 				return nil
 			}
 
@@ -171,9 +130,49 @@ func NewENWeekdayParser() *ENWeekdayParser {
 	return parser
 }
 
+// resolveWeekday determines the target weekday based on the word and modifier
+// Returns -1 if the word is not recognized
+func resolveWeekday(weekdayWord, modifier string, context *kronos.ParsingContext) time.Weekday {
+	// Regular weekday from dictionary
+	if wd, ok := data.WeekdayDictionary[weekdayWord]; ok || weekdayWord == "sunday" {
+		return wd
+	}
+
+	// Weekend: "this/next weekend" means Saturday, "last weekend" means Sunday
+	if weekdayWord == "weekend" {
+		if modifier == "last" {
+			return time.Sunday
+		}
+		return time.Saturday
+	}
+
+	// Weekday: any day except weekend
+	if weekdayWord == "weekday" {
+		refDate := context.Reference().GetDateWithAdjustedTimezone()
+		refWeekday := refDate.Weekday()
+
+		if refWeekday == time.Sunday || refWeekday == time.Saturday {
+			if modifier == "last" {
+				return time.Friday
+			}
+			return time.Monday
+		}
+
+		// On a weekday, find the next/last weekday
+		wd := int(refWeekday) - 1
+		if modifier == "last" {
+			wd--
+		} else {
+			wd++
+		}
+		return time.Weekday((wd % 5) + 1)
+	}
+
+	return -1
+}
+
 // handleWeekendCounting calculates the date for "N weekends ago" or "N weekends from now"
 func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, countStr, direction string) *kronos.ParsingComponents {
-	// Parse count, default to 1 if not specified
 	count := 1
 	if countStr != "" {
 		var err error
@@ -187,41 +186,25 @@ func handleWeekendCounting(context *kronos.ParsingContext, refDate time.Time, co
 	var daysOffset int
 	refWeekday := refDate.Weekday()
 
-	switch direction {
-	case "ago":
-		// Looking backward: resolve to Sunday
+	if direction == "ago" {
 		targetWeekday = time.Sunday
-
-		// Calculate days back to the Nth previous Sunday
-		// First, find days to last Sunday
 		daysToLastSunday := int(refWeekday)
 		if daysToLastSunday == 0 {
-			// Already on Sunday, go back 7 days to previous Sunday
 			daysToLastSunday = 7
 		}
-
-		// Then go back (count-1) more weeks
 		daysOffset = -(daysToLastSunday + 7*(count-1))
-	case "from now":
-		// Looking forward: resolve to Saturday
+	} else if direction == "from now" {
 		targetWeekday = time.Saturday
-
-		// Calculate days forward to the Nth next Saturday
 		daysToNextSaturday := (int(time.Saturday) - int(refWeekday) + 7) % 7
 		if daysToNextSaturday == 0 {
-			// Already on Saturday, go forward 7 days to next Saturday
 			daysToNextSaturday = 7
 		}
-
-		// Then go forward (count-1) more weeks
 		daysOffset = daysToNextSaturday + 7*(count-1)
-	default:
+	} else {
 		return nil
 	}
 
 	targetDate := refDate.AddDate(0, 0, daysOffset)
-
-	// Create components
 	components := context.CreateParsingComponents(nil)
 	helpers.ImplySimilarDate(components, targetDate)
 	components.Assign(kronos.ComponentWeekday, int(targetWeekday))
