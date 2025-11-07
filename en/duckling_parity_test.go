@@ -27,17 +27,7 @@ var ducklingRefDate = time.Date(2013, 2, 12, 4, 30, 0, 0, time.UTC)
 // TestDucklingParity_RelativeTime tests relative time expressions
 // Ported from: Duckling/Time/EN/Corpus.hs
 func TestDucklingParity_RelativeTime(t *testing.T) {
-	tests := []struct {
-		name          string
-		text          string
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		expectedHour  *int
-		expectedMin   *int
-		skip          bool
-		skipReason    string
-	}{
+	tests := []ducklingTestCase{
 		{
 			name:          "now",
 			text:          "now",
@@ -101,29 +91,7 @@ func TestDucklingParity_RelativeTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip(tt.skipReason)
-			}
-
-			chrono := createDucklingChrono()
-			results := chrono.Parse(tt.text, ducklingRefDate, nil)
-
-			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
-			if len(results) == 0 {
-				return
-			}
-
-			result := results[0]
-			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
-			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
-			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
-
-			if tt.expectedHour != nil {
-				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
-			}
-			if tt.expectedMin != nil {
-				assert.Equal(t, *tt.expectedMin, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
-			}
+			runDucklingTest(t, tt)
 		})
 	}
 }
@@ -131,15 +99,7 @@ func TestDucklingParity_RelativeTime(t *testing.T) {
 // TestDucklingParity_DayOfWeek tests day of week expressions
 // Ported from: Duckling/Time/EN/Corpus.hs
 func TestDucklingParity_DayOfWeek(t *testing.T) {
-	tests := []struct {
-		name          string
-		text          string
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		skip          bool
-		skipReason    string
-	}{
+	tests := []ducklingTestCase{
 		{
 			name:          "monday",
 			text:          "monday",
@@ -183,22 +143,7 @@ func TestDucklingParity_DayOfWeek(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip(tt.skipReason)
-			}
-
-			chrono := createDucklingChrono()
-			results := chrono.Parse(tt.text, ducklingRefDate, nil)
-
-			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
-			if len(results) == 0 {
-				return
-			}
-
-			result := results[0]
-			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
-			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
-			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+			runDucklingTest(t, tt)
 		})
 	}
 }
@@ -206,15 +151,7 @@ func TestDucklingParity_DayOfWeek(t *testing.T) {
 // TestDucklingParity_SpecificDates tests specific date expressions
 // Ported from: Duckling/Time/EN/Corpus.hs
 func TestDucklingParity_SpecificDates(t *testing.T) {
-	tests := []struct {
-		name          string
-		text          string
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		skip          bool
-		skipReason    string
-	}{
+	tests := []ducklingTestCase{
 		{
 			name:          "2/15",
 			text:          "2/15",
@@ -244,22 +181,7 @@ func TestDucklingParity_SpecificDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip(tt.skipReason)
-			}
-
-			chrono := createDucklingChrono()
-			results := chrono.Parse(tt.text, ducklingRefDate, nil)
-
-			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
-			if len(results) == 0 {
-				return
-			}
-
-			result := results[0]
-			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
-			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
-			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+			runDucklingTest(t, tt)
 		})
 	}
 }
@@ -267,24 +189,14 @@ func TestDucklingParity_SpecificDates(t *testing.T) {
 // TestDucklingParity_TimeOfDay tests time expressions
 // Ported from: Duckling/Time/EN/Corpus.hs
 func TestDucklingParity_TimeOfDay(t *testing.T) {
-	tests := []struct {
-		name          string
-		text          string
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		expectedHour  int
-		expectedMin   *int
-		skip          bool
-		skipReason    string
-	}{
+	tests := []ducklingTestCase{
 		{
 			name:          "at 3am",
 			text:          "at 3am",
 			expectedYear:  2013,
 			expectedMonth: 2,
 			expectedDay:   13, // Forward to next occurrence
-			expectedHour:  3,
+			expectedHour:  intPtr(3),
 			expectedMin:   intPtr(0),
 			skip:          true,
 			skipReason:    "SKIP: Time before reference defaults to same day not next day - behavior difference",
@@ -295,7 +207,7 @@ func TestDucklingParity_TimeOfDay(t *testing.T) {
 			expectedYear:  2013,
 			expectedMonth: 2,
 			expectedDay:   12,
-			expectedHour:  15,
+			expectedHour:  intPtr(15),
 			expectedMin:   intPtr(0),
 		},
 		{
@@ -304,34 +216,14 @@ func TestDucklingParity_TimeOfDay(t *testing.T) {
 			expectedYear:  2013,
 			expectedMonth: 2,
 			expectedDay:   13,
-			expectedHour:  0,
+			expectedHour:  intPtr(0),
 			expectedMin:   intPtr(0),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip(tt.skipReason)
-			}
-
-			chrono := createDucklingChrono()
-			results := chrono.Parse(tt.text, ducklingRefDate, nil)
-
-			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
-			if len(results) == 0 {
-				return
-			}
-
-			result := results[0]
-			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
-			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
-			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
-			assert.Equal(t, tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
-
-			if tt.expectedMin != nil {
-				assert.Equal(t, *tt.expectedMin, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
-			}
+			runDucklingTest(t, tt)
 		})
 	}
 }
@@ -339,17 +231,7 @@ func TestDucklingParity_TimeOfDay(t *testing.T) {
 // TestDucklingParity_RelativeDurations tests relative duration expressions
 // Ported from: Duckling/Time/EN/Corpus.hs
 func TestDucklingParity_RelativeDurations(t *testing.T) {
-	tests := []struct {
-		name          string
-		text          string
-		expectedYear  int
-		expectedMonth int
-		expectedDay   int
-		expectedHour  *int
-		expectedMin   *int
-		skip          bool
-		skipReason    string
-	}{
+	tests := []ducklingTestCase{
 		{
 			name:          "in 2 minutes",
 			text:          "in 2 minutes",
@@ -383,29 +265,7 @@ func TestDucklingParity_RelativeDurations(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip(tt.skipReason)
-			}
-
-			chrono := createDucklingChrono()
-			results := chrono.Parse(tt.text, ducklingRefDate, nil)
-
-			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
-			if len(results) == 0 {
-				return
-			}
-
-			result := results[0]
-			assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
-			assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
-			assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
-
-			if tt.expectedHour != nil {
-				assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
-			}
-			if tt.expectedMin != nil {
-				assert.Equal(t, *tt.expectedMin, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
-			}
+			runDucklingTest(t, tt)
 		})
 	}
 }
@@ -485,4 +345,44 @@ func createDucklingChrono() *kronos.Chrono {
 		},
 	}
 	return kronos.NewChrono(config)
+}
+
+// ducklingTestCase is the common test case structure for Duckling parity tests
+type ducklingTestCase struct {
+	name          string
+	text          string
+	expectedYear  int
+	expectedMonth int
+	expectedDay   int
+	expectedHour  *int
+	expectedMin   *int
+	skip          bool
+	skipReason    string
+}
+
+// runDucklingTest runs a single Duckling parity test case
+func runDucklingTest(t *testing.T, tt ducklingTestCase) {
+	if tt.skip {
+		t.Skip(tt.skipReason)
+	}
+
+	chrono := createDucklingChrono()
+	results := chrono.Parse(tt.text, ducklingRefDate, nil)
+
+	assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
+	if len(results) == 0 {
+		return
+	}
+
+	result := results[0]
+	assert.Equal(t, tt.expectedYear, *result.Start().Get(kronos.ComponentYear), "Year mismatch")
+	assert.Equal(t, tt.expectedMonth, *result.Start().Get(kronos.ComponentMonth), "Month mismatch")
+	assert.Equal(t, tt.expectedDay, *result.Start().Get(kronos.ComponentDay), "Day mismatch")
+
+	if tt.expectedHour != nil {
+		assert.Equal(t, *tt.expectedHour, *result.Start().Get(kronos.ComponentHour), "Hour mismatch")
+	}
+	if tt.expectedMin != nil {
+		assert.Equal(t, *tt.expectedMin, *result.Start().Get(kronos.ComponentMinute), "Minute mismatch")
+	}
 }

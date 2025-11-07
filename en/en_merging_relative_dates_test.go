@@ -34,7 +34,7 @@ func TestMergingRelativeDates(t *testing.T) {
 			expectYear:  2022,
 			expectMonth: 2,
 			expectDay:   15,
-			expectWday:  ptr(2), // Tuesday
+			expectWday:  intPtr(2), // Tuesday
 			certainDay:  true,
 			certainMon:  true,
 			certainYear: true,
@@ -107,9 +107,4 @@ func TestMergingRelativeDates(t *testing.T) {
 			assert.Equal(t, tt.expectHour, *start.Get(kronos.ComponentHour), "Hour mismatch")
 		})
 	}
-}
-
-// ptr is a helper function to get a pointer to an int
-func ptr(i int) *int {
-	return &i
 }

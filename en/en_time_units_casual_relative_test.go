@@ -31,11 +31,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// ptrInt returns a pointer to the given int value
-func ptrInt(i int) *int {
-	return &i
-}
-
 // TestCasualRelativePositiveTimeUnits tests positive time unit expressions
 func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 	tests := []struct {
@@ -57,7 +52,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   15, // Oct 1 + 14 days
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "next 2 days",
@@ -67,7 +62,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   3, // Oct 3
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "next two years",
@@ -77,7 +72,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 			expectedYear:  2018,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "next 2 weeks 3 days",
@@ -87,7 +82,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   18, // Oct 1 + 14 + 3 days
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "after a year",
@@ -97,7 +92,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 			expectedYear:  2017,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:           "after an hour",
@@ -107,8 +102,8 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(16),
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(16),
+			expectedMinute: intPtr(0),
 		},
 	}
 
@@ -161,7 +156,7 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   17, // Oct 1 - 14 days = Sep 17
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "last two weeks",
@@ -171,7 +166,7 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   17, // Oct 1 - 14 days = Sep 17
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "past 2 days",
@@ -181,7 +176,7 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   29, // Oct 1 - 2 days = Sep 29
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "+2 months, 5 days",
@@ -191,7 +186,7 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 12,
 			expectedDay:   6, // Oct 1 + 2 months + 5 days = Dec 6
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 	}
 
@@ -238,8 +233,8 @@ func TestCasualRelativePlusSign(t *testing.T) {
 			refDate:        time.Date(2012, 7, 10, 12, 14, 0, 0, time.UTC),
 			expectedText:   "+15 minutes",
 			expectedDay:    10,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(29),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(29),
 		},
 		{
 			name:           "+15min",
@@ -247,8 +242,8 @@ func TestCasualRelativePlusSign(t *testing.T) {
 			refDate:        time.Date(2012, 7, 10, 12, 14, 0, 0, time.UTC),
 			expectedText:   "+15min",
 			expectedDay:    10,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(29),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(29),
 		},
 		{
 			name:           "+1 day 2 hour",
@@ -256,8 +251,8 @@ func TestCasualRelativePlusSign(t *testing.T) {
 			refDate:        time.Date(2012, 7, 10, 12, 14, 0, 0, time.UTC),
 			expectedText:   "+1 day 2 hour",
 			expectedDay:    11,
-			expectedHour:   ptrInt(14),
-			expectedMinute: ptrInt(14),
+			expectedHour:   intPtr(14),
+			expectedMinute: intPtr(14),
 		},
 		{
 			name:           "+1m",
@@ -265,8 +260,8 @@ func TestCasualRelativePlusSign(t *testing.T) {
 			refDate:        time.Date(2012, 7, 10, 12, 14, 0, 0, time.UTC),
 			expectedText:   "+1m",
 			expectedDay:    10,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(15),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(15),
 		},
 	}
 
@@ -318,8 +313,8 @@ func TestCasualRelativeMinusSign(t *testing.T) {
 			expectedYear:   2012,
 			expectedMonth:  7,
 			expectedDay:    10,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(14),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(14),
 		},
 		{
 			name:           "-2hr5min",
@@ -329,8 +324,8 @@ func TestCasualRelativeMinusSign(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(9),
-			expectedMinute: ptrInt(55),
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(55),
 		},
 	}
 
@@ -398,8 +393,8 @@ func TestCasualRelativeWithoutAbbreviations(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(9),
-			expectedMinute: ptrInt(55),
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(55),
 		},
 	}
 
@@ -510,8 +505,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(59),
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(59),
 		},
 		{
 			name:           "an hour ago",
@@ -521,8 +516,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:          "a day ago",
@@ -532,7 +527,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   30,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "a week ago",
@@ -542,7 +537,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   24, // Sept 24
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "a couple of days ago",
@@ -552,7 +547,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   29, // Sept 29 (Oct 1 - 2 days)
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "couple days ago (without of)",
@@ -562,7 +557,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 9,
 			expectedDay:   29, // Sept 29
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:           "a few hours ago",
@@ -572,8 +567,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(9),
-			expectedMinute: ptrInt(0), // 12 - 3 = 9
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(0), // 12 - 3 = 9
 		},
 		{
 			name:           "few hours ago (without a)",
@@ -583,8 +578,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(9),
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:          "several weeks ago",
@@ -594,7 +589,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 8,
 			expectedDay:   13, // Oct 1 - 49 days (7 weeks) = Aug 13
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:           "half an hour ago",
@@ -604,8 +599,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(30), // 12:00 - 0.5h = 11:30
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(30), // 12:00 - 0.5h = 11:30
 		},
 		{
 			name:           "half a day ago",
@@ -615,8 +610,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    2,
-			expectedHour:   ptrInt(0), // Oct 2 12:00 - 12h = Oct 2 00:00
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(0), // Oct 2 12:00 - 12h = Oct 2 00:00
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:          "a dozen hours ago",
@@ -626,7 +621,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   2,
-			expectedHour:  ptrInt(0), // Oct 2 12:00 - 12h = Oct 2 00:00
+			expectedHour:  intPtr(0), // Oct 2 12:00 - 12h = Oct 2 00:00
 		},
 		// Test with "next" prefix
 		{
@@ -637,8 +632,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(13),
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(13),
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:          "next a couple of days",
@@ -648,7 +643,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   3,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:           "next half an hour",
@@ -658,8 +653,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(30),
 		},
 		// Test with + prefix
 		{
@@ -670,8 +665,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(1),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(1),
 		},
 		{
 			name:           "+half an hour",
@@ -681,8 +676,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(30),
 		},
 		// Test with - prefix
 		{
@@ -693,8 +688,8 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:          "-a couple days",
@@ -704,7 +699,7 @@ func TestExtendedNumberWords(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 	}
 
@@ -762,8 +757,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(14),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(14),
+			expectedMinute: intPtr(30),
 		},
 		{
 			name:           "1.5 days with last",
@@ -773,8 +768,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:          "0.5 weeks from now",
@@ -784,7 +779,7 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:  2016,
 			expectedMonth: 10,
 			expectedDay:   5, // 0.5 weeks = 3.5 days, rounded to 4 days
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:           "3.25 minutes ago",
@@ -794,9 +789,9 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(56),
-			expectedSecond: ptrInt(45),
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(56),
+			expectedSecond: intPtr(45),
 		},
 		{
 			name:           "in 2.5 hours",
@@ -806,8 +801,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(14),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(14),
+			expectedMinute: intPtr(30),
 		},
 		{
 			name:           "10.75 minutes ago",
@@ -817,9 +812,9 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(49),
-			expectedSecond: ptrInt(15),
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(49),
+			expectedSecond: intPtr(15),
 		},
 		{
 			name:           "2,5 hours with last (comma separator)",
@@ -829,8 +824,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(9),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(30),
 		},
 		{
 			name:           "1,5 days with past (comma separator)",
@@ -840,8 +835,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
-			expectedMinute: ptrInt(0),
+			expectedHour:   intPtr(0), // -1.5 days = -1 day -12 hours = Oct 1 00:00
+			expectedMinute: intPtr(0),
 		},
 		{
 			name:           "+0.5 hours",
@@ -851,8 +846,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(12),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(12),
+			expectedMinute: intPtr(30),
 		},
 		{
 			name:           "+1.5 days 2.5 hours",
@@ -862,8 +857,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    3,
-			expectedHour:   ptrInt(2),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(2),
+			expectedMinute: intPtr(30),
 		},
 		{
 			name:           "0.001 seconds with last",
@@ -873,9 +868,9 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(11),
-			expectedMinute: ptrInt(59),
-			expectedSecond: ptrInt(59), // -0.001 seconds = -1 millisecond
+			expectedHour:   intPtr(11),
+			expectedMinute: intPtr(59),
+			expectedSecond: intPtr(59), // -0.001 seconds = -1 millisecond
 		},
 		{
 			name:           "-2.5 hours",
@@ -885,8 +880,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 			expectedYear:   2016,
 			expectedMonth:  10,
 			expectedDay:    1,
-			expectedHour:   ptrInt(9),
-			expectedMinute: ptrInt(30),
+			expectedHour:   intPtr(9),
+			expectedMinute: intPtr(30),
 		},
 	}
 
@@ -945,7 +940,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2006,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "2 decades ago",
@@ -955,7 +950,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  1996,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "last a decade",
@@ -965,7 +960,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2006,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "next a decade",
@@ -975,7 +970,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2026,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "a decade ago",
@@ -985,7 +980,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2006,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "100 decades ago",
@@ -995,7 +990,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  1016,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		// Combined with other time units
 		{
@@ -1006,7 +1001,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2004,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "1 decade 12 months ago",
@@ -1016,7 +1011,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2005,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		// With casual relative prefixes
 		{
@@ -1027,7 +1022,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2006,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "+1 decade",
@@ -1037,7 +1032,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2026,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "-1 decade",
@@ -1047,7 +1042,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2006,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		// Fractional decades
 		{
@@ -1058,7 +1053,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2011,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "0.5 decades ago",
@@ -1068,7 +1063,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2011,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "1.5 decades ago",
@@ -1078,7 +1073,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2001,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 		{
 			name:          "2.5 decades from now",
@@ -1088,7 +1083,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			expectedYear:  2041,
 			expectedMonth: 10,
 			expectedDay:   1,
-			expectedHour:  ptrInt(12),
+			expectedHour:  intPtr(12),
 		},
 	}
 
