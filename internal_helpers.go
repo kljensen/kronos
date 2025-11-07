@@ -37,18 +37,6 @@ func InternalMergeDateTimeResult(dateResult, timeResult *parsingResult) *parsing
 	return mergeDateTimeResult(dateResult, timeResult)
 }
 
-func InternalNewParserRegistry() *parserRegistry {
-	return newParserRegistry()
-}
-
-func InternalGlobalRegistry() *parserRegistry {
-	return globalRegistry
-}
-
-func InternalRegister(name string, info parserInfo, factory parserFactory) {
-	internalRegister(name, info, factory)
-}
-
 func InternalValidateSettings(s Settings) error {
 	return validateSettings(s)
 }
