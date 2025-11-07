@@ -81,11 +81,11 @@ var defaultTimezoneAbbrMap = TimezoneAbbrMap{
 		TimezoneOffsetNonDst:    -300, // EST = UTC-5
 		DstStart: func(year int) time.Time {
 			// DST starts 2nd Sunday of March at 2 AM
-			return getNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
+			return InternalGetNthWeekdayOfMonth(year, time.March, time.Sunday, 2, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends 1st Sunday of November at 2 AM
-			return getNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
+			return InternalGetNthWeekdayOfMonth(year, time.November, time.Sunday, 1, 2)
 		},
 	},
 	"CST":  -360,
@@ -110,11 +110,11 @@ var defaultTimezoneAbbrMap = TimezoneAbbrMap{
 		TimezoneOffsetNonDst:    60,  // CET = UTC+1
 		DstStart: func(year int) time.Time {
 			// DST starts last Sunday of March at 2 AM
-			return getLastWeekdayOfMonth(year, time.March, time.Sunday, 2)
+			return InternalGetLastWeekdayOfMonth(year, time.March, time.Sunday, 2)
 		},
 		DstEnd: func(year int) time.Time {
 			// DST ends last Sunday of October at 3 AM
-			return getLastWeekdayOfMonth(year, time.October, time.Sunday, 3)
+			return InternalGetLastWeekdayOfMonth(year, time.October, time.Sunday, 3)
 		},
 	},
 	"CEST": 120,
@@ -232,59 +232,4 @@ func resolveAmbiguousTimezone(ambiguous AmbiguousTimezoneMap, instant time.Time)
 		offset = ambiguous.TimezoneOffsetNonDst
 	}
 	return &offset
-}
-
-// Unexported helper functions for internal timezone calculations
-
-// getNthWeekdayOfMonth returns the date of the nth occurrence of a given weekday
-// in a given month and year (unexported version for internal DST calculations).
-func getNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int, hour int) time.Time {
-	dayOfMonth := 0
-	count := 0
-
-	// Iterate through days of the month
-	for count < n {
-		dayOfMonth++
-		date := time.Date(year, time.Month(month), dayOfMonth, hour, 0, 0, 0, time.UTC)
-
-		// Check if this day is the target weekday
-		if int(date.Weekday()) == int(weekday) {
-			count++
-		}
-	}
-
-	return time.Date(year, time.Month(month), dayOfMonth, hour, 0, 0, 0, time.UTC)
-}
-
-// getLastWeekdayOfMonth returns the date of the last occurrence of a given weekday
-// in a given month and year (unexported version for internal DST calculations).
-func getLastWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, hour int) time.Time {
-	// Start with the first day of the next month
-	nextMonth := time.Date(year, time.Month(month)+1, 1, 12, 0, 0, 0, time.UTC)
-
-	// Convert weekdays to 1-indexed (Monday=1, Sunday=7)
-	targetWeekday := int(weekday)
-	if targetWeekday == 0 {
-		targetWeekday = 7
-	}
-
-	firstWeekdayNextMonth := int(nextMonth.Weekday())
-	if firstWeekdayNextMonth == 0 {
-		firstWeekdayNextMonth = 7
-	}
-
-	// Calculate how many days to go back
-	var dayDiff int
-	switch {
-	case firstWeekdayNextMonth == targetWeekday:
-		dayDiff = 7
-	case firstWeekdayNextMonth < targetWeekday:
-		dayDiff = 7 + firstWeekdayNextMonth - targetWeekday
-	default:
-		dayDiff = firstWeekdayNextMonth - targetWeekday
-	}
-
-	// Go back to find the last occurrence
-	result := nextMonth.AddDate(0, 0, -dayDiff)
-	return time.Date(result.Year(), result.Month(), result.Day(), hour, 0, 0, 0, time.UTC)
 }
