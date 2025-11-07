@@ -40,9 +40,6 @@ func NewENRelativeDateFormatParser() *ENRelativeDateFormatParser {
 
 	parser.AbstractParserWithWordBoundary = parsing.NewAbstractParserWithWordBoundary(
 		func(context *kronos.ParsingContext) *regexp.Regexp {
-			// Add optional approximation words at the beginning
-			// Tilde is handled separately because it's a symbol, not a word
-			approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
 			pattern := approximationPattern + `(this|last|past|next|after\s*this)\s*(` + endata.MatchAnyPattern(TimeUnitRelativeDictionary) + `)(?:\s|$|\b)`
 			return regexp.MustCompile("(?i)" + pattern)
 		},

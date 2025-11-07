@@ -12,12 +12,6 @@ import (
 	"github.com/kljensen/kronos/internal/parsing"
 )
 
-const (
-	approximationPattern = `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
-	wordNumbers          = `half|dozen|several|couple|few|ninety|eighty|seventy|sixty|fifty|forty|thirty|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one|a|an|the`
-	unitSeparator        = `(?:\s*,\s*|\s+and\s+|\s+)`
-)
-
 // ENTimeUnitAgoFormatParser parses expressions like:
 // "3 days ago", "2 hours ago", "5 minutes before", "15 minutes earlier"
 type ENTimeUnitAgoFormatParser struct {

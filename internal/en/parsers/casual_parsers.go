@@ -108,9 +108,6 @@ func NewENCasualTimeParser() *ENCasualTimeParser {
 }
 
 func (p *ENCasualTimeParser) innerPattern(context *kronos.ParsingContext) *regexp.Regexp {
-	// Add optional approximation words at the beginning
-	// Tilde is handled separately because it's a symbol, not a word
-	approximationPattern := `(?:~\s*|(?:about|around|roughly|approximately|approx|circa)\s+)?`
 	pattern := `(?i)` + approximationPattern + `(?:this)?\s{0,3}(morning|afternoon|evening|night|midnight|midday|noon)`
 	return regexp.MustCompile(pattern)
 }
