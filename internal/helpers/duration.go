@@ -104,14 +104,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional weeks to days
-			// Round to nearest day for both positive and negative values
-			days := remainder * 7
-			const roundingOffset = 0.5
-			if days > 0 {
-				working[kronos.TimeunitDay] += float64(int(days + roundingOffset))
-			} else if days < 0 {
-				working[kronos.TimeunitDay] += float64(int(days - roundingOffset))
-			}
+			roundAndCascade(remainder*7, kronos.TimeunitDay, working)
 		}
 	}
 
@@ -122,14 +115,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional days to hours
-			// Round to nearest hour for both positive and negative values
-			hours := remainder * 24
-			const roundingOffset = 0.5
-			if hours > 0 {
-				working[kronos.TimeunitHour] += float64(int(hours + roundingOffset))
-			} else if hours < 0 {
-				working[kronos.TimeunitHour] += float64(int(hours - roundingOffset))
-			}
+			roundAndCascade(remainder*24, kronos.TimeunitHour, working)
 		}
 	}
 
@@ -140,15 +126,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional hours to minutes
-			// For positive values: round to nearest minute
-			// For negative values: preserve sign and round to nearest minute
-			minutes := remainder * 60
-			const roundingOffset = 0.5
-			if minutes > 0 {
-				working[kronos.TimeunitMinute] += float64(int(minutes + roundingOffset))
-			} else if minutes < 0 {
-				working[kronos.TimeunitMinute] += float64(int(minutes - roundingOffset))
-			}
+			roundAndCascade(remainder*60, kronos.TimeunitMinute, working)
 		}
 	}
 
@@ -159,15 +137,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional minutes to seconds
-			// For positive values: round to nearest second
-			// For negative values: preserve sign and round to nearest second
-			seconds := remainder * 60
-			const roundingOffset = 0.5
-			if seconds > 0 {
-				working[kronos.TimeunitSecond] += float64(int(seconds + roundingOffset))
-			} else if seconds < 0 {
-				working[kronos.TimeunitSecond] += float64(int(seconds - roundingOffset))
-			}
+			roundAndCascade(remainder*60, kronos.TimeunitSecond, working)
 		}
 	}
 
@@ -178,15 +148,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional seconds to milliseconds
-			// For positive values: round to nearest millisecond
-			// For negative values: preserve sign and round to nearest millisecond
-			milliseconds := remainder * 1000
-			const roundingOffset = 0.5
-			if milliseconds > 0 {
-				working[kronos.TimeunitMillisecond] += float64(int(milliseconds + roundingOffset))
-			} else if milliseconds < 0 {
-				working[kronos.TimeunitMillisecond] += float64(int(milliseconds - roundingOffset))
-			}
+			roundAndCascade(remainder*1000, kronos.TimeunitMillisecond, working)
 		}
 	}
 
@@ -197,13 +159,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional milliseconds to microseconds
-			microseconds := remainder * 1000
-			const roundingOffset = 0.5
-			if microseconds > 0 {
-				working[kronos.TimeunitMicrosecond] += float64(int(microseconds + roundingOffset))
-			} else if microseconds < 0 {
-				working[kronos.TimeunitMicrosecond] += float64(int(microseconds - roundingOffset))
-			}
+			roundAndCascade(remainder*1000, kronos.TimeunitMicrosecond, working)
 		}
 	}
 
@@ -214,13 +170,7 @@ func AddDuration(ref time.Time, duration kronos.Duration) (time.Time, error) {
 		remainder := val - float64(floor)
 		if remainder != 0 {
 			// Convert fractional microseconds to nanoseconds
-			nanoseconds := remainder * 1000
-			const roundingOffset = 0.5
-			if nanoseconds > 0 {
-				working[kronos.TimeunitNanosecond] += float64(int(nanoseconds + roundingOffset))
-			} else if nanoseconds < 0 {
-				working[kronos.TimeunitNanosecond] += float64(int(nanoseconds - roundingOffset))
-			}
+			roundAndCascade(remainder*1000, kronos.TimeunitNanosecond, working)
 		}
 	}
 
@@ -249,6 +199,17 @@ func ReverseDuration(duration kronos.Duration) kronos.Duration {
 }
 
 // Helper functions
+
+// roundAndCascade rounds a value and adds it to a target timeunit in the working duration.
+// It handles both positive and negative values correctly by rounding towards zero.
+func roundAndCascade(value float64, targetUnit kronos.Timeunit, working kronos.Duration) {
+	const roundingOffset = 0.5
+	if value > 0 {
+		working[targetUnit] += float64(int(value + roundingOffset))
+	} else if value < 0 {
+		working[targetUnit] += float64(int(value - roundingOffset))
+	}
+}
 
 func validateDate(t time.Time) error {
 	year := t.Year()
