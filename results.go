@@ -667,9 +667,13 @@ func (pr *ParsingResult) SetStart(start *ParsingComponents) {
 	pr.start = start
 }
 
-// ParsingResultWithBoundary wraps ParsingComponents with boundary information
+// ParsingResultWithBoundary wraps ParsingComponents with boundary information.
 // This is used internally to communicate the adjusted text (without boundary) to chrono.go
 // when parsers using AbstractParserWithWordBoundary return ParsingComponents.
+//
+// Deprecated: This is an internal implementation detail that should not be used by external code.
+// It remains exported only for use by internal parser implementations. This type will be moved
+// to an internal package in a future version.
 type ParsingResultWithBoundary struct {
 	Components         *ParsingComponents
 	AdjustedText       string

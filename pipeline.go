@@ -8,6 +8,11 @@ import (
 
 // Pipeline manages the parsing process with configurable parsers and settings.
 // It provides a flexible way to control which parsers run and in what order.
+//
+// Deprecated: This type is part of the advanced API. For most use cases, use the
+// builder pattern instead (kronos.New(chrono).Parse(text)). Direct use of Pipeline
+// exposes internal implementation details and will be moved to the experimental
+// package in a future version.
 type Pipeline struct {
 	parsers  []Parser
 	refiners []Refiner
@@ -15,6 +20,10 @@ type Pipeline struct {
 }
 
 // NewPipeline creates a new parsing pipeline with the given configuration and settings.
+//
+// Deprecated: This function is part of the advanced API. For most use cases, use the
+// builder pattern instead (kronos.New(chrono)). This function will be moved to the
+// experimental package in a future version.
 func NewPipeline(config *Configuration, settings Settings) *Pipeline {
 	if config == nil {
 		config = &Configuration{
@@ -31,6 +40,10 @@ func NewPipeline(config *Configuration, settings Settings) *Pipeline {
 }
 
 // NewPipelineWithSettings creates a pipeline using settings to determine parsers.
+//
+// Deprecated: This function is part of the advanced API. For most use cases, use the
+// builder pattern instead (kronos.New(chrono).WithOption(...)). This function will be
+// moved to the experimental package in a future version.
 func NewPipelineWithSettings(config *Configuration, settings Settings) (*Pipeline, error) {
 	// Validate settings
 	if err := ValidateSettings(settings); err != nil {
@@ -287,6 +300,14 @@ func updateComponentsFromDate(components *ParsingComponents, date time.Time) {
 
 // ParseWithSettings is a convenience function that creates a pipeline
 // and executes it with the given settings.
+//
+// Deprecated: This function exposes internal implementation details (ParsingResult).
+// Use the builder pattern API instead:
+//
+//	parser := kronos.New(chrono).WithReferenceDate(refDate)
+//	results, err := parser.Parse(text)
+//
+// This function will be removed in a future version.
 func ParseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*ParsingResult, error) {
 	pipeline, err := NewPipelineWithSettings(config, settings)
 	if err != nil {
