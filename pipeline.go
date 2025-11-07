@@ -31,9 +31,6 @@ func NewPipeline(config *Configuration, settings Settings) *Pipeline {
 }
 
 // NewPipelineWithSettings creates a pipeline using settings to determine parsers.
-// If EnabledParsers is empty, all parsers from the configuration are used.
-// If EnabledParsers is specified, only those parsers are used.
-// ParserOrder determines the execution order.
 func NewPipelineWithSettings(config *Configuration, settings Settings) (*Pipeline, error) {
 	// Validate settings
 	if err := ValidateSettings(settings); err != nil {
@@ -47,45 +44,13 @@ func NewPipelineWithSettings(config *Configuration, settings Settings) (*Pipelin
 		settings: settings,
 	}
 
-	// Determine which parsers to use
-	switch {
-	case len(settings.EnabledParsers) > 0:
-		// Use specified parsers from registry
-		parsers := GlobalRegistry.GetParsers(settings.EnabledParsers)
-		pipeline.parsers = parsers
-	case config != nil:
-		// Use all parsers from configuration
-		pipeline.parsers = append([]Parser{}, config.Parsers...)
-	default:
-		// Use all registered parsers
-		pipeline.parsers = GlobalRegistry.GetAllParsers()
-	}
-
-	// Apply parser order if specified
-	if len(settings.ParserOrder) > 0 {
-		pipeline.parsers = reorderParsers(pipeline.parsers, settings.ParserOrder)
-	}
-
-	// Apply max parsers limit
-	if settings.MaxParsers > 0 && len(pipeline.parsers) > settings.MaxParsers {
-		pipeline.parsers = pipeline.parsers[:settings.MaxParsers]
-	}
-
-	// Copy refiners from configuration
+	// Use all parsers from configuration
 	if config != nil {
+		pipeline.parsers = append([]Parser{}, config.Parsers...)
 		pipeline.refiners = append([]Refiner{}, config.Refiners...)
 	}
 
 	return pipeline, nil
-}
-
-// reorderParsers reorders parsers according to the specified order.
-// Parsers not in the order list are appended at the end.
-func reorderParsers(parsers []Parser, order []string) []Parser {
-	// This is a simple implementation.
-	// A more sophisticated version would use parser names from a registry.
-	// For now, we keep the existing order since parsers don't have names yet.
-	return parsers
 }
 
 // Execute runs the pipeline on the given text with a reference date.
@@ -97,26 +62,9 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 		return nil, fmt.Errorf("failed to apply settings: %w", err)
 	}
 
-	// Set up timeout if specified
-	var timeoutChan <-chan time.Time
-	if p.settings.Timeout > 0 {
-		timer := time.NewTimer(p.settings.Timeout)
-		defer timer.Stop()
-		timeoutChan = timer.C
-	}
-
 	// Execute parsers
 	results := make([]*ParsingResult, 0)
 	for _, parser := range p.parsers {
-		// Check timeout
-		if timeoutChan != nil {
-			select {
-			case <-timeoutChan:
-				return nil, fmt.Errorf("parsing timeout after %v", p.settings.Timeout)
-			default:
-			}
-		}
-
 		// Execute parser
 		parsedResults := p.executeParser(ctx, parser)
 		results = append(results, parsedResults...)
@@ -135,11 +83,6 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 	// Apply strict parsing validation
 	if p.settings.StrictParsing {
 		results = p.applyStrictValidation(results)
-	}
-
-	// Apply required parts validation
-	if len(p.settings.RequireParts) > 0 {
-		results = p.applyRequiredParts(results)
 	}
 
 	// Apply timezone conversion if needed
@@ -247,32 +190,6 @@ func (p *Pipeline) applyStrictValidation(results []*ParsingResult) []*ParsingRes
 
 		// Accept if it has year and month
 		if hasYear && hasMonth {
-			filtered = append(filtered, result)
-		}
-	}
-	return filtered
-}
-
-// applyRequiredParts filters out results that don't have required components.
-func (p *Pipeline) applyRequiredParts(results []*ParsingResult) []*ParsingResult {
-	if len(p.settings.RequireParts) == 0 {
-		return results
-	}
-
-	filtered := make([]*ParsingResult, 0, len(results))
-	for _, result := range results {
-		start := result.Start()
-		hasAllParts := true
-
-		for _, part := range p.settings.RequireParts {
-			component := Component(part)
-			if !start.IsCertain(component) {
-				hasAllParts = false
-				break
-			}
-		}
-
-		if hasAllParts {
 			filtered = append(filtered, result)
 		}
 	}

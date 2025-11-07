@@ -21,9 +21,6 @@ func TestDefaultSettings(t *testing.T) {
 	if settings.Timezone != "UTC" {
 		t.Errorf("Expected UTC timezone, got %s", settings.Timezone)
 	}
-	if !settings.Normalize {
-		t.Error("Expected Normalize to be true")
-	}
 	if settings.StrictParsing {
 		t.Error("Expected StrictParsing to be false")
 	}
@@ -57,25 +54,6 @@ func TestValidateSettings_ValidToTimezone(t *testing.T) {
 	// Either way is fine - just testing it doesn't panic
 }
 
-func TestValidateSettings_ValidRequireParts(t *testing.T) {
-	settings := DefaultSettings()
-	settings.RequireParts = []string{"year", "month", "day"}
-
-	err := ValidateSettings(settings)
-	if err != nil {
-		t.Errorf("Expected no error for valid required parts, got: %v", err)
-	}
-}
-
-func TestValidateSettings_InvalidRequireParts(t *testing.T) {
-	settings := DefaultSettings()
-	settings.RequireParts = []string{"invalid_part"}
-
-	err := ValidateSettings(settings)
-	if err == nil {
-		t.Error("Expected error for invalid required parts")
-	}
-}
 
 func TestDateOrderString(t *testing.T) {
 	tests := []struct {
@@ -124,7 +102,6 @@ func TestToParsingOption(t *testing.T) {
 
 func TestApplySettings_Normalization(t *testing.T) {
 	settings := DefaultSettings()
-	settings.Normalize = true
 
 	text := "test\u00A0text" // Non-breaking space
 	refDate := time.Now()
@@ -136,41 +113,6 @@ func TestApplySettings_Normalization(t *testing.T) {
 
 	// Text should be normalized - just verify it doesn't error
 	_ = ctx.Text()
-}
-
-func TestApplySettings_SkipTokens(t *testing.T) {
-	settings := DefaultSettings()
-	settings.SkipTokens = []string{"at", "on"}
-
-	text := "on March 15 at 3pm"
-	refDate := time.Now()
-
-	ctx, err := applySettings(text, refDate, settings)
-	if err != nil {
-		t.Fatalf("ApplySettings failed: %v", err)
-	}
-
-	// Tokens should be removed - just verify it doesn't error
-	_ = ctx.Text()
-}
-
-func TestApplySettings_RelativeBase(t *testing.T) {
-	settings := DefaultSettings()
-	baseTime := time.Date(2020, 3, 15, 12, 0, 0, 0, time.UTC)
-	settings.RelativeBase = &baseTime
-
-	text := "test"
-	refDate := time.Now()
-
-	ctx, err := applySettings(text, refDate, settings)
-	if err != nil {
-		t.Fatalf("ApplySettings failed: %v", err)
-	}
-
-	// The context should use the relative base as reference
-	if !ctx.RefDate().Equal(baseTime) {
-		t.Errorf("Expected RefDate to be %v, got %v", baseTime, ctx.RefDate())
-	}
 }
 
 func TestApplySettings_InvalidSettings(t *testing.T) {
@@ -186,87 +128,6 @@ func TestApplySettings_InvalidSettings(t *testing.T) {
 	}
 }
 
-func TestRemoveToken(t *testing.T) {
-	tests := []struct {
-		name     string
-		text     string
-		token    string
-		expected string
-	}{
-		{
-			name:     "simple removal",
-			text:     "on March 15",
-			token:    "on",
-			expected: " March 15",
-		},
-		{
-			name:     "multiple occurrences",
-			text:     "at 3pm at home",
-			token:    "at",
-			expected: " 3pm  home",
-		},
-		{
-			name:     "no match",
-			text:     "March 15",
-			token:    "on",
-			expected: "March 15",
-		},
-		{
-			name:     "word boundary - should not remove part of word",
-			text:     "attorney at law",
-			token:    "at",
-			expected: "attorney  law",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			result := removeToken(tc.text, tc.token)
-			if result != tc.expected {
-				t.Errorf("Expected '%s', got '%s'", tc.expected, result)
-			}
-		})
-	}
-}
-
-func TestSettings_EnabledParsers(t *testing.T) {
-	settings := DefaultSettings()
-	settings.EnabledParsers = []string{"iso8601", "en_casual_date"}
-
-	if len(settings.EnabledParsers) != 2 {
-		t.Errorf("Expected 2 enabled parsers, got %d", len(settings.EnabledParsers))
-	}
-}
-
-func TestSettings_ParserOrder(t *testing.T) {
-	settings := DefaultSettings()
-	settings.ParserOrder = []string{"en_casual_date", "iso8601"}
-
-	if len(settings.ParserOrder) != 2 {
-		t.Errorf("Expected 2 parsers in order, got %d", len(settings.ParserOrder))
-	}
-	if settings.ParserOrder[0] != "en_casual_date" {
-		t.Errorf("Expected first parser to be en_casual_date, got %s", settings.ParserOrder[0])
-	}
-}
-
-func TestSettings_Timeout(t *testing.T) {
-	settings := DefaultSettings()
-	settings.Timeout = 5 * time.Second
-
-	if settings.Timeout != 5*time.Second {
-		t.Errorf("Expected timeout of 5s, got %v", settings.Timeout)
-	}
-}
-
-func TestSettings_MaxParsers(t *testing.T) {
-	settings := DefaultSettings()
-	settings.MaxParsers = 10
-
-	if settings.MaxParsers != 10 {
-		t.Errorf("Expected MaxParsers of 10, got %d", settings.MaxParsers)
-	}
-}
 
 func TestSettings_StrictParsing(t *testing.T) {
 	settings := DefaultSettings()
@@ -297,7 +158,6 @@ func TestSettings_ReturnTimezoneAware(t *testing.T) {
 
 func TestNewParsingContextWithSettings(t *testing.T) {
 	settings := DefaultSettings()
-	settings.Normalize = true
 	settings.PreferDatesFrom = PreferFuture
 
 	text := "March 15"
@@ -335,9 +195,6 @@ func TestSettings_BackwardCompatibility(t *testing.T) {
 	}
 	if settings.PreferDatesFrom != PreferCurrentPeriod {
 		t.Error("Default PreferDatesFrom changed - breaks backward compatibility")
-	}
-	if settings.Normalize != true {
-		t.Error("Default Normalize changed - breaks backward compatibility")
 	}
 	if settings.StrictParsing != false {
 		t.Error("Default StrictParsing changed - breaks backward compatibility")

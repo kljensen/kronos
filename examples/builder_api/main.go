@@ -88,53 +88,14 @@ func demonstrateCommonOptions() {
 func demonstrateExperimentalOptions() {
 	fmt.Println("=== Advanced Options (Experimental Package) ===")
 
-	// Custom parser configuration
-	parser := en.New().
-		WithOption(experimental.WithMaxParsers(3)).
-		WithOption(experimental.WithTimeout(5 * time.Second))
-
-	results, _ := parser.Parse("tomorrow")
-	if len(results) > 0 {
-		fmt.Printf("With max parsers: %v\n", results[0].Date())
-	}
-
-	// Skip common words
-	parser = en.New().
-		WithOption(experimental.WithSkipTokens("at", "on"))
-
-	results, _ = parser.Parse("on March 15 at 3pm")
-	if len(results) > 0 {
-		fmt.Printf("With skip tokens: %v\n", results[0].Date())
-	}
-
-	// Require specific parts
-	parser = en.New().
-		WithOption(experimental.WithRequiredParts("year", "month", "day"))
-
-	// This will parse "2024-03-15" but might not parse "tomorrow"
-	results, _ = parser.Parse("2024-03-15")
-	if len(results) > 0 {
-		fmt.Printf("With required parts: %v\n", results[0].Date())
-	}
-
-	// Custom relative base
-	baseTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
-	parser = en.New().
-		WithOption(experimental.WithRelativeBase(baseTime))
-
-	results, _ = parser.Parse("in 3 days")
-	if len(results) > 0 {
-		fmt.Printf("With custom base: %v\n", results[0].Date())
-	}
-
 	// Custom timezone overrides
 	customTimezones := kronos.TimezoneAbbrMap{
 		"CUSTOM": 123, // UTC+2:03
 	}
-	parser = en.New().
+	parser := en.New().
 		WithOption(experimental.WithTimezoneOverrides(customTimezones))
 
-	results, _ = parser.Parse("3pm CUSTOM")
+	results, _ := parser.Parse("3pm CUSTOM")
 	if len(results) > 0 {
 		fmt.Printf("With custom timezone: %v\n", results[0].Date())
 	}
@@ -149,6 +110,33 @@ func demonstrateExperimentalOptions() {
 	results, _ = parser.Parse("tomorrow")
 	if len(results) > 0 {
 		fmt.Printf("With debug handler: %v\n", results[0].Date())
+	}
+
+	// Day preference
+	parser = en.New().
+		WithOption(experimental.WithDayPreference(kronos.DayPreferFirst))
+
+	results, _ = parser.Parse("March")
+	if len(results) > 0 {
+		fmt.Printf("With day preference: %v\n", results[0].Date())
+	}
+
+	// Timezone aware results
+	parser = en.New().
+		WithOption(experimental.WithTimezoneAware(true))
+
+	results, _ = parser.Parse("3pm EST")
+	if len(results) > 0 {
+		fmt.Printf("With timezone aware: %v\n", results[0].Date())
+	}
+
+	// Time as period tracking
+	parser = en.New().
+		WithOption(experimental.WithTimeAsPeriod(true))
+
+	results, _ = parser.Parse("2024")
+	if len(results) > 0 {
+		fmt.Printf("With time as period: %v\n", results[0].Date())
 	}
 
 	fmt.Println()
@@ -166,9 +154,8 @@ func demonstrateCombinedOptions() {
 		WithDateOrder(kronos.DateOrderDMY).
 		Strict().
 		PreferFuture().
-		WithOption(experimental.WithMaxParsers(5)).
-		WithOption(experimental.WithNormalization(true)).
-		WithOption(experimental.WithDayPreference(kronos.DayPreferFirst))
+		WithOption(experimental.WithDayPreference(kronos.DayPreferFirst)).
+		WithOption(experimental.WithTimezoneAware(true))
 
 	results, _ := parser.Parse("15/03/2024")
 	if len(results) > 0 {

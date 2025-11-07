@@ -74,8 +74,8 @@ func (d DayPreference) String() string {
 //	import "github.com/kljensen/kronos/experimental"
 //
 //	parser := kronos.New(en.Casual).
-//	    WithOption(experimental.WithParserOrder("iso8601")).
-//	    WithOption(experimental.WithMaxParsers(3))
+//	    WithOption(experimental.WithTimezoneOverrides(customTimezones)).
+//	    WithOption(experimental.WithDebugHandler(debugFunc))
 //
 // The Settings struct will remain available for compatibility but new code should
 // use the builder pattern.
@@ -91,24 +91,10 @@ type Settings struct {
 	ReturnTimezoneAware bool   // Include timezone information in results
 
 	// Parsing behavior
-	StrictParsing bool     // Validate strictly - reject ambiguous dates
-	Normalize     bool     // Unicode normalization before parsing
-	SkipTokens    []string // Words to ignore during parsing
-	RequireParts  []string // Required components (e.g., "year", "month", "day")
-
-	// Relative dates
-	RelativeBase *time.Time // Base time for relative date calculations
+	StrictParsing bool // Validate strictly - reject ambiguous dates
 
 	// Period tracking
 	ReturnTimeAsPeriod bool // Track parsing granularity (year, month, day, time)
-
-	// Parser control
-	EnabledParsers []string // Which parsers to use (empty = all)
-	ParserOrder    []string // Order of parser execution (empty = default)
-
-	// Performance
-	MaxParsers int           // Maximum number of parsers to run (0 = unlimited)
-	Timeout    time.Duration // Parsing timeout (0 = no timeout)
 
 	// Advanced configuration
 	TimezoneOverrides TimezoneAbbrMap // Custom timezone abbreviations
@@ -149,15 +135,7 @@ func DefaultSettings() Settings {
 		ToTimezone:          "",
 		ReturnTimezoneAware: false,
 		StrictParsing:       false,
-		Normalize:           true,
-		SkipTokens:          []string{},
-		RequireParts:        []string{},
-		RelativeBase:        nil,
 		ReturnTimeAsPeriod:  false,
-		EnabledParsers:      []string{},
-		ParserOrder:         []string{},
-		MaxParsers:          0,
-		Timeout:             0,
 	}
 }
 
@@ -175,21 +153,6 @@ func ValidateSettings(s Settings) error {
 	if s.ToTimezone != "" {
 		if _, err := time.LoadLocation(s.ToTimezone); err != nil {
 			return fmt.Errorf("invalid to_timezone: %s - %w", s.ToTimezone, err)
-		}
-	}
-
-	// Validate RequireParts
-	validParts := map[string]bool{
-		"year":   true,
-		"month":  true,
-		"day":    true,
-		"hour":   true,
-		"minute": true,
-		"second": true,
-	}
-	for _, part := range s.RequireParts {
-		if !validParts[part] {
-			return fmt.Errorf("invalid required part: %s (valid: year, month, day, hour, minute, second)", part)
 		}
 	}
 
@@ -219,22 +182,8 @@ func applySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 		return nil, err
 	}
 
-	// Apply normalization if enabled
-	if settings.Normalize {
-		text = sanitizeInput(text)
-	}
-
-	// Apply skip tokens
-	for _, token := range settings.SkipTokens {
-		// Simple token removal - could be enhanced with word boundary matching
-		text = removeToken(text, token)
-	}
-
-	// Determine reference date
-	ref := refDate
-	if settings.RelativeBase != nil {
-		ref = *settings.RelativeBase
-	}
+	// Apply normalization
+	text = sanitizeInput(text)
 
 	// Create parsing option from settings
 	opt := ParsingOption{
@@ -245,46 +194,7 @@ func applySettings(text string, refDate time.Time, settings Settings) (*ParsingC
 	}
 
 	// Create context
-	ctx := newParsingContext(text, ref, &opt)
+	ctx := newParsingContext(text, refDate, &opt)
 
 	return ctx, nil
-}
-
-// removeToken removes all occurrences of a token from text.
-// This is a simple implementation that preserves spaces around tokens.
-//
-//nolint:gofumpt // Function formatting is correct
-func removeToken(text string, token string) string {
-	// Simple approach: iterate through the text and skip tokens
-	result := ""
-	i := 0
-	for i < len(text) {
-		if i+len(token) <= len(text) && text[i:i+len(token)] == token {
-			// Check if this is a word boundary (not part of a larger word)
-			isWordBoundary := true
-			if i > 0 && text[i-1] != ' ' {
-				isWordBoundary = false
-			}
-			if i+len(token) < len(text) && text[i+len(token)] != ' ' {
-				isWordBoundary = false
-			}
-
-			if isWordBoundary {
-				// Skip the token but preserve the surrounding space structure
-				i += len(token)
-				// If there's a trailing space, include one space in the result
-				if i < len(text) && text[i] == ' ' {
-					result += " "
-					i++
-				}
-			} else {
-				result += string(text[i])
-				i++
-			}
-		} else {
-			result += string(text[i])
-			i++
-		}
-	}
-	return result
 }

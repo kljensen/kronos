@@ -58,7 +58,6 @@ func New(chrono *Chrono) *ParserBuilder {
 // This date is used as the basis for expressions like "tomorrow", "next week", etc.
 func (p *ParserBuilder) WithReferenceDate(refDate time.Time) *ParserBuilder {
 	p.refDate = refDate
-	p.settings.RelativeBase = &refDate
 	return p
 }
 

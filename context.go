@@ -53,10 +53,8 @@ func newParsingContextWithSettings(text string, refDate interface{}, settings Se
 
 	reference := fromInput(refDate, nil)
 
-	// Apply normalization if enabled
-	if settings.Normalize {
-		text = sanitizeInput(text)
-	}
+	// Apply normalization
+	text = sanitizeInput(text)
 
 	ctx := &ParsingContext{
 		text:      text,
