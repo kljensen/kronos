@@ -47,6 +47,11 @@ func InternalMergeDateTimeResult(dateResult, timeResult *parsingResult) *parsing
 	return mergeDateTimeResult(dateResult, timeResult)
 }
 
+// InternalMergeDateTimeComponent merges date and time components (internal use only).
+func InternalMergeDateTimeComponent(dateComp, timeComp *parsingComponents) *parsingComponents {
+	return mergeDateTimeComponent(dateComp, timeComp)
+}
+
 // InternalValidateSettings validates parsing settings (internal use only).
 func InternalValidateSettings(s Settings) error {
 	return validateSettings(s)
