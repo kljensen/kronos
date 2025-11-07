@@ -400,7 +400,7 @@ func findYearClosestToRefWithPreference(refDate time.Time, day, month int, prefe
 		return candidates[0].Year()
 
 	case PreferFuture:
-		for i := 0; i < len(candidates); i++ {
+		for i := range len(candidates) {
 			if candidates[i].After(refDate) || candidates[i].Equal(refDate) {
 				return candidates[i].Year()
 			}
