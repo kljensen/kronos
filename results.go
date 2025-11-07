@@ -5,12 +5,6 @@ import (
 	"time"
 )
 
-// emptyDuration is an internal copy of empty duration for use within the root package.
-var emptyDuration = Duration{
-	TimeunitDay:         0,
-	TimeunitSecond:      0,
-	TimeunitMillisecond: 0,
-}
 
 // referenceWithTimezone represents a reference date/time with an optional timezone offset.
 // It is used as the reference point for parsing relative dates and times.
@@ -450,7 +444,7 @@ func determinePeriodFromComponents(pc *parsingComponents) Period {
 // Returns nil if the duration calculation fails (e.g., overflow).
 func createRelativeFromReference(reference *referenceWithTimezone, duration Duration) *parsingComponents {
 	if duration == nil {
-		duration = emptyDuration
+		duration = Duration{}
 	}
 
 	date, err := addDuration(reference.GetDateWithAdjustedTimezone(), duration)

@@ -47,6 +47,9 @@ const (
 	maxDaysDuration    = 3650000
 	maxHoursDuration   = 87600000
 	maxMinutesDuration = 5256000000
+
+	// roundingOffset is used for rounding fractional time units
+	roundingOffset = 0.5
 )
 
 // Duration represents a directed time duration as a set of values by timeunits.
@@ -211,7 +214,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			// Convert fractional weeks to days
 			// Round to nearest day for both positive and negative values
 			days := remainder * 7
-			const roundingOffset = 0.5
 			if days > 0 {
 				working[TimeunitDay] += float64(int(days + roundingOffset))
 			} else if days < 0 {
@@ -229,7 +231,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			// Convert fractional days to hours
 			// Round to nearest hour for both positive and negative values
 			hours := remainder * 24
-			const roundingOffset = 0.5
 			if hours > 0 {
 				working[TimeunitHour] += float64(int(hours + roundingOffset))
 			} else if hours < 0 {
@@ -248,7 +249,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			// For positive values: round to nearest minute
 			// For negative values: preserve sign and round to nearest minute
 			minutes := remainder * 60
-			const roundingOffset = 0.5
 			if minutes > 0 {
 				working[TimeunitMinute] += float64(int(minutes + roundingOffset))
 			} else if minutes < 0 {
@@ -267,7 +267,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			// For positive values: round to nearest second
 			// For negative values: preserve sign and round to nearest second
 			seconds := remainder * 60
-			const roundingOffset = 0.5
 			if seconds > 0 {
 				working[TimeunitSecond] += float64(int(seconds + roundingOffset))
 			} else if seconds < 0 {
@@ -286,7 +285,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			// For positive values: round to nearest millisecond
 			// For negative values: preserve sign and round to nearest millisecond
 			milliseconds := remainder * 1000
-			const roundingOffset = 0.5
 			if milliseconds > 0 {
 				working[TimeunitMillisecond] += float64(int(milliseconds + roundingOffset))
 			} else if milliseconds < 0 {
@@ -303,7 +301,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 		if remainder != 0 {
 			// Convert fractional milliseconds to microseconds
 			microseconds := remainder * 1000
-			const roundingOffset = 0.5
 			if microseconds > 0 {
 				working[TimeunitMicrosecond] += float64(int(microseconds + roundingOffset))
 			} else if microseconds < 0 {
@@ -320,7 +317,6 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 		if remainder != 0 {
 			// Convert fractional microseconds to nanoseconds
 			nanoseconds := remainder * 1000
-			const roundingOffset = 0.5
 			if nanoseconds > 0 {
 				working[TimeunitNanosecond] += float64(int(nanoseconds + roundingOffset))
 			} else if nanoseconds < 0 {
