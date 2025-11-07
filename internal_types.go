@@ -99,14 +99,9 @@ func InternalGetLastWeekdayOfMonth(year int, month time.Month, weekday time.Week
 	}
 
 	// Calculate how many days to go back
-	var dayDiff int
-	switch {
-	case firstWeekdayNextMonth == targetWeekday:
-		dayDiff = 7
-	case firstWeekdayNextMonth < targetWeekday:
-		dayDiff = 7 + firstWeekdayNextMonth - targetWeekday
-	default:
-		dayDiff = firstWeekdayNextMonth - targetWeekday
+	dayDiff := firstWeekdayNextMonth - targetWeekday
+	if dayDiff <= 0 {
+		dayDiff += 7
 	}
 
 	// Go back to find the last occurrence
