@@ -80,3 +80,15 @@ issues:
     - path: _test\.go
       linters:
         - errcheck
+    # Allow deprecated API usage in test files that test internal/advanced APIs
+    # These tests need to use deprecated types to test the internal implementation
+    - path: _test\.go
+      text: "SA1019"
+    # Allow deprecated API usage in en/en.go which provides the public API
+    # This file uses internal types to construct Chrono instances
+    - path: en/en\.go
+      text: "SA1019"
+    # Allow deprecated API usage in internal/ packages
+    # These are internal implementations that legitimately use deprecated public types
+    - path: internal/
+      text: "SA1019"
