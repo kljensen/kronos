@@ -2,7 +2,6 @@ package kronos
 
 import (
 	"sort"
-	"time"
 )
 
 // Chrono is the main parsing engine that coordinates multiple parsers and refiners.
@@ -35,54 +34,6 @@ func NewChrono(config *Configuration) *Chrono {
 		parsers:  append([]Parser{}, config.Parsers...),
 		refiners: append([]Refiner{}, config.Refiners...),
 	}
-}
-
-// Clone creates a shallow copy of the Chrono object with the same configuration.
-// The parsers and refiners slices are copied, but the parsers/refiners themselves are not.
-func (c *Chrono) Clone() *Chrono {
-	return &Chrono{
-		parsers:  append([]Parser{}, c.parsers...),
-		refiners: append([]Refiner{}, c.refiners...),
-	}
-}
-
-// ParseDate is a shortcut for calling Parse and returning the first result's date.
-// Returns nil if no results are found.
-func (c *Chrono) ParseDate(text string, referenceDate interface{}, option *parsingOption) *time.Time {
-	results := c.Parse(text, referenceDate, option)
-	if len(results) > 0 {
-		date := results[0].Date()
-		return &date
-	}
-	return nil
-}
-
-// parseWithSettings parses the input text using the provided settings.
-// Settings provide more comprehensive configuration than ParsingOption.
-// This method creates a pipeline from the current configuration and settings.
-func (c *Chrono) parseWithSettings(text string, referenceDate time.Time, settings Settings) ([]*parsingResult, error) {
-	// Create a configuration from this Chrono instance
-	config := &Configuration{
-		Parsers:  append([]Parser{}, c.parsers...),
-		Refiners: append([]Refiner{}, c.refiners...),
-	}
-
-	// Create and execute pipeline
-	return parseWithSettings(text, referenceDate, settings, config)
-}
-
-// ParseDateWithSettings is a shortcut for calling parseWithSettings and returning the first result's date.
-// Returns nil if no results are found or an error occurs.
-func (c *Chrono) ParseDateWithSettings(text string, referenceDate time.Time, settings Settings) (*time.Time, error) {
-	results, err := c.parseWithSettings(text, referenceDate, settings)
-	if err != nil {
-		return nil, err
-	}
-	if len(results) > 0 {
-		date := results[0].Date()
-		return &date, nil
-	}
-	return nil, nil
 }
 
 // Parse parses the input text and returns all found date/time results.

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -61,26 +60,8 @@ func TestNewChrono(t *testing.T) {
 	})
 }
 
-func TestChronoClone(t *testing.T) {
-	parser := &MockParser{pattern: `test`}
-	refiner := &MockRefiner{}
-	config := &Configuration{
-		Parsers:  []Parser{parser},
-		Refiners: []Refiner{refiner},
-	}
-
-	c := NewChrono(config)
-	clone := c.Clone()
-
-	assert.NotNil(t, clone)
-	assert.Len(t, clone.parsers, 1)
-	assert.Len(t, clone.refiners, 1)
-
-	// Ensure it's a shallow copy - modifying the clone shouldn't affect original
-	clone.parsers = append(clone.parsers, &MockParser{pattern: `another`})
-	assert.Len(t, c.parsers, 1)
-	assert.Len(t, clone.parsers, 2)
-}
+// TestChronoClone was removed as Clone() method has been removed from the API.
+// Chrono objects are deprecated in favor of the ParserBuilder API.
 
 func TestChronoParse(t *testing.T) {
 	t.Run("basic parsing", func(t *testing.T) {
@@ -146,42 +127,8 @@ func TestChronoParse(t *testing.T) {
 	})
 }
 
-func TestChronoParseDate(t *testing.T) {
-	t.Run("returns first date", func(t *testing.T) {
-		parser := &MockParser{
-			pattern: `\b(\d{4})-(\d{2})-(\d{2})\b`,
-			extractFunc: func(context *parsingContext, match []string) interface{} {
-				return map[Component]int{
-					ComponentYear:  2023,
-					ComponentMonth: 10,
-					ComponentDay:   15,
-				}
-			},
-		}
-
-		config := &Configuration{Parsers: []Parser{parser}}
-		c := NewChrono(config)
-
-		date := c.ParseDate("Today is 2023-10-15", nil, nil)
-		assert.NotNil(t, date)
-		assert.Equal(t, 2023, date.Year())
-		assert.Equal(t, time.Month(10), date.Month())
-		assert.Equal(t, 15, date.Day())
-	})
-
-	t.Run("returns nil when no matches", func(t *testing.T) {
-		parser := &MockParser{
-			pattern:     `\b(\d{4})-(\d{2})-(\d{2})\b`,
-			extractFunc: func(context *parsingContext, match []string) interface{} { return nil },
-		}
-
-		config := &Configuration{Parsers: []Parser{parser}}
-		c := NewChrono(config)
-
-		date := c.ParseDate("No date here", nil, nil)
-		assert.Nil(t, date)
-	})
-}
+// TestChronoParseDate was removed as ParseDate() method has been removed from the API.
+// Use ParserBuilder.ParseDate() instead, which is the recommended builder-based API.
 
 func TestChronoRefiner(t *testing.T) {
 	t.Run("refiner processes results", func(t *testing.T) {
