@@ -72,7 +72,7 @@ func TestMergingRelativeDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := CasualChrono() // was CreateCasualConfiguration(true)
+			chrono := englishCasualChrono() // was CreateCasualConfiguration(true)
 			results := chrono.Parse(tt.text, tt.refDate, nil)
 
 			assert.Len(t, results, 1, "Expected exactly 1 result")

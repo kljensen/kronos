@@ -32,7 +32,7 @@ import (
 )
 
 // createCasualChrono creates a Chrono instance with casual parsers
-func createCasualChrono() *kronos.Chrono {
+func createenglishCasualChrono() *kronos.Chrono {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
 			parsers.NewENCasualDateParser(),
@@ -180,7 +180,7 @@ func TestSingleExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createCasualChrono()
+			chrono := createenglishCasualChrono()
 			results := chrono.Parse(tt.text, tt.refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
@@ -271,7 +271,7 @@ func TestRandomText(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createCasualChrono()
+			chrono := createenglishCasualChrono()
 			results := chrono.Parse(tt.text, tt.refDate, nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
@@ -307,7 +307,7 @@ func TestWeekdayShorthand(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createCasualChrono()
+			chrono := createenglishCasualChrono()
 			results := chrono.Parse(tt.text, time.Now(), nil)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
@@ -346,7 +346,7 @@ func TestRandomNegativeText(t *testing.T) {
 
 	for _, text := range negativeTests {
 		t.Run(text, func(t *testing.T) {
-			chrono := createCasualChrono()
+			chrono := createenglishCasualChrono()
 			results := chrono.Parse(text, time.Now(), nil)
 
 			assert.Empty(t, results, "Should not parse: %s", text)

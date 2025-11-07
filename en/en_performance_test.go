@@ -32,7 +32,7 @@ func TestPerformanceWhitespaceBacktracking(t *testing.T) {
 
 	start := time.Now()
 	refDate := time.Now()
-	chrono := CasualChrono()
+	chrono := englishCasualChrono()
 	results, err := kronos.New(chrono).WithReferenceDate(refDate).Parse(str)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

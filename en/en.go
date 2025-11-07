@@ -133,31 +133,18 @@ func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 	return config
 }
 
-// CasualChrono creates a Chrono instance configured for parsing casual English.
-// It recognizes informal expressions like "today", "tomorrow", "next week", etc.
-// Most users should use New() instead, which provides a more convenient builder API.
-func CasualChrono() *kronos.Chrono {
+// Internal convenience functions for the builder API
+func englishCasualChrono() *kronos.Chrono {
 	return kronos.NewChrono(createCasualConfiguration(false))
 }
 
-// StrictChrono creates a Chrono instance configured for parsing strict English.
-// It only recognizes formal date/time patterns and avoids casual expressions.
-// Most users should use NewStrict() instead, which provides a more convenient builder API.
-func StrictChrono() *kronos.Chrono {
+func englishStrictChrono() *kronos.Chrono {
 	return kronos.NewChrono(createConfiguration(true, false))
 }
 
-// GBChrono creates a Chrono instance configured for parsing UK-style English.
-// It uses little-endian date format (day/month/year) and casual expressions.
-// Most users should use NewGB() instead, which provides a more convenient builder API.
-func GBChrono() *kronos.Chrono {
+func englishGBChrono() *kronos.Chrono {
 	return kronos.NewChrono(createCasualConfiguration(true))
 }
-
-// Internal convenience functions for the builder API
-func englishCasualChrono() *kronos.Chrono { return CasualChrono() }
-func englishStrictChrono() *kronos.Chrono  { return StrictChrono() }
-func englishGBChrono() *kronos.Chrono      { return GBChrono() }
 
 // ParseSimple is a convenience function that parses text using the new builder API.
 // It uses casual English configuration and the current time as reference.

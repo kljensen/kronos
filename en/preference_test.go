@@ -77,7 +77,7 @@ func TestDatePreferenceWithMonth(t *testing.T) {
 			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
-			chrono := CasualChrono()
+			chrono := englishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, option)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
@@ -147,7 +147,7 @@ func TestDatePreferenceWithMonthAndDay(t *testing.T) {
 			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
-			chrono := CasualChrono()
+			chrono := englishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, option)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
@@ -236,7 +236,7 @@ func TestDatePreferenceWithTimeOnly(t *testing.T) {
 			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
-			chrono := CasualChrono()
+			chrono := englishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, option)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
@@ -271,7 +271,7 @@ func TestDatePreferenceWithAbsoluteDates(t *testing.T) {
 			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
-			chrono := CasualChrono()
+			chrono := englishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, option)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
@@ -328,7 +328,7 @@ func TestDatePreferenceWithLittleEndianFormat(t *testing.T) {
 			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
-			chrono := GBChrono()
+			chrono := englishGBChrono()
 			results := chrono.Parse(tt.input, refDate, option)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
@@ -384,7 +384,7 @@ func TestDatePreferenceDoesNotAffectRelativeDates(t *testing.T) {
 			option := &kronos.InternalParsingOption{
 				Preference: tt.preference,
 			}
-			chrono := CasualChrono()
+			chrono := englishCasualChrono()
 			results := chrono.Parse(tt.input, refDate, option)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
@@ -405,7 +405,7 @@ func TestPreferenceDefault(t *testing.T) {
 	refDate := time.Date(2015, 2, 15, 15, 30, 0, 0, time.UTC)
 
 	// Parse without specifying preference
-	chrono := CasualChrono()
+	chrono := englishCasualChrono()
 	results := chrono.Parse("March 15", refDate, nil)
 
 	if len(results) == 0 {
