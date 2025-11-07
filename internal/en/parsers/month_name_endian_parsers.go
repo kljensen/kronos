@@ -101,6 +101,7 @@ func (p *ENMonthNameLittleEndianParser) innerExtract(context *kronos.InternalPar
 // Also handles ranges: "January 12 - 15, 2012"
 type ENMonthNameMiddleEndianParser struct {
 	*parsing.AbstractParserWithWordBoundary
+
 	shouldSkipYearLikeDate bool
 }
 

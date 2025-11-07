@@ -12,6 +12,7 @@ import (
 // AbstractMergeDateTimeRefiner merges date-only and time-only results.
 type AbstractMergeDateTimeRefiner struct {
 	BaseMergingRefiner
+
 	PatternBetweenFunc func() *regexp.Regexp
 }
 

@@ -16,6 +16,7 @@ import (
 // Supports both numeric months and month names (e.g., 2012/Aug/10)
 type ENYearMonthDayParser struct {
 	*parsing.AbstractParserWithWordBoundary
+
 	strictMonthDateOrder bool
 }
 

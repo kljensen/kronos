@@ -23,6 +23,7 @@ linters:
     - nestif             # Nesting is sometimes clearer than extraction
     - lll                # Line length varies in this codebase
     - wsl                # Whitespace linting is too opinionated
+    - wsl_v5             # Whitespace linting is too opinionated (v5)
     - dupl               # Some duplication is acceptable in similar patterns
     - nlreturn           # Blank lines before returns is too opinionated
     - tagliatelle        # Struct tag formats don't need to be enforced
@@ -41,6 +42,12 @@ linters:
     - predeclared        # Shadowing predeclared identifiers is sometimes clearer
     - err113             # Dynamic errors are appropriate for detailed validation messages
     - goconst            # Repeated strings in tests don't always need to be constants
+    - noinlineerr        # Inline error handling is idiomatic Go
+    - unconvert          # Unnecessary conversions are harmless and sometimes aid clarity
+    - modernize          # Modernization suggestions require newer Go versions or are too opinionated
+    - noctx              # Context usage in exec commands is too strict, especially for tests
+    - funcorder          # Method ordering is too opinionated and doesn't affect correctness
+    - godoclint          # Package doc formatting is too strict
 
   settings:
     errcheck:
@@ -51,10 +58,15 @@ linters:
       enable-all: true
       disable:
         - fieldalignment  # Disable field alignment checks as they're too pedantic and can hurt readability
+        - shadow          # Variable shadowing is acceptable in many cases
 
     goconst:
       min-len: 3
       min-occurrences: 3
+
+    gocritic:
+      disabled-checks:
+        - ifElseChain  # if-else is sometimes clearer than switch
 
     misspell:
       locale: US
@@ -72,6 +84,16 @@ linters:
       - path: _test\.go
         linters:
           - errcheck
+      # Disable errcheck and forbidigo for example files
+      # Examples are demonstrations and should be simple/readable
+      - path: examples/
+        linters:
+          - errcheck
+          - forbidigo
+      # Allow type alias comment format in internal_helpers.go
+      # Type aliases in grouped declarations don't need individual comments
+      - path: internal_helpers\.go
+        text: "comment on exported type.*should be of the form"
       # Allow deprecated API usage in test files that test internal/advanced APIs
       # These tests need to use deprecated types to test the internal implementation
       - path: _test\.go

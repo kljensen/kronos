@@ -16,6 +16,7 @@ import (
 // "3 days ago", "2 hours ago", "5 minutes before", "15 minutes earlier"
 type ENTimeUnitAgoFormatParser struct {
 	*parsing.AbstractParserWithWordBoundary
+
 	strictMode bool
 }
 
@@ -82,6 +83,7 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 // "in 3 days", "3 hours later", "5 minutes from now", "2 weeks after"
 type ENTimeUnitLaterFormatParser struct {
 	*parsing.AbstractParserWithWordBoundary
+
 	strictMode bool
 }
 
@@ -146,6 +148,7 @@ func NewENTimeUnitLaterFormatParser(strictMode bool) *ENTimeUnitLaterFormatParse
 // Creates a date range from now to now + duration
 type ENTimeUnitWithinFormatParser struct {
 	*parsing.AbstractParserWithWordBoundary
+
 	strictMode bool
 }
 
@@ -214,6 +217,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 // "this week", "next month", "last year", "past week", "+3 days", "-2 weeks"
 type ENTimeUnitCasualRelativeFormatParser struct {
 	*parsing.AbstractParserWithWordBoundary
+
 	allowAbbreviations bool
 }
 

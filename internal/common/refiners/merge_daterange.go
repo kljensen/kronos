@@ -12,6 +12,7 @@ import (
 // AbstractMergeDateRangeRefiner merges two date results into a date range.
 type AbstractMergeDateRangeRefiner struct {
 	BaseMergingRefiner
+
 	PatternBetweenFunc func() *regexp.Regexp
 }
 
