@@ -167,7 +167,7 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		floor := int(val)
-		date = addYears(date, floor)
+		date = date.AddDate(floor, 0, 0)
 		if err := validateDate(date); err != nil {
 			return time.Time{}, err
 		}
@@ -183,7 +183,7 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		floor := int(val)
-		date = addMonths(date, floor*3)
+		date = date.AddDate(0, floor*3, 0)
 		if err := validateDate(date); err != nil {
 			return time.Time{}, err
 		}
@@ -195,7 +195,7 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 			return time.Time{}, err
 		}
 		floor := int(val)
-		date = addMonths(date, floor)
+		date = date.AddDate(0, floor, 0)
 		if err := validateDate(date); err != nil {
 			return time.Time{}, err
 		}
@@ -349,14 +349,3 @@ func reverseDuration(duration Duration) Duration {
 	return reversed
 }
 
-// addYears adds the specified number of years to the date.
-// It handles month overflow correctly (e.g., Jan 31 + 1 year = Jan 31 next year).
-func addYears(date time.Time, years int) time.Time {
-	return date.AddDate(years, 0, 0)
-}
-
-// addMonths adds the specified number of months to the date.
-// It handles varying month lengths correctly (e.g., Jan 31 + 1 month = Feb 28/29).
-func addMonths(date time.Time, months int) time.Time {
-	return date.AddDate(0, months, 0)
-}
