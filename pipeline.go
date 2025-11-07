@@ -97,8 +97,18 @@ func (p *Pipeline) Execute(text string, refDate time.Time) ([]*ParsingResult, er
 }
 
 // executeParser executes a single parser on the context.
-// This is similar to Chrono.executeParser but uses the pipeline's context.
+// This delegates to the shared executeParser implementation.
 func (p *Pipeline) executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
+	return executeParser(context, parser)
+}
+
+// executeParser is the shared implementation for executing a single parser.
+// It handles:
+// - Finding all matches in the text
+// - Proper index tracking as text is consumed
+// - Multiple return types from Extract: map, ParsingComponents, ParsingResult
+// - Overlapping matches by advancing by 1 on extract failure
+func executeParser(context *ParsingContext, parser Parser) []*ParsingResult {
 	results := make([]*ParsingResult, 0)
 	pattern := parser.Pattern(context)
 
