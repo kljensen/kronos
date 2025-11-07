@@ -248,14 +248,14 @@ func GetDaysToWeekday(refDate time.Time, targetWeekday time.Weekday, modifier *s
 	return getDaysToWeekdayClosest(refDate, targetWeekday)
 }
 
-// GetLastWeekdayOfMonth wraps kronos.GetLastWeekdayOfMonth for use in internal packages.
-func GetLastWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, hour int) time.Time {
-	return kronos.GetLastWeekdayOfMonth(year, month, weekday, hour)
+// GetNthWeekdayOfMonth wraps the internal kronos function for use in internal packages.
+func GetNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int, hour int) time.Time {
+	return kronos.InternalGetNthWeekdayOfMonth(year, month, weekday, n, hour)
 }
 
-// GetNthWeekdayOfMonth wraps kronos.GetNthWeekdayOfMonth for use in internal packages.
-func GetNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int, hour int) time.Time {
-	return kronos.GetNthWeekdayOfMonth(year, month, weekday, n, hour)
+// GetLastWeekdayOfMonth wraps the internal kronos function for use in internal packages.
+func GetLastWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, hour int) time.Time {
+	return kronos.InternalGetLastWeekdayOfMonth(year, month, weekday, hour)
 }
 
 // Helper functions

@@ -56,3 +56,15 @@ func InternalValidateSettings(s Settings) error {
 func InternalParseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*parsingResult, error) {
 	return parseWithSettings(text, refDate, settings, config)
 }
+
+// Weekday calculation helpers for internal packages
+
+// InternalGetNthWeekdayOfMonth wraps the unexported weekday calculation (internal use only).
+func InternalGetNthWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, n int, hour int) time.Time {
+	return getNthWeekdayOfMonth(year, month, weekday, n, hour)
+}
+
+// InternalGetLastWeekdayOfMonth wraps the unexported weekday calculation (internal use only).
+func InternalGetLastWeekdayOfMonth(year int, month time.Month, weekday time.Weekday, hour int) time.Time {
+	return getLastWeekdayOfMonth(year, month, weekday, hour)
+}
