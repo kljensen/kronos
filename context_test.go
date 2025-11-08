@@ -63,8 +63,8 @@ func TestNewParsingContext(t *testing.T) {
 
 		settings := ctx.Settings()
 
-		if settings.ForwardDate() {
-			t.Errorf("Expected ForwardDate to be false by default")
+		if settings.PreferDatesFrom != PreferCurrentPeriod {
+			t.Errorf("Expected PreferCurrentPeriod by default, got %v", settings.PreferDatesFrom)
 		}
 
 		if settings.TimezoneOverrides != nil {
@@ -95,8 +95,8 @@ func TestNewParsingContext(t *testing.T) {
 
 		s := ctx.Settings()
 
-		if !s.ForwardDate() {
-			t.Errorf("Expected ForwardDate to be true")
+		if s.PreferDatesFrom != PreferFuture {
+			t.Errorf("Expected PreferFuture, got %v", s.PreferDatesFrom)
 		}
 
 		if s.DebugHandler == nil {
@@ -351,8 +351,8 @@ func TestContextAccessors(t *testing.T) {
 	t.Run("Settings returns parsing settings", func(t *testing.T) {
 		s := ctx.Settings()
 
-		if !s.ForwardDate() {
-			t.Errorf("Expected ForwardDate to be true")
+		if s.PreferDatesFrom != PreferFuture {
+			t.Errorf("Expected PreferFuture, got %v", s.PreferDatesFrom)
 		}
 	})
 

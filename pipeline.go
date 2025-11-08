@@ -62,10 +62,29 @@ type parsingContext struct {
 // If refDate is nil, the current time is used.
 // If option is nil, default options are used.
 // The input text is sanitized to normalize Unicode characters before parsing.
-func newParsingContext(text string, refDate any, option *parsingOption) *parsingContext {
+// The option parameter can be *parsingOption or Settings (for backward compatibility).
+func newParsingContext(text string, refDate any, option any) *parsingContext {
 	var opt parsingOption
-	if option != nil {
-		opt = *option
+	var settings *Settings
+
+	// Handle different types of option parameter
+	switch v := option.(type) {
+	case *parsingOption:
+		if v != nil {
+			opt = *v
+		}
+	case parsingOption:
+		opt = v
+	case Settings:
+		opt = v.toparsingOption(nil)
+		settings = &v
+	case *Settings:
+		if v != nil {
+			opt = v.toparsingOption(nil)
+			settings = v
+		}
+	case nil:
+		// Use default options
 	}
 
 	var timezones TimezoneAbbrMap
@@ -83,7 +102,7 @@ func newParsingContext(text string, refDate any, option *parsingOption) *parsing
 		option:    opt,
 		reference: reference,
 		refDate:   reference.Instant(),
-		settings:  nil,
+		settings:  settings,
 	}
 }
 

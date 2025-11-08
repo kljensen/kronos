@@ -2,6 +2,8 @@ package kronos
 
 import (
 	"testing"
+
+	"github.com/kljensen/kronos/internal/sanitization"
 )
 
 func TestSanitizeInput(t *testing.T) {
@@ -261,7 +263,7 @@ func TestSanitizeInput(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := sanitizeInput(tt.input)
+			result := sanitization.SanitizeInput(tt.input)
 			if result != tt.expected {
 				t.Errorf("sanitizeInput(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
@@ -299,7 +301,7 @@ func TestNormalizeApostrophes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := normalizeApostrophes(tt.input)
+			result := sanitization.NormalizeApostrophes(tt.input)
 			if result != tt.expected {
 				t.Errorf("normalizeApostrophes(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
@@ -337,7 +339,7 @@ func TestRemoveZeroWidthChars(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := removeZeroWidthChars(tt.input)
+			result := sanitization.RemoveZeroWidthChars(tt.input)
 			if result != tt.expected {
 				t.Errorf("removeZeroWidthChars(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
@@ -360,7 +362,7 @@ func BenchmarkSanitizeInput(b *testing.B) {
 	for _, tc := range testCases {
 		b.Run(tc.name, func(b *testing.B) {
 			for range b.N {
-				sanitizeInput(tc.input)
+				sanitization.SanitizeInput(tc.input)
 			}
 		})
 	}

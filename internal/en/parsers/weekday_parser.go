@@ -106,7 +106,7 @@ func NewENWeekdayParser() *ENWeekdayParser {
 			var modPtr *string
 			if modifier != "" {
 				modPtr = &modifier
-			} else if context.Option().ForwardDate() {
+			} else if context.Option().ForwardDate {
 				// When ForwardDate is enabled and no modifier is given,
 				// treat it as "this" (forward)
 				thisModifier := "this"

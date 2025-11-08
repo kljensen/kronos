@@ -148,3 +148,32 @@ func StripApproximationWords(input string) (cleaned string, isApproximate bool) 
 
 	return strings.TrimSpace(cleaned), isApproximate
 }
+
+// AtoiSafe converts a string to an integer, returning the value and a boolean indicating success.
+// This is a safe wrapper around strconv.Atoi that returns false instead of an error on failure.
+func AtoiSafe(s string) (int, bool) {
+	// Try to extract numeric part
+	val := regexp.MustCompile(`^-?\d+`).FindString(s)
+	if val == "" {
+		return 0, false
+	}
+
+	// Parse the number manually
+	result := 0
+	isNegative := val[0] == '-'
+	start := 0
+	if isNegative {
+		start = 1
+	}
+
+	for i := start; i < len(val); i++ {
+		if val[i] >= '0' && val[i] <= '9' {
+			result = result*10 + int(val[i]-'0')
+		}
+	}
+
+	if isNegative {
+		return -result, true
+	}
+	return result, true
+}

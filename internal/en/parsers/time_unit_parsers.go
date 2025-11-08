@@ -167,7 +167,7 @@ func NewENTimeUnitWithinFormatParser(strictMode bool) *ENTimeUnitWithinFormatPar
 
 			var pattern string
 			option := context.Option()
-			if option.ForwardDate() {
+			if option.ForwardDate {
 				pattern = `(?:(?:within|in|for)\s*)?`
 			} else {
 				pattern = `(?:within|in|for)\s*`

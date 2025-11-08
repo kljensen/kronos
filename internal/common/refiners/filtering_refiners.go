@@ -47,7 +47,7 @@ func (r *OverlapRemovalRefiner) Refine(context *kronos.InternalParsingContext, r
 			kept = prevResult
 		}
 
-		if context.Option().DebugHandler != nil {
+		if context.Option().Debug != nil {
 			context.Debug(func() {
 				// Log: OverlapRemovalRefiner removing result
 			})
@@ -105,7 +105,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.InternalParsingContext, r
 				}
 			}
 		}
-		if context.Option().DebugHandler != nil {
+		if context.Option().Debug != nil {
 			context.Debug(func() {
 				// Log: Removing unlikely result
 			})
@@ -119,7 +119,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.InternalParsingContext, r
 		return false
 	}
 	if !resultStart.IsValidDate() {
-		if context.Option().DebugHandler != nil {
+		if context.Option().Debug != nil {
 			context.Debug(func() {
 				// Log: Removing invalid result
 			})
@@ -131,7 +131,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.InternalParsingContext, r
 	if result.End() != nil {
 		if resultEnd, okEnd := helpers.AsParsingComponents(result.End()); okEnd {
 			if !resultEnd.IsValidDate() {
-				if context.Option().DebugHandler != nil {
+				if context.Option().Debug != nil {
 					context.Debug(func() {
 						// Log: Removing invalid result with invalid end date
 					})
@@ -139,7 +139,7 @@ func (f *UnlikelyFormatFilter) isValid(context *kronos.InternalParsingContext, r
 				return false
 			}
 		} else {
-			if context.Option().DebugHandler != nil {
+			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: Removing invalid result with invalid end date
 				})
@@ -163,7 +163,7 @@ func (f *UnlikelyFormatFilter) isStrictModeValid(context *kronos.InternalParsing
 		return false
 	}
 	if resultStart.IsOnlyWeekdayComponent() {
-		if context.Option().DebugHandler != nil {
+		if context.Option().Debug != nil {
 			context.Debug(func() {
 				// Log: (Strict) Removing weekday only component
 			})
@@ -192,7 +192,7 @@ func NewDatePreferenceRefiner() *DatePreferenceRefiner {
 
 // Refine adjusts dates based on the preference setting
 func (r *DatePreferenceRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
-	preference := context.Option().PreferDatesFrom
+	preference := context.Option().Preference
 
 	// PreferCurrentPeriod is the default - no adjustment needed
 	if preference == kronos.PreferCurrentPeriod {
@@ -258,7 +258,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 			refPreviousDay = refPreviousDay.AddDate(0, 0, -1)
 			components.ImplySimilarDate(refPreviousDay)
 
-			if context.Option().DebugHandler != nil {
+			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: DatePreferenceRefiner (PreferPast) adjusted time to previous day
 				})
@@ -273,7 +273,7 @@ func (r *DatePreferenceRefiner) adjustTimeOnlyComponents(
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
 			components.ImplySimilarDate(refFollowingDay)
 
-			if context.Option().DebugHandler != nil {
+			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: DatePreferenceRefiner (PreferFuture) adjusted time to following day
 				})

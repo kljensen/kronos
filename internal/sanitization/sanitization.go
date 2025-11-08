@@ -77,20 +77,30 @@ func SanitizeInput(input string) string {
 	return input
 }
 
-// normalizeApostrophes replaces all apostrophe lookalike Unicode characters
+// NormalizeApostrophes replaces all apostrophe lookalike Unicode characters
 // with the ASCII apostrophe (U+0027).
-func normalizeApostrophes(s string) string {
+func NormalizeApostrophes(s string) string {
 	for _, lookalike := range apostropheLookalikes {
 		s = strings.ReplaceAll(s, string(lookalike), "'")
 	}
 	return s
 }
 
-// removeZeroWidthChars removes zero-width and directional formatting characters
+// RemoveZeroWidthChars removes zero-width and directional formatting characters
 // that are invisible but can break parsing.
-func removeZeroWidthChars(s string) string {
+func RemoveZeroWidthChars(s string) string {
 	for _, zwChar := range zeroWidthChars {
 		s = strings.ReplaceAll(s, string(zwChar), "")
 	}
 	return s
+}
+
+// normalizeApostrophes is a wrapper for backward compatibility
+func normalizeApostrophes(s string) string {
+	return NormalizeApostrophes(s)
+}
+
+// removeZeroWidthChars is a wrapper for backward compatibility
+func removeZeroWidthChars(s string) string {
+	return RemoveZeroWidthChars(s)
 }

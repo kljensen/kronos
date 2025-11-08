@@ -20,7 +20,7 @@ func NewForwardDateRefiner() *ForwardDateRefiner {
 
 // Refine adjusts dates to be in the future when forwardDate option is enabled
 func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, results []*kronos.InternalParsingResult) []*kronos.InternalParsingResult {
-	if !context.Option().ForwardDate() {
+	if !context.Option().ForwardDate {
 		return results
 	}
 
@@ -38,7 +38,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 			refFollowingDay = refFollowingDay.AddDate(0, 0, 1)
 
 			resultStart.ImplySimilarDate(refFollowingDay)
-			if context.Option().DebugHandler != nil {
+			if context.Option().Debug != nil {
 				context.Debug(func() {
 					// Log: ForwardDateRefiner adjusted time from ref date to following day
 				})
@@ -73,7 +73,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 				}
 				resultStart.ImplySimilarDate(adjustedDate)
 
-				if context.Option().DebugHandler != nil {
+				if context.Option().Debug != nil {
 					context.Debug(func() {
 						// Log: ForwardDateRefiner adjusted weekday
 					})
@@ -95,7 +95,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 								}
 								resultEnd.ImplySimilarDate(adjustedDate)
 
-								if context.Option().DebugHandler != nil {
+								if context.Option().Debug != nil {
 									context.Debug(func() {
 										// Log: ForwardDateRefiner adjusted end weekday
 									})
@@ -113,7 +113,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 				yearVal := resultStart.Get(kronos.ComponentYear)
 				if yearVal != nil {
 					resultStart.Imply(kronos.ComponentYear, *yearVal+1)
-					if context.Option().DebugHandler != nil {
+					if context.Option().Debug != nil {
 						context.Debug(func() {
 							// Log: ForwardDateRefiner adjusted year
 						})
@@ -125,7 +125,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 								endYearVal := resultEnd.Get(kronos.ComponentYear)
 								if endYearVal != nil {
 									resultEnd.Imply(kronos.ComponentYear, *endYearVal+1)
-									if context.Option().DebugHandler != nil {
+									if context.Option().Debug != nil {
 										context.Debug(func() {
 											// Log: ForwardDateRefiner adjusted end year
 										})

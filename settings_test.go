@@ -60,17 +60,17 @@ func TestDateOrderString(t *testing.T) {
 	}
 }
 
-func TestForwardDate(t *testing.T) {
+func TestPreferFuture(t *testing.T) {
 	settings := DefaultSettings()
 	settings.PreferDatesFrom = PreferFuture
 
-	if !settings.ForwardDate() {
-		t.Error("Expected ForwardDate() to be true when PreferDatesFrom is PreferFuture")
+	if settings.PreferDatesFrom != PreferFuture {
+		t.Error("Expected PreferDatesFrom to be PreferFuture")
 	}
 
 	settings.PreferDatesFrom = PreferPast
-	if settings.ForwardDate() {
-		t.Error("Expected ForwardDate() to be false when PreferDatesFrom is PreferPast")
+	if settings.PreferDatesFrom != PreferPast {
+		t.Error("Expected PreferDatesFrom to be PreferPast")
 	}
 }
 
@@ -132,11 +132,6 @@ func TestNewParsingContextWithSettings(t *testing.T) {
 
 	if ctxSettings.PreferDatesFrom != PreferFuture {
 		t.Errorf("Expected PreferFuture, got %v", ctxSettings.PreferDatesFrom)
-	}
-
-	// Check ForwardDate is derived from settings
-	if !ctxSettings.ForwardDate() {
-		t.Error("Expected ForwardDate() to be true when PreferDatesFrom is PreferFuture")
 	}
 }
 
