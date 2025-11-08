@@ -3,8 +3,6 @@ package kronos
 import (
 	"fmt"
 	"time"
-
-	"github.com/kljensen/kronos/parser"
 )
 
 // parsingResult represents a parsed result containing date/time information.
@@ -35,7 +33,7 @@ func newParsingResult(reference *referenceWithTimezone, index int, text string, 
 }
 
 // Clone creates a deep copy of the ParsingResult.
-func (pr *parsingResult) Clone() parser.Result {
+func (pr *parsingResult) Clone() *parsingResult {
 	var startClone *parsingComponents
 	if pr.start != nil {
 		startClone = pr.start.Clone()
@@ -56,7 +54,7 @@ func (pr *parsingResult) Date() time.Time {
 
 // AddTag adds a debugging tag to both start and end components.
 // Returns the result to allow method chaining.
-func (pr *parsingResult) AddTag(tag string) parser.Result {
+func (pr *parsingResult) AddTag(tag string) *parsingResult {
 	pr.start.AddTag(tag)
 	if pr.end != nil {
 		pr.end.AddTag(tag)
@@ -137,12 +135,12 @@ func (pr *parsingResult) Text() string {
 }
 
 // Start returns the starting date/time components.
-func (pr *parsingResult) Start() any {
+func (pr *parsingResult) Start() Components {
 	return pr.start
 }
 
 // End returns the ending date/time components.
-func (pr *parsingResult) End() any {
+func (pr *parsingResult) End() Components {
 	if pr.end == nil {
 		return nil
 	}

@@ -7,6 +7,7 @@ import (
 // mergeDateTimeResult merges a date-only result with a time-only result.
 func mergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 	result := dateResult.Clone()
+
 	beginDate := dateResult.start
 	beginTime := timeResult.start
 
@@ -29,7 +30,7 @@ func mergeDateTimeResult(dateResult, timeResult *parsingResult) *parsingResult {
 
 		// If date has no end and the merged end time is before start time,
 		// the end should be on the next day
-		if dateResult.End() == nil && endDateTime.Date().Before(result.Start().Date()) {
+		if dateResult.end == nil && endDateTime.Date().Before(result.start.Date()) {
 			nextDay := endDateTime.Date().Add(24 * time.Hour)
 			if endDateTime.IsCertain(ComponentDay) {
 				endDateTime.AssignSimilarDate(nextDay)

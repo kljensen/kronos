@@ -93,14 +93,14 @@ func (p *pipeline) Execute(text string, refDate time.Time) ([]*parsingResult, er
 			ctxAdapter := &contextAdapter{ctx: ctx}
 			resultInterfaces := make([]parser.Result, len(results))
 			for i, r := range results {
-				resultInterfaces[i] = r
+				resultInterfaces[i] = &parserResultAdapter{result: r}
 			}
 			refinedInterfaces := pr.Refine(ctxAdapter, resultInterfaces)
 			// Convert back to []*parsingResult
 			results = make([]*parsingResult, len(refinedInterfaces))
 			for i, r := range refinedInterfaces {
-				if pr, ok := r.(*parsingResult); ok {
-					results[i] = pr
+				if ra, ok := r.(*parserResultAdapter); ok {
+					results[i] = ra.result
 				}
 			}
 		}
@@ -233,9 +233,9 @@ func (p *pipeline) applyStrictValidation(results []*parsingResult) []*parsingRes
 	filtered := make([]*parsingResult, 0, len(results))
 	for _, result := range results {
 		// In strict mode, require at least year and month
-		start := result.Start()
-		hasYear := start.IsCertain(ComponentYear)
-		hasMonth := start.IsCertain(ComponentMonth)
+		// Access the internal start field directly since we're working with internal types
+		hasYear := result.start.IsCertain(ComponentYear)
+		hasMonth := result.start.IsCertain(ComponentMonth)
 
 		// Accept if it has year and month
 		if hasYear && hasMonth {

@@ -28,10 +28,9 @@ type contextAdapter struct {
 	ctx *parsingContext
 }
 
-// Ensure contextAdapter implements parser.Context
+// Ensure adapters implement parser interfaces
 var _ parser.Context = (*contextAdapter)(nil)
 var _ parser.Reference = (*referenceWithTimezone)(nil)
-var _ parser.Result = (*parsingResult)(nil)
 var _ parser.Option = (*optionAdapter)(nil)
 
 // Implement parser.Context interface
@@ -59,11 +58,13 @@ func (ca *contextAdapter) Settings() parser.Settings {
 }
 
 func (ca *contextAdapter) CreateParsingComponents(components any) any {
+	// Internal method returns *parsingComponents, which is what we want
 	return ca.ctx.CreateParsingComponents(components)
 }
 
 func (ca *contextAdapter) CreateParsingResult(index int, textOrEndIndex any, args ...any) parser.Result {
-	return ca.ctx.CreateParsingResult(index, textOrEndIndex, args...)
+	result := ca.ctx.CreateParsingResult(index, textOrEndIndex, args...)
+	return &parserResultAdapter{result: result}
 }
 
 // settingsAdapter wraps Settings to implement parser.Settings
@@ -80,9 +81,23 @@ func (s *settingsAdapter) Debug() func(string) {
 	return opt.Debug
 }
 
-// CreateParsingComponents is already defined in parsingContext
+// parserResultAdapter wraps *parsingResult to implement parser.Result
+// This is used when public parsers/refiners need to work with results.
+type parserResultAdapter struct {
+	result *parsingResult
+}
 
-// CreateParsingResult is already defined in parsingContext
+// Ensure parserResultAdapter implements parser.Result
+var _ parser.Result = (*parserResultAdapter)(nil)
 
-// parsingResult.SetStart signature has been updated to accept any,
-// so it now satisfies the parser.Result interface directly.
+func (ra *parserResultAdapter) Index() int                { return ra.result.Index() }
+func (ra *parserResultAdapter) Text() string              { return ra.result.Text() }
+func (ra *parserResultAdapter) Start() any                { return ra.result.Start() }
+func (ra *parserResultAdapter) End() any                  { return ra.result.End() }
+func (ra *parserResultAdapter) Date() time.Time           { return ra.result.Date() }
+func (ra *parserResultAdapter) Clone() parser.Result      { return &parserResultAdapter{result: ra.result.Clone()} }
+func (ra *parserResultAdapter) SetIndex(index int)        { ra.result.SetIndex(index) }
+func (ra *parserResultAdapter) SetStart(start any)        { ra.result.SetStart(start) }
+func (ra *parserResultAdapter) AddTag(tag string) parser.Result { ra.result.AddTag(tag); return ra }
+func (ra *parserResultAdapter) Tags() map[string]bool     { return ra.result.Tags() }
+func (ra *parserResultAdapter) RefDate() time.Time        { return ra.result.RefDate() }
