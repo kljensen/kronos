@@ -264,66 +264,27 @@ func assignOrImplyComponent(result, source *parsingComponents, component Compone
 	}
 }
 
+// mergeComponents merges multiple components from source to result.
+// Uses assignOrImplyComponent to preserve certainty information.
+func mergeComponents(result, source *parsingComponents, components ...Component) {
+	for _, component := range components {
+		assignOrImplyComponent(result, source, component)
+	}
+}
+
 // mergeDateTimeComponent merges date and time components.
 func mergeDateTimeComponent(dateComp, timeComp *parsingComponents) *parsingComponents {
 	result := dateComp.Clone()
 
-	// Merge time components based on certainty
-	if timeComp.IsCertain(ComponentHour) {
-		// Hour is certain - assign hour and minute
-		if hourVal := timeComp.Get(ComponentHour); hourVal != nil {
-			result.Assign(ComponentHour, *hourVal)
-		}
-		if minuteVal := timeComp.Get(ComponentMinute); minuteVal != nil {
-			result.Assign(ComponentMinute, *minuteVal)
-		}
-
-		// Handle second and subsecond components
-		if timeComp.IsCertain(ComponentSecond) {
-			// Second is certain - assign it
-			if secondVal := timeComp.Get(ComponentSecond); secondVal != nil {
-				result.Assign(ComponentSecond, *secondVal)
-			}
-			// Subsecond components may be certain or implied
-			assignOrImplyComponent(result, timeComp, ComponentMillisecond)
-			assignOrImplyComponent(result, timeComp, ComponentMicrosecond)
-			assignOrImplyComponent(result, timeComp, ComponentNanosecond)
-		} else {
-			// Second is not certain - imply all subsecond components
-			if secondVal := timeComp.Get(ComponentSecond); secondVal != nil {
-				result.Imply(ComponentSecond, *secondVal)
-			}
-			if millisecondVal := timeComp.Get(ComponentMillisecond); millisecondVal != nil {
-				result.Imply(ComponentMillisecond, *millisecondVal)
-			}
-			if microsecondVal := timeComp.Get(ComponentMicrosecond); microsecondVal != nil {
-				result.Imply(ComponentMicrosecond, *microsecondVal)
-			}
-			if nanosecondVal := timeComp.Get(ComponentNanosecond); nanosecondVal != nil {
-				result.Imply(ComponentNanosecond, *nanosecondVal)
-			}
-		}
-	} else {
-		// Hour is not certain - imply all time components
-		if hourVal := timeComp.Get(ComponentHour); hourVal != nil {
-			result.Imply(ComponentHour, *hourVal)
-		}
-		if minuteVal := timeComp.Get(ComponentMinute); minuteVal != nil {
-			result.Imply(ComponentMinute, *minuteVal)
-		}
-		if secondVal := timeComp.Get(ComponentSecond); secondVal != nil {
-			result.Imply(ComponentSecond, *secondVal)
-		}
-		if millisecondVal := timeComp.Get(ComponentMillisecond); millisecondVal != nil {
-			result.Imply(ComponentMillisecond, *millisecondVal)
-		}
-		if microsecondVal := timeComp.Get(ComponentMicrosecond); microsecondVal != nil {
-			result.Imply(ComponentMicrosecond, *microsecondVal)
-		}
-		if nanosecondVal := timeComp.Get(ComponentNanosecond); nanosecondVal != nil {
-			result.Imply(ComponentNanosecond, *nanosecondVal)
-		}
-	}
+	// Merge all time components, preserving certainty
+	mergeComponents(result, timeComp,
+		ComponentHour,
+		ComponentMinute,
+		ComponentSecond,
+		ComponentMillisecond,
+		ComponentMicrosecond,
+		ComponentNanosecond,
+	)
 
 	// Merge timezone
 	if timeComp.IsCertain(ComponentTimezoneOffset) {
