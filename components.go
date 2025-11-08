@@ -8,12 +8,9 @@ import (
 	"github.com/kljensen/kronos/internal/component"
 )
 
-// ParsingComponents represents a collection of parsed date/time components.
+// parsingComponents represents a collection of parsed date/time components.
 // Components are stored as either "known" (directly parsed) or "implied" (inferred).
-//
-// Deprecated: This concrete type exposes internal implementation details. New code should
-// use the Components interface instead, which provides a cleaner API that hides implementation.
-// This type will be moved to an internal package in a future version.
+// This is an internal implementation type. External code should use the Components interface.
 type parsingComponents struct {
 	knownValues   map[Component]int
 	impliedValues map[Component]int

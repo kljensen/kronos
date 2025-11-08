@@ -49,8 +49,6 @@ func NewGB() *kronos.ParserBuilder {
 }
 
 // includeCommonConfiguration adds common parsers and refiners to a configuration.
-//
-//nolint:staticcheck // SA1019 Using deprecated internal API for configuration
 func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *kronos.Configuration {
 	// Add ISO format parser at the beginning
 	config.Parsers = append([]kronos.Parser{parsers.NewISOFormatParser()}, config.Parsers...)
@@ -75,8 +73,6 @@ func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *
 }
 
 // createCasualConfiguration creates a casual English configuration.
-//
-//nolint:staticcheck // SA1019 Using deprecated internal API for configuration
 func createCasualConfiguration(littleEndian bool) *kronos.Configuration {
 	config := createConfiguration(false, littleEndian)
 
@@ -87,8 +83,6 @@ func createCasualConfiguration(littleEndian bool) *kronos.Configuration {
 }
 
 // createConfiguration creates a standard English configuration.
-//
-//nolint:staticcheck // SA1019 Using deprecated internal API for configuration
 func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
@@ -141,17 +135,14 @@ func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 
 // Internal convenience functions for the builder API
 
-//nolint:staticcheck // SA1019 Using deprecated internal API for configuration
 func englishCasualChrono() *kronos.Chrono {
 	return kronos.NewChrono(createCasualConfiguration(false))
 }
 
-//nolint:staticcheck // SA1019 Using deprecated internal API for configuration
 func englishStrictChrono() *kronos.Chrono {
 	return kronos.NewChrono(createConfiguration(true, false))
 }
 
-//nolint:staticcheck // SA1019 Using deprecated internal API for configuration
 func englishGBChrono() *kronos.Chrono {
 	return kronos.NewChrono(createCasualConfiguration(true))
 }
