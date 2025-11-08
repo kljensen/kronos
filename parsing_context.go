@@ -104,7 +104,8 @@ func newParsingContext(text string, refDate any, option any) *parsingContext {
 // CreateParsingComponents creates ParsingComponents from a component map or existing components.
 // If components is already a ParsingComponents, it returns it as-is.
 // Otherwise, it creates new ParsingComponents with the provided values.
-func (ctx *parsingContext) CreateParsingComponents(components any) *parsingComponents {
+// Returns any to satisfy parser.Context interface, but the actual type is *parsingComponents.
+func (ctx *parsingContext) CreateParsingComponents(components any) any {
 	if components == nil {
 		return newParsingComponents(ctx.reference, nil)
 	}
@@ -166,9 +167,13 @@ func (ctx *parsingContext) CreateParsingResult(index int, textOrEndIndex any, ar
 			}
 		case map[Component]int:
 			if start == nil {
-				start = ctx.CreateParsingComponents(v)
+				if components := ctx.CreateParsingComponents(v); components != nil {
+					start = components.(*parsingComponents)
+				}
 			} else {
-				end = ctx.CreateParsingComponents(v)
+				if components := ctx.CreateParsingComponents(v); components != nil {
+					end = components.(*parsingComponents)
+				}
 			}
 		}
 	}

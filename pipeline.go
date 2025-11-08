@@ -2,10 +2,12 @@ package kronos
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"time"
 
 	"github.com/kljensen/kronos/internal/chrono"
+	"github.com/kljensen/kronos/parser"
 )
 
 // ============================================================================
@@ -16,8 +18,8 @@ import (
 // It provides a flexible way to control which parsers run and in what order.
 // This is an internal implementation type used by the builder pattern.
 type pipeline struct {
-	parsers  []Parser
-	refiners []Refiner
+	parsers  []any // Can be internalParser or parser.Parser
+	refiners []any // Can be internalRefiner or parser.Refiner
 	settings Settings
 }
 
@@ -31,23 +33,9 @@ func newPipeline(config *chrono.Configuration, settings Settings) *pipeline {
 		}
 	}
 
-	// Convert []any to []Parser and []Refiner
-	parsers := make([]Parser, len(config.Parsers))
-	for i, p := range config.Parsers {
-		if parser, ok := p.(Parser); ok {
-			parsers[i] = parser
-		}
-	}
-	refiners := make([]Refiner, len(config.Refiners))
-	for i, r := range config.Refiners {
-		if refiner, ok := r.(Refiner); ok {
-			refiners[i] = refiner
-		}
-	}
-
 	return &pipeline{
-		parsers:  parsers,
-		refiners: refiners,
+		parsers:  config.Parsers,
+		refiners: config.Refiners,
 		settings: settings,
 	}
 }
@@ -60,27 +48,16 @@ func newPipelineWithSettings(config *chrono.Configuration, settings Settings) (*
 		return nil, fmt.Errorf("invalid settings: %w", err)
 	}
 
-	// Convert []any to []Parser and []Refiner
-	var parsers []Parser
-	var refiners []Refiner
-	if config != nil {
-		parsers = make([]Parser, len(config.Parsers))
-		for i, p := range config.Parsers {
-			if parser, ok := p.(Parser); ok {
-				parsers[i] = parser
-			}
-		}
-		refiners = make([]Refiner, len(config.Refiners))
-		for i, r := range config.Refiners {
-			if refiner, ok := r.(Refiner); ok {
-				refiners[i] = refiner
-			}
+	if config == nil {
+		config = &chrono.Configuration{
+			Parsers:  []any{},
+			Refiners: []any{},
 		}
 	}
 
 	return &pipeline{
-		parsers:  parsers,
-		refiners: refiners,
+		parsers:  config.Parsers,
+		refiners: config.Refiners,
 		settings: settings,
 	}, nil
 }
@@ -108,7 +85,25 @@ func (p *pipeline) Execute(text string, refDate time.Time) ([]*parsingResult, er
 
 	// Apply refiners
 	for _, refiner := range p.refiners {
-		results = refiner.Refine(ctx, results)
+		if ir, ok := refiner.(internalRefiner); ok {
+			// Internal refiner using *parsingContext and []*parsingResult
+			results = ir.Refine(ctx, results)
+		} else if pr, ok := refiner.(Refiner); ok {
+			// Public refiner using parser.Context and []parser.Result
+			ctxAdapter := &contextAdapter{ctx: ctx}
+			resultInterfaces := make([]parser.Result, len(results))
+			for i, r := range results {
+				resultInterfaces[i] = r
+			}
+			refinedInterfaces := pr.Refine(ctxAdapter, resultInterfaces)
+			// Convert back to []*parsingResult
+			results = make([]*parsingResult, len(refinedInterfaces))
+			for i, r := range refinedInterfaces {
+				if pr, ok := r.(*parsingResult); ok {
+					results[i] = pr
+				}
+			}
+		}
 	}
 
 	// Apply strict parsing validation
@@ -125,9 +120,30 @@ func (p *pipeline) Execute(text string, refDate time.Time) ([]*parsingResult, er
 // - Proper index tracking as text is consumed
 // - Multiple return types from Extract: map, ParsingComponents, ParsingResult
 // - Overlapping matches by advancing by 1 on extract failure
-func executeParser(context *parsingContext, parser Parser) []*parsingResult {
+func executeParser(context *parsingContext, parser any) []*parsingResult {
 	results := make([]*parsingResult, 0)
-	pattern := parser.Pattern(context)
+
+	// Check if this is an internal parser or a public parser
+	var pattern *regexp.Regexp
+	var extractFunc func([]string) any
+
+	if ip, ok := parser.(internalParser); ok {
+		// Internal parser using *parsingContext
+		pattern = ip.Pattern(context)
+		extractFunc = func(match []string) any {
+			return ip.Extract(context, match)
+		}
+	} else if pp, ok := parser.(Parser); ok {
+		// Public parser using parser.Context
+		ctxAdapter := &contextAdapter{ctx: context}
+		pattern = pp.Pattern(ctxAdapter)
+		extractFunc = func(match []string) any {
+			return pp.Extract(ctxAdapter, match)
+		}
+	} else {
+		// Unknown parser type, skip
+		return results
+	}
 
 	originalText := context.Text()
 	remainingText := originalText
@@ -157,7 +173,7 @@ func executeParser(context *parsingContext, parser Parser) []*parsingResult {
 		}
 
 		// Call the parser's Extract method
-		result := parser.Extract(context, matchArray)
+		result := extractFunc(matchArray)
 		if result == nil {
 			remainingText = originalText[index+1:]
 			continue

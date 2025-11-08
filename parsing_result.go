@@ -3,6 +3,8 @@ package kronos
 import (
 	"fmt"
 	"time"
+
+	"github.com/kljensen/kronos/parser"
 )
 
 // parsingResult represents a parsed result containing date/time information.
@@ -33,7 +35,7 @@ func newParsingResult(reference *referenceWithTimezone, index int, text string, 
 }
 
 // Clone creates a deep copy of the ParsingResult.
-func (pr *parsingResult) Clone() *parsingResult {
+func (pr *parsingResult) Clone() parser.Result {
 	var startClone *parsingComponents
 	if pr.start != nil {
 		startClone = pr.start.Clone()
@@ -53,7 +55,8 @@ func (pr *parsingResult) Date() time.Time {
 }
 
 // AddTag adds a debugging tag to both start and end components.
-func (pr *parsingResult) AddTag(tag string) *parsingResult {
+// Returns the result to allow method chaining.
+func (pr *parsingResult) AddTag(tag string) parser.Result {
 	pr.start.AddTag(tag)
 	if pr.end != nil {
 		pr.end.AddTag(tag)
@@ -107,8 +110,15 @@ func (pr *parsingResult) SetIndex(index int) {
 
 // SetStart sets the start component of the parsing result.
 // This is used by parsers and refiners to update the parsed components.
-func (pr *parsingResult) SetStart(start *parsingComponents) {
-	pr.start = start
+// The start parameter should be *parsingComponents or nil.
+func (pr *parsingResult) SetStart(start any) {
+	if start == nil {
+		pr.start = nil
+		return
+	}
+	if pc, ok := start.(*parsingComponents); ok {
+		pr.start = pc
+	}
 }
 
 // parsingResultWithBoundary wraps parsingComponents with boundary information.
@@ -127,12 +137,12 @@ func (pr *parsingResult) Text() string {
 }
 
 // Start returns the starting date/time components.
-func (pr *parsingResult) Start() Components {
+func (pr *parsingResult) Start() any {
 	return pr.start
 }
 
 // End returns the ending date/time components.
-func (pr *parsingResult) End() Components {
+func (pr *parsingResult) End() any {
 	if pr.end == nil {
 		return nil
 	}
