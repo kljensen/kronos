@@ -14,6 +14,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
@@ -332,8 +333,8 @@ func TestDucklingParity_GrainPrecision(t *testing.T) {
 
 // createDucklingParser creates a ParserBuilder instance for Duckling parity tests
 func createDucklingParser() *kronos.ParserBuilder {
-	config := &kronos.Configuration{
-		Parsers: []kronos.Parser{
+	config := &chrono.Configuration{
+		Parsers: []any{
 			parsers.NewENCasualDateParser(),
 			parsers.NewENCasualTimeParser(),
 			parsers.NewENWeekdayParser(),
@@ -342,7 +343,7 @@ func createDucklingParser() *kronos.ParserBuilder {
 			parsers.NewENSlashMonthFormatParser(),
 		},
 	}
-	return kronos.New(kronos.NewChrono(config))
+	return kronos.New(chrono.NewChrono(config))
 }
 
 // ducklingTestCase is the common test case structure for Duckling parity tests

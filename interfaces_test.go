@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/kljensen/kronos/internal/chrono"
 )
 
 // Mock parser for testing
@@ -260,9 +262,9 @@ func TestConfiguration(t *testing.T) {
 		refiner1 := &mockRefiner{}
 		refiner2 := &mockRefiner{}
 
-		config := Configuration{
-			Parsers:  []Parser{parser1, parser2},
-			Refiners: []Refiner{refiner1, refiner2},
+		config := chrono.Configuration{
+			Parsers:  []any{parser1, parser2},
+			Refiners: []any{refiner1, refiner2},
 		}
 
 		if len(config.Parsers) != 2 {
@@ -275,9 +277,9 @@ func TestConfiguration(t *testing.T) {
 	})
 
 	t.Run("Configuration can be empty", func(t *testing.T) {
-		config := Configuration{
-			Parsers:  []Parser{},
-			Refiners: []Refiner{},
+		config := chrono.Configuration{
+			Parsers:  []any{},
+			Refiners: []any{},
 		}
 
 		if len(config.Parsers) != 0 {
@@ -292,9 +294,9 @@ func TestConfiguration(t *testing.T) {
 	t.Run("Configuration with only parsers", func(t *testing.T) {
 		parser := &mockParser{}
 
-		config := Configuration{
-			Parsers:  []Parser{parser},
-			Refiners: []Refiner{},
+		config := chrono.Configuration{
+			Parsers:  []any{parser},
+			Refiners: []any{},
 		}
 
 		if len(config.Parsers) != 1 {
@@ -309,9 +311,9 @@ func TestConfiguration(t *testing.T) {
 	t.Run("Configuration with only refiners", func(t *testing.T) {
 		refiner := &mockRefiner{}
 
-		config := Configuration{
-			Parsers:  []Parser{},
-			Refiners: []Refiner{refiner},
+		config := chrono.Configuration{
+			Parsers:  []any{},
+			Refiners: []any{refiner},
 		}
 
 		if len(config.Parsers) != 0 {

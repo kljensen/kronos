@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sort"
 	"time"
+
+	"github.com/kljensen/kronos/internal/chrono"
 )
 
 // ============================================================================
@@ -21,43 +23,58 @@ type pipeline struct {
 
 // newPipeline creates a new parsing pipeline with the given configuration and settings.
 // This is an internal function used by the builder pattern.
-func newPipeline(config *Configuration, settings Settings) *pipeline {
+func newPipeline(config *chrono.Configuration, settings Settings) *pipeline {
 	if config == nil {
-		config = &Configuration{
-			Parsers:  []Parser{},
-			Refiners: []Refiner{},
+		config = &chrono.Configuration{
+			Parsers:  []any{},
+			Refiners: []any{},
 		}
 	}
 
+	// Convert []any to []Parser and []Refiner
+	parsers := make([]Parser, len(config.Parsers))
+	for i, p := range config.Parsers {
+		parsers[i] = p.(Parser)
+	}
+	refiners := make([]Refiner, len(config.Refiners))
+	for i, r := range config.Refiners {
+		refiners[i] = r.(Refiner)
+	}
+
 	return &pipeline{
-		parsers:  append([]Parser{}, config.Parsers...),
-		refiners: append([]Refiner{}, config.Refiners...),
+		parsers:  parsers,
+		refiners: refiners,
 		settings: settings,
 	}
 }
 
 // newPipelineWithSettings creates a pipeline using settings to determine parsers.
 // This is an internal function used by the builder pattern.
-func newPipelineWithSettings(config *Configuration, settings Settings) (*pipeline, error) {
+func newPipelineWithSettings(config *chrono.Configuration, settings Settings) (*pipeline, error) {
 	// Validate settings
 	if err := validateSettings(settings); err != nil {
 		return nil, fmt.Errorf("invalid settings: %w", err)
 	}
 
-	// Start with empty pipeline
-	pipeline := &pipeline{
-		parsers:  []Parser{},
-		refiners: []Refiner{},
-		settings: settings,
-	}
-
-	// Use all parsers from configuration
+	// Convert []any to []Parser and []Refiner
+	var parsers []Parser
+	var refiners []Refiner
 	if config != nil {
-		pipeline.parsers = append([]Parser{}, config.Parsers...)
-		pipeline.refiners = append([]Refiner{}, config.Refiners...)
+		parsers = make([]Parser, len(config.Parsers))
+		for i, p := range config.Parsers {
+			parsers[i] = p.(Parser)
+		}
+		refiners = make([]Refiner, len(config.Refiners))
+		for i, r := range config.Refiners {
+			refiners[i] = r.(Refiner)
+		}
 	}
 
-	return pipeline, nil
+	return &pipeline{
+		parsers:  parsers,
+		refiners: refiners,
+		settings: settings,
+	}, nil
 }
 
 // Execute runs the pipeline on the given text with a reference date.

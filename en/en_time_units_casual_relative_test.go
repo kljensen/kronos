@@ -1,4 +1,5 @@
 //nolint:staticcheck // SA1019 Test file uses deprecated internal APIs for testing
+
 package en
 
 // Tests ported from chrono's en_time_units_casual_relative.test.ts
@@ -27,6 +28,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
@@ -110,8 +112,8 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -191,8 +193,8 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -264,8 +266,8 @@ func TestCasualRelativePlusSign(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -326,8 +328,8 @@ func TestCasualRelativeMinusSign(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -393,8 +395,8 @@ func TestCasualRelativeWithoutAbbreviations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(false) // No abbreviations
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			if !tt.shouldParse {
 				assert.Empty(t, results, "Expected NO results for: %s", tt.text)
@@ -464,8 +466,8 @@ func TestCasualRelativeNegativeCases(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -694,8 +696,8 @@ func TestExtendedNumberWords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -874,8 +876,8 @@ func TestFractionalTimeUnits(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -1075,8 +1077,8 @@ func TestDecadeTimeUnit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			agoParser := parsers.NewENTimeUnitAgoFormatParser(false)
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser, agoParser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser, agoParser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {

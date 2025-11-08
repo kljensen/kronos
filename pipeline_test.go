@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewPipeline(t *testing.T) {
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
@@ -29,7 +29,7 @@ func TestNewPipeline_NilConfig(t *testing.T) {
 }
 
 func TestNewPipelineWithSettings(t *testing.T) {
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
@@ -46,7 +46,7 @@ func TestNewPipelineWithSettings(t *testing.T) {
 }
 
 func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
@@ -61,7 +61,7 @@ func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
 
 func TestPipeline_Execute_BasicParsing(t *testing.T) {
 	// This is a simplified test - full integration tests would use real parsers
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
@@ -84,7 +84,7 @@ func TestPipeline_Execute_BasicParsing(t *testing.T) {
 }
 
 func TestPipeline_Execute_StrictParsing(t *testing.T) {
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
@@ -106,7 +106,7 @@ func TestPipeline_Execute_StrictParsing(t *testing.T) {
 }
 
 func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}
@@ -132,7 +132,7 @@ func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 }
 
 func TestParseWithSettings_InvalidSettings(t *testing.T) {
-	config := &Configuration{
+	config := &chrono.Configuration{
 		Parsers:  []Parser{},
 		Refiners: []Refiner{},
 	}

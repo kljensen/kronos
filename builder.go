@@ -2,6 +2,8 @@ package kronos
 
 import (
 	"time"
+
+	"github.com/kljensen/kronos/internal/chrono"
 )
 
 // ============================================================================
@@ -29,7 +31,7 @@ import (
 //	    PreferPast()
 //	result := parser.Parse("last Monday")
 type ParserBuilder struct {
-	config   *Configuration
+	config   *chrono.Configuration
 	settings Settings
 	refDate  time.Time
 }
@@ -40,15 +42,15 @@ type ParserBuilder struct {
 // Example:
 //
 //	parser := kronos.New(en.Casual)
-func New(chrono *Chrono) *ParserBuilder {
-	if chrono == nil {
-		chrono = NewChrono(nil)
+func New(c *chrono.Chrono) *ParserBuilder {
+	if c == nil {
+		c = chrono.NewChrono(nil)
 	}
 
-	// Extract configuration from Chrono
-	config := &Configuration{
-		Parsers:  append([]Parser{}, chrono.parsers...),
-		Refiners: append([]Refiner{}, chrono.refiners...),
+	// Extract configuration from Chrono (returns []any which we keep as-is)
+	config := &chrono.Configuration{
+		Parsers:  append([]any{}, c.Parsers()...),
+		Refiners: append([]any{}, c.Refiners()...),
 	}
 
 	return &ParserBuilder{

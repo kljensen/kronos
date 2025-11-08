@@ -26,14 +26,15 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
 
 // createCasualParser creates a parser with casual parsers for testing
 func createCasualParser() *kronos.ParserBuilder {
-	config := &kronos.Configuration{
-		Parsers: []kronos.Parser{
+	config := &chrono.Configuration{
+		Parsers: []any{
 			parsers.NewENCasualDateParser(),
 			parsers.NewENCasualTimeParser(),
 			parsers.NewENWeekdayParser(),
@@ -41,7 +42,7 @@ func createCasualParser() *kronos.ParserBuilder {
 			parsers.NewENMonthNameParser(),
 		},
 	}
-	return kronos.New(kronos.NewChrono(config))
+	return kronos.New(chrono.NewChrono(config))
 }
 
 // TestSingleExpression covers basic casual date/time expressions
