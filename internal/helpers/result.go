@@ -13,7 +13,7 @@ func CreateRelativeFromReference(reference *kronos.InternalReferenceWithTimezone
 		duration = emptyDuration
 	}
 
-	date, err := AddDuration(reference.GetDateWithAdjustedTimezone(), duration)
+	date, err := kronos.InternalAddDuration(reference.GetDateWithAdjustedTimezone(), duration)
 	if err != nil {
 		// Duration calculation failed - return nil to indicate invalid result
 		return nil

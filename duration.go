@@ -1,8 +1,8 @@
 package kronos
 
 import (
-	"maps"
 	"fmt"
+	"maps"
 	"math"
 	"time"
 )
@@ -133,10 +133,18 @@ func checkFloatToIntOverflow(value float64, unit Timeunit) error {
 	return nil
 }
 
-// AddDuration returns the date after adding the given duration to ref.
+// InternalAddDuration is exported for use by internal packages only.
+// External code should not use this function directly.
+//
+// It returns the date after adding the given duration to ref.
 // It handles fractional durations by cascading remainders to smaller units.
 // For example, 1.5 months becomes 1 month + 2 weeks.
 // Returns an error if the duration or resulting date is out of bounds.
+func InternalAddDuration(ref time.Time, duration Duration) (time.Time, error) {
+	return addDuration(ref, duration)
+}
+
+// addDuration is the internal implementation.
 func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 	// Validate input date
 	if err := validateDate(ref); err != nil {
@@ -343,8 +351,16 @@ func addDuration(ref time.Time, duration Duration) (time.Time, error) {
 	return date, nil
 }
 
-// ReverseDuration returns the reversed duration (e.g., back into the past instead of future).
+// InternalReverseDuration is exported for use by internal packages only.
+// External code should not use this function directly.
+//
+// It returns the reversed duration (e.g., back into the past instead of future).
 // All values in the duration are negated.
+func InternalReverseDuration(duration Duration) Duration {
+	return reverseDuration(duration)
+}
+
+// reverseDuration is the internal implementation.
 func reverseDuration(duration Duration) Duration {
 	reversed := make(Duration)
 	for key, val := range duration {

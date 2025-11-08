@@ -219,7 +219,7 @@ func (r *ENMergeRelativeAfterDateRefiner) Refine(context *kronos.InternalParsing
 		// Merge the results
 		duration := endata.ParseDuration(strings.TrimPrefix(next.Text(), "+"))
 		if isNegativeFollowingReference(next) {
-			duration = helpers.ReverseDuration(duration)
+			duration = internal.ReverseDuration(duration)
 		}
 
 		// Create new reference from current result's date
@@ -314,7 +314,7 @@ func (r *ENMergeRelativeFollowByDateRefiner) Refine(context *kronos.InternalPars
 		// Merge the results
 		duration := endata.ParseDuration(current.Text())
 		if hasImpliedEarlierReferenceDate(current) {
-			duration = helpers.ReverseDuration(duration)
+			duration = internal.ReverseDuration(duration)
 		}
 
 		// Create new reference from next result's date

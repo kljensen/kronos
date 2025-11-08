@@ -5,6 +5,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal"
 	"github.com/kljensen/kronos/internal/helpers"
 )
 
@@ -66,7 +67,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 					daysToAdd += 7
 				}
 
-				adjustedDate, err := helpers.AddDuration(refDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
+				adjustedDate, err := internal.AddDuration(refDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
 				if err != nil {
 					// Duration calculation failed - skip this adjustment
 					continue
@@ -88,7 +89,7 @@ func (r *ForwardDateRefiner) Refine(context *kronos.InternalParsingContext, resu
 								if daysToAdd <= 0 {
 									daysToAdd += 7
 								}
-								adjustedDate, err = helpers.AddDuration(adjustedDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
+								adjustedDate, err = internal.AddDuration(adjustedDate, kronos.Duration{kronos.TimeunitDay: float64(daysToAdd)})
 								if err != nil {
 									// Duration calculation failed - skip this adjustment
 									continue

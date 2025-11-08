@@ -82,7 +82,7 @@ func Midnight(reference *kronos.InternalReferenceWithTimezone) *kronos.InternalP
 	// Unless it's very early morning (0-2 AM), assume midnight refers to the coming midnight
 	if targetDate.Hour() > 2 {
 		duration := kronos.Duration{kronos.TimeunitDay: 1}
-		newDate, err := AddDuration(targetDate, duration)
+		newDate, err := kronos.InternalAddDuration(targetDate, duration)
 		if err != nil {
 			// Duration calculation failed - return nil
 			return nil

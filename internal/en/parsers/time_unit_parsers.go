@@ -56,7 +56,7 @@ func NewENTimeUnitAgoFormatParser(strictMode bool) *ENTimeUnitAgoFormatParser {
 			}
 
 			// Reverse the duration (go backwards in time)
-			reversedDuration := helpers.ReverseDuration(duration)
+			reversedDuration := internal.ReverseDuration(duration)
 
 			// Create relative result from reference
 			components := helpers.CreateRelativeFromReference(context.Reference(), reversedDuration, internal.EmptyDuration)
@@ -261,7 +261,7 @@ func NewENTimeUnitCasualRelativeFormatParser(allowAbbreviations bool) *ENTimeUni
 			// Reverse duration for "last", "past", and "-"
 			switch prefix {
 			case "last", "past", "-":
-				duration = helpers.ReverseDuration(duration)
+				duration = internal.ReverseDuration(duration)
 			}
 
 			// Create relative result from reference
