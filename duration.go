@@ -23,17 +23,17 @@ type Timeunit string
 //	    kronos.TimeunitHour: 3,
 //	}
 const (
-	// Large time units
+	// TimeunitDecade represents a decade (10 years)
 	TimeunitDecade  Timeunit = "decade"
 	TimeunitYear    Timeunit = "year"
 	TimeunitQuarter Timeunit = "quarter"
 	TimeunitMonth   Timeunit = "month"
 
-	// Medium time units
+	// TimeunitWeek represents a week (7 days)
 	TimeunitWeek Timeunit = "week"
 	TimeunitDay  Timeunit = "day"
 
-	// Small time units
+	// TimeunitHour represents an hour
 	TimeunitHour        Timeunit = "hour"
 	TimeunitMinute      Timeunit = "minute"
 	TimeunitSecond      Timeunit = "second"

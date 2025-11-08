@@ -8,13 +8,13 @@ type Component string
 
 // Date/time component constants
 const (
-	// Date components
+	// ComponentYear represents the year component
 	ComponentYear    Component = "year"
 	ComponentMonth   Component = "month"
 	ComponentDay     Component = "day"
 	ComponentWeekday Component = "weekday"
 
-	// Time components
+	// ComponentHour represents the hour component
 	ComponentHour        Component = "hour"
 	ComponentMinute      Component = "minute"
 	ComponentSecond      Component = "second"
@@ -22,7 +22,7 @@ const (
 	ComponentMicrosecond Component = "microsecond"
 	ComponentNanosecond  Component = "nanosecond"
 
-	// Special components
+	// ComponentMeridiem represents AM/PM
 	ComponentMeridiem       Component = "meridiem"
 	ComponentTimezoneOffset Component = "timezoneOffset"
 )
