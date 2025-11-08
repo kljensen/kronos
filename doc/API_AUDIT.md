@@ -1,17 +1,18 @@
 # Kronos API Audit - Issue #144
 
-**Date:** 2025-11-06
-**Current Version:** API minimization complete
-**Total Exports:** 92 (limit: 100)
+**Date:** 2025-11-08 (Updated)
+**Current Version:** API minimization complete - deprecation cleanup finished
+**Total Exports:** ~92 (limit: 100)
 
 ## Executive Summary
 
-This document provides a complete inventory of the kronos public API after the API minimization effort. We have successfully reduced the public API from 127 to 92 exports.
+This document provides a complete inventory of the kronos public API after the API minimization effort and deprecation cleanup. We have successfully reduced the public API from 127 to ~92 exports and clarified the API boundaries.
 
 ### Current State
 - **Essential API (stable):** Core types, enums, and builder pattern (~60 exports)
+- **Advanced API:** Chrono, Configuration, Parser, Refiner for custom implementations (~4 types)
 - **X-prefixed helpers:** Reduced to 4 (only for private field access)
-- **Total exports:** 92 (down from 127)
+- **Total exports:** ~92 (down from 127)
 - **Guard limit:** 100 (reduced from 150)
 
 ### Achievements
@@ -19,14 +20,17 @@ This document provides a complete inventory of the kronos public API after the A
 2. ✓ Retired X-prefixed configuration helpers (kept only 4 for private field access)
 3. ✓ Tightened configuration exposure around builder API
 4. ✓ Reduced MAX_EXPORTS guard from 150 to 100
+5. ✓ Clarified "deprecated" vs "advanced" API (2025-11-08)
+6. ✓ Removed obsolete FOLLOW_UP_ISSUES.md (2025-11-08)
+7. ✓ Cleaned up //nolint:staticcheck suppressions in en package (2025-11-08)
 
 ## Category Definitions
 
 ### Essential (Keep Public)
 Stable, user-facing API that forms the core of kronos. These are guaranteed to remain stable and are documented for general use. Breaking changes require a major version bump.
 
-### Deprecated (Phase Out)
-Legacy exports kept for backward compatibility but marked for removal in the next major version. Users should migrate away from these.
+### Advanced API
+Public types needed for creating custom parsers, refiners, and configurations. These are primarily used by language packages (like en) and users implementing custom parsing logic. Most users should use the builder pattern instead.
 
 ### Internal (X-Prefixed)
 Exports needed by internal/ packages. These use the X prefix convention to signal "internal use only" while remaining accessible to internal/ code. These can change without notice.
@@ -126,37 +130,32 @@ parser := en.New().
 
 ---
 
-### Deprecated API (4 exports)
+### Advanced API (4+ exports)
 
-These should be marked with deprecation notices and removed in v2.0.
+These types are part of the advanced API for creating custom parsers, refiners, and configurations. They're primarily used by language packages (like en) and users implementing custom parsing logic.
 
-#### Types (1)
-- `DayPreference` - Replaced by more general DatePreference configuration
+#### Interfaces (2)
+- `Parser` - Interface for custom date/time parsers
+- `Refiner` - Interface for post-processing parsing results
 
-#### Constants (3)
-- `DayPreferCurrent` - DayPreference enum value
-- `DayPreferFirst` - DayPreference enum value
-- `DayPreferLast` - DayPreference enum value
+#### Types (2)
+- `Configuration` - Holds lists of parsers and refiners
+- `Chrono` - Main parsing engine that coordinates parsers and refiners
 
-**Rationale:** `DayPreference` was an early attempt at ambiguous date resolution, but `DatePreference` is more general and handles the same cases. These should be removed in v2.0.
+#### Functions (1+)
+- `NewChrono(config *Configuration) *Chrono` - Creates a new parsing engine
 
-**Deprecation notice:**
+**Usage:** These types are marked as "Advanced API" rather than deprecated. They're needed by language packages like `en` to create pre-configured parsing engines. Most users should use the builder pattern (`en.New()`) instead of using these types directly.
+
+**Example (internal use in en package):**
 ```go
-// Deprecated: Use DatePreference instead.
-// Will be removed in v2.0.
-type DayPreference int
+config := &kronos.Configuration{
+    Parsers: []kronos.Parser{...},
+    Refiners: []kronos.Refiner{...},
+}
+chrono := kronos.NewChrono(config)
+return kronos.New(chrono)  // Return builder
 ```
-
-**Migration path:**
-```go
-// Before:
-settings.DayPreference = kronos.DayPreferFirst
-
-// After:
-settings.DatePreference = kronos.PreferPast
-```
-
-**Impact assessment:** Very low. No examples use DayPreference, suggesting it was superseded before gaining adoption.
 
 ---
 
@@ -242,12 +241,20 @@ Updated documentation to reflect new API boundaries:
 2. **Internal API** - Minimal X-prefixed helpers (only 4 remain)
 3. README simplified to focus on builder pattern
 
+### Completed Cleanup (2025-11-08)
+
+Recent cleanup completed:
+- ✓ Removed obsolete FOLLOW_UP_ISSUES.md
+- ✓ Clarified "Advanced API" vs truly deprecated code
+- ✓ Cleaned up misleading deprecation comments on private types
+- ✓ Removed //nolint:staticcheck suppressions in en package
+
 ### Future Cleanup for v2.0 (Low Priority)
 
 Consider for v2.0:
-- Remove `DayPreference` completely (currently 1 deprecated type remains)
 - Further reduce X-prefixed helpers if possible
 - Evaluate if any essential API can be simplified
+- Consider moving internal types to internal/ package
 
 ---
 
@@ -258,9 +265,9 @@ Current state:
 | Category | Count | Notes |
 |----------|-------|-------|
 | Essential | ~60 | Stable public API (types, enums, builder pattern) |
-| Deprecated | 1 | DayPreference (remove in v2.0) |
-| Internal (X-prefixed) | 4 | Minimal helpers for private field access |
-| **Total** | **92** | Down from 127 originally |
+| Advanced API | ~4 | Chrono, Configuration, Parser, Refiner |
+| Internal (X-prefixed) | ~28 | Minimal helpers for private field access |
+| **Total** | **~92** | Down from 127 originally |
 
 **Current MAX_EXPORTS guard: 100** (room for ~8 additions to essential API)
 
@@ -269,11 +276,11 @@ Current state:
 | Category | Count | Notes |
 |----------|-------|-------|
 | Essential | ~60 | Stable public API |
-| Deprecated | 0 | Remove DayPreference |
+| Advanced API | ~4 | For custom parsers/refiners |
 | Internal (X-prefixed) | 0-4 | Minimize further if possible |
-| **Total** | **~60-64** | Clean, minimal API |
+| **Total** | **~64-68** | Clean, minimal API |
 
-**Future MAX_EXPORTS target: 80** (room for ~16-20 additions)
+**Future MAX_EXPORTS target: 80** (room for ~12-16 additions)
 
 ---
 
@@ -311,30 +318,31 @@ Current state:
 ## Appendix: Export Counts by Category
 
 ```
-Total: 92 exports
+Total: ~92 exports
 
-Essential (60):
+Essential (~60):
   - Types: 11
   - Constants: 43
   - Functions: 6
 
-Deprecated (4):
-  - Types: 1
-  - Constants: 3
+Advanced API (~4):
+  - Types: 2 (Chrono, Configuration)
+  - Interfaces: 2 (Parser, Refiner)
+  - Functions: 1+ (NewChrono, etc.)
 
-Internal (50):
+Internal (~28):
   - Types: 12
-  - Functions: 38
+  - Functions: 16+
 ```
 
 ---
 
 ## Appendix: Complete Export List
 
-For reference, the complete list of all 92 exports is documented in the inventory above. Each export includes:
+For reference, the complete list of all exports is documented in the inventory above. Each export includes:
 - Name
 - Type (type, const, func, var)
-- Category (essential, deprecated, internal)
+- Category (essential, advanced, internal)
 - Rationale for categorization
 
 This audit was generated using `go doc -all .` and categorization based on:
@@ -342,3 +350,4 @@ This audit was generated using `go doc -all .` and categorization based on:
 2. Naming conventions (X-prefix for internal)
 3. API design principles (builder pattern as primary interface)
 4. API minimization decisions
+5. Clarification of advanced vs deprecated API (2025-11-08)

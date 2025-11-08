@@ -108,27 +108,22 @@ func (d DateOrder) String() string {
 }
 
 // Settings contains all configuration for date parsing.
-// It provides a comprehensive way to customize parsing behavior,
-// similar to Python's dateparser settings system.
+// It provides a comprehensive way to customize parsing behavior.
 //
-// Deprecated: Direct use of Settings is discouraged in favor of the builder pattern.
-// Use the fluent builder API for common options:
+// Most users should use the fluent builder API for common options:
 //
-//	parser := kronos.New(en.Casual).
+//	parser := en.New().
 //	    DateOrder(kronos.DateOrderDMY).
 //	    PreferFuture().
 //	    Strict()
 //
 // For advanced options, use WithOption to modify settings directly:
 //
-//	parser := kronos.New(en.Casual).
+//	parser := en.New().
 //	    WithOption(func(s *kronos.Settings) {
 //	        s.TimezoneOverrides = customTimezones
 //	        s.DebugHandler = debugFunc
 //	    })
-//
-// The Settings struct will remain available for compatibility but new code should
-// use the builder pattern.
 type Settings struct {
 	// Date interpretation
 	DateOrder       DateOrder      // Order of date components (MDY, DMY, YMD)

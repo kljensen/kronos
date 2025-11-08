@@ -5,11 +5,8 @@ import (
 	"time"
 )
 
-// ParsingResult represents a parsed result containing date/time information.
-//
-// Deprecated: This concrete type exposes internal implementation details. New code should
-// use the Result interface instead, which provides a cleaner API that hides implementation.
-// This type will be moved to an internal package in a future version.
+// parsingResult represents a parsed result containing date/time information.
+// This is an internal implementation type. External code should use the Result interface.
 type parsingResult struct {
 	reference *referenceWithTimezone
 	refDate   time.Time
@@ -114,13 +111,9 @@ func (pr *parsingResult) SetStart(start *parsingComponents) {
 	pr.start = start
 }
 
-// ParsingResultWithBoundary wraps ParsingComponents with boundary information.
+// parsingResultWithBoundary wraps parsingComponents with boundary information.
 // This is used internally to communicate the adjusted text (without boundary) to chrono.go
-// when parsers using AbstractParserWithWordBoundary return ParsingComponents.
-//
-// Deprecated: This is an internal implementation detail that should not be used by external code.
-// It remains exported only for use by internal parser implementations. This type will be moved
-// to an internal package in a future version.
+// when parsers using AbstractParserWithWordBoundary return components.
 type parsingResultWithBoundary struct {
 	Components         *parsingComponents
 	AdjustedText       string

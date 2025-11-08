@@ -10,13 +10,9 @@ import (
 // Pipeline and parsing execution
 // ============================================================================
 
-// Pipeline manages the parsing process with configurable parsers and settings.
+// pipeline manages the parsing process with configurable parsers and settings.
 // It provides a flexible way to control which parsers run and in what order.
-//
-// Deprecated: This type is part of the advanced API. For most use cases, use the
-// builder pattern instead (kronos.New(chrono).Parse(text)). Direct use of Pipeline
-// exposes internal implementation details and will be moved to the experimental
-// package in a future version.
+// This is an internal implementation type used by the builder pattern.
 type pipeline struct {
 	parsers  []Parser
 	refiners []Refiner
@@ -24,10 +20,7 @@ type pipeline struct {
 }
 
 // newPipeline creates a new parsing pipeline with the given configuration and settings.
-//
-// Deprecated: This function is part of the advanced API. For most use cases, use the
-// builder pattern instead (kronos.New(chrono)). This function will be moved to the
-// experimental package in a future version.
+// This is an internal function used by the builder pattern.
 func newPipeline(config *Configuration, settings Settings) *pipeline {
 	if config == nil {
 		config = &Configuration{
@@ -44,10 +37,7 @@ func newPipeline(config *Configuration, settings Settings) *pipeline {
 }
 
 // newPipelineWithSettings creates a pipeline using settings to determine parsers.
-//
-// Deprecated: This function is part of the advanced API. For most use cases, use the
-// builder pattern instead (kronos.New(chrono).WithOption(...)). This function will be
-// moved to the experimental package in a future version.
+// This is an internal function used by the builder pattern.
 func newPipelineWithSettings(config *Configuration, settings Settings) (*pipeline, error) {
 	// Validate settings
 	if err := validateSettings(settings); err != nil {

@@ -6,16 +6,16 @@ import (
 )
 
 // ============================================================================
-// Deprecated Chrono API (kept for backward compatibility)
+// Advanced API - For creating custom parsers and configurations
 // ============================================================================
 
 // Parser is an abstraction for Chrono parsers.
 // Each parser should recognize and handle a certain date format.
 // Chrono uses multiple parsers (and refiners) together for parsing the input.
 //
-// Deprecated: This interface is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
+// Advanced API: This interface is part of the advanced API for creating custom parsers.
+// Most users should use the builder pattern (en.New()) instead. This interface is primarily
+// used by internal packages and users implementing custom date parsing logic.
 type Parser interface {
 	// Pattern returns the regular expression pattern for this parser.
 	// The pattern is used to find potential matches in the input text.
@@ -31,9 +31,9 @@ type Parser interface {
 // and returns another list of results.
 // Chrono applies each refiner in order and returns the output from the last refiner.
 //
-// Deprecated: This interface is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
+// Advanced API: This interface is part of the advanced API for creating custom refiners.
+// Most users should use the builder pattern (en.New()) instead. This interface is primarily
+// used by internal packages and users implementing custom date parsing logic.
 type Refiner interface {
 	// Refine processes a list of parsing results and returns a refined list.
 	Refine(context *parsingContext, results []*parsingResult) []*parsingResult
@@ -42,9 +42,9 @@ type Refiner interface {
 // Configuration holds the parsers and refiners for Chrono.
 // It is simply an ordered list of parsers and refiners.
 //
-// Deprecated: This type is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
+// Advanced API: This type is part of the advanced API for configuring custom parser combinations.
+// Most users should use the builder pattern (en.New()) instead. This type is primarily used
+// by language packages (like en) to define parsing configurations.
 type Configuration struct {
 	Parsers  []Parser
 	Refiners []Refiner
@@ -54,9 +54,9 @@ type Configuration struct {
 // It maintains a list of parsers (each handling a specific date format) and refiners
 // (each post-processing the results).
 //
-// Deprecated: This type is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
+// Advanced API: This type is part of the advanced API for custom parsing engines.
+// Most users should use the builder pattern (en.New()) instead. This type is primarily used
+// by language packages (like en) to create pre-configured parsing engines.
 type Chrono struct {
 	parsers  []Parser
 	refiners []Refiner
@@ -65,9 +65,8 @@ type Chrono struct {
 // NewChrono creates a new Chrono instance with the given configuration.
 // If config is nil, an empty Chrono is created.
 //
-// Deprecated: This function is part of the advanced API and will be moved to the
-// experimental package in a future version. For new code, import and use
-// github.com/kljensen/kronos/experimental instead.
+// Advanced API: This function is part of the advanced API for creating custom parsing engines.
+// Most users should use the builder pattern (en.New()) instead.
 func NewChrono(config *Configuration) *Chrono {
 	if config == nil {
 		return &Chrono{
