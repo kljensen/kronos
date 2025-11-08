@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from: github.com/facebook/duckling - Duckling/Time/EN/Corpus.hs
@@ -308,8 +307,7 @@ func TestDucklingParity_NegativeExamples(t *testing.T) {
 
 	for _, text := range negativeTests {
 		t.Run(text, func(t *testing.T) {
-			chrono := createDucklingChrono()
-			results := chrono.Parse(text, ducklingRefDate, nil)
+			results, _ := createDucklingParser().WithReferenceDate(ducklingRefDate).Parse(text)
 
 			// These should not parse as dates
 			assert.Empty(t, results, "Should not parse: %s", text)
@@ -332,8 +330,8 @@ func TestDucklingParity_GrainPrecision(t *testing.T) {
 	// A full test suite would verify certainty for each expression.
 }
 
-// createDucklingChrono creates a Chrono instance for Duckling parity tests
-func createDucklingChrono() *kronos.Chrono {
+// createDucklingParser creates a ParserBuilder instance for Duckling parity tests
+func createDucklingParser() *kronos.ParserBuilder {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
 			parsers.NewENCasualDateParser(),
@@ -344,7 +342,7 @@ func createDucklingChrono() *kronos.Chrono {
 			parsers.NewENSlashMonthFormatParser(),
 		},
 	}
-	return kronos.NewChrono(config)
+	return kronos.New(kronos.NewChrono(config))
 }
 
 // ducklingTestCase is the common test case structure for Duckling parity tests
@@ -366,8 +364,7 @@ func runDucklingTest(t *testing.T, tt ducklingTestCase) {
 		t.Skip(tt.skipReason)
 	}
 
-	chrono := createDucklingChrono()
-	results := chrono.Parse(tt.text, ducklingRefDate, nil)
+	results, _ := createDucklingParser().WithReferenceDate(ducklingRefDate).Parse(tt.text)
 
 	assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 	if len(results) == 0 {

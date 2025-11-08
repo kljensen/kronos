@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -72,8 +71,7 @@ func TestMergingRelativeDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(true)
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := New().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.Len(t, results, 1, "Expected exactly 1 result")
 			if len(results) == 0 {

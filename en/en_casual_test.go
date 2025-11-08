@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_casual.test.ts
@@ -31,8 +30,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// createCasualChrono creates a Chrono instance with casual parsers
-func createenglishCasualChrono() *kronos.Chrono {
+// createCasualParser creates a parser with casual parsers for testing
+func createCasualParser() *kronos.ParserBuilder {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
 			parsers.NewENCasualDateParser(),
@@ -42,7 +41,7 @@ func createenglishCasualChrono() *kronos.Chrono {
 			parsers.NewENMonthNameParser(),
 		},
 	}
-	return kronos.NewChrono(config)
+	return kronos.New(kronos.NewChrono(config))
 }
 
 // TestSingleExpression covers basic casual date/time expressions
@@ -180,8 +179,7 @@ func TestSingleExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createenglishCasualChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := createCasualParser().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -271,8 +269,7 @@ func TestRandomText(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createenglishCasualChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := createCasualParser().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -307,8 +304,7 @@ func TestWeekdayShorthand(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createenglishCasualChrono()
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := createCasualParser().Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -346,8 +342,7 @@ func TestRandomNegativeText(t *testing.T) {
 
 	for _, text := range negativeTests {
 		t.Run(text, func(t *testing.T) {
-			chrono := createenglishCasualChrono()
-			results := chrono.Parse(text, time.Now(), nil)
+			results, _ := createCasualParser().Parse(text)
 
 			assert.Empty(t, results, "Should not parse: %s", text)
 		})

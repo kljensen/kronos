@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -222,8 +221,7 @@ func TestNoonMidnightKeywords(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := New().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -250,11 +248,9 @@ func TestNoonMidnightKeywords(t *testing.T) {
 
 // TestNoonMidnightEdgeCases tests edge cases and potential issues
 func TestNoonMidnightEdgeCases(t *testing.T) {
-	chrono := englishCasualChrono()
-
 	t.Run("midnight should be hour 0, not hour 12", func(t *testing.T) {
 		refDate := time.Date(2023, 1, 1, 14, 0, 0, 0, time.UTC)
-		results := chrono.Parse("midnight", refDate, nil)
+		results, _ := New().WithReferenceDate(refDate).Parse("midnight")
 
 		assert.NotEmpty(t, results)
 		result := results[0]
@@ -265,7 +261,7 @@ func TestNoonMidnightEdgeCases(t *testing.T) {
 
 	t.Run("noon should be hour 12", func(t *testing.T) {
 		refDate := time.Date(2023, 1, 1, 14, 0, 0, 0, time.UTC)
-		results := chrono.Parse("noon", refDate, nil)
+		results, _ := New().WithReferenceDate(refDate).Parse("noon")
 
 		assert.NotEmpty(t, results)
 		result := results[0]
@@ -277,7 +273,7 @@ func TestNoonMidnightEdgeCases(t *testing.T) {
 	t.Run("midnight tonight should not be converted to 12 PM", func(t *testing.T) {
 		// This is the critical test for the bug fix
 		refDate := time.Date(2023, 1, 1, 10, 0, 0, 0, time.UTC)
-		results := chrono.Parse("midnight tonight", refDate, nil)
+		results, _ := New().WithReferenceDate(refDate).Parse("midnight tonight")
 
 		assert.NotEmpty(t, results)
 		result := results[0]
@@ -292,7 +288,7 @@ func TestNoonMidnightEdgeCases(t *testing.T) {
 
 	t.Run("midnight with explicit date should work", func(t *testing.T) {
 		refDate := time.Date(2023, 1, 1, 10, 0, 0, 0, time.UTC)
-		results := chrono.Parse("at midnight on August 12", refDate, nil)
+		results, _ := New().WithReferenceDate(refDate).Parse("at midnight on August 12")
 
 		assert.NotEmpty(t, results)
 		result := results[0]
@@ -304,8 +300,6 @@ func TestNoonMidnightEdgeCases(t *testing.T) {
 
 // TestNoonMidnightWithTimezones tests noon/midnight with timezone expressions
 func TestNoonMidnightWithTimezones(t *testing.T) {
-	chrono := englishCasualChrono()
-
 	tests := []struct {
 		name         string
 		text         string
@@ -331,7 +325,7 @@ func TestNoonMidnightWithTimezones(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := New().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results)
 			result := results[0]

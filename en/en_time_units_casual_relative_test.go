@@ -111,9 +111,7 @@ func TestCasualRelativePositiveTimeUnits(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -194,9 +192,7 @@ func TestCasualRelativeNegativeTimeUnits(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -269,9 +265,7 @@ func TestCasualRelativePlusSign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -333,9 +327,7 @@ func TestCasualRelativeMinusSign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -402,9 +394,7 @@ func TestCasualRelativeWithoutAbbreviations(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(false) // No abbreviations
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			if !tt.shouldParse {
 				assert.Empty(t, results, "Expected NO results for: %s", tt.text)
@@ -475,9 +465,7 @@ func TestCasualRelativeNegativeCases(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -707,9 +695,7 @@ func TestExtendedNumberWords(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -889,9 +875,7 @@ func TestFractionalTimeUnits(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -1092,9 +1076,7 @@ func TestDecadeTimeUnit(t *testing.T) {
 			parser := parsers.NewENTimeUnitCasualRelativeFormatParser(true)
 			agoParser := parsers.NewENTimeUnitAgoFormatParser(false)
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser, agoParser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {

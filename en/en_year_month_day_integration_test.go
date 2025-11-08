@@ -94,14 +94,13 @@ func TestYearMonthDayNumeric(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
 
 			refDate := tt.refDate
 			if refDate.IsZero() {
 				refDate = time.Now()
 			}
 
-			results := chrono.Parse(tt.text, refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -173,9 +172,8 @@ func TestYearMonthDayWithMonthName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
 
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -262,9 +260,7 @@ func TestYearMonthDayUnlikelyPatterns(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(time.Now()).Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: %s", tt.text)
 		})
 	}
@@ -290,9 +286,7 @@ func TestYearMonthDayImpossibleDates(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
 			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			chrono := kronos.NewChrono(config)
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(time.Now()).Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: %s", tt.text)
 		})
 	}

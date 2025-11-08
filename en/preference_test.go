@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -7,6 +6,20 @@ import (
 
 	"github.com/kljensen/kronos"
 )
+
+// applyPreference applies the given preference to the parser builder
+func applyPreference(parser *kronos.ParserBuilder, pref kronos.DatePreference) *kronos.ParserBuilder {
+	switch pref {
+	case kronos.PreferPast:
+		return parser.PreferPast()
+	case kronos.PreferFuture:
+		return parser.PreferFuture()
+	case kronos.PreferCurrentPeriod:
+		return parser.PreferCurrentPeriod()
+	default:
+		return parser
+	}
+}
 
 // TestDatePreferenceWithMonth tests month-only expressions with different preferences
 func TestDatePreferenceWithMonth(t *testing.T) {
@@ -74,16 +87,13 @@ func TestDatePreferenceWithMonth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.InternalParsingOption{
-				Preference: tt.preference,
-			}
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, option)
+			parser := applyPreference(New().WithReferenceDate(refDate), tt.preference)
+			results, _ := parser.Parse(tt.input)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
 			}
 
-			result := results[0].Date()
+			result := results[0].Start().Date()
 			if result.Year() != tt.expected.Year() || result.Month() != tt.expected.Month() {
 				t.Errorf("Expected %v, got %v", tt.expected.Format("2006-01"), result.Format("2006-01"))
 			}
@@ -144,16 +154,13 @@ func TestDatePreferenceWithMonthAndDay(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.InternalParsingOption{
-				Preference: tt.preference,
-			}
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, option)
+			parser := applyPreference(New().WithReferenceDate(refDate), tt.preference)
+			results, _ := parser.Parse(tt.input)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
 			}
 
-			result := results[0].Date()
+			result := results[0].Start().Date()
 			if result.Year() != tt.expected.Year() || result.Month() != tt.expected.Month() || result.Day() != tt.expected.Day() {
 				t.Errorf("Expected %v, got %v", tt.expected.Format("2006-01-02"), result.Format("2006-01-02"))
 			}
@@ -233,16 +240,13 @@ func TestDatePreferenceWithTimeOnly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.InternalParsingOption{
-				Preference: tt.preference,
-			}
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, option)
+			parser := applyPreference(New().WithReferenceDate(refDate), tt.preference)
+			results, _ := parser.Parse(tt.input)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
 			}
 
-			result := results[0].Date()
+			result := results[0].Start().Date()
 			if !result.Equal(tt.expected) {
 				t.Errorf("Expected %v, got %v", tt.expected.Format("2006-01-02 15:04"), result.Format("2006-01-02 15:04"))
 			}
@@ -268,16 +272,13 @@ func TestDatePreferenceWithAbsoluteDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.InternalParsingOption{
-				Preference: tt.preference,
-			}
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, option)
+			parser := applyPreference(New().WithReferenceDate(refDate), tt.preference)
+			results, _ := parser.Parse(tt.input)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
 			}
 
-			result := results[0].Date()
+			result := results[0].Start().Date()
 			if result.Year() != expected.Year() || result.Month() != expected.Month() || result.Day() != expected.Day() {
 				t.Errorf("Expected %v, got %v (preference should not affect absolute dates)",
 					expected.Format("2006-01-02"), result.Format("2006-01-02"))
@@ -325,16 +326,13 @@ func TestDatePreferenceWithLittleEndianFormat(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.InternalParsingOption{
-				Preference: tt.preference,
-			}
-			chrono := englishGBChrono()
-			results := chrono.Parse(tt.input, refDate, option)
+			parser := applyPreference(NewGB().WithReferenceDate(refDate), tt.preference)
+			results, _ := parser.Parse(tt.input)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
 			}
 
-			result := results[0].Date()
+			result := results[0].Start().Date()
 			if result.Year() != tt.expected.Year() || result.Month() != tt.expected.Month() || result.Day() != tt.expected.Day() {
 				t.Errorf("Expected %v, got %v", tt.expected.Format("2006-01-02"), result.Format("2006-01-02"))
 			}
@@ -381,16 +379,13 @@ func TestDatePreferenceDoesNotAffectRelativeDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			option := &kronos.InternalParsingOption{
-				Preference: tt.preference,
-			}
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, option)
+			parser := applyPreference(New().WithReferenceDate(refDate), tt.preference)
+			results, _ := parser.Parse(tt.input)
 			if len(results) == 0 {
 				t.Fatal("Expected at least one result")
 			}
 
-			result := results[0].Date()
+			result := results[0].Start().Date()
 			if result.Year() != tt.expected.Year() || result.Month() != tt.expected.Month() || result.Day() != tt.expected.Day() {
 				t.Errorf("Expected %v, got %v (preference should not affect relative dates)",
 					tt.expected.Format("2006-01-02"), result.Format("2006-01-02"))
@@ -405,14 +400,13 @@ func TestPreferenceDefault(t *testing.T) {
 	refDate := time.Date(2015, 2, 15, 15, 30, 0, 0, time.UTC)
 
 	// Parse without specifying preference
-	chrono := englishCasualChrono()
-	results := chrono.Parse("March 15", refDate, nil)
+	results, _ := New().WithReferenceDate(refDate).Parse("March 15")
 
 	if len(results) == 0 {
 		t.Fatal("Expected at least one result")
 	}
 
-	result := results[0].Date()
+	result := results[0].Start().Date()
 	expected := time.Date(2015, 3, 15, 12, 0, 0, 0, time.UTC)
 
 	if result.Year() != expected.Year() || result.Month() != expected.Month() || result.Day() != expected.Day() {

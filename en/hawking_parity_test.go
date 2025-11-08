@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from: github.com/zoho/hawking
@@ -65,8 +64,7 @@ func TestHawkingParity_ComplexExpressions(t *testing.T) {
 				t.Skip(tt.skipReason)
 			}
 
-			chrono := createHawkingChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := createHawkingParser().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -155,9 +153,8 @@ func TestHawkingParity_ContextDisambiguation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createHawkingChrono()
 			refDate := time.Date(2024, 10, 15, 12, 0, 0, 0, time.UTC)
-			results := chrono.Parse(tt.text, refDate, nil)
+			results, _ := createHawkingParser().WithReferenceDate(refDate).Parse(tt.text)
 
 			// Skip known issues with context disambiguation
 			if !tt.shouldFind && len(results) > 0 && (tt.text == "Sun rises in the east" || tt.text == "may I help you") {
@@ -262,8 +259,7 @@ func TestHawkingParity_PrefixPostfixModifiers(t *testing.T) {
 				t.Skip(tt.skipReason)
 			}
 
-			chrono := createHawkingChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := createHawkingParser().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 			if len(results) == 0 {
@@ -316,8 +312,7 @@ func TestHawkingParity_DurationExpressions(t *testing.T) {
 				t.Skip(tt.skipReason)
 			}
 
-			chrono := createHawkingChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := createHawkingParser().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 		})
@@ -377,16 +372,15 @@ func TestHawkingParity_MultipleDetection(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := createHawkingChrono()
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := createHawkingParser().WithReferenceDate(tt.refDate).Parse(tt.text)
 
 			assert.Len(t, results, tt.expectedCount, "Expected %d date expressions in: %s", tt.expectedCount, tt.text)
 		})
 	}
 }
 
-// createHawkingChrono creates a Chrono instance for Hawking parity tests
-func createHawkingChrono() *kronos.Chrono {
+// createHawkingParser creates a ParserBuilder instance for Hawking parity tests
+func createHawkingParser() *kronos.ParserBuilder {
 	config := &kronos.Configuration{
 		Parsers: []kronos.Parser{
 			parsers.NewENCasualDateParser(),
@@ -400,5 +394,5 @@ func createHawkingChrono() *kronos.Chrono {
 			parsers.NewENTimeUnitWithinFormatParser(false),
 		},
 	}
-	return kronos.NewChrono(config)
+	return kronos.New(kronos.NewChrono(config))
 }

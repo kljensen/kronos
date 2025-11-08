@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -61,12 +60,11 @@ func TestSanitizationIntegration(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a basic English chrono parser
-			chrono := englishCasualChrono()
+			// Create a basic English parser using builder API
 			refDate := time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)
 
 			// Parse the input
-			results := chrono.Parse(tt.input, refDate, nil)
+			results, _ := New().WithReferenceDate(refDate).Parse(tt.input)
 
 			// Verify parsing behavior
 			if tt.expectParse {
@@ -85,7 +83,6 @@ func TestSanitizationIntegration(t *testing.T) {
 // TestSanitizationPreservesSemantics tests that sanitization doesn't change
 // the semantic meaning of the text, only normalizes the representation.
 func TestSanitizationPreservesSemantics(t *testing.T) {
-	chrono := englishCasualChrono()
 	refDate := time.Date(2024, 3, 10, 12, 0, 0, 0, time.UTC)
 
 	// Test that the same semantic date with different Unicode representations
@@ -109,9 +106,9 @@ func TestSanitizationPreservesSemantics(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var firstResult *kronos.InternalParsingResult
+			var firstResult kronos.Result
 			for i, input := range tc.inputs {
-				results := chrono.Parse(input, refDate, nil)
+				results, _ := New().WithReferenceDate(refDate).Parse(input)
 				if len(results) == 0 {
 					t.Errorf("Failed to parse input %d: %q. %s", i, input, tc.message)
 					continue
@@ -123,8 +120,8 @@ func TestSanitizationPreservesSemantics(t *testing.T) {
 				}
 
 				// Compare the parsed dates
-				currentDate := results[0].Date()
-				expectedDate := firstResult.Date()
+				currentDate := results[0].Start().Date()
+				expectedDate := firstResult.Start().Date()
 
 				if !currentDate.Equal(expectedDate) {
 					t.Errorf("Input %d (%q) parsed to %v, expected %v. %s",
