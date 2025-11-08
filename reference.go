@@ -96,3 +96,9 @@ func (r *referenceWithTimezone) GetTimezoneOffset() int {
 func (r *referenceWithTimezone) Instant() time.Time {
 	return r.instant
 }
+
+// TimezoneOffset returns the timezone offset in minutes, if known.
+// Returns nil if no timezone information is available.
+func (r *referenceWithTimezone) TimezoneOffset() *int {
+	return r.timezoneOffset
+}

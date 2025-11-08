@@ -53,6 +53,7 @@ func (pr *parsingResult) Date() time.Time {
 }
 
 // AddTag adds a debugging tag to both start and end components.
+// Returns the result to allow method chaining.
 func (pr *parsingResult) AddTag(tag string) *parsingResult {
 	pr.start.AddTag(tag)
 	if pr.end != nil {
@@ -107,8 +108,15 @@ func (pr *parsingResult) SetIndex(index int) {
 
 // SetStart sets the start component of the parsing result.
 // This is used by parsers and refiners to update the parsed components.
-func (pr *parsingResult) SetStart(start *parsingComponents) {
-	pr.start = start
+// The start parameter should be *parsingComponents or nil.
+func (pr *parsingResult) SetStart(start any) {
+	if start == nil {
+		pr.start = nil
+		return
+	}
+	if pc, ok := start.(*parsingComponents); ok {
+		pr.start = pc
+	}
 }
 
 // parsingResultWithBoundary wraps parsingComponents with boundary information.
