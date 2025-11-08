@@ -21,6 +21,45 @@ const (
 	singleDigitThreshold = 1
 )
 
+// parseFractionalSeconds parses a fractional seconds string and assigns the result to components.
+// Returns false if parsing fails, true otherwise (including when fracStr is empty).
+func parseFractionalSeconds(fracStr string, components *kronos.InternalParsingComponents) bool {
+	if fracStr == "" {
+		return true
+	}
+
+	// Pad or truncate to 9 digits (nanoseconds)
+	for len(fracStr) < maxNanoDigits {
+		fracStr += "0"
+	}
+	if len(fracStr) > maxNanoDigits {
+		fracStr = fracStr[:maxNanoDigits]
+	}
+
+	nanos, ok := helpers.AtoiSafe(fracStr)
+	if !ok {
+		return false
+	}
+
+	// Store as milliseconds, microseconds, and nanoseconds for compatibility
+	millisecond := nanos / 1000000
+	remainingNanos := nanos % 1000000
+	microsecond := remainingNanos / 1000
+	nanosecond := remainingNanos % 1000
+
+	if millisecond > 0 {
+		components.Assign(kronos.ComponentMillisecond, millisecond)
+	}
+	if microsecond > 0 {
+		components.Assign(kronos.ComponentMicrosecond, microsecond)
+	}
+	if nanosecond > 0 {
+		components.Assign(kronos.ComponentNanosecond, nanosecond)
+	}
+
+	return true
+}
+
 // ExtractPrimaryTimeComponents extracts time components from the primary match
 func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	context *kronos.InternalParsingContext,
@@ -122,35 +161,8 @@ func (p *AbstractTimeExpressionParser) ExtractPrimaryTimeComponents(
 	}
 
 	// Parse fractional seconds (up to nanoseconds)
-	if match[TimeFractionalSecGroup] != "" {
-		fracStr := match[TimeFractionalSecGroup]
-		// Pad or truncate to 9 digits (nanoseconds)
-		for len(fracStr) < maxNanoDigits {
-			fracStr += "0"
-		}
-		if len(fracStr) > maxNanoDigits {
-			fracStr = fracStr[:maxNanoDigits]
-		}
-		nanos, ok := helpers.AtoiSafe(fracStr)
-		if !ok {
-			return nil
-		}
-
-		// Store as milliseconds, microseconds, and nanoseconds for compatibility
-		millisecond := nanos / 1000000
-		remainingNanos := nanos % 1000000
-		microsecond := remainingNanos / 1000
-		nanosecond := remainingNanos % 1000
-
-		if millisecond > 0 {
-			components.Assign(kronos.ComponentMillisecond, millisecond)
-		}
-		if microsecond > 0 {
-			components.Assign(kronos.ComponentMicrosecond, microsecond)
-		}
-		if nanosecond > 0 {
-			components.Assign(kronos.ComponentNanosecond, nanosecond)
-		}
+	if !parseFractionalSeconds(match[TimeFractionalSecGroup], components) {
+		return nil
 	}
 
 	// Call hook if provided
@@ -190,35 +202,8 @@ func (p *AbstractTimeExpressionParser) ExtractFollowingTimeComponents(
 	}
 
 	// Parse fractional seconds (up to nanoseconds)
-	if match[TimeFractionalSecGroup] != "" {
-		fracStr := match[TimeFractionalSecGroup]
-		// Pad or truncate to 9 digits (nanoseconds)
-		for len(fracStr) < maxNanoDigits {
-			fracStr += "0"
-		}
-		if len(fracStr) > maxNanoDigits {
-			fracStr = fracStr[:maxNanoDigits]
-		}
-		nanos, ok := helpers.AtoiSafe(fracStr)
-		if !ok {
-			return nil
-		}
-
-		// Store as milliseconds, microseconds, and nanoseconds for compatibility
-		millisecond := nanos / 1000000
-		remainingNanos := nanos % 1000000
-		microsecond := remainingNanos / 1000
-		nanosecond := remainingNanos % 1000
-
-		if millisecond > 0 {
-			components.Assign(kronos.ComponentMillisecond, millisecond)
-		}
-		if microsecond > 0 {
-			components.Assign(kronos.ComponentMicrosecond, microsecond)
-		}
-		if nanosecond > 0 {
-			components.Assign(kronos.ComponentNanosecond, nanosecond)
-		}
+	if !parseFractionalSeconds(match[TimeFractionalSecGroup], components) {
+		return nil
 	}
 
 	// Check if this looks like part of a decimal range

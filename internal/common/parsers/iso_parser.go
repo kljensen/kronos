@@ -117,35 +117,8 @@ func (p *ISOFormatParser) innerExtract(context *kronos.InternalParsingContext, m
 		}
 
 		// Parse fractional seconds if present (up to nanoseconds)
-		if match[isoMillisecondGroup] != "" {
-			fracStr := match[isoMillisecondGroup]
-			// Pad or truncate to 9 digits (nanoseconds)
-			for len(fracStr) < 9 {
-				fracStr += "0"
-			}
-			if len(fracStr) > 9 {
-				fracStr = fracStr[:9]
-			}
-			nanos, err := strconv.Atoi(fracStr)
-			if err != nil {
-				return nil
-			}
-
-			// Store as milliseconds, microseconds, and nanoseconds for compatibility
-			millisecond := nanos / 1000000
-			remainingNanos := nanos % 1000000
-			microsecond := remainingNanos / 1000
-			nanosecond := remainingNanos % 1000
-
-			if millisecond > 0 {
-				components.Assign(kronos.ComponentMillisecond, millisecond)
-			}
-			if microsecond > 0 {
-				components.Assign(kronos.ComponentMicrosecond, microsecond)
-			}
-			if nanosecond > 0 {
-				components.Assign(kronos.ComponentNanosecond, nanosecond)
-			}
+		if !parseFractionalSeconds(match[isoMillisecondGroup], components) {
+			return nil
 		}
 
 		// Parse timezone if present
