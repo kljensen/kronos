@@ -154,20 +154,9 @@
 //   - Use ParseDate() instead of Parse() if you only need the first result
 //   - Consider using strict mode to reduce parser overhead
 //
-// # Custom Parsers
+// # Extensibility
 //
-// Advanced users can create custom Chrono configurations:
-//
-//	config := &kronos.Configuration{
-//	    Parsers: []kronos.Parser{
-//	        // Your custom parsers
-//	    },
-//	    Refiners: []kronos.Refiner{
-//	        // Your custom refiners
-//	    },
-//	}
-//	chrono := kronos.NewChrono(config)
-//	parser := kronos.New(chrono)
-//
-// See the Parser and Refiner interfaces for details on creating custom components.
+// The parser and refiner interfaces are used internally but not part of the public API.
+// For most use cases, the pre-configured parsers (Casual, Strict, GB) provide excellent coverage.
+// If you need additional parsing capabilities, please open an issue on GitHub.
 package kronos

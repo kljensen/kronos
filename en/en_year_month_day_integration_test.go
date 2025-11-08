@@ -1,4 +1,5 @@
 //nolint:staticcheck // SA1019 Test file uses deprecated internal APIs for testing
+
 package en
 
 // Tests ported from chrono's en_year_month_day.test.ts
@@ -23,6 +24,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/kljensen/kronos/internal/en/parsers"
 	"github.com/stretchr/testify/assert"
 )
@@ -93,14 +95,14 @@ func TestYearMonthDayNumeric(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			config := &chrono.Configuration{Parsers: []any{parser}}
 
 			refDate := tt.refDate
 			if refDate.IsZero() {
 				refDate = time.Now()
 			}
 
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(refDate).Parse(tt.text)
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -171,9 +173,9 @@ func TestYearMonthDayWithMonthName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
+			config := &chrono.Configuration{Parsers: []any{parser}}
 
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 
 			if len(results) > 0 {
@@ -259,8 +261,8 @@ func TestYearMonthDayUnlikelyPatterns(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(time.Now()).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(time.Now()).Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: %s", tt.text)
 		})
 	}
@@ -285,8 +287,8 @@ func TestYearMonthDayImpossibleDates(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			parser := parsers.NewENYearMonthDayParser(true) // strict mode
-			config := &kronos.Configuration{Parsers: []kronos.Parser{parser}}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(time.Now()).Parse(tt.text)
+			config := &chrono.Configuration{Parsers: []any{parser}}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(time.Now()).Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: %s", tt.text)
 		})
 	}

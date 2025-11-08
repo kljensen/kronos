@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/kljensen/kronos/internal/common/parsers"
 	"github.com/kljensen/kronos/internal/common/refiners"
 	enparsers "github.com/kljensen/kronos/internal/en/parsers"
@@ -49,12 +50,12 @@ func NewGB() *kronos.ParserBuilder {
 }
 
 // includeCommonConfiguration adds common parsers and refiners to a configuration.
-func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *kronos.Configuration {
+func includeCommonConfiguration(config *chrono.Configuration, strictMode bool) *chrono.Configuration {
 	// Add ISO format parser at the beginning
-	config.Parsers = append([]kronos.Parser{parsers.NewISOFormatParser()}, config.Parsers...)
+	config.Parsers = append([]any{parsers.NewISOFormatParser()}, config.Parsers...)
 
 	// Add common refiners at the beginning
-	config.Refiners = append([]kronos.Refiner{
+	config.Refiners = append([]any{
 		refiners.NewMergeWeekdayComponentRefiner(),
 		refiners.NewExtractTimezoneOffsetRefiner(),
 		refiners.NewOverlapRemovalRefiner(),
@@ -73,7 +74,7 @@ func includeCommonConfiguration(config *kronos.Configuration, strictMode bool) *
 }
 
 // createCasualConfiguration creates a casual English configuration.
-func createCasualConfiguration(littleEndian bool) *kronos.Configuration {
+func createCasualConfiguration(littleEndian bool) *chrono.Configuration {
 	config := createConfiguration(false, littleEndian)
 
 	// Add unlikely format filter for additional filtering
@@ -83,9 +84,9 @@ func createCasualConfiguration(littleEndian bool) *kronos.Configuration {
 }
 
 // createConfiguration creates a standard English configuration.
-func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
-	config := &kronos.Configuration{
-		Parsers: []kronos.Parser{
+func createConfiguration(strictMode, littleEndian bool) *chrono.Configuration {
+	config := &chrono.Configuration{
+		Parsers: []any{
 			parsers.NewSlashDateFormatParser(littleEndian),
 			enparsers.NewENTimeUnitWithinFormatParser(strictMode),
 			enparsers.NewENMonthNameLittleEndianParser(),
@@ -103,7 +104,7 @@ func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 			enparsers.NewENYearParser(),          // Add year-only parser before compact format
 			enparsers.NewENCompactFormatParser(), // Add compact format parser last as catch-all
 		},
-		Refiners: []kronos.Refiner{
+		Refiners: []any{
 			enrefiners.NewENMergeDateTimeRefiner(),
 		},
 	}
@@ -112,10 +113,10 @@ func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 	config = includeCommonConfiguration(config, strictMode)
 
 	// Add year/month/day parser at the beginning
-	config.Parsers = append([]kronos.Parser{enparsers.NewENYearMonthDayParser(strictMode)}, config.Parsers...)
+	config.Parsers = append([]any{enparsers.NewENYearMonthDayParser(strictMode)}, config.Parsers...)
 
 	// Add relative date refiners at the beginning
-	config.Refiners = append([]kronos.Refiner{
+	config.Refiners = append([]any{
 		enrefiners.NewENMergeRelativeFollowByDateRefiner(),
 		enrefiners.NewENMergeRelativeAfterDateRefiner(),
 		refiners.NewOverlapRemovalRefiner(),
@@ -135,16 +136,16 @@ func createConfiguration(strictMode, littleEndian bool) *kronos.Configuration {
 
 // Internal convenience functions for the builder API
 
-func englishCasualChrono() *kronos.Chrono {
-	return kronos.NewChrono(createCasualConfiguration(false))
+func englishCasualChrono() *chrono.Chrono {
+	return chrono.NewChrono(createCasualConfiguration(false))
 }
 
-func englishStrictChrono() *kronos.Chrono {
-	return kronos.NewChrono(createConfiguration(true, false))
+func englishStrictChrono() *chrono.Chrono {
+	return chrono.NewChrono(createConfiguration(true, false))
 }
 
-func englishGBChrono() *kronos.Chrono {
-	return kronos.NewChrono(createCasualConfiguration(true))
+func englishGBChrono() *chrono.Chrono {
+	return chrono.NewChrono(createCasualConfiguration(true))
 }
 
 // ParseSimple is a convenience function that parses text using the new builder API.

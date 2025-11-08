@@ -17,6 +17,7 @@ import (
 	"time"
 
 	kronos "github.com/kljensen/kronos"
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -74,8 +75,8 @@ func TestRelativeThisExpressions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := &kronos.Configuration{}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 		})
 	}
@@ -144,8 +145,8 @@ func TestRelativePastExpressions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config := &kronos.Configuration{}
-			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
+			config := &chrono.Configuration{}
+			results, _ := kronos.New(chrono.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 		})
 	}

@@ -2,9 +2,10 @@
 package parsers
 
 import (
-	"github.com/kljensen/kronos/internal/parsing"
 	"regexp"
 	"strconv"
+
+	"github.com/kljensen/kronos/internal/parsing"
 
 	kronos "github.com/kljensen/kronos"
 )

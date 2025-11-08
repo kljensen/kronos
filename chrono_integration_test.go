@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kljensen/kronos/internal/chrono"
+
 	"github.com/kljensen/kronos"
 	"github.com/kljensen/kronos/internal/common/parsers"
 	"github.com/stretchr/testify/assert"
@@ -14,16 +16,16 @@ import (
 func TestChronoIntegration(t *testing.T) {
 	t.Run("parse ISO date", func(t *testing.T) {
 		// Create a configuration with ISO parser
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewISOFormatParser(),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("Let's finish this before 2013-02-07")
 
@@ -39,16 +41,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("parse ISO datetime with timezone", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewISOFormatParser(),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("Event at 1994-11-05T08:15:30-05:30")
 
@@ -66,16 +68,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("parse slash date MM/DD/YYYY", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewSlashDateFormatParser(false), // US format
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("The Deadline is 8/10/2012")
 
@@ -90,16 +92,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("parse slash date DD/MM/YYYY", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewSlashDateFormatParser(true), // UK/EU format
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("The Deadline is 8/10/2012")
 
@@ -113,17 +115,17 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("multiple parsers - multiple matches", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewISOFormatParser(),
 				parsers.NewSlashDateFormatParser(false),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("Meeting on 8/10/2012 and event at 2013-02-07")
 
@@ -145,16 +147,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("ParseDate returns first result date", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewISOFormatParser(),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		date, err := kronos.New(chrono).
+		date, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			ParseDate("Event at 1994-11-05T13:15:30Z")
 
@@ -170,16 +172,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("ParseDate returns nil when no match", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewISOFormatParser(),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
-		date, err := kronos.New(chrono).
+		date, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			ParseDate("No date here")
 
@@ -188,16 +190,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("2-digit year inference", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewSlashDateFormatParser(false),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("Meeting on 12/30/16")
 
@@ -210,16 +212,16 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("year inference without year", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewSlashDateFormatParser(false),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 10, 0, 0, 0, 0, time.Local)
 
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("Meeting on 8/15")
 
@@ -233,17 +235,17 @@ func TestChronoIntegration(t *testing.T) {
 	})
 
 	t.Run("word boundaries prevent false matches", func(t *testing.T) {
-		config := &kronos.Configuration{
-			Parsers: []kronos.Parser{
+		config := &chrono.Configuration{
+			Parsers: []any{
 				parsers.NewISOFormatParser(),
 			},
 		}
 
-		chrono := kronos.NewChrono(config)
+		c := chrono.NewChrono(config)
 		refDate := time.Date(2012, 8, 8, 0, 0, 0, 0, time.Local)
 
 		// Should not match date in version number
-		results, err := kronos.New(chrono).
+		results, err := kronos.New(c).
 			WithReferenceDate(refDate).
 			Parse("Version1994-11-05T13:15:30Z released")
 
