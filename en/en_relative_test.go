@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 // Tests ported from chrono's en_relative.test.ts
@@ -76,8 +75,7 @@ func TestRelativeThisExpressions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := &kronos.Configuration{}
-			chrono := kronos.NewChrono(config)
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 		})
 	}
@@ -147,8 +145,7 @@ func TestRelativePastExpressions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			config := &kronos.Configuration{}
-			chrono := kronos.NewChrono(config)
-			results := chrono.Parse(tt.text, tt.refDate, nil)
+			results, _ := kronos.New(kronos.NewChrono(config)).WithReferenceDate(tt.refDate).Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse: %s", tt.text)
 		})
 	}

@@ -19,7 +19,6 @@ package en
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -45,11 +44,7 @@ func TestNegativeRandomNonDatePatterns(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			refDate := time.Now()
-			results := chrono.Parse(tt.text, refDate, nil)
+			results, _ := New().Parse(tt.text)
 
 			assert.Empty(t, results, "Expected NO results for: '%s', but got %d", tt.text, len(results))
 		})
@@ -76,10 +71,7 @@ func TestNegativeURLEncoded(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: '%s'", tt.text)
 		})
 	}
@@ -103,10 +95,7 @@ func TestNegativeHyphenatedNumbers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -129,10 +118,7 @@ func TestNegativeImpossibleDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -150,10 +136,7 @@ func TestNegativeImpossibleDateRanges(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -172,10 +155,7 @@ func TestNegativeVersionNumbers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -192,10 +172,7 @@ func TestNegativeIncorrectReference(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.Empty(t, results, "Expected NO results for: '%s', but got %d", tt.text, len(results))
 		})
 	}
@@ -227,10 +204,7 @@ func TestPositiveDateWithVersionNumber(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono() // was CreateCasualConfiguration(false)
-			// chrono created above
-
-			results := chrono.Parse(tt.text, time.Now(), nil)
+			results, _ := New().Parse(tt.text)
 			assert.NotEmpty(t, results, "Expected to parse date in: '%s'", tt.text)
 
 			if len(results) > 0 {

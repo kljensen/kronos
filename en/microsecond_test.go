@@ -1,4 +1,3 @@
-//nolint:staticcheck // SA1019: Must use deprecated types during transition
 package en
 
 import (
@@ -128,8 +127,7 @@ func TestMicrosecondPrecisionInTimestamps(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, nil)
+			results, _ := New().WithReferenceDate(refDate).Parse(tt.input)
 
 			assert.NotEmpty(t, results, "Should parse: %s", tt.input)
 			if len(results) == 0 {
@@ -154,7 +152,7 @@ func TestMicrosecondPrecisionInTimestamps(t *testing.T) {
 			assert.Equal(t, tt.expectedSecond, *start.Get(kronos.ComponentSecond), "Second mismatch")
 
 			// Check nanoseconds
-			actualDate := result.Date()
+			actualDate := result.Start().Date()
 			assert.Equal(t, tt.expectedNanos, actualDate.Nanosecond(), "Nanosecond mismatch")
 		})
 	}
@@ -198,8 +196,7 @@ func TestRelativeTimeWithMicroseconds(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono()
-			results := chrono.Parse(tt.input, refDate, nil)
+			results, _ := New().WithReferenceDate(refDate).Parse(tt.input)
 
 			assert.NotEmpty(t, results, "Should parse: %s", tt.input)
 			if len(results) == 0 {
@@ -207,7 +204,7 @@ func TestRelativeTimeWithMicroseconds(t *testing.T) {
 			}
 
 			result := results[0]
-			actualDate := result.Date()
+			actualDate := result.Start().Date()
 			expectedDate := refDate.Add(time.Duration(tt.expectedNanos) * time.Nanosecond)
 
 			assert.Equal(t, expectedDate, actualDate, "Date mismatch for: %s", tt.input)
@@ -292,16 +289,14 @@ func TestTrailingZerosInFractionalSeconds(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			chrono := englishCasualChrono()
-
-			results1 := chrono.Parse(tt.input1, refDate, nil)
+			results1, _ := New().WithReferenceDate(refDate).Parse(tt.input1)
 			assert.NotEmpty(t, results1)
 
-			results2 := chrono.Parse(tt.input2, refDate, nil)
+			results2, _ := New().WithReferenceDate(refDate).Parse(tt.input2)
 			assert.NotEmpty(t, results2)
 
-			date1 := results1[0].Date()
-			date2 := results2[0].Date()
+			date1 := results1[0].Start().Date()
+			date2 := results2[0].Start().Date()
 
 			assert.Equal(t, tt.expectedNanos, date1.Nanosecond(), "Input1 nanoseconds mismatch")
 			assert.Equal(t, tt.expectedNanos, date2.Nanosecond(), "Input2 nanoseconds mismatch")
