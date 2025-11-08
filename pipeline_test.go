@@ -3,12 +3,14 @@ package kronos
 import (
 	"testing"
 	"time"
+
+	"github.com/kljensen/kronos/internal/chrono"
 )
 
 func TestNewPipeline(t *testing.T) {
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 
@@ -30,8 +32,8 @@ func TestNewPipeline_NilConfig(t *testing.T) {
 
 func TestNewPipelineWithSettings(t *testing.T) {
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 
@@ -47,8 +49,8 @@ func TestNewPipelineWithSettings(t *testing.T) {
 
 func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 	settings.Timezone = "Invalid/Timezone"
@@ -62,8 +64,8 @@ func TestNewPipelineWithSettings_InvalidSettings(t *testing.T) {
 func TestPipeline_Execute_BasicParsing(t *testing.T) {
 	// This is a simplified test - full integration tests would use real parsers
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 
@@ -85,8 +87,8 @@ func TestPipeline_Execute_BasicParsing(t *testing.T) {
 
 func TestPipeline_Execute_StrictParsing(t *testing.T) {
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 	settings.StrictParsing = true
@@ -107,8 +109,8 @@ func TestPipeline_Execute_StrictParsing(t *testing.T) {
 
 func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 
@@ -133,8 +135,8 @@ func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 
 func TestParseWithSettings_InvalidSettings(t *testing.T) {
 	config := &chrono.Configuration{
-		Parsers:  []Parser{},
-		Refiners: []Refiner{},
+		Parsers:  []any{},
+		Refiners: []any{},
 	}
 	settings := DefaultSettings()
 	settings.Timezone = "Invalid/Timezone"

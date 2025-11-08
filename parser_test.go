@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kljensen/kronos/internal/chrono"
 	"github.com/stretchr/testify/assert"
 )
 

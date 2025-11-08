@@ -34,11 +34,15 @@ func newPipeline(config *chrono.Configuration, settings Settings) *pipeline {
 	// Convert []any to []Parser and []Refiner
 	parsers := make([]Parser, len(config.Parsers))
 	for i, p := range config.Parsers {
-		parsers[i] = p.(Parser)
+		if parser, ok := p.(Parser); ok {
+			parsers[i] = parser
+		}
 	}
 	refiners := make([]Refiner, len(config.Refiners))
 	for i, r := range config.Refiners {
-		refiners[i] = r.(Refiner)
+		if refiner, ok := r.(Refiner); ok {
+			refiners[i] = refiner
+		}
 	}
 
 	return &pipeline{
@@ -62,11 +66,15 @@ func newPipelineWithSettings(config *chrono.Configuration, settings Settings) (*
 	if config != nil {
 		parsers = make([]Parser, len(config.Parsers))
 		for i, p := range config.Parsers {
-			parsers[i] = p.(Parser)
+			if parser, ok := p.(Parser); ok {
+				parsers[i] = parser
+			}
 		}
 		refiners = make([]Refiner, len(config.Refiners))
 		for i, r := range config.Refiners {
-			refiners[i] = r.(Refiner)
+			if refiner, ok := r.(Refiner); ok {
+				refiners[i] = refiner
+			}
 		}
 	}
 
