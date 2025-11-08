@@ -25,18 +25,23 @@ type Timeunit string
 //	    kronos.TimeunitHour: 3,
 //	}
 const (
-	TimeunitYear        Timeunit = "year"
-	TimeunitMonth       Timeunit = "month"
-	TimeunitWeek        Timeunit = "week"
-	TimeunitDay         Timeunit = "day"
+	// Large time units
+	TimeunitDecade  Timeunit = "decade"
+	TimeunitYear    Timeunit = "year"
+	TimeunitQuarter Timeunit = "quarter"
+	TimeunitMonth   Timeunit = "month"
+
+	// Medium time units
+	TimeunitWeek Timeunit = "week"
+	TimeunitDay  Timeunit = "day"
+
+	// Small time units
 	TimeunitHour        Timeunit = "hour"
 	TimeunitMinute      Timeunit = "minute"
 	TimeunitSecond      Timeunit = "second"
 	TimeunitMillisecond Timeunit = "millisecond"
 	TimeunitMicrosecond Timeunit = "microsecond"
 	TimeunitNanosecond  Timeunit = "nanosecond"
-	TimeunitQuarter     Timeunit = "quarter"
-	TimeunitDecade      Timeunit = "decade"
 )
 
 // Bounds constants for date arithmetic.
