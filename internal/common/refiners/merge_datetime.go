@@ -9,6 +9,7 @@ import (
 )
 
 // AbstractMergeDateTimeRefiner merges date-only and time-only results.
+// This refiner preserves time ranges when merging with dates (see issue #150).
 type AbstractMergeDateTimeRefiner struct {
 	BaseMergingRefiner
 
@@ -66,7 +67,18 @@ func (r *AbstractMergeDateTimeRefiner) MergeResults(textBetween string, current,
 	if !okStart {
 		return current
 	}
-	result = context.CreateParsingResult(resultIndex, resultText, startComponents, nil)
+
+	// Preserve end components if present
+	var endComponents *kronos.InternalParsingComponents
+	if result.End() != nil {
+		var okEnd bool
+		endComponents, okEnd = helpers.AsParsingComponents(result.End())
+		if !okEnd {
+			endComponents = nil
+		}
+	}
+
+	result = context.CreateParsingResult(resultIndex, resultText, startComponents, endComponents)
 
 	return result
 }
