@@ -115,8 +115,8 @@ func (d DateOrder) String() string {
 // Use the fluent builder API for common options:
 //
 //	parser := kronos.New(en.Casual).
-//	    WithDateOrder(kronos.DateOrderDMY).
-//	    WithForwardDate(true).
+//	    DateOrder(kronos.DateOrderDMY).
+//	    PreferFuture().
 //	    Strict()
 //
 // For advanced options, use WithOption to modify settings directly:

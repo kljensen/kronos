@@ -169,8 +169,7 @@ parser := en.New().
     PreferPast().                // Prefer past dates when ambiguous
     PreferFuture().              // Prefer future dates when ambiguous
     PreferCurrentPeriod().       // Prefer current period (default)
-    Timezone(tz).                // Set default timezone
-    ForwardDate()                // Parse only forward dates (legacy)
+    Timezone(tz)                 // Set default timezone
 ```
 
 ### Parsing Methods
