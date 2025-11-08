@@ -182,25 +182,6 @@ func convertToParsingResult(context *parsingContext, result any, index int, matc
 	}
 }
 
-// parseWithSettings is a convenience function that creates a pipeline
-// and executes it with the given settings.
-//
-// Deprecated: This function exposes internal implementation details (ParsingResult).
-// Use the builder pattern API instead:
-//
-//	parser := kronos.New(chrono).WithReferenceDate(refDate)
-//	results, err := parser.Parse(text)
-//
-// This function will be removed in a future version.
-func parseWithSettings(text string, refDate time.Time, settings Settings, config *Configuration) ([]*parsingResult, error) {
-	pipeline, err := newPipelineWithSettings(config, settings)
-	if err != nil {
-		return nil, err
-	}
-
-	return pipeline.Execute(text, refDate)
-}
-
 // ParserCount returns the number of parsers in the pipeline.
 // This is useful for testing and validation.
 func (p *pipeline) ParserCount() int {

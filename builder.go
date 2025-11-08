@@ -134,8 +134,14 @@ func (p *ParserBuilder) WithOption(option func(*Settings)) *ParserBuilder {
 // Parse executes the parser on the given text and returns all found date/time results.
 // Returns an error if the settings are invalid or parsing fails.
 func (p *ParserBuilder) Parse(text string) ([]Result, error) {
-	// Use pipeline for parsing with settings
-	results, err := parseWithSettings(text, p.refDate, p.settings, p.config)
+	// Create pipeline with settings
+	pipeline, err := newPipelineWithSettings(p.config, p.settings)
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute parsing
+	results, err := pipeline.Execute(text, p.refDate)
 	if err != nil {
 		return nil, err
 	}

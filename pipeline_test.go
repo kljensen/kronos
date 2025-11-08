@@ -115,9 +115,14 @@ func TestParseWithSettings_ConvenienceFunction(t *testing.T) {
 	text := "March 15, 2020"
 	refDate := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	results, err := parseWithSettings(text, refDate, settings, config)
+	pipeline, err := newPipelineWithSettings(config, settings)
 	if err != nil {
-		t.Fatalf("parseWithSettings failed: %v", err)
+		t.Fatalf("newPipelineWithSettings failed: %v", err)
+	}
+
+	results, err := pipeline.Execute(text, refDate)
+	if err != nil {
+		t.Fatalf("pipeline.Execute failed: %v", err)
 	}
 
 	// With no parsers, we expect no results
@@ -137,9 +142,15 @@ func TestParseWithSettings_InvalidSettings(t *testing.T) {
 	text := "March 15, 2020"
 	refDate := time.Now()
 
-	_, err := parseWithSettings(text, refDate, settings, config)
+	pipeline, err := newPipelineWithSettings(config, settings)
 	if err == nil {
-		t.Error("Expected error for invalid settings")
+		t.Error("Expected error for invalid settings during pipeline creation")
+	}
+	if pipeline != nil {
+		_, err = pipeline.Execute(text, refDate)
+		if err == nil {
+			t.Error("Expected error for invalid settings during execution")
+		}
 	}
 }
 
