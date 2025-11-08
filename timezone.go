@@ -9,8 +9,7 @@ import (
 // AmbiguousTimezoneMap defines a timezone that has different offsets
 // depending on whether daylight saving time (DST) is in effect.
 //
-// Deprecated: Direct use of AmbiguousTimezoneMap is discouraged. Use the builder pattern
-// with WithOption instead:
+// This type is used with the builder pattern via WithOption for custom timezone handling:
 //
 //	customTimezones := kronos.TimezoneAbbrMap{
 //	    "ET": &kronos.AmbiguousTimezoneMap{
@@ -20,7 +19,7 @@ import (
 //	        DstEnd: func(year int) time.Time { ... },
 //	    },
 //	}
-//	parser := kronos.New(en.Casual).
+//	parser := en.New().
 //	    WithOption(func(s *kronos.Settings) {
 //	        s.TimezoneOverrides = customTimezones
 //	    })
@@ -30,14 +29,13 @@ type AmbiguousTimezoneMap = data.AmbiguousTimezoneMap
 // Values can be either a simple offset (in minutes) or an AmbiguousTimezoneMap
 // for timezones that observe DST.
 //
-// Deprecated: Direct use of TimezoneAbbrMap is discouraged. Use the builder pattern
-// with WithOption instead:
+// This type is used with the builder pattern via WithOption for custom timezone handling:
 //
 //	customTimezones := kronos.TimezoneAbbrMap{
 //	    "CUSTOM": 123,  // UTC+2:03
 //	    "TEST": -456,   // UTC-7:36
 //	}
-//	parser := kronos.New(en.Casual).
+//	parser := en.New().
 //	    WithOption(func(s *kronos.Settings) {
 //	        s.TimezoneOverrides = customTimezones
 //	    })
@@ -46,10 +44,9 @@ type TimezoneAbbrMap = data.TimezoneAbbrMap
 // DebugHandler is a function that handles debug events.
 // It receives a debug message for logging or analysis.
 //
-// Deprecated: Direct use of DebugHandler is discouraged. Use the builder pattern
-// with WithOption instead:
+// This type is used with the builder pattern via WithOption for debug logging:
 //
-//	parser := kronos.New(en.Casual).
+//	parser := en.New().
 //	    WithOption(func(s *kronos.Settings) {
 //	        s.DebugHandler = func(msg string) {
 //	            log.Printf("DEBUG: %s", msg)
