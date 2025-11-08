@@ -147,6 +147,22 @@ if results[0].End() != nil {
 }
 ```
 
+### Time Ranges
+
+Kronos can also parse time ranges within date expressions:
+
+```go
+// Time range on a specific date
+results, _ := en.ParseSimple("Wed, Nov 5, 2025 8:30 PM - 10:45 PM")
+if results[0].End() != nil {
+    start := results[0].Start().Date()  // 2025-11-05 20:30:00
+    end := results[0].End().Date()      // 2025-11-05 22:45:00
+    fmt.Printf("Event from %s to %s\n",
+        start.Format("3:04 PM"),
+        end.Format("3:04 PM"))
+}
+```
+
 ## API Overview
 
 ### Core Types

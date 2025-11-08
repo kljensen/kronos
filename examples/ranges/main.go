@@ -49,6 +49,8 @@ func main() {
 		"between March 1 and March 15",
 		"from 9am to 5pm",
 		"March 1 - March 15",
+		"Wed, Nov 5, 2025 8:30 PM - 10:45 PM",
+		"Thursday, Nov 6 2025 at 9:30 - 3:00 pm EST",
 	}
 
 	for _, expr := range rangeExpressions {
