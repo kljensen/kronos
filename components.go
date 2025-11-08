@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"maps"
 	"time"
+
+	"github.com/kljensen/kronos/internal/component"
 )
 
 // ParsingComponents represents a collection of parsed date/time components.
@@ -238,22 +240,6 @@ func (pc *parsingComponents) AssignSimilarDate(date time.Time) {
 	pc.Assign(ComponentYear, date.Year())
 }
 
-// breakdownNanoseconds splits nanoseconds into milliseconds, microseconds, and nanoseconds.
-func breakdownNanoseconds(totalNanos int) (millisecond, microsecond, nanosecond int) {
-	millisecond = totalNanos / 1000000
-	remainingNanos := totalNanos % 1000000
-	microsecond = remainingNanos / 1000
-	nanosecond = remainingNanos % 1000
-	return
-}
-
-// hourToMeridiem converts an hour (0-23) to meridiem value (0=AM, 1=PM).
-func hourToMeridiem(hour int) int {
-	if hour < 12 {
-		return 0 // AM
-	}
-	return 1 // PM
-}
 
 // setSimilarTimeComponents sets time components using the provided setter function.
 // This is used by both AssignSimilarTime and ImplySimilarTime to avoid duplication.
@@ -262,7 +248,7 @@ func setSimilarTimeComponents(date time.Time, setter func(Component, int) *parsi
 	setter(ComponentMinute, date.Minute())
 	setter(ComponentSecond, date.Second())
 
-	millisecond, microsecond, nanosecond := breakdownNanoseconds(date.Nanosecond())
+	millisecond, microsecond, nanosecond := component.BreakdownNanoseconds(date.Nanosecond())
 
 	setter(ComponentMillisecond, millisecond)
 	if microsecond > 0 {
@@ -272,7 +258,7 @@ func setSimilarTimeComponents(date time.Time, setter func(Component, int) *parsi
 		setter(ComponentNanosecond, nanosecond)
 	}
 
-	setter(ComponentMeridiem, hourToMeridiem(date.Hour()))
+	setter(ComponentMeridiem, component.HourToMeridiem(date.Hour()))
 }
 
 // AssignSimilarTime assigns (force updates) the parsing components to the same time as the target.
@@ -297,26 +283,18 @@ func (pc *parsingComponents) ImplySimilarTime(date time.Time) {
 
 // dateInLocation creates a time.Time from components in the specified location.
 func (pc *parsingComponents) dateInLocation(location *time.Location) time.Time {
-	const (
-		defaultYear  = 2000
-		defaultMonth = 1
-		defaultDay   = 1
+	return component.CreateDateInLocation(
+		pc.Get(ComponentYear),
+		pc.Get(ComponentMonth),
+		pc.Get(ComponentDay),
+		pc.Get(ComponentHour),
+		pc.Get(ComponentMinute),
+		pc.Get(ComponentSecond),
+		pc.Get(ComponentMillisecond),
+		pc.Get(ComponentMicrosecond),
+		pc.Get(ComponentNanosecond),
+		location,
 	)
-
-	year := getValueOrDefault(pc.Get(ComponentYear), defaultYear)
-	month := getValueOrDefault(pc.Get(ComponentMonth), defaultMonth)
-	day := getValueOrDefault(pc.Get(ComponentDay), defaultDay)
-	hour := getValueOrDefault(pc.Get(ComponentHour), 0)
-	minute := getValueOrDefault(pc.Get(ComponentMinute), 0)
-	second := getValueOrDefault(pc.Get(ComponentSecond), 0)
-	millisecond := getValueOrDefault(pc.Get(ComponentMillisecond), 0)
-	microsecond := getValueOrDefault(pc.Get(ComponentMicrosecond), 0)
-	nanosecond := getValueOrDefault(pc.Get(ComponentNanosecond), 0)
-
-	// Calculate total nanoseconds from milliseconds, microseconds, and nanoseconds
-	totalNanos := (millisecond * 1000000) + (microsecond * 1000) + nanosecond
-
-	return time.Date(year, time.Month(month), day, hour, minute, second, totalNanos, location)
 }
 
 // componentsAdapter adapts an internal ParsingComponents to implement the public Components interface.
@@ -348,12 +326,4 @@ func (c *componentsAdapter) Date() time.Time {
 // This is exposed for testing purposes to verify parser behavior.
 func (c *componentsAdapter) Tags() map[string]bool {
 	return c.components.Tags()
-}
-
-// Helper function to get value or default
-func getValueOrDefault(ptr *int, defaultVal int) int {
-	if ptr == nil {
-		return defaultVal
-	}
-	return *ptr
 }
