@@ -339,7 +339,6 @@ func uniqueStrings(slice []string) []string {
 	return result
 }
 
-
 // Example output format for the API surface report
 func ExampleTestAPIExports() {
 	// This example shows the expected output format

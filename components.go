@@ -240,7 +240,6 @@ func (pc *parsingComponents) AssignSimilarDate(date time.Time) {
 	pc.Assign(ComponentYear, date.Year())
 }
 
-
 // setSimilarTimeComponents sets time components using the provided setter function.
 // This is used by both AssignSimilarTime and ImplySimilarTime to avoid duplication.
 func setSimilarTimeComponents(date time.Time, setter func(Component, int) *parsingComponents) {

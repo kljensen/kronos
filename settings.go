@@ -1,8 +1,8 @@
 package kronos
 
 import (
-	"maps"
 	"fmt"
+	"maps"
 	"time"
 )
 
