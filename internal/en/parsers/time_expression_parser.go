@@ -24,8 +24,9 @@ func NewENTimeExpressionParser(strictMode bool) *ENTimeExpressionParser {
 				return `(?:(?:at|from)\s*)?` // Optional "at" or "from" prefix
 			},
 			func() string {
-				// En dash (–) is Unicode U+2013, represented as literal character in regexp
-				return `\s*(?:\-|–|\~|to|until|through|till|\?)\s*` // Range separator
+				// En dash (–) is U+2013, em dash (—) is U+2014
+				// Support single/double/triple hyphens, en-dash, em-dash
+				return `\s*(?:\-{1,3}|–|—|\~|to|until|through|till|\?)\s*` // Range separator
 			},
 			strictMode,
 		),

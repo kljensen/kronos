@@ -119,6 +119,30 @@ func TestDateTimeRangeP1SeparatorVariations(t *testing.T) {
 			wantStart: time.Date(2025, 11, 5, 20, 30, 0, 0, time.UTC),
 			wantEnd:   time.Date(2025, 11, 5, 22, 45, 0, 0, time.UTC),
 		},
+		{
+			name:      "Double hyphen separator",
+			text:      "Nov 5, 2025 8:30 PM -- 10:45 PM",
+			wantStart: time.Date(2025, 11, 5, 20, 30, 0, 0, time.UTC),
+			wantEnd:   time.Date(2025, 11, 5, 22, 45, 0, 0, time.UTC),
+		},
+		{
+			name:      "Triple hyphen separator",
+			text:      "Nov 5, 2025 8:30 PM --- 10:45 PM",
+			wantStart: time.Date(2025, 11, 5, 20, 30, 0, 0, time.UTC),
+			wantEnd:   time.Date(2025, 11, 5, 22, 45, 0, 0, time.UTC),
+		},
+		{
+			name:      "En-dash separator",
+			text:      "Nov 5, 2025 8:30 PM – 10:45 PM",
+			wantStart: time.Date(2025, 11, 5, 20, 30, 0, 0, time.UTC),
+			wantEnd:   time.Date(2025, 11, 5, 22, 45, 0, 0, time.UTC),
+		},
+		{
+			name:      "Em-dash separator",
+			text:      "Nov 5, 2025 8:30 PM — 10:45 PM",
+			wantStart: time.Date(2025, 11, 5, 20, 30, 0, 0, time.UTC),
+			wantEnd:   time.Date(2025, 11, 5, 22, 45, 0, 0, time.UTC),
+		},
 	}
 
 	for _, tt := range tests {
