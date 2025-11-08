@@ -124,6 +124,8 @@ type Reference interface {
 
 // Result represents a parsed date/time result.
 // This interface provides access to the matched text, position, and parsed components.
+//
+//nolint:interfacebloat // Result needs comprehensive methods for parser/refiner implementations
 type Result interface {
 	// Index returns the position in the input text where this result was found.
 	Index() int
@@ -165,6 +167,8 @@ type Result interface {
 // Option represents parsing options.
 // This interface provides access to configuration like forward date mode,
 // date preferences, and timezone maps.
+//
+//nolint:iface // Option is the base interface; Settings extends it for future needs
 type Option interface {
 	// ForwardDate returns true if only forward dates should be parsed.
 	ForwardDate() bool
@@ -183,8 +187,10 @@ type Option interface {
 }
 
 // Settings represents comprehensive parsing settings.
-// This is a more complete version of Option that includes all configuration.
+// This extends Option with additional configuration.
 // It may be nil if only basic options were provided.
+//
+//nolint:iface // Settings is designed for future extensibility beyond Option
 type Settings interface {
 	Option
 	// Additional methods can be added here as needed

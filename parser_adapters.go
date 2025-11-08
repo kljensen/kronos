@@ -1,3 +1,4 @@
+//nolint:revive // Adapter methods implement parser package interfaces
 package kronos
 
 import (
@@ -15,6 +16,7 @@ type optionAdapter struct {
 	opt parsingOption
 }
 
+//nolint:revive // Implementing parser.Option interface
 func (o *optionAdapter) ForwardDate() bool       { return o.opt.ForwardDate }
 func (o *optionAdapter) Preference() int         { return int(o.opt.Preference) }
 func (o *optionAdapter) DateOrder() int          { return int(o.opt.DateOrder) }
@@ -33,7 +35,7 @@ var _ parser.Context = (*contextAdapter)(nil)
 var _ parser.Reference = (*referenceWithTimezone)(nil)
 var _ parser.Option = (*optionAdapter)(nil)
 
-// Implement parser.Context interface
+//nolint:revive // Implementing parser.Context interface
 func (ca *contextAdapter) Text() string {
 	return ca.ctx.Text()
 }
@@ -72,6 +74,7 @@ type settingsAdapter struct {
 	settings *Settings
 }
 
+//nolint:revive // Implementing parser.Settings interface
 func (s *settingsAdapter) ForwardDate() bool         { opt := s.settings.toparsingOption(nil); return opt.ForwardDate }
 func (s *settingsAdapter) Preference() int           { opt := s.settings.toparsingOption(nil); return int(opt.Preference) }
 func (s *settingsAdapter) DateOrder() int            { opt := s.settings.toparsingOption(nil); return int(opt.DateOrder) }
@@ -90,6 +93,7 @@ type parserResultAdapter struct {
 // Ensure parserResultAdapter implements parser.Result
 var _ parser.Result = (*parserResultAdapter)(nil)
 
+//nolint:revive // Implementing parser.Result interface
 func (ra *parserResultAdapter) Index() int                { return ra.result.Index() }
 func (ra *parserResultAdapter) Text() string              { return ra.result.Text() }
 func (ra *parserResultAdapter) Start() any                { return ra.result.Start() }
